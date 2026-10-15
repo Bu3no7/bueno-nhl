@@ -406,12 +406,16 @@ async function loadDate(dateStr) {
   });
 
   // rosters for games without usable pbp rosters (future games return empty rosterSpots)
+  // NOTE: /roster/{team}/current 307-redirects to an absolute api-web.nhle.com URL,
+  // which escapes the same-origin proxy and dies on CORS. Use the season path directly.
   const needRoster = games.filter((g, i) => !pbps[i] || !(pbps[i].rosterSpots || []).length);
   const rosterTeams = [...new Set(needRoster.flatMap((g) => [g.awayTeam.abbrev, g.homeTeam.abbrev]))];
+  const [ry, rm] = dateStr.split('-').map(Number);
+  const seasonId = `${rm >= 7 ? ry : ry - 1}${(rm >= 7 ? ry : ry - 1) + 1}`;
   const rosterMap = {};
   await limitedMap(rosterTeams, 4, async (t) => {
     try {
-      const r = await fetchJSON(`${API}/roster/${t}/current`);
+      const r = await fetchJSON(`${API}/roster/${t}/${seasonId}`);
       rosterMap[t] = [...(r.forwards || []), ...(r.defensemen || [])];
     } catch (e) { rosterMap[t] = []; }
   });
