@@ -1321,4 +1321,11 @@ async function boot(isReload, date) {
 }
 
 startAutoRefresh();
+// default the picker to today (local date); the HTML ships a stale fallback value
+(() => {
+  const n = new Date();
+  const t = `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, '0')}-${String(n.getDate()).padStart(2, '0')}`;
+  const dp = $('datePicker');
+  if (dp && t >= dp.min && t <= dp.max) dp.value = t;
+})();
 boot(false, $('datePicker').value);
