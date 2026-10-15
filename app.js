@@ -291,10 +291,89 @@ function zoneShareFor(shots) {
 }
 
 /* ---------------- data loading ---------------- */
+/* ---------------- player landing cache ----------------
+   Landings are ~25KB each and change at most once a day. Keep a slimmed copy
+   in localStorage (date-stamped, per player) so return visits skip ~220
+   network fetches. Data cache only — no identifiers, no cross-site use,
+   consistent with the site's no-tracking stance. */
+const LS_PLAYER_PREFIX = 'bueno-pl-v1-';
+const LS_SWEEP_KEY = 'bueno-pl-v1-sweep';
+function lsToday() {
+  const n = new Date();
+  return `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, '0')}-${String(n.getDate()).padStart(2, '0')}`;
+}
+function slimLanding(d) {
+  // keep exactly what skaterSeason() and the goalie save-pct lookup consume
+  const sub = (d.featuredStats && d.featuredStats.regularSeason && d.featuredStats.regularSeason.subSeason) || {};
+  return {
+    sub: {
+      gamesPlayed: sub.gamesPlayed || 0,
+      goals: sub.goals || 0,
+      shots: sub.shots || 0,
+      assists: sub.assists || 0,
+      points: sub.points || 0,
+      powerPlayGoals: sub.powerPlayGoals || 0,
+      powerPlayPoints: sub.powerPlayPoints || 0,
+      savePctg: sub.savePctg || 0,
+    },
+    totals: (d.seasonTotals || [])
+      .filter((t) => t.gameTypeId === 2 && t.avgToi)
+      .map((t) => ({ season: t.season, avgToi: t.avgToi })),
+    last5: d.last5Games || [],
+  };
+}
+function unslimLanding(s) {
+  return {
+    featuredStats: { regularSeason: { subSeason: s.sub || {} } },
+    seasonTotals: (s.totals || []).map((t) => ({ gameTypeId: 2, season: t.season, avgToi: t.avgToi })),
+    last5Games: s.last5 || [],
+  };
+}
+function lsGetPlayer(pid) {
+  try {
+    const raw = localStorage.getItem(LS_PLAYER_PREFIX + pid);
+    if (!raw) return null;
+    const env = JSON.parse(raw);
+    if (!env || env.date !== lsToday() || !env.d) return null;
+    return unslimLanding(env.d);
+  } catch (e) { return null; }
+}
+function lsSetPlayer(pid, d) {
+  try {
+    localStorage.setItem(LS_PLAYER_PREFIX + pid, JSON.stringify({ date: lsToday(), d: slimLanding(d) }));
+  } catch (e) { /* quota / private mode: skip */ }
+}
+function lsSweepPlayers() {
+  // drop stale-dated entries once per day so old keys can't eat the quota
+  try {
+    const today = lsToday();
+    if (localStorage.getItem(LS_SWEEP_KEY) === today) return;
+    const stale = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && k.indexOf(LS_PLAYER_PREFIX) === 0) {
+        let drop = true;
+        try {
+          const env = JSON.parse(localStorage.getItem(k));
+          drop = !env || env.date !== today || !env.d;
+        } catch (e) { /* drop */ }
+        if (drop) stale.push(k);
+      }
+    }
+    for (const k of stale) localStorage.removeItem(k);
+    localStorage.setItem(LS_SWEEP_KEY, today);
+  } catch (e) { /* ignore */ }
+}
 async function getPlayer(pid) {
   if (state.playerCache.has(pid)) return state.playerCache.get(pid);
+  const cached = lsGetPlayer(pid);
+  if (cached) {
+    state.playerCache.set(pid, cached);
+    return cached;
+  }
   const d = await fetchJSON(`${API}/player/${pid}/landing`);
   state.playerCache.set(pid, d);
+  lsSetPlayer(pid, d);
   return d;
 }
 
@@ -327,29 +406,38 @@ function skaterSeason(d) {
   };
 }
 
-async function recentFinalGameIds(teamAbbrev, beforeDate, maxN) {
-  // scan previous 7 days of schedule for completed games involving team
-  const ids = [];
+async function recentFinalsByTeam(beforeDate, maxN) {
+  // Fetch each of the last 7 dates ONCE (one date's schedule covers all teams),
+  // then index completed finals by team — newest first, trimmed to maxN per team.
+  // This replaces one-scan-per-team (up to 22 teams x 7 dates = 154 requests).
   const base = new Date(beforeDate + 'T12:00:00Z');
-  for (let back = 1; back <= 7 && ids.length < maxN; back++) {
+  const dates = [];
+  for (let back = 1; back <= 7; back++) {
     const dt = new Date(base.getTime() - back * 86400000);
-    const ds = dt.toISOString().slice(0, 10);
-    try {
-      const sched = await fetchJSON(`${API}/schedule/${ds}`);
-      for (const w of (sched.gameWeek || [])) {
-        if (w.date !== ds) continue;
-        for (const g of (w.games || [])) {
-          const st = g.gameState;
-          if ((st === 'OFF' || st === 'FINAL') &&
-              (g.awayTeam.abbrev === teamAbbrev || g.homeTeam.abbrev === teamAbbrev)) {
-            ids.push(g.id);
-            if (ids.length >= maxN) break;
-          }
+    dates.push(dt.toISOString().slice(0, 10));
+  }
+  const scheds = await limitedMap(dates, 4, async (ds) => {
+    try { return await fetchJSON(`${API}/schedule/${ds}`); }
+    catch (e) { return null; }
+  });
+  const byTeam = {};
+  dates.forEach((ds, i) => {
+    const sched = scheds[i];
+    if (!sched) return;
+    for (const w of (sched.gameWeek || [])) {
+      if (w.date !== ds) continue;
+      for (const g of (w.games || [])) {
+        const st = g.gameState;
+        if (st === 'OFF' || st === 'FINAL') {
+          const a = g.awayTeam.abbrev, h = g.homeTeam.abbrev;
+          (byTeam[a] = byTeam[a] || []).push(g.id);
+          (byTeam[h] = byTeam[h] || []).push(g.id);
         }
       }
-    } catch (e) { /* skip bad days */ }
-  }
-  return ids;
+    }
+  });
+  for (const t of Object.keys(byTeam)) byTeam[t] = byTeam[t].slice(0, maxN);
+  return byTeam;
 }
 
 function shotsFromPbp(pbp, playerId) {
@@ -398,6 +486,7 @@ async function loadDate(dateStr) {
     renderEmpty('No NHL games scheduled for this date.');
     return;
   }
+  lsSweepPlayers(); // drop yesterday's cached landings so they can't eat quota
 
   // play-by-play per game (null for unstarted)
   const pbps = await limitedMap(games, 4, async (g) => {
@@ -420,12 +509,11 @@ async function loadDate(dateStr) {
     } catch (e) { rosterMap[t] = []; }
   });
 
-  // zone data: recent finals per team (max 2) + tonight's pbp
+  // zone data: recent finals per team (max 1) + tonight's pbp
   const teams = [...new Set(games.flatMap((g) => [g.awayTeam.abbrev, g.homeTeam.abbrev]))];
+  const recentByTeam = await recentFinalsByTeam(dateStr, 1);
   const recentIds = {};
-  await limitedMap(teams, 4, async (t) => {
-    recentIds[t] = await recentFinalGameIds(t, dateStr, 2);
-  });
+  for (const t of teams) recentIds[t] = recentByTeam[t] || [];
   const zonePbps = {};
   const allZoneIds = [...new Set(Object.values(recentIds).flat())];
   await limitedMap(allZoneIds, 4, async (id) => {
@@ -441,7 +529,7 @@ async function loadDate(dateStr) {
     const { id } = goalieForGame(pbp);
     if (!id) return;
     try {
-      const gl = await fetchJSON(`${API}/player/${id}/landing`);
+      const gl = await getPlayer(id);
       const sub = gl.featuredStats?.regularSeason?.subSeason || {};
       goalieSv[g.id] = sub.savePctg || 0.900;
     } catch (e) { goalieSv[g.id] = 0.900; }
