@@ -405,8 +405,8 @@ async function loadDate(dateStr) {
     catch (e) { return null; }
   });
 
-  // rosters for games without pbp (future games)
-  const needRoster = games.filter((g, i) => !pbps[i]);
+  // rosters for games without usable pbp rosters (future games return empty rosterSpots)
+  const needRoster = games.filter((g, i) => !pbps[i] || !(pbps[i].rosterSpots || []).length);
   const rosterTeams = [...new Set(needRoster.flatMap((g) => [g.awayTeam.abbrev, g.homeTeam.abbrev]))];
   const rosterMap = {};
   await limitedMap(rosterTeams, 4, async (t) => {
@@ -447,7 +447,7 @@ async function loadDate(dateStr) {
   const skaterDefs = []; // {pid, name, pos, team, gameId, headshot}
   games.forEach((g, i) => {
     const pbp = pbps[i];
-    if (pbp && pbp.rosterSpots) {
+    if (pbp && (pbp.rosterSpots || []).length) {
       for (const r of pbp.rosterSpots) {
         if (r.positionCode === 'G') continue;
         const teamAb = r.teamId === pbp.homeTeam.id ? pbp.homeTeam.abbrev : pbp.awayTeam.abbrev;
