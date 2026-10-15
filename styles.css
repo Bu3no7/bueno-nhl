@@ -347,6 +347,16 @@ td .pname img.pavatar {
   box-shadow: 0 0 8px rgba(58, 219, 227, .4);
 }
 
+/* scorer highlight on the projection board: row tint + glowing name + goal badge */
+tr.scored { background: var(--teal-wash); }
+tr.scored td:first-child .pname { color: #8ff5f7; text-shadow: 0 0 14px rgba(58, 219, 227, .55); }
+.goal-badge {
+  display: inline-block; margin-left: .45rem; padding: .1rem .45rem;
+  font-size: .68rem; font-weight: 700; letter-spacing: .04em;
+  color: #062b2d; background: linear-gradient(180deg, #5eead4, var(--teal));
+  border-radius: 99px; vertical-align: middle; white-space: nowrap;
+}
+
 /* ---------- longshots ---------- */
 .longshots-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: .8rem; }
 .ls-card {

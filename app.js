@@ -765,6 +765,22 @@ function extractGoals(pbp, game) {
     .sort((a, b) => b.order - a.order); // newest first
 }
 
+// Anytime-goal scorer counts for one game: playerId -> goals scored.
+// Shootout goals are excluded (periodType 'SO'), matching anytime-goal
+// semantics and the Live feed's goal-type logic. No new fetches.
+function scorerCounts(game) {
+  const counts = {};
+  const pbp = game && game.pbp;
+  if (!pbp) return counts;
+  for (const p of (pbp.plays || [])) {
+    if (p.typeDescKey !== 'goal') continue;
+    if ((p.periodDescriptor || {}).periodType === 'SO') continue;
+    const id = (p.details || {}).scoringPlayerId;
+    if (id) counts[id] = (counts[id] || 0) + 1;
+  }
+  return counts;
+}
+
 function goalItemHtml(gl) {
   const perLabel = gl.periodType === 'OT' ? 'OT' : gl.periodType === 'SO' ? 'SO' : `P${gl.period}`;
   const assists = gl.assists.length
@@ -1085,9 +1101,14 @@ function sortedSkaters() {
 
 function renderBoard() {
   const tb = $('boardBody');
-  tb.innerHTML = sortedSkaters().map((r) => `
-    <tr>
-      <td>${pnameBtn(r)}
+  const scorerByGame = {};
+  for (const g of state.games) scorerByGame[g.id] = scorerCounts(g);
+  tb.innerHTML = sortedSkaters().map((r) => {
+    const ng = (scorerByGame[r.gameId] || {})[r.pid] || 0;
+    const badge = ng ? `<span class="goal-badge">${ng > 1 ? ng + 'G' : 'GOAL'}</span>` : '';
+    return `
+    <tr${ng ? ' class="scored"' : ''}>
+      <td>${pnameBtn(r)}${badge}
         <div class="prob-bar"><i style="width:${Math.min(100, r.p * 100 * 2.5)}%"></i></div></td>
       <td><span class="team-cell"><img src="${teamLogoUrl(r.team)}" alt="" ${imgFallback}>${esc(r.team)}</span></td>
       <td>${esc(r.pos)}</td>
@@ -1097,7 +1118,8 @@ function renderBoard() {
       <td class="num">${r.gp ? r.sogpg.toFixed(1) : '–'}</td>
       <td class="num">${fmtToi(r.toiMin)}</td>
       <td class="num">${Math.round(r.zone.share * 100)}${r.zone.lowSample ? '*' : ''}</td>
-    </tr>`).join('');
+    </tr>`;
+  }).join('');
   tb.querySelectorAll('.pname').forEach((b) =>
     b.addEventListener('click', () => openPlayer(b.dataset.pid, b.dataset.gid)));
 }
@@ -1377,6 +1399,7 @@ async function refreshScores() {
   }
   if (state.view === 'slate') renderSlate();
   if (state.view === 'goals') renderGoals();
+  if (state.view === 'board') renderBoard();
 }
 
 function setView(v) {
