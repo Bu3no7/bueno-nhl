@@ -522,6 +522,8 @@ async function loadDate(dateStr) {
     try { zonePbps[id] = await fetchJSON(`${API}/gamecenter/${id}/play-by-play`); }
     catch (e) { /* skip */ }
   });
+  state.zonePbps = zonePbps;   // recent finals, reused by matchup goalie panels (no refetch)
+  state.recentIds = recentIds; // teamAbbrev -> [recent final gameIds]
 
   // goalie save pct per game
   const goalieSv = {};
@@ -1155,6 +1157,170 @@ function cmpRow(aV, hV, lower) {
   return aBetter ? 'a' : 'h';
 }
 
+/* ---------------- goalie vulnerability (matchup card) ----------------
+   Where each goalie gets beaten: goal locations from already-loaded pbps
+   (tonight's + recent finals kept in state), plus which shooter positions
+   beat him. Zero new requests — everything is in memory.
+   Orientation note: normalizeShot() is reused for consistency with the
+   player shot charts; since a goal must come from the offensive zone, x is
+   mirrored to +x when normalization misses (homeTeamDefendingSide is no
+   longer sent by the API), so every goal-against lands in the attacking
+   half. Side labels are from the goalie's perspective facing the shooter. */
+let pendingGoalieDraw = []; // [{canvasId, goals}] filled by goalieSectionHtml, drawn after inject
+
+function goalieStarter(pbp, teamAbbrev) {
+  // starting goalie for teamAbbrev: first goalieInNetId seen defending for them
+  if (!pbp) return null;
+  const home = pbp.homeTeam || {}, away = pbp.awayTeam || {};
+  if (teamAbbrev !== home.abbrev && teamAbbrev !== away.abbrev) return null;
+  const info = {};
+  for (const r of (pbp.rosterSpots || [])) {
+    if (r.positionCode !== 'G') continue;
+    info[r.playerId] = { name: `${r.firstName.default} ${r.lastName.default}`, teamId: r.teamId };
+  }
+  const idToAbbrev = {};
+  if (home.id != null) idToAbbrev[home.id] = home.abbrev;
+  if (away.id != null) idToAbbrev[away.id] = away.abbrev;
+  for (const p of (pbp.plays || [])) {
+    const gid = (p.details || {}).goalieInNetId;
+    const gi = gid && info[gid];
+    if (!gi) continue;
+    if (idToAbbrev[gi.teamId] === teamAbbrev) return { id: gid, name: gi.name };
+  }
+  return null;
+}
+
+function panelGoalie(g, teamAbbrev) {
+  // tonight's starter when the game has begun, else the most recent starter
+  const pbp = g.pbp;
+  if (pbp && (pbp.plays || []).length) {
+    const s = goalieStarter(pbp, teamAbbrev);
+    if (s) return { ...s, tag: 'Confirmed' };
+  }
+  const ids = (state.recentIds || {})[teamAbbrev] || [];
+  for (const id of ids) {
+    const s = goalieStarter((state.zonePbps || {})[id], teamAbbrev);
+    if (s) return { ...s, tag: 'Projected' };
+  }
+  return { id: null, name: 'TBD', tag: null };
+}
+
+function goalsAgainstGoalie(goalieId) {
+  // every non-shootout goal with this goalie in net, across tonight's + recent pbps
+  const out = [];
+  if (!goalieId) return out;
+  const pbps = [];
+  for (const g of state.games) if (g.pbp) pbps.push(g.pbp);
+  for (const id of Object.keys(state.zonePbps || {})) pbps.push(state.zonePbps[id]);
+  const seen = new Set(), posOf = {};
+  for (const pbp of pbps) {
+    if (!pbp || seen.has(pbp)) continue;
+    seen.add(pbp);
+    for (const r of (pbp.rosterSpots || [])) posOf[r.playerId] = r.positionCode;
+  }
+  for (const s of state.skaters) if (!posOf[s.pid]) posOf[s.pid] = s.pos;
+  for (const pbp of seen) {
+    const homeId = (pbp.homeTeam || {}).id;
+    const homeDefSide = pbp.homeTeamDefendingSide;
+    for (const p of (pbp.plays || [])) {
+      if (p.typeDescKey !== 'goal') continue;
+      if ((p.periodDescriptor || {}).periodType === 'SO') continue;
+      const det = p.details || {};
+      if (det.goalieInNetId !== goalieId) continue;
+      let x = null, y = null;
+      if (det.xCoord != null && det.yCoord != null) {
+        const n = normalizeShot(det.xCoord, det.yCoord, det.eventOwnerTeamId, homeId, homeDefSide);
+        x = Math.abs(n.x); y = n.y;
+      }
+      out.push({ x, y, pos: posOf[det.scoringPlayerId] || null });
+    }
+  }
+  return out;
+}
+
+function goalZoneLabel(x, y) {
+  // net at (89,0); side from the goalie's perspective facing the shooter
+  const side = y < -10 ? "goalie's right" : y > 10 ? "goalie's left" : 'middle';
+  let zone;
+  if (x >= 82) zone = 'in tight';
+  else if (x <= 89 && Math.hypot(89 - x, y) < 30) zone = 'the slot';
+  else if (x < 55) zone = 'the point';
+  else zone = 'mid-range';
+  return side === 'middle' ? zone : `${zone}, ${side}`;
+}
+function topZone(goals) {
+  const counts = {};
+  for (const gl of goals) {
+    if (gl.x == null) continue;
+    const z = goalZoneLabel(gl.x, gl.y);
+    counts[z] = (counts[z] || 0) + 1;
+  }
+  const top = Object.entries(counts).sort((a, b) => b[1] - a[1])[0];
+  return top ? top[0] : null;
+}
+
+const GOALIE_POS = ['C', 'LW', 'RW', 'D'];
+const POS_FIX = { C: 'C', L: 'LW', R: 'RW', D: 'D' };
+function goaliePosCounts(goals) {
+  const c = { C: 0, LW: 0, RW: 0, D: 0 };
+  for (const gl of goals) {
+    const l = POS_FIX[gl.pos];
+    if (l) c[l]++;
+  }
+  return c;
+}
+
+function goaliePanelHtml(g, teamAbbrev) {
+  const pg = panelGoalie(g, teamAbbrev);
+  const tag = pg.tag ? `<span class="g-tag">${esc(pg.tag)}</span>` : '';
+  if (!pg.id) {
+    return `<div class="goalie-panel"><div class="goalie-head"><strong>${esc(pg.name)}</strong>${tag}
+      <span class="muted small">${esc(teamAbbrev)}</span></div>
+      <div class="muted small">No goalie data yet.</div></div>`;
+  }
+  const goals = goalsAgainstGoalie(pg.id);
+  const n = goals.length;
+  const canvasId = `grink-${teamAbbrev}-${g.id}`;
+  pendingGoalieDraw.push({ canvasId, goals });
+  const zone = topZone(goals);
+  const pc = goaliePosCounts(goals);
+  const pTot = GOALIE_POS.reduce((a, k) => a + pc[k], 0);
+  const segs = GOALIE_POS.map((k) => pc[k]
+    ? `<div class="pos-seg pos-${k}" style="width:${(pc[k] / pTot * 100).toFixed(1)}%" title="${k}: ${pc[k]}"></div>` : '').join('');
+  const legs = GOALIE_POS.map((k) => pc[k]
+    ? `<span class="pos-leg"><i class="pos-dot pos-${k}"></i>${k} ${pc[k]}</span>` : '').join('');
+  const sample = n < 10 ? `<div class="muted small">Small sample — ${n} goal${n === 1 ? '' : 's'} charted.</div>` : '';
+  const map = goals.some((gl) => gl.x != null)
+    ? `<canvas class="grink" id="${canvasId}"></canvas>`
+    : `<div class="muted small">No located goals charted.</div>`;
+  return `<div class="goalie-panel">
+    <div class="goalie-head"><strong>${esc(pg.name)}</strong>${tag}<span class="muted small">${esc(teamAbbrev)}</span></div>
+    ${map}
+    ${zone ? `<div class="goalie-zone">Most beaten: <strong>${esc(zone)}</strong></div>` : ''}
+    ${pTot ? `<div class="posbar" aria-label="Goals by shooter position">${segs}</div>
+    <div class="pos-legend">${legs}</div>` : ''}
+    ${sample}
+  </div>`;
+}
+
+function goalieSectionHtml(g) {
+  pendingGoalieDraw = [];
+  return `<h4 class="tape-title">Goalies</h4>
+  <div class="goalie-panels">
+    ${goaliePanelHtml(g, g.away)}
+    ${goaliePanelHtml(g, g.home)}
+  </div>`;
+}
+
+function drawGoalieRinks() {
+  for (const d of pendingGoalieDraw) {
+    const cv = document.getElementById(d.canvasId);
+    if (!cv) continue;
+    drawRink(cv, d.goals.filter((gl) => gl.x != null).map((gl) => ({ x: gl.x, y: gl.y, goal: true })), '#d4a017');
+  }
+  pendingGoalieDraw = [];
+}
+
 function matchupHtml(g, lamA, lamB, wp, st) {
   const A = g.away, H = g.home;
   const sa = st ? st[A] : null, sh = st ? st[H] : null;
@@ -1208,7 +1374,8 @@ function matchupHtml(g, lamA, lamB, wp, st) {
     ${tapeRow(streak(sa), 'Streak', streak(sh), null)}
     ${tapeRow(l10rec(sa), 'Last 10', l10rec(sh), cmpRow(l10A, l10H))}
   </div>
-  <p class="muted small matchup-note">Win % from each team's Poisson scoring rate (regulation ties split evenly). Team stats via NHL standings, cached per date.</p>`;
+  ${goalieSectionHtml(g)}
+  <p class="muted small matchup-note">Win % from each team's Poisson scoring rate (regulation ties split evenly). Team stats via NHL standings, cached per date. Goalie maps chart non-shootout goals with this goalie in net, from tonight's and recent games.</p>`;
 }
 
 async function openMatchup(gameId) {
@@ -1219,10 +1386,12 @@ async function openMatchup(gameId) {
   const wp = matchupWinProb(lamA, lamB);
   // show win prob + projection immediately; fill in standings when they arrive
   $('matchupBody').innerHTML = matchupHtml(g, lamA, lamB, wp, null);
+  drawGoalieRinks();
   $('matchupModal').classList.remove('hidden');
   const st = await getStandings();
   if (!$('matchupModal').classList.contains('hidden')) {
     $('matchupBody').innerHTML = matchupHtml(g, lamA, lamB, wp, st);
+    drawGoalieRinks();
   }
 }
 function closeMatchup() { $('matchupModal').classList.add('hidden'); }
