@@ -1,4 +1,4 @@
-# Deploying the NHL Goal Model site
+# Deploying the Bueno Sports site
 
 Pure static files — no build step, no backend, no API keys. The one
 infrastructure requirement: the NHL API doesn't send CORS headers, so the

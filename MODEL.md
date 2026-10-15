@@ -1,4 +1,4 @@
-# NHL Goal Model — static site edition
+# Bueno Sports — NHL model (static site edition)
 
 A factor-based Poisson model estimating each skater's **anytime-goal
 probability** for tonight's games. All data comes from the public NHL API,
