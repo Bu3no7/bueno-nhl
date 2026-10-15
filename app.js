@@ -88,7 +88,8 @@ const state = {
   games: [],          // {id, away, home, awayId, homeId, state, startUTC, pbp}
   skaters: [],        // computed model rows
   playerCache: new Map(),
-  view: 'anytime',
+  view: 'goalprobs',
+  goalType: 'atg',    // 'atg' | 'twoplus' | 'firstgoal'
   sortBy: 'prob',
   teamFilter: '',
   refreshTimer: null,
@@ -575,9 +576,7 @@ function renderEmpty(msg) {
   $('boardBody').innerHTML = '';
   $('longshotsList').innerHTML = '';
   if ($('goalsFeed')) $('goalsFeed').innerHTML = '';
-  if ($('anytimeBody')) $('anytimeBody').innerHTML = '';
-  if ($('firstgoalBody')) $('firstgoalBody').innerHTML = '';
-  if ($('twoplusBody')) $('twoplusBody').innerHTML = '';
+  if ($('goalprobsBody')) $('goalprobsBody').innerHTML = '';
   if ($('marketsWrap')) $('marketsWrap').innerHTML = '';
 }
 
@@ -767,34 +766,37 @@ function wirePnameClicks(tbody) {
     b.addEventListener('click', () => openPlayer(b.dataset.pid, b.dataset.gid)));
 }
 
-function renderFirstGoal() {
-  const tb = $('firstgoalBody');
+/* ---------------- consolidated goal-probabilities view ----------------
+   One "Goals" tab; the goalTypeSelect dropdown switches between
+   anytime (ATG), 2+ goals, and first-goal tables. */
+const GOALPROB_SUBS = {
+  atg: 'Ranked by model probability &middot; fair no-vig odds.',
+  twoplus: 'Probability of scoring at least twice.',
+  firstgoal: "Each skater's share of their matchup's scoring rate.",
+};
+function renderGoalProbs() {
+  const tb = $('goalprobsBody');
   if (!tb) return;
-  tb.innerHTML = probTableHtml(firstGoalProbs(), 'fgP', 'fgFair');
-  wirePnameClicks(tb);
-}
-
-function renderTwoPlus() {
-  const tb = $('twoplusBody');
-  if (!tb) return;
-  tb.innerHTML = probTableHtml(twoPlusProbs(), 'tpP', 'tpFair');
-  wirePnameClicks(tb);
-}
-
-/* ---------------- anytime-goals view ---------------- */
-function renderAnytime() {
-  const tb = $('anytimeBody');
-  if (!tb) return;
-  const rows = state.skaters.slice().sort((a, b) => b.p - a.p);
-  tb.innerHTML = rows.map((r) => `
+  const sel = $('goalTypeSelect');
+  const type = sel ? sel.value : state.goalType;
+  state.goalType = type;
+  if (type === 'twoplus') {
+    tb.innerHTML = probTableHtml(twoPlusProbs(), 'tpP', 'tpFair');
+  } else if (type === 'firstgoal') {
+    tb.innerHTML = probTableHtml(firstGoalProbs(), 'fgP', 'fgFair');
+  } else {
+    const rows = state.skaters.slice().sort((a, b) => b.p - a.p);
+    tb.innerHTML = rows.map((r) => `
     <tr>
       <td>${pnameBtn(r)}</td>
       <td><span class="team-cell"><img src="${teamLogoUrl(r.team)}" alt="" ${imgFallback}>${esc(r.team)}</span></td>
       <td class="num"><strong>${pct1(r.p)}</strong></td>
       <td class="num">${r.fair}</td>
     </tr>`).join('');
-  tb.querySelectorAll('.pname').forEach((b) =>
-    b.addEventListener('click', () => openPlayer(b.dataset.pid, b.dataset.gid)));
+  }
+  const sub = $('goalprobsSub');
+  if (sub) sub.innerHTML = GOALPROB_SUBS[type] || GOALPROB_SUBS.atg;
+  wirePnameClicks(tb);
 }
 
 function renderSlate() {
@@ -1109,9 +1111,7 @@ function renderAll() {
   renderSlate();
   renderGoals();
   renderBoard();
-  renderAnytime();
-  renderFirstGoal();
-  renderTwoPlus();
+  renderGoalProbs();
   renderLongshots();
   renderMarkets();
   renderParlay();
@@ -1291,6 +1291,8 @@ function runSims() {
 document.querySelectorAll('.tab').forEach((t) =>
   t.addEventListener('click', () => setView(t.dataset.view)));
 $('sortSelect').addEventListener('change', (e) => { state.sortBy = e.target.value; renderBoard(); });
+const goalTypeSelect = $('goalTypeSelect');
+if (goalTypeSelect) goalTypeSelect.addEventListener('change', (e) => { state.goalType = e.target.value; renderGoalProbs(); });
 $('teamFilter').addEventListener('change', (e) => applyTeamFilter(e.target.value));
 const mktFilter = $('mktTeamFilter');
 if (mktFilter) mktFilter.addEventListener('change', (e) => applyTeamFilter(e.target.value));

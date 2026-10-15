@@ -133,6 +133,11 @@ input[type="date"] { padding: .35rem .5rem; font-size: .82rem; }
 input[type="number"] { width: 5.5rem; font-variant-numeric: tabular-nums; }
 select:disabled { opacity: .45; }
 
+#goalTypeSelect {
+  min-height: 2.75rem; min-width: 10rem; font-size: 1rem; font-weight: 600;
+  cursor: pointer;
+}
+
 button:focus-visible, a:focus-visible, summary:focus-visible,
 input:focus-visible, select:focus-visible {
   outline: 2px solid var(--teal); outline-offset: 2px; border-radius: 6px;

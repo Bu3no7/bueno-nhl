@@ -30,9 +30,7 @@
     <div class="nav-group">
       <span class="nav-label">Run</span>
       <div class="nav-grid">
-        <button class="tab active" data-view="anytime" role="tab">Anytime</button>
-        <button class="tab" data-view="firstgoal" role="tab">First goal</button>
-        <button class="tab" data-view="twoplus" role="tab">2+ goals</button>
+        <button class="tab active" data-view="goalprobs" role="tab">Goals</button>
         <button class="tab" data-view="sims" role="tab">Sims</button>
         <button class="tab" data-view="markets" role="tab">Markets</button>
         <button class="tab" data-view="longshots" role="tab">Longshots</button>
@@ -43,7 +41,7 @@
       <span class="nav-label">Review</span>
       <div class="nav-grid">
         <button class="tab" data-view="slate" role="tab">Slate</button>
-        <button class="tab" data-view="goals" role="tab">Goals</button>
+        <button class="tab" data-view="goals" role="tab">Live</button>
         <button class="tab" data-view="board" role="tab">Board</button>
       </div>
     </div>
@@ -111,55 +109,28 @@
     <p class="muted small">Probabilities are model anytime-goal estimates. See <a href="MODEL.md">MODEL.md</a> for the exact formula.</p>
   </section>
 
-  <section id="view-anytime" class="view active">
+  <section id="view-goalprobs" class="view active">
     <div class="view-head">
       <div>
         <p class="kicker">Probabilities</p>
-        <h2>Anytime goals</h2>
-        <p class="view-sub muted">Ranked by model probability &middot; fair no-vig odds.</p>
+        <h2>Goals</h2>
+        <p id="goalprobsSub" class="view-sub muted">Ranked by model probability &middot; fair no-vig odds.</p>
       </div>
+      <label class="small muted">Type
+        <select id="goalTypeSelect">
+          <option value="atg" selected>Anytime goals</option>
+          <option value="twoplus">2+ goals</option>
+          <option value="firstgoal">First goal</option>
+        </select>
+      </label>
     </div>
     <div class="table-wrap">
       <table>
         <thead><tr><th>Skater</th><th>Team</th><th class="num">Prob</th><th class="num">Fair</th></tr></thead>
-        <tbody id="anytimeBody"></tbody>
+        <tbody id="goalprobsBody"></tbody>
       </table>
     </div>
-    <p class="muted small">Model anytime-goal probability with no-vig fair American odds. See <a href="MODEL.md">MODEL.md</a> for the exact formula.</p>
-  </section>
-
-  <section id="view-firstgoal" class="view">
-    <div class="view-head">
-      <div>
-        <p class="kicker">Probabilities</p>
-        <h2>First goal</h2>
-        <p class="view-sub muted">Each skater's share of their matchup's scoring rate.</p>
-      </div>
-    </div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Skater</th><th>Team</th><th class="num">Prob</th><th class="num">Fair</th></tr></thead>
-        <tbody id="firstgoalBody"></tbody>
-      </table>
-    </div>
-    <p class="muted small">First-goal probability = the skater's goal rate ÷ the sum of every skater's rate in that game. See <a href="MODEL.md">MODEL.md</a> for the exact formula.</p>
-  </section>
-
-  <section id="view-twoplus" class="view">
-    <div class="view-head">
-      <div>
-        <p class="kicker">Probabilities</p>
-        <h2>2+ goals</h2>
-        <p class="view-sub muted">Probability of scoring at least twice.</p>
-      </div>
-    </div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Skater</th><th>Team</th><th class="num">Prob</th><th class="num">Fair</th></tr></thead>
-        <tbody id="twoplusBody"></tbody>
-      </table>
-    </div>
-    <p class="muted small">From each skater's Poisson goal rate: 1 − e<sup>−λ</sup> − λe<sup>−λ</sup>. See <a href="MODEL.md">MODEL.md</a> for the exact formula.</p>
+    <p class="muted small">Model goal probabilities with no-vig fair American odds. See <a href="MODEL.md">MODEL.md</a> for the exact formulas.</p>
   </section>
 
   <section id="view-sims" class="view">
