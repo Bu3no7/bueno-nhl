@@ -1,0 +1,19 @@
+# Netlify deploy config for the NHL Goal Model static site.
+#
+# The NHL API (api-web.nhle.com) does not send CORS headers, so browsers
+# refuse direct cross-origin fetch() calls. This rewrite proxies the API
+# through the same origin, which the browser happily allows. No functions,
+# no build step — plain static hosting + one rewrite rule.
+
+[[redirects]]
+  from = "/nhl-api/*"
+  to = "https://api-web.nhle.com/v1/:splat"
+  status = 200
+  force = true
+
+# Long cache for the immutable image CDN is unnecessary (images load
+# straight from assets.nhle.com in the browser). Keep HTML fresh:
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=60"
