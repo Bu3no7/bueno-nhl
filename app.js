@@ -77,6 +77,7 @@ const state = {
   sortBy: 'prob',
   teamFilter: '',
   refreshTimer: null,
+  parlay: [],         // {key, name, team, label, prob, fair}
 };
 
 /* ---------------- utils ---------------- */
@@ -151,6 +152,103 @@ function computeProb(s, hdShare, oppSv) {
   };
 }
 
+/* ---------------- markets: shots / assists / points over-under ----------------
+   Each skater gets a Poisson rate per market:
+     shots   λ = shots on goal per game
+     assists λ = assists per game
+     points  λ = points (goals + assists) per game
+   P(over n.5) = 1 − Σ_{k=0}^{n} e^(−λ) λ^k / k!
+   Fair American odds come from the same fairOdds() as anytime goals.
+   No calibration history or learned multipliers here — raw rates only.
+------------------------------------------------------------------------------ */
+const MARKET_LINES = {
+  shots: [1.5, 2.5, 3.5],
+  assists: [0.5, 1.5, 2.5, 3.5],
+  points: [0.5, 1.5, 2.5],
+};
+const MARKET_META = {
+  shots: { label: 'Shots on goal', short: 'SOG', unit: 'SOG', rateKey: 'sogpg', last5Key: 'shots' },
+  assists: { label: 'Assists', short: 'AST', unit: 'A', rateKey: 'apg', last5Key: 'assists' },
+  points: { label: 'Points', short: 'PTS', unit: 'P', rateKey: 'ptspg', last5Key: 'points' },
+};
+
+function fact(n) { let f = 1; for (let i = 2; i <= n; i++) f *= i; return f; }
+function poissonPmf(k, lam) {
+  if (lam <= 0) return k === 0 ? 1 : 0;
+  return Math.exp(-lam) * Math.pow(lam, k) / fact(k);
+}
+// P(X > n.5) = P(X >= n+1) = 1 − Σ_{k=0}^{n} pmf(k)
+function pOverLine(lam, n) {
+  let s = 0;
+  for (let k = 0; k <= n; k++) s += poissonPmf(k, lam);
+  return clamp(1 - s, 0, 1);
+}
+function fairOddsSafe(p) {
+  if (!(p > 0.0005) || !(p < 0.9995)) return '–';
+  return fairOdds(p);
+}
+
+function computeMarkets(s) {
+  const out = {};
+  for (const kind of Object.keys(MARKET_LINES)) {
+    const lam = s[MARKET_META[kind].rateKey] || 0;
+    out[kind] = MARKET_LINES[kind].map((line) => {
+      const over = pOverLine(lam, Math.floor(line));
+      return {
+        line, lam, over, under: 1 - over,
+        overFair: fairOddsSafe(over), underFair: fairOddsSafe(1 - over),
+      };
+    });
+  }
+  return out;
+}
+function marketOver(r, kind, line) {
+  const m = (r.markets[kind] || []).find((x) => x.line === line);
+  return m ? m.over : 0;
+}
+
+/* ---------------- beat/miss snapshots ----------------
+   Compact per-line rationale: lean, one-line beat case, one-line miss case,
+   grounded in season rate, last-5 hit rate, ice time, and PP involvement. */
+function marketSnapshot(r, kind, line, over) {
+  const meta = MARKET_META[kind];
+  const rate = r[meta.rateKey] || 0;
+  const vals = (r.last5 || []).slice(0, 5).map((x) => x[meta.last5Key] || 0);
+  const n = vals.length;
+  const hitN = vals.filter((v) => v > line).length;
+  const last2 = vals.slice(0, 2).reduce((a, b) => a + b, 0);
+  const edge = Math.abs(over - 0.5);
+  const lean = (edge >= 0.18 ? 'Strong ' : edge >= 0.08 ? '' : 'Slight ') + (over >= 0.5 ? 'OVER' : 'UNDER');
+
+  let beat;
+  if (rate >= line + 0.75) beat = `Averaging ${rate.toFixed(1)} ${meta.unit}/g — clears ${line} with room`;
+  else if (n >= 4 && hitN >= 3) beat = `Beat ${line} in ${hitN} of last ${n}`;
+  else if (kind === 'assists' && (r.ppp || 0) >= 4) beat = `${r.ppp} power-play points — PP time feeds helpers`;
+  else if (r.toiMin >= 19) beat = `Heavy minutes (${fmtToi(r.toiMin)} avg) fuel ${meta.unit} volume`;
+  else if (last2 > line) beat = `Heating up: ${last2} ${meta.unit} in last 2`;
+  else beat = `Ceiling case: ${rate.toFixed(1)} ${meta.unit}/g season rate`;
+
+  let miss;
+  if (rate < line) miss = `Averaging ${rate.toFixed(1)} ${meta.unit}/g — sits below the line`;
+  else if (n >= 4 && (n - hitN) >= 3) miss = `Missed in ${n - hitN} of last ${n}`;
+  else if (r.toiMin < 14) miss = `Limited role (${fmtToi(r.toiMin)} avg) caps ${meta.unit}`;
+  else miss = `Cold patch: just ${last2} ${meta.unit} in last 2`;
+
+  return { lean, leanOver: over >= 0.5, beat, miss };
+}
+
+/* ---------------- parlay math (fair odds, no-vig) ---------------- */
+function americanToDecimal(o) {
+  const v = parseFloat(String(o).replace(/−/g, '-').replace('+', ''));
+  if (!isFinite(v) || v === 0) return null;
+  return v > 0 ? 1 + v / 100 : 1 + 100 / Math.abs(v);
+}
+function decimalToAmerican(d) {
+  if (!isFinite(d) || d <= 1.0001) return '–';
+  if (d >= 2) return '+' + Math.round((d - 1) * 100);
+  return '−' + Math.round(100 / (d - 1));
+}
+
 /* ---------------- shot zones ---------------- */
 // Normalize so the shooting team always attacks +x (net at x=89).
 function normalizeShot(x, y, shooterTeamId, homeId, homeDefSide) {
@@ -190,15 +288,22 @@ function skaterSeason(d) {
     }
   }
   const gp = sub.gamesPlayed || 0;
-  if (!gp) return { gp: 0, goals: 0, shots: 0, ppg: 0, toiMin: 12, last5: [] }; // rookie prior-ish
+  if (!gp) return { gp: 0, goals: 0, shots: 0, assists: 0, points: 0, ppg: 0, ppp: 0, toiMin: 12, last5: [], sogpg: 0, apg: 0, ptspg: 0 }; // rookie prior-ish
+  const assists = sub.assists || 0;
+  const points = sub.points || 0;
   return {
     gp,
     goals: sub.goals || 0,
     shots: sub.shots || 0,
+    assists,
+    points,
     ppg: sub.powerPlayGoals || 0,
+    ppp: sub.powerPlayPoints || 0,
     toiMin: parseToi(avgToi) || 12,
     last5: d.last5Games || [],
     sogpg: (sub.shots || 0) / gp,
+    apg: assists / gp,
+    ptspg: points / gp,
   };
 }
 
@@ -383,7 +488,7 @@ async function loadDate(dateStr) {
   // compute model rows
   state.skaters = defs.map((d, i) => {
     const land = landings[i];
-    const s = land ? skaterSeason(land) : { gp: 0, goals: 0, shots: 0, ppg: 0, toiMin: 12, last5: [] };
+    const s = land ? skaterSeason(land) : { gp: 0, goals: 0, shots: 0, assists: 0, points: 0, ppg: 0, ppp: 0, toiMin: 12, last5: [], sogpg: 0, apg: 0, ptspg: 0 };
     const z = zoneShareFor(zoneByPid[d.pid + ':' + d.gameId] || []);
     const g = games.find((gg) => gg.id === d.gameId);
     const oppAbbr = (d.team === g.awayTeam.abbrev) ? g.homeTeam.abbrev : g.awayTeam.abbrev;
@@ -394,6 +499,7 @@ async function loadDate(dateStr) {
       p: m.p, lam: m.lam, factors: m.factors,
       fair: fairOdds(m.p),
       isLongshot: m.p <= LONGSHOT_P,
+      markets: computeMarkets(s),
       shots: zoneByPid[d.pid + ':' + d.gameId] || [],
     };
   });
@@ -528,12 +634,111 @@ function renderLongshots() {
     b.addEventListener('click', () => openPlayer(b.dataset.pid, b.dataset.gid)));
 }
 
+/* ---------------- markets view ---------------- */
+const MARKET_HEADLINE = { shots: 2.5, assists: 0.5, points: 1.5 };
+
+function renderMarkets() {
+  const wrap = $('marketsWrap');
+  if (!wrap) return;
+  let rows = state.skaters.slice();
+  if (state.teamFilter) rows = rows.filter((r) => r.team === state.teamFilter);
+  wrap.innerHTML = ['shots', 'assists', 'points'].map((kind) => {
+    const meta = MARKET_META[kind];
+    const sorted = rows.slice()
+      .sort((a, b) => marketOver(b, kind, MARKET_HEADLINE[kind]) - marketOver(a, kind, MARKET_HEADLINE[kind]))
+      .slice(0, 80);
+    const body = sorted.map((r) => `
+      <tr>
+        <td><button class="pname" data-pid="${r.pid}" data-gid="${r.gameId}">${esc(r.name)}</button></td>
+        <td><span class="team-cell"><img src="${teamLogoUrl(r.team)}" alt="" ${imgFallback}>${esc(r.team)}</span></td>
+        ${r.markets[kind].map((m) => `
+          <td class="num"><strong>${pct1(m.over)}</strong><div class="small muted">${m.overFair}</div></td>`).join('')}
+      </tr>`).join('');
+    return `<h3 class="mkt-title">${meta.label} <span class="muted small">over / under · Poisson λ from ${meta.short}/game</span></h3>
+      <div class="table-wrap"><table><thead><tr><th>Skater</th><th>Team</th>
+      ${MARKET_LINES[kind].map((l) => `<th class="num">o${l}</th>`).join('')}</tr></thead>
+      <tbody>${body || `<tr><td colspan="${2 + MARKET_LINES[kind].length}" class="muted">No skaters.</td></tr>`}</tbody></table></div>`;
+  }).join('');
+  wrap.querySelectorAll('.pname').forEach((b) =>
+    b.addEventListener('click', () => openPlayer(b.dataset.pid, b.dataset.gid)));
+}
+
+/* ---------------- parlay builder ---------------- */
+function addParlayLeg(r, v) {
+  let leg;
+  if (v === 'atg') {
+    if (!(r.p > 0.0005)) return;
+    leg = { key: `${r.pid}:atg`, name: r.name, team: r.team, label: 'Anytime goal', prob: r.p, fair: r.fair };
+  } else {
+    const [kind, lineStr] = String(v).split('|');
+    const line = parseFloat(lineStr);
+    const m = (r.markets[kind] || []).find((x) => x.line === line);
+    if (!m || !(m.over > 0.0005) || m.overFair === '–') return;
+    leg = { key: `${r.pid}:${kind}:${line}`, name: r.name, team: r.team, label: `${MARKET_META[kind].label} o${line}`, prob: m.over, fair: m.overFair };
+  }
+  if (!state.parlay.some((l) => l.key === leg.key)) state.parlay.push(leg);
+  closePlayer();
+  setView('parlay');
+  renderParlay();
+}
+
+function renderParlay() {
+  const el = $('parlayLegs');
+  if (!el) return;
+  if (!state.parlay.length) {
+    el.innerHTML = '<p class="muted">No legs yet — open any player card and use the parlay dropdown to add one.</p>';
+  } else {
+    el.innerHTML = state.parlay.map((l, i) => `
+      <div class="parlay-leg">
+        <div><strong>${esc(l.name)}</strong> <span class="muted">${esc(l.team)} · ${esc(l.label)}</span></div>
+        <div class="num">${pct1(l.prob)} <span class="muted">(${esc(l.fair)})</span><button class="linklike" data-i="${i}" aria-label="Remove leg">✕</button></div>
+      </div>`).join('');
+    el.querySelectorAll('.linklike').forEach((b) => b.addEventListener('click', () => {
+      state.parlay.splice(+b.dataset.i, 1);
+      renderParlay();
+    }));
+  }
+  renderParlayTotals();
+}
+
+function renderParlayTotals() {
+  const box = $('parlayTotals');
+  if (!box) return;
+  const stake = Math.max(0, parseFloat(($('parlayStake') || {}).value) || 0);
+  const decs = state.parlay.map((l) => americanToDecimal(l.fair)).filter((d) => d && d > 1);
+  if (!state.parlay.length || decs.length !== state.parlay.length || !stake) {
+    box.innerHTML = '<p class="muted small">Add legs and a stake to see the math.</p>';
+    return;
+  }
+  const dec = decs.reduce((a, b) => a * b, 1);
+  const joint = state.parlay.reduce((a, l) => a * l.prob, 1);
+  box.innerHTML = `
+    <div class="totals-grid">
+      <div><div class="t-label">Combined odds</div><div class="t-val">${decimalToAmerican(dec)}</div></div>
+      <div><div class="t-label">Payout</div><div class="t-val">$${(stake * dec).toFixed(2)}</div></div>
+      <div><div class="t-label">Profit</div><div class="t-val">$${(stake * (dec - 1)).toFixed(2)}</div></div>
+      <div><div class="t-label">Implied prob</div><div class="t-val">${pct1(1 / dec)}</div></div>
+      <div><div class="t-label">Model hit rate</div><div class="t-val">${pct1(joint)}</div></div>
+    </div>
+    <p class="muted small">Same-game legs are correlated — books may restrict or shade these, and the joint model rate assumes independence. Fair (no-vig) odds. Not betting advice.</p>`;
+}
+
 function populateTeamFilter() {
   const sel = $('teamFilter');
   const teams = [...new Set(state.skaters.map((r) => r.team))].sort();
-  sel.innerHTML = '<option value="">All teams</option>' +
+  const opts = '<option value="">All teams</option>' +
     teams.map((t) => `<option value="${t}">${t}</option>`).join('');
+  sel.innerHTML = opts;
+  const mkt = $('mktTeamFilter');
+  if (mkt) mkt.innerHTML = opts;
   state.teamFilter = '';
+}
+function applyTeamFilter(v) {
+  state.teamFilter = v;
+  if ($('teamFilter')) $('teamFilter').value = v;
+  if ($('mktTeamFilter')) $('mktTeamFilter').value = v;
+  renderBoard();
+  renderMarkets();
 }
 
 /* ---------------- player card ---------------- */
@@ -589,6 +794,33 @@ function openPlayer(pid, gameId) {
   const l5s = l5.reduce((a, x) => a + (x.shots || 0), 0);
   const factorRows = r.factors.map((f) => `
     <tr><td>${esc(f.label)}</td><td>${esc(f.value)}${f.mult != null ? ` <span class="muted">×${f.mult.toFixed(2)}</span>` : ''}</td></tr>`).join('');
+
+  // markets + beat/miss snapshots
+  const marketsHtml = ['shots', 'assists', 'points'].map((kind) => {
+    const meta = MARKET_META[kind];
+    const rows = r.markets[kind].map((m) => {
+      const snap = marketSnapshot(r, kind, m.line, m.over);
+      return `<div class="snap">
+        <div class="snap-top"><strong>o${m.line}</strong>
+          <span>${pct1(m.over)} <span class="muted">(${m.overFair})</span></span>
+          <span class="lean ${snap.leanOver ? 'lean-over' : 'lean-under'}">${esc(snap.lean)}</span></div>
+        <div class="snap-line"><span class="snap-arrow up">▲</span>${esc(snap.beat)}</div>
+        <div class="snap-line"><span class="snap-arrow dn">▼</span>${esc(snap.miss)}</div>
+        <div class="snap-under muted small">u${m.line} ${pct1(m.under)} (${m.underFair})</div>
+      </div>`;
+    }).join('');
+    return `<h4 class="mkt-h">${meta.label} <span class="muted small">λ ${r.markets[kind][0].lam.toFixed(2)}/g</span></h4>${rows}`;
+  }).join('');
+
+  // parlay leg picker
+  const legOpts = [`<option value="atg">Anytime goal — ${pct1(r.p)} (${r.fair})</option>`];
+  for (const kind of ['shots', 'assists', 'points']) {
+    for (const m of r.markets[kind]) {
+      if (m.overFair === '–') continue;
+      legOpts.push(`<option value="${kind}|${m.line}">${esc(MARKET_META[kind].label)} o${m.line} — ${pct1(m.over)} (${m.overFair})</option>`);
+    }
+  }
+
   $('modalBody').innerHTML = `
     <div class="pc-head">
       <img class="headshot" src="${esc(r.headshot)}" alt="" ${imgFallback}>
@@ -606,7 +838,13 @@ function openPlayer(pid, gameId) {
       <tr><td>Expected goals (λ)</td><td>${r.lam.toFixed(3)}</td></tr>
       <tr><td>Opponent</td><td>${esc(r.oppAbbr)} goalie ${(r.oppSv * 100).toFixed(1)}% SV</td></tr>
     </table>
-    <p class="small muted">Season: ${r.goals}G / ${r.gp}GP · Last 5: ${l5g}G, ${l5s} SOG${r.zone.lowSample ? ' · <em>zone share uses league-average (small sample)</em>' : ''}</p>
+    <p class="small muted">Season: ${r.goals}G ${r.assists}A ${r.points}P / ${r.gp}GP · Last 5: ${l5g}G, ${l5s} SOG${r.zone.lowSample ? ' · <em>zone share uses league-average (small sample)</em>' : ''}</p>
+    <h4 style="margin:.8rem 0 .2rem">Markets <span class="muted small">Poisson over/under</span></h4>
+    ${marketsHtml}
+    <div class="parlay-add">
+      <select id="parlayLegSelect" aria-label="Choose a parlay leg">${legOpts.join('')}</select>
+      <button class="btn" id="parlayAddBtn">Add to parlay</button>
+    </div>
     <h4 style="margin:.6rem 0 .2rem">Shot map <span class="muted small">recent games, attacking →</span></h4>
     <canvas class="rink" id="rinkCanvas"></canvas>
     <div class="legend"><span><span class="dot" style="background:#2f6fed"></span>attempt</span>
@@ -614,6 +852,7 @@ function openPlayer(pid, gameId) {
       <span><span class="dot" style="border:2px dashed #e8a13d;background:none"></span>high-danger zone</span></div>`;
   $('playerModal').classList.remove('hidden');
   drawRink($('rinkCanvas'), r.shots, '#2f6fed');
+  $('parlayAddBtn').addEventListener('click', () => addParlayLeg(r, $('parlayLegSelect').value));
 }
 
 function closePlayer() { $('playerModal').classList.add('hidden'); }
@@ -623,6 +862,8 @@ function renderAll() {
   renderSlate();
   renderBoard();
   renderLongshots();
+  renderMarkets();
+  renderParlay();
 }
 
 async function refreshScores() {
@@ -658,7 +899,11 @@ function startAutoRefresh() {
 document.querySelectorAll('.tab').forEach((t) =>
   t.addEventListener('click', () => setView(t.dataset.view)));
 $('sortSelect').addEventListener('change', (e) => { state.sortBy = e.target.value; renderBoard(); });
-$('teamFilter').addEventListener('change', (e) => { state.teamFilter = e.target.value; renderBoard(); });
+$('teamFilter').addEventListener('change', (e) => applyTeamFilter(e.target.value));
+const mktFilter = $('mktTeamFilter');
+if (mktFilter) mktFilter.addEventListener('change', (e) => applyTeamFilter(e.target.value));
+const stakeInput = $('parlayStake');
+if (stakeInput) stakeInput.addEventListener('input', renderParlayTotals);
 $('refreshBtn').addEventListener('click', () => boot(true));
 $('datePicker').addEventListener('change', (e) => boot(true, e.target.value || state.date));
 $('modalClose').addEventListener('click', closePlayer);

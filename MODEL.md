@@ -81,6 +81,58 @@ fewer than 5 located attempts fall back to the league-neutral `0.30`
 A skater is a longshot when the model's fair odds are **+500 or longer**
 (`p ≤ 1/6`). The Longshots view ranks them by model probability.
 
+## Markets (shots / assists / points over-under)
+
+Each skater gets a Poisson rate per market, straight from season averages
+(no adjustments, no calibration history):
+
+```
+λ_shots   = SHOTS / GP
+λ_assists = ASSISTS / GP
+λ_points  = POINTS / GP
+```
+
+Over/under probabilities for a half-goal line `n.5`:
+
+```
+P(over n.5)  = 1 − Σ_{k=0}^{n} e^(−λ) · λ^k / k!
+P(under n.5) = 1 − P(over n.5)
+```
+
+Lines offered:
+
+| Market  | Lines                  |
+|---------|------------------------|
+| Shots   | over/under 1.5, 2.5, 3.5 |
+| Assists | over/under 0.5, 1.5, 2.5, 3.5 |
+| Points  | over/under 0.5, 1.5, 2.5 |
+
+Fair American odds per line use the same conversion as anytime goals.
+Player cards add a compact beat/miss snapshot per line — the lean
+(over/under), a one-line beat case, and a one-line miss case, grounded in
+the skater's season rate, last-5 hit rate, ice time, and power-play
+involvement.
+
+## Parlay builder
+
+Legs are added from any player card (anytime goal or a specific
+over/under). All legs use fair (no-vig) American odds.
+
+```
+decimal_i        = 1 + odds/100            (odds > 0)
+                 = 1 + 100/|odds|          (odds < 0)
+combined decimal = Π decimal_i
+combined American: decimal ≥ 2 → +round((decimal − 1) × 100)
+                   decimal < 2 → −round(100 / (decimal − 1))
+payout           = stake × combined decimal
+profit           = stake × (combined decimal − 1)
+implied prob     = 1 / combined decimal
+model hit rate   = Π leg probabilities
+```
+
+Legs from the same game are correlated — the joint model rate assumes
+independence, and real books may restrict or shade same-game legs.
+
 ## Data sources (all public, no keys)
 
 - Schedule/scores: `api-web.nhle.com/v1/schedule/YYYY-MM-DD`

@@ -27,7 +27,9 @@
   <nav class="tabs" role="tablist">
     <button class="tab active" data-view="slate" role="tab">Slate</button>
     <button class="tab" data-view="board" role="tab">Projection Board</button>
+    <button class="tab" data-view="markets" role="tab">Markets</button>
     <button class="tab" data-view="longshots" role="tab">Longshots</button>
+    <button class="tab" data-view="parlay" role="tab">Parlay</button>
   </nav>
 </header>
 
@@ -77,6 +79,28 @@
   <section id="view-longshots" class="view">
     <div class="view-head"><h2>Longshots <span class="muted small">model fair odds +500 or longer</span></h2></div>
     <div id="longshotsList" class="longshots-list"></div>
+  </section>
+
+  <section id="view-markets" class="view">
+    <div class="view-head">
+      <h2>Markets <span class="muted small">Poisson over/under</span></h2>
+      <label class="small muted">Team
+        <select id="mktTeamFilter"><option value="">All teams</option></select>
+      </label>
+    </div>
+    <div id="marketsWrap"></div>
+    <p class="muted small">Over probabilities from each skater's Poisson rate (shots, assists, points per game). Tap a name for beat/miss snapshots. See <a href="MODEL.md">MODEL.md</a> for the exact formula.</p>
+  </section>
+
+  <section id="view-parlay" class="view">
+    <div class="view-head">
+      <h2>Parlay builder</h2>
+      <label class="small muted">Stake $
+        <input type="number" id="parlayStake" value="10" min="0" step="1">
+      </label>
+    </div>
+    <div id="parlayLegs"></div>
+    <div id="parlayTotals" style="margin-top:.8rem"></div>
   </section>
 </main>
 
