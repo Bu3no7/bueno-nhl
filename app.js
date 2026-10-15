@@ -436,6 +436,7 @@ async function loadDate(dateStr) {
           name: `${r.firstName.default} ${r.lastName.default}`,
           pos: r.positionCode, team: teamAb, gameId: g.id,
           headshot: r.headshot || headshotUrl(teamAb, r.playerId),
+          lineup: 'confirmed', // dressed: in the official game roster
         });
       }
     } else {
@@ -446,6 +447,7 @@ async function loadDate(dateStr) {
             name: `${r.firstName.default} ${r.lastName.default}`,
             pos: r.positionCode, team: t, gameId: g.id,
             headshot: r.headshot || headshotUrl(t, r.id),
+            lineup: 'projected', // game not started: from team roster, not confirmed dressed
           });
         }
       }
@@ -503,6 +505,26 @@ async function loadDate(dateStr) {
       shots: zoneByPid[d.pid + ':' + d.gameId] || [],
     };
   });
+
+  /* ---------------- line estimates ----------------
+     The NHL API exposes no official line combinations, so lines are
+     ESTIMATED: forwards on each team+game are ranked by average TOI —
+     top 3 ≈ L1, next 3 ≈ L2, next 3 ≈ L3, rest ≈ L4. Always labeled
+     "est." — never presented as confirmed. */
+  const FWD_POS = new Set(['C', 'L', 'R']);
+  const fwdsByTeamGame = {};
+  for (const r of state.skaters) {
+    if (!FWD_POS.has(r.pos)) continue;
+    const k = r.team + ':' + r.gameId;
+    (fwdsByTeamGame[k] = fwdsByTeamGame[k] || []).push(r);
+  }
+  for (const k of Object.keys(fwdsByTeamGame)) {
+    fwdsByTeamGame[k].sort((a, b) => b.toiMin - a.toiMin);
+    fwdsByTeamGame[k].forEach((r, i) => {
+      r.line = 'L' + Math.min(4, Math.floor(i / 3) + 1);
+      r.lineEst = true;
+    });
+  }
 
   state.games = games.map((g, i) => ({
     id: g.id,
@@ -1009,6 +1031,14 @@ function openPlayer(pid, gameId) {
     }
   }
 
+  // line badge (estimated from TOI rank) + dressed status
+  const lineBadge = r.line
+    ? `<span class="line-badge" title="Estimated from average ice time — not official">${r.line}<span class="est">est.</span></span>`
+    : '';
+  const statusPill = r.lineup === 'confirmed'
+    ? '<span class="status-pill ok">In lineup</span>'
+    : '<span class="status-pill proj">Projected</span>';
+
   $('modalBody').innerHTML = `
     <div class="pc-head">
       <img class="headshot" src="${esc(r.headshot)}" alt="" ${imgFallback}>
@@ -1022,6 +1052,7 @@ function openPlayer(pid, gameId) {
         <div class="pc-fair">${r.fair} fair</div>
       </div>
     </div>
+    <div class="pc-status">${lineBadge}${statusPill}</div>
     <table class="factor-table">${factorRows}
       <tr><td>Expected goals (λ)</td><td>${r.lam.toFixed(3)}</td></tr>
       <tr><td>Opponent</td><td>${esc(r.oppAbbr)} goalie ${(r.oppSv * 100).toFixed(1)}% SV</td></tr>

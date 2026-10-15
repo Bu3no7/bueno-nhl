@@ -154,6 +154,20 @@ independence, and real books may restrict or shade same-game legs.
 - Headshots: `assets.nhle.com/mugs/nhl/20262027/{TEAM}/{playerId}.png`
 - Team logos: `assets.nhle.com/logos/nhl/svg/{TEAM}_light.svg`
 
+## Line designations & dressed status (player cards)
+
+The NHL API exposes no official line combinations, so forward lines are
+**estimated**: each team's forwards are ranked by average TOI —
+top 3 ≈ L1, next 3 ≈ L2, next 3 ≈ L3, the rest ≈ L4.
+The badge is always labeled "est." and is never presented as confirmed.
+Defensemen get no line badge.
+
+Dressed status comes from the game's source:
+- **In lineup** — the skater is on the official game roster
+  (`rosterSpots` in play-by-play), i.e. confirmed dressed.
+- **Projected** — the game hasn't started; the skater comes from the
+  team roster, so scratches aren't known yet.
+
 ## Limitations
 
 - Probabilities are estimates, not betting advice.

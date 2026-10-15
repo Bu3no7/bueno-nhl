@@ -323,6 +323,23 @@ td .pname:hover { text-decoration: none; background: var(--blue-wash); color: #8
   font-weight: 700; font-size: .83rem; font-variant-numeric: tabular-nums; letter-spacing: .01em;
 }
 
+.pc-status { display: flex; gap: .5rem; align-items: center; margin: 0 0 .7rem; flex-wrap: wrap; }
+.line-badge {
+  display: inline-flex; align-items: baseline; gap: .3rem;
+  font-weight: 800; font-size: .85rem; letter-spacing: .02em;
+  padding: .2rem .65rem; border-radius: 99px;
+  background: var(--blue-wash); color: var(--blue);
+  border: 1px solid rgba(94, 168, 255, .35);
+}
+.line-badge .est { font-weight: 600; font-size: .68rem; color: var(--muted); letter-spacing: .04em; }
+.status-pill {
+  display: inline-flex; align-items: center;
+  font-size: .76rem; font-weight: 700; letter-spacing: .03em;
+  padding: .2rem .65rem; border-radius: 99px;
+}
+.status-pill.ok { background: var(--accent-wash); color: var(--accent); border: 1px solid rgba(63, 214, 127, .35); }
+.status-pill.proj { background: var(--gold-wash); color: var(--gold); border: 1px solid rgba(245, 185, 66, .35); }
+
 .factor-table { width: 100%; font-size: .86rem; margin: .7rem 0; border-collapse: collapse; }
 .factor-table td { padding: .45rem .2rem; border-bottom: 1px dashed var(--border); white-space: normal; }
 .factor-table td:first-child { color: var(--muted); }
