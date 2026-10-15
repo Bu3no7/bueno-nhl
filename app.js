@@ -730,10 +730,14 @@ function twoPlusProbs() {
   }).sort((a, b) => b.tpP - a.tpP);
 }
 
+function pnameBtn(r) {
+  const hs = r.headshot || headshotUrl(r.team, r.pid);
+  return `<button class="pname" data-pid="${r.pid}" data-gid="${r.gameId}"><img class="pavatar" src="${esc(hs)}" alt="" ${imgFallback}>${esc(r.name)}</button>`;
+}
 function probTableHtml(rows, pKey, fairKey) {
   return rows.map((r) => `
     <tr>
-      <td><button class="pname" data-pid="${r.pid}" data-gid="${r.gameId}">${esc(r.name)}</button></td>
+      <td>${pnameBtn(r)}</td>
       <td><span class="team-cell"><img src="${teamLogoUrl(r.team)}" alt="" ${imgFallback}>${esc(r.team)}</span></td>
       <td class="num"><strong>${pct1(r[pKey])}</strong></td>
       <td class="num">${r[fairKey]}</td>
@@ -765,7 +769,7 @@ function renderAnytime() {
   const rows = state.skaters.slice().sort((a, b) => b.p - a.p);
   tb.innerHTML = rows.map((r) => `
     <tr>
-      <td><button class="pname" data-pid="${r.pid}" data-gid="${r.gameId}">${esc(r.name)}</button></td>
+      <td>${pnameBtn(r)}</td>
       <td><span class="team-cell"><img src="${teamLogoUrl(r.team)}" alt="" ${imgFallback}>${esc(r.team)}</span></td>
       <td class="num"><strong>${pct1(r.p)}</strong></td>
       <td class="num">${r.fair}</td>
@@ -817,7 +821,7 @@ function renderBoard() {
   const tb = $('boardBody');
   tb.innerHTML = sortedSkaters().map((r) => `
     <tr>
-      <td><button class="pname" data-pid="${r.pid}" data-gid="${r.gameId}">${esc(r.name)}</button>
+      <td>${pnameBtn(r)}
         <div class="prob-bar"><i style="width:${Math.min(100, r.p * 100 * 2.5)}%"></i></div></td>
       <td><span class="team-cell"><img src="${teamLogoUrl(r.team)}" alt="" ${imgFallback}>${esc(r.team)}</span></td>
       <td>${esc(r.pos)}</td>
@@ -838,7 +842,7 @@ function renderLongshots() {
   if (!ls.length) { el.innerHTML = '<p class="muted">No longshots on this slate.</p>'; return; }
   el.innerHTML = ls.map((r) => `
     <div class="ls-card">
-      <img class="headshot" src="${esc(r.headshot)}" alt="" ${imgFallback}>
+      <img class="headshot" src="${esc(r.headshot || headshotUrl(r.team, r.pid))}" alt="" ${imgFallback}>
       <div class="ls-info">
         <button class="pname" data-pid="${r.pid}" data-gid="${r.gameId}">${esc(r.name)}</button>
         <div class="ls-stats">${esc(r.team)} · ${esc(r.pos)} · ${pct1(r.p)} model · ${r.goals}G/${r.gp}GP</div>
@@ -864,7 +868,7 @@ function renderMarkets() {
       .slice(0, 80);
     const body = sorted.map((r) => `
       <tr>
-        <td><button class="pname" data-pid="${r.pid}" data-gid="${r.gameId}">${esc(r.name)}</button></td>
+        <td>${pnameBtn(r)}</td>
         <td><span class="team-cell"><img src="${teamLogoUrl(r.team)}" alt="" ${imgFallback}>${esc(r.team)}</span></td>
         ${r.markets[kind].map((m) => `
           <td class="num"><strong>${pct1(m.over)}</strong><div class="small muted">${m.overFair}</div></td>`).join('')}

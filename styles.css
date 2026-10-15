@@ -325,9 +325,14 @@ td .pname {
   color: var(--teal); cursor: pointer; font-weight: 650; font-family: inherit;
   background: none; border: 0; padding: .12rem .3rem; margin: -.12rem -.3rem;
   font-size: inherit; text-align: left; border-radius: 6px;
+  display: inline-flex; align-items: center; gap: .45rem;
   transition: background .12s ease, color .12s ease;
 }
 td .pname:hover { text-decoration: none; background: var(--teal-wash); color: #7cebf1; }
+td .pname img.pavatar {
+  width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+  background: var(--panel2); object-fit: cover; border: 1px solid var(--border);
+}
 .team-cell { display: inline-flex; align-items: center; gap: .4rem; font-weight: 600; }
 .team-cell img { width: 20px; height: 20px; }
 .prob-bar { height: 6px; background: #182031; border-radius: 99px; margin-top: 4px; min-width: 70px; overflow: hidden; }
