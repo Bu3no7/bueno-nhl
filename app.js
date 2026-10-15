@@ -893,6 +893,35 @@ function iceBreakerProbs() {
   }).sort((a, b) => b.ibP - a.ibP);
 }
 
+/* Ice Breaker Score (0–100): one number blending game context and
+   league context. raw = boosted first-goal probability × pace factor,
+   where pace factor = this game's expected total goals / slate-average
+   expected total goals. Game expected goals reuses the sims' own
+   convention (sum of simLambda(sk.p) per team — no new data fetched).
+   score = 100 × raw / max raw across the slate, so tonight's top pick
+   is 100 and everyone else is relative to him. */
+function iceBreakerScores(rows) {
+  const xgByGame = {};
+  let xgSum = 0, xgN = 0;
+  for (const g of state.games) {
+    let xg = 0;
+    for (const sk of state.skaters) {
+      if (sk.gameId === g.id) xg += simLambda(sk.p);
+    }
+    if (xg > 0) { xgByGame[g.id] = xg; xgSum += xg; xgN++; }
+  }
+  const avg = xgN > 0 ? xgSum / xgN : 0;
+  const scored = rows.map((r) => {
+    const xg = xgByGame[r.gameId];
+    const pace = (xg > 0 && avg > 0) ? xg / avg : 1; // missing λ → neutral
+    return { ...r, ibScoreRaw: (r.ibP || 0) * pace };
+  });
+  let maxRaw = 0;
+  for (const r of scored) if (r.ibScoreRaw > maxRaw) maxRaw = r.ibScoreRaw;
+  for (const r of scored) r.ibScore = maxRaw > 0 ? Math.round(100 * r.ibScoreRaw / maxRaw) : 0;
+  return scored;
+}
+
 // American odds -> implied (no-vig) probability; null when unparseable
 function impliedProb(raw) {
   const o = parseFloat(String(raw == null ? '' : raw).replace(/[+\s,]/g, ''));
@@ -914,6 +943,7 @@ function iceRowHtml(r, matchup) {
     <td>${pnameBtn(r)}</td>
     <td><span class="team-cell"><img src="${teamLogoUrl(r.team)}" alt="" ${imgFallback}>${esc(r.team)}</span></td>
     ${matchup ? `<td class="muted small">${esc(matchup)}</td>` : ''}
+    <td class="num"><strong>${r.ibScore}</strong></td>
     <td class="num"><strong>${pct1(r.ibP)}</strong>${l1tag}</td>
     <td class="num">${r.ibFair}</td>
     <td class="num"><input class="book-input" data-pid="${r.pid}" data-p="${r.ibP}" value="${esc(book)}" placeholder="+800" inputmode="text" aria-label="Book odds for ${esc(r.name)}"><div class="small edge-out ${edge.cls}">${esc(edge.txt)}</div></td>
@@ -927,8 +957,8 @@ function iceLeagueHtml(rows) {
     return iceRowHtml(r, matchup);
   }).join('');
   return `<div class="table-wrap"><table>
-    <thead><tr><th>Skater</th><th>Team</th><th>Matchup</th><th class="num">1st-goal %</th><th class="num">Fair</th><th class="num">Book / edge</th></tr></thead>
-    <tbody>${body || '<tr><td colspan="6" class="muted">No skaters.</td></tr>'}</tbody>
+    <thead><tr><th>Skater</th><th>Team</th><th>Matchup</th><th class="num">Score</th><th class="num">1st-goal %</th><th class="num">Fair</th><th class="num">Book / edge</th></tr></thead>
+    <tbody>${body || '<tr><td colspan="7" class="muted">No skaters.</td></tr>'}</tbody>
   </table></div>`;
 }
 function iceGameHtml(g, rows) {
@@ -944,19 +974,22 @@ function iceGameHtml(g, rows) {
       <span class="ib-shares muted small">First-goal share&nbsp; ${esc(g.away)} ${pct1(awayShare)} · ${esc(g.home)} ${pct1(homeShare)}</span>
     </div>
     <div class="table-wrap"><table>
-      <thead><tr><th>Skater</th><th>Team</th><th class="num">1st-goal %</th><th class="num">Fair</th><th class="num">Book / edge</th></tr></thead>
-      <tbody>${body || '<tr><td colspan="5" class="muted">No skaters.</td></tr>'}</tbody>
+      <thead><tr><th>Skater</th><th>Team</th><th class="num">Score</th><th class="num">1st-goal %</th><th class="num">Fair</th><th class="num">Book / edge</th></tr></thead>
+      <tbody>${body || '<tr><td colspan="6" class="muted">No skaters.</td></tr>'}</tbody>
     </table></div>
   </div>`;
 }
 function renderIcebreaker() {
   const wrap = $('icebreakerWrap');
   if (!wrap) return;
-  const rows = iceBreakerProbs();
+  const rows = iceBreakerScores(iceBreakerProbs());
   if (!rows.length) { wrap.innerHTML = '<p class="muted">No skaters on this slate.</p>'; return; }
   if (state.iceView === 'league') {
-    wrap.innerHTML = iceLeagueHtml(rows.slice(0, 50));
+    // League best: rank by blended Ice Breaker Score, not raw first-goal %
+    const ranked = rows.slice().sort((a, b) => (b.ibScore - a.ibScore) || (b.ibP - a.ibP));
+    wrap.innerHTML = iceLeagueHtml(ranked.slice(0, 50));
   } else {
+    // Per game: keep first-goal % order, show the Score alongside
     wrap.innerHTML = state.games.map((g) => iceGameHtml(g, rows)).join('');
   }
   wrap.querySelectorAll('.pname').forEach((b) =>

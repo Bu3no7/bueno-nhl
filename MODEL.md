@@ -150,6 +150,20 @@ section on the page says so plainly. Book-odds inputs convert American
 odds to no-vig implied probability; edge = model probability minus
 implied, in percentage points.
 
+**Ice Breaker Score (0–100)** — the blended ranking number shown on the
+Ice Breaker tab. For each skater:
+
+```
+raw   = boosted first-goal probability × (game expected goals / slate-average expected goals)
+score = round(100 × raw / max(raw over the slate))
+```
+
+Game expected goals is the same team-λ sum the sims use (home λ +
+away λ, recovered from anytime-goal probabilities — no extra data
+fetched). A single-game slate gives every skater a pace factor of 1,
+and missing team rates fall back to a neutral factor of 1. The
+night's top pick always scores 100.
+
 ## Parlay builder
 
 Legs are added from any player card (anytime goal or a specific
