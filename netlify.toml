@@ -11,6 +11,12 @@
   status = 200
   force = true
 
+# Keep internal docs off the live site:
+[[redirects]]
+  from = "/MODEL.md"
+  to = "/404"
+  status = 404
+
 # Long cache for the immutable image CDN is unnecessary (images load
 # straight from assets.nhle.com in the browser). Keep HTML fresh:
 [[headers]]
