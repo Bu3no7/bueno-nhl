@@ -795,6 +795,10 @@ function renderSlate() {
       ${scorersHtml(g)}
     </div>`;
   }).join('');
+  const ud = $('utilDate');
+  if (ud) ud.textContent = d.toLocaleDateString([], { weekday: 'long', month: 'short', day: 'numeric' });
+  const ug = $('utilGames');
+  if (ug) ug.textContent = state.games.length + (state.games.length === 1 ? ' game' : ' games');
 }
 
 function sortedSkaters() {
@@ -1087,6 +1091,7 @@ function renderAll() {
   renderLongshots();
   renderMarkets();
   renderParlay();
+  renderSimSetup();
 }
 
 async function refreshScores() {
@@ -1119,6 +1124,145 @@ function startAutoRefresh() {
   }, 30000);
 }
 
+/* ---------------- sims (Monte Carlo, client-side) ---------------- */
+const simState = { scope: 'all' };
+
+// Recover each skater's Poisson goal rate from their anytime-goal probability.
+function simLambda(p) {
+  if (!(p > 0)) return 0;
+  return p >= 0.9999 ? 9 : -Math.log(1 - p);
+}
+
+// Knuth's algorithm — exact Poisson draws, fast for the small rates here.
+function poissonSample(lam) {
+  if (lam <= 0) return 0;
+  const L = Math.exp(-lam);
+  let k = 0, pr = 1;
+  do { k++; pr *= Math.random(); } while (pr > L);
+  return k - 1;
+}
+
+function teamPool(gameId, team) {
+  const pool = [];
+  for (const sk of state.skaters) {
+    if (sk.gameId !== gameId || sk.team !== team) continue;
+    const lam = simLambda(sk.p);
+    if (lam > 0) pool.push({ name: sk.name, lam });
+  }
+  return pool;
+}
+
+function pickWeighted(pool, total) {
+  if (!pool.length || total <= 0) return { name: '—' };
+  let r = Math.random() * total;
+  for (const s of pool) { r -= s.lam; if (r <= 0) return s; }
+  return pool[pool.length - 1];
+}
+
+function randGoalTime() {
+  const period = 1 + Math.floor(Math.random() * 3);
+  const mm = String(Math.floor(Math.random() * 20)).padStart(2, '0');
+  const ss = String(Math.floor(Math.random() * 60)).padStart(2, '0');
+  return { period, clock: mm + ':' + ss, ord: period * 3600 + (+mm) * 60 + (+ss) };
+}
+
+function simOneGame(g, n) {
+  const poolA = teamPool(g.id, g.away);
+  const poolB = teamPool(g.id, g.home);
+  const lamA = poolA.reduce((s, x) => s + x.lam, 0);
+  const lamB = poolB.reduce((s, x) => s + x.lam, 0);
+  let sumA = 0, sumB = 0, winA = 0, winB = 0, tie = 0;
+  const lines = {};
+  let sample = [];
+  for (let i = 0; i < n; i++) {
+    const a = poissonSample(lamA), b = poissonSample(lamB);
+    sumA += a; sumB += b;
+    if (a > b) winA++; else if (b > a) winB++; else tie++;
+    const k = a + '-' + b;
+    lines[k] = (lines[k] || 0) + 1;
+    if (i === n - 1) {
+      // keep the final sim as the sample box score
+      sample = [];
+      for (let q = 0; q < a; q++) sample.push({ team: g.away, scorer: pickWeighted(poolA, lamA).name, ...randGoalTime() });
+      for (let q = 0; q < b; q++) sample.push({ team: g.home, scorer: pickWeighted(poolB, lamB).name, ...randGoalTime() });
+      sample.sort((x, y) => x.ord - y.ord);
+    }
+  }
+  const top = Object.entries(lines).sort((x, y) => y[1] - x[1]).slice(0, 5);
+  return { g, n, avgA: sumA / n, avgB: sumB / n, winA: winA / n, winB: winB / n, tie: tie / n, top, sample };
+}
+
+const simPct = (x) => (x * 100).toFixed(1) + '%';
+
+function renderSimResults(results) {
+  const wrap = $('simResults');
+  if (!wrap) return;
+  if (!results.length) { wrap.innerHTML = '<p class="muted">No games on this slate.</p>'; return; }
+  wrap.innerHTML = results.map((r) => {
+    const g = r.g;
+    const chips = r.top.map(([sc, c]) =>
+      `<span class="score-chip"><strong>${esc(sc)}</strong> ${simPct(c / r.n)}</span>`).join('');
+    const box = r.sample.length
+      ? `<details class="sim-box"><summary>Sample box score — ${r.sample.length} goal${r.sample.length === 1 ? '' : 's'}</summary>
+         <ul>${r.sample.map((gl) =>
+           `<li><span class="sim-team">${esc(gl.team)}</span>${esc(gl.scorer)} <span class="muted small">P${gl.period} ${gl.clock}</span></li>`).join('')}</ul>
+         </details>`
+      : '<p class="muted small goal-none">Sample sim finished scoreless.</p>';
+    const prow = (label, v) =>
+      `<div class="sim-prow"><span class="sim-plabel">${label}</span><div class="sim-pbar"><i style="width:${(v * 100).toFixed(1)}%"></i></div><span class="num">${simPct(v)}</span></div>`;
+    return `<div class="sim-card">
+      <div class="sim-matchup">
+        <span class="team"><img src="${teamLogoUrl(g.away)}" alt="" ${imgFallback}>${esc(g.away)}</span>
+        <span class="muted">@</span>
+        <span class="team"><img src="${teamLogoUrl(g.home)}" alt="" ${imgFallback}>${esc(g.home)}</span>
+      </div>
+      <div class="sim-avg"><span>${r.avgA.toFixed(2)}</span><span class="muted">avg</span><span>${r.avgB.toFixed(2)}</span></div>
+      <div class="sim-probs">
+        ${prow(esc(g.away), r.winA)}
+        ${prow(esc(g.home), r.winB)}
+        <div class="sim-prow tie"><span class="sim-plabel">Tie</span><div class="sim-pbar"><i style="width:${(r.tie * 100).toFixed(1)}%"></i></div><span class="num">${simPct(r.tie)}</span></div>
+      </div>
+      <p class="sim-sub">Most common scorelines</p>
+      <div class="score-chips">${chips}</div>
+      ${box}
+    </div>`;
+  }).join('');
+}
+
+function renderSimSetup() {
+  const sel = $('simGameSelect');
+  if (!sel) return;
+  sel.innerHTML = state.games.map((g) =>
+    `<option value="${g.id}">${esc(g.away)} @ ${esc(g.home)}</option>`).join('');
+  const gc = $('simGameCount');
+  if (gc) gc.textContent = state.games.length + (state.games.length === 1 ? ' game' : ' games');
+  applySimScope();
+}
+
+function applySimScope() {
+  const one = $('simOneBtn'), all = $('simAllBtn'), sel = $('simGameSelect');
+  if (!one || !all || !sel) return;
+  one.classList.toggle('active', simState.scope === 'one');
+  all.classList.toggle('active', simState.scope === 'all');
+  sel.disabled = simState.scope !== 'one';
+}
+
+function runSims() {
+  const n = parseInt((($('simCountSelect') || {}).value), 10) || 1000;
+  const games = simState.scope === 'one'
+    ? state.games.filter((g) => String(g.id) === String(($('simGameSelect') || {}).value))
+    : state.games.slice();
+  const btn = $('simRunBtn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Simulating…'; }
+  setTimeout(() => {
+    try {
+      renderSimResults(games.map((g) => simOneGame(g, n)));
+    } finally {
+      if (btn) { btn.disabled = false; btn.textContent = 'Run simulation'; }
+    }
+  }, 30);
+}
+
 /* ---------------- boot ---------------- */
 document.querySelectorAll('.tab').forEach((t) =>
   t.addEventListener('click', () => setView(t.dataset.view)));
@@ -1128,6 +1272,11 @@ const mktFilter = $('mktTeamFilter');
 if (mktFilter) mktFilter.addEventListener('change', (e) => applyTeamFilter(e.target.value));
 const stakeInput = $('parlayStake');
 if (stakeInput) stakeInput.addEventListener('input', renderParlayTotals);
+const simOneBtn = $('simOneBtn'), simAllBtn = $('simAllBtn');
+if (simOneBtn) simOneBtn.addEventListener('click', () => { simState.scope = 'one'; applySimScope(); });
+if (simAllBtn) simAllBtn.addEventListener('click', () => { simState.scope = 'all'; applySimScope(); });
+const simRunBtn = $('simRunBtn');
+if (simRunBtn) simRunBtn.addEventListener('click', runSims);
 $('refreshBtn').addEventListener('click', () => boot(true));
 $('datePicker').addEventListener('change', (e) => boot(true, e.target.value || state.date));
 $('modalClose').addEventListener('click', closePlayer);

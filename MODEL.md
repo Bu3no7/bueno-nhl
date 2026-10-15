@@ -168,6 +168,21 @@ Dressed status comes from the game's source:
 - **Projected** — the game hasn't started; the skater comes from the
   team roster, so scratches aren't known yet.
 
+## Game simulator (Sims tab, client-side Monte Carlo)
+
+For each selected game, all in the browser — no backend:
+
+1. **Team goal rate.** Each skater's anytime-goal probability `p` is converted
+   back to a Poisson rate: `λᵢ = −ln(1 − p)`. A team's rate is the sum over
+   its skaters: `Λ = Σ λᵢ`.
+2. **Goals.** Each team's goals are drawn from `Poisson(Λ)` (Knuth's algorithm).
+3. **Scorers.** Each goal is assigned to a skater with probability
+   `λᵢ / Λ` (weighted draw over the team's skaters).
+4. **Results.** Over N sims (1,000 / 5,000 / 10,000): average final score,
+   win probability per team plus tie probability, the five most common
+   scorelines, and a sample box score (the final sim's goals, each with a
+   random regulation period/time) per game.
+
 ## Limitations
 
 - Probabilities are estimates, not betting advice.
