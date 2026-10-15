@@ -21,10 +21,16 @@ fetched live in the browser. No backend, no keys.
 **Step 1 — base expected goals** (scoring form weighted first, shot volume second):
 
 ```
-gpg      = G / GP
-sogpg    = SHOTS / GP
+w        = GP / (GP + 12)                       # regression weight on observed rate
+gpg      = w * (G / GP)     + (1 - w) * G_PRIOR  # regressed goals/game
+sogpg    = w * (SHOTS / GP) + (1 - w) * S_PRIOR  # regressed shots/game
 lam_base = 0.6 * gpg + 0.4 * (sogpg * 0.105)
 ```
+
+Early in the season raw per-game rates are noisy (2 goals in 2 games reads as a
+1.00 G/GP scorer), so rates are shrunk toward league-average priors. Priors:
+forwards G 0.20 / SOG 2.0, defensemen G 0.07 / SOG 1.5. The 12-game prior means
+a 3-game sample keeps ~20% weight on what we've actually seen.
 
 `0.105` is the league-average shooting percentage.
 

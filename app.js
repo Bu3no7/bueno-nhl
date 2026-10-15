@@ -66,6 +66,21 @@ const CALIBRATION = 0.88;
 const TAIL_DAMP = 0.85;
 const LONGSHOT_P = 1 / 6;
 const HD_NEUTRAL = 0.30;
+
+// --- regression to the mean ---
+// Early in the season raw per-game rates are noisy: 2 goals in 2 games reads as
+// a 1.00 G/GP scorer. Shrink observed rates toward league-average priors, with
+// the weight on the observed rate growing as games accumulate.
+const REG_K = 12; // games of prior
+const PRIORS = {
+  F: { g: 0.20, s: 2.0, a: 0.32, p: 0.52 },
+  D: { g: 0.07, s: 1.5, a: 0.12, p: 0.19 },
+};
+function regress(obs, gp, prior) {
+  const w = gp / (gp + REG_K);
+  return w * obs + (1 - w) * prior;
+}
+const priorsFor = (pos) => PRIORS[pos === 'D' ? 'D' : 'F'];
 const MIN_ZONE_ATTEMPTS = 5;
 
 const state = {
@@ -126,10 +141,11 @@ function fairOdds(p) {
 }
 
 /* ---------------- model ---------------- */
-function computeProb(s, hdShare, oppSv) {
+function computeProb(s, hdShare, oppSv, pos) {
   const gp = Math.max(s.gp, 1);
-  const gpg = s.goals / gp;
-  const sogpg = s.shots / gp;
+  const pr = priorsFor(pos);
+  const gpg = regress(s.goals / gp, gp, pr.g);
+  const sogpg = regress(s.shots / gp, gp, pr.s);
   const lamBase = 0.6 * gpg + 0.4 * (sogpg * LEAGUE_SH_PCT);
   const mToi = clamp(0.6 + 0.4 * (s.toiMin / 20), 0.7, 1.3);
   const mPp = 1 + clamp((s.ppg / gp) * 2, 0, 0.35);
@@ -188,10 +204,13 @@ function fairOddsSafe(p) {
   return fairOdds(p);
 }
 
-function computeMarkets(s) {
+function computeMarkets(s, pos) {
   const out = {};
+  const pr = priorsFor(pos);
+  const priorKey = { shots: 's', assists: 'a', points: 'p' };
   for (const kind of Object.keys(MARKET_LINES)) {
-    const lam = s[MARKET_META[kind].rateKey] || 0;
+    const rawLam = s[MARKET_META[kind].rateKey] || 0;
+    const lam = regress(rawLam, Math.max(s.gp, 1), pr[priorKey[kind]]);
     out[kind] = MARKET_LINES[kind].map((line) => {
       const over = pOverLine(lam, Math.floor(line));
       return {
@@ -495,13 +514,13 @@ async function loadDate(dateStr) {
     const g = games.find((gg) => gg.id === d.gameId);
     const oppAbbr = (d.team === g.awayTeam.abbrev) ? g.homeTeam.abbrev : g.awayTeam.abbrev;
     const oppSv = goalieSv[d.gameId] || 0.900;
-    const m = computeProb(s, z.share, oppSv);
+    const m = computeProb(s, z.share, oppSv, d.pos);
     return {
       ...d, ...s, zone: z, oppSv, oppAbbr,
       p: m.p, lam: m.lam, factors: m.factors,
       fair: fairOdds(m.p),
       isLongshot: m.p <= LONGSHOT_P,
-      markets: computeMarkets(s),
+      markets: computeMarkets(s, d.pos),
       shots: zoneByPid[d.pid + ':' + d.gameId] || [],
     };
   });
