@@ -782,8 +782,9 @@ function renderSlate() {
     const pbp = g.pbp;
     const as = pbp ? pbp.awayTeam.score : 0;
     const hs = pbp ? pbp.homeTeam.score : 0;
-    const asog = pbp ? pbp.awayTeam.sog : '–';
-    const hsog = pbp ? pbp.homeTeam.sog : '–';
+    const asog = pbp && typeof pbp.awayTeam.sog === 'number' ? pbp.awayTeam.sog : null;
+    const hsog = pbp && typeof pbp.homeTeam.sog === 'number' ? pbp.homeTeam.sog : null;
+    const sogHtml = (asog !== null && hsog !== null) ? `<span>SOG ${asog}–${hsog}</span>` : '';
     return `<div class="game-card">
       <div class="matchup">
         <span class="team"><img src="${teamLogoUrl(g.away)}" alt="" ${imgFallback}>${esc(g.away)}</span>
@@ -791,7 +792,7 @@ function renderSlate() {
         <span class="team"><img src="${teamLogoUrl(g.home)}" alt="" ${imgFallback}>${esc(g.home)}</span>
       </div>
       <div class="score-line"><span>${as}</span><span>${hs}</span></div>
-      <div class="game-meta"><span>${gameStatusText(g)}</span><span>SOG ${asog}–${hsog}</span></div>
+      <div class="game-meta"><span>${gameStatusText(g)}</span>${sogHtml}</div>
       ${scorersHtml(g)}
     </div>`;
   }).join('');
