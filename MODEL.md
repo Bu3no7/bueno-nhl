@@ -113,6 +113,16 @@ Player cards add a compact beat/miss snapshot per line — the lean
 the skater's season rate, last-5 hit rate, ice time, and power-play
 involvement.
 
+## First goal & 2+ goals
+
+Every goal type gets its own tab; Anytime is the hero view.
+
+- **First goal** — competing scoring rates within each matchup:
+  `P(first goal by i) = λ_i / Σ_j λ_j`, summed over every skater in that
+  game. Fair American odds from the same conversion as anytime goals.
+- **2+ goals** — from the skater's Poisson goal rate:
+  `P(2+) = 1 − e^(−λ) − λ·e^(−λ)`.
+
 ## Parlay builder
 
 Legs are added from any player card (anytime goal or a specific

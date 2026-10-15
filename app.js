@@ -73,7 +73,7 @@ const state = {
   games: [],          // {id, away, home, awayId, homeId, state, startUTC, pbp}
   skaters: [],        // computed model rows
   playerCache: new Map(),
-  view: 'slate',
+  view: 'anytime',
   sortBy: 'prob',
   teamFilter: '',
   refreshTimer: null,
@@ -533,6 +533,11 @@ function renderEmpty(msg) {
   $('gamesGrid').innerHTML = `<p class="muted">${esc(msg)}</p>`;
   $('boardBody').innerHTML = '';
   $('longshotsList').innerHTML = '';
+  if ($('goalsFeed')) $('goalsFeed').innerHTML = '';
+  if ($('anytimeBody')) $('anytimeBody').innerHTML = '';
+  if ($('firstgoalBody')) $('firstgoalBody').innerHTML = '';
+  if ($('twoplusBody')) $('twoplusBody').innerHTML = '';
+  if ($('marketsWrap')) $('marketsWrap').innerHTML = '';
 }
 
 function gameStatusText(g) {
@@ -562,6 +567,189 @@ function scorersHtml(g) {
     return `${esc(who)} (${p.periodDescriptor.number}, ${esc(p.timeInPeriod)})`;
   });
   return `<details class="scorers"><summary>Goals (${goals.length})</summary>${items.join('<br>')}</details>`;
+}
+
+/* ---------------- live goal feed ----------------
+   Goal type is derived from the NHL situationCode, a 4-char string:
+     [awayGoalie][awaySkaters][homeSkaters][homeGoalie]
+   e.g. "1551" = 5v5, "1451" = home 5v4 PP, "0641" = away goalie pulled, 6v4.
+   Empty net = the conceding team's goalie is not in net. */
+const GOAL_TYPE_LABEL = {
+  EV: 'Even strength', PP: 'Power play', SH: 'Shorthanded',
+  EN: 'Empty net', SO: 'Shootout', PS: 'Penalty shot',
+};
+
+function goalTypeFromSituation(code, scoredByHome, isShootout, isPenaltyShot) {
+  if (isPenaltyShot) return 'PS';
+  if (isShootout) return 'SO';
+  const c = String(code || '');
+  if (c.length < 4) return 'EV';
+  const awayG = +c[0], awayS = +c[1], homeS = +c[2], homeG = +c[3];
+  if (![awayG, awayS, homeS, homeG].every((n) => isFinite(n))) return 'EV';
+  const myS = scoredByHome ? homeS : awayS;
+  const oppS = scoredByHome ? awayS : homeS;
+  const oppG = scoredByHome ? awayG : homeG;
+  if (oppG === 0) return 'EN';
+  if (myS > oppS) return 'PP';
+  if (myS < oppS) return 'SH';
+  return 'EV';
+}
+
+function extractGoals(pbp, game) {
+  if (!pbp) return [];
+  const names = {}, shots = {};
+  for (const r of (pbp.rosterSpots || [])) {
+    names[r.playerId] = `${r.firstName.default} ${r.lastName.default}`;
+    if (r.headshot) shots[r.playerId] = r.headshot;
+  }
+  const homeId = pbp.homeTeam.id, awayId = pbp.awayTeam.id;
+  const teamOf = (tid) => (tid === homeId ? pbp.homeTeam.abbrev
+    : tid === awayId ? pbp.awayTeam.abbrev : '');
+  return (pbp.plays || [])
+    .filter((p) => p.typeDescKey === 'goal')
+    .map((p) => {
+      const det = p.details || {};
+      const pd = p.periodDescriptor || {};
+      const scoredByHome = det.eventOwnerTeamId === homeId;
+      const aids = [det.assist1PlayerId, det.assist2PlayerId].filter(Boolean);
+      return {
+        scorerId: det.scoringPlayerId,
+        scorer: names[det.scoringPlayerId] || 'Unknown',
+        headshot: shots[det.scoringPlayerId] || '',
+        assists: aids.map((id) => names[id] || 'Unknown'),
+        team: teamOf(det.eventOwnerTeamId),
+        period: pd.number,
+        periodType: pd.periodType,
+        time: p.timeInPeriod || '',
+        type: goalTypeFromSituation(p.situationCode, scoredByHome, pd.periodType === 'SO', !!det.penaltyShot),
+        awayScore: det.awayScore, homeScore: det.homeScore,
+        shotType: det.shotType || '',
+        order: p.sortOrder || 0,
+        gameId: game.id,
+      };
+    })
+    .sort((a, b) => b.order - a.order); // newest first
+}
+
+function goalItemHtml(gl) {
+  const perLabel = gl.periodType === 'OT' ? 'OT' : gl.periodType === 'SO' ? 'SO' : `P${gl.period}`;
+  const assists = gl.assists.length
+    ? `<div class="goal-assists muted small">${gl.assists.map(esc).join(', ')}</div>` : '';
+  const inModel = state.skaters.some((s) =>
+    String(s.pid) === String(gl.scorerId) && String(s.gameId) === String(gl.gameId));
+  const nameHtml = inModel
+    ? `<button class="pname" data-pid="${gl.scorerId}" data-gid="${gl.gameId}">${esc(gl.scorer)}</button>`
+    : `<span class="pname-static">${esc(gl.scorer)}</span>`;
+  const hs = gl.headshot ? esc(gl.headshot) : headshotUrl(gl.team, gl.scorerId);
+  return `<div class="goal-item">
+    <img class="headshot" src="${hs}" alt="" ${imgFallback}>
+    <div class="goal-info">
+      <div>${nameHtml}${assists}</div>
+      <div class="goal-meta muted small">${esc(gl.team)} · ${perLabel} ${esc(gl.time)}${gl.shotType ? ' · ' + esc(gl.shotType) : ''}</div>
+    </div>
+    <div class="goal-right">
+      <span class="gtype gtype-${gl.type.toLowerCase()}">${GOAL_TYPE_LABEL[gl.type] || gl.type}</span>
+      <div class="goal-score num">${gl.awayScore}–${gl.homeScore}</div>
+    </div>
+  </div>`;
+}
+
+function renderGoals() {
+  const feed = $('goalsFeed');
+  if (!feed) return;
+  const blocks = state.games
+    .map((g) => ({ g, goals: extractGoals(g.pbp, g) }))
+    .filter((b) => b.g.pbp);
+  if (!blocks.length) {
+    feed.innerHTML = '<p class="muted">No game data yet — check back once games start.</p>';
+    return;
+  }
+  feed.innerHTML = blocks.map(({ g, goals }) => {
+    const pbp = g.pbp;
+    const items = goals.length
+      ? goals.map(goalItemHtml).join('')
+      : '<p class="muted small goal-none">No goals yet.</p>';
+    return `<div class="goal-game game-card">
+      <div class="matchup">
+        <span class="team"><img src="${teamLogoUrl(g.away)}" alt="" ${imgFallback}>${esc(g.away)}</span>
+        <span class="score-line goal-final">${pbp.awayTeam.score}–${pbp.homeTeam.score}</span>
+        <span class="team"><img src="${teamLogoUrl(g.home)}" alt="" ${imgFallback}>${esc(g.home)}</span>
+      </div>
+      <div class="game-meta"><span>${gameStatusText(g)}</span><span>${goals.length} goal${goals.length === 1 ? '' : 's'}</span></div>
+      <div class="goal-list">${items}</div>
+    </div>`;
+  }).join('');
+  feed.querySelectorAll('.pname').forEach((b) =>
+    b.addEventListener('click', () => openPlayer(b.dataset.pid, b.dataset.gid)));
+}
+
+/* ---------------- first-goal & 2+ goals views ----------------
+   First goal: competing scoring rates within a matchup —
+     P(first goal by i) = λ_i / Σ_j λ_j   (all skaters in that game)
+   2+ goals: from the Poisson goal rate —
+     P(2+) = 1 − e^(−λ) − λ·e^(−λ) */
+function firstGoalProbs() {
+  const sumByGame = {};
+  for (const r of state.skaters) {
+    sumByGame[r.gameId] = (sumByGame[r.gameId] || 0) + Math.max(r.lam, 0);
+  }
+  return state.skaters.map((r) => {
+    const denom = sumByGame[r.gameId] || 1;
+    const p = denom > 0 ? Math.max(r.lam, 0) / denom : 0;
+    return { ...r, fgP: p, fgFair: fairOddsSafe(p) };
+  }).sort((a, b) => b.fgP - a.fgP);
+}
+
+function twoPlusProbs() {
+  return state.skaters.map((r) => {
+    const lam = Math.max(r.lam, 0);
+    const p = 1 - Math.exp(-lam) * (1 + lam);
+    return { ...r, tpP: p, tpFair: fairOddsSafe(p) };
+  }).sort((a, b) => b.tpP - a.tpP);
+}
+
+function probTableHtml(rows, pKey, fairKey) {
+  return rows.map((r) => `
+    <tr>
+      <td><button class="pname" data-pid="${r.pid}" data-gid="${r.gameId}">${esc(r.name)}</button></td>
+      <td><span class="team-cell"><img src="${teamLogoUrl(r.team)}" alt="" ${imgFallback}>${esc(r.team)}</span></td>
+      <td class="num"><strong>${pct1(r[pKey])}</strong></td>
+      <td class="num">${r[fairKey]}</td>
+    </tr>`).join('');
+}
+function wirePnameClicks(tbody) {
+  tbody.querySelectorAll('.pname').forEach((b) =>
+    b.addEventListener('click', () => openPlayer(b.dataset.pid, b.dataset.gid)));
+}
+
+function renderFirstGoal() {
+  const tb = $('firstgoalBody');
+  if (!tb) return;
+  tb.innerHTML = probTableHtml(firstGoalProbs(), 'fgP', 'fgFair');
+  wirePnameClicks(tb);
+}
+
+function renderTwoPlus() {
+  const tb = $('twoplusBody');
+  if (!tb) return;
+  tb.innerHTML = probTableHtml(twoPlusProbs(), 'tpP', 'tpFair');
+  wirePnameClicks(tb);
+}
+
+/* ---------------- anytime-goals view ---------------- */
+function renderAnytime() {
+  const tb = $('anytimeBody');
+  if (!tb) return;
+  const rows = state.skaters.slice().sort((a, b) => b.p - a.p);
+  tb.innerHTML = rows.map((r) => `
+    <tr>
+      <td><button class="pname" data-pid="${r.pid}" data-gid="${r.gameId}">${esc(r.name)}</button></td>
+      <td><span class="team-cell"><img src="${teamLogoUrl(r.team)}" alt="" ${imgFallback}>${esc(r.team)}</span></td>
+      <td class="num"><strong>${pct1(r.p)}</strong></td>
+      <td class="num">${r.fair}</td>
+    </tr>`).join('');
+  tb.querySelectorAll('.pname').forEach((b) =>
+    b.addEventListener('click', () => openPlayer(b.dataset.pid, b.dataset.gid)));
 }
 
 function renderSlate() {
@@ -860,7 +1048,11 @@ function closePlayer() { $('playerModal').classList.add('hidden'); }
 /* ---------------- views & refresh ---------------- */
 function renderAll() {
   renderSlate();
+  renderGoals();
   renderBoard();
+  renderAnytime();
+  renderFirstGoal();
+  renderTwoPlus();
   renderLongshots();
   renderMarkets();
   renderParlay();
@@ -878,6 +1070,7 @@ async function refreshScores() {
     } catch (e) { /* keep old */ }
   }
   if (state.view === 'slate') renderSlate();
+  if (state.view === 'goals') renderGoals();
 }
 
 function setView(v) {

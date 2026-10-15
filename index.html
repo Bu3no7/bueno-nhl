@@ -25,7 +25,11 @@
     </div>
   </div>
   <nav class="tabs" role="tablist">
-    <button class="tab active" data-view="slate" role="tab">Slate</button>
+    <button class="tab active" data-view="anytime" role="tab">Anytime</button>
+    <button class="tab" data-view="firstgoal" role="tab">First Goal</button>
+    <button class="tab" data-view="twoplus" role="tab">2+ Goals</button>
+    <button class="tab" data-view="slate" role="tab">Slate</button>
+    <button class="tab" data-view="goals" role="tab">Goals</button>
     <button class="tab" data-view="board" role="tab">Projection Board</button>
     <button class="tab" data-view="markets" role="tab">Markets</button>
     <button class="tab" data-view="longshots" role="tab">Longshots</button>
@@ -37,12 +41,20 @@
   <div id="errorBanner" class="error-banner hidden" role="alert"></div>
   <div id="loadingBar" class="loading hidden"><span id="loadingText">Loading…</span></div>
 
-  <section id="view-slate" class="view active">
+  <section id="view-slate" class="view">
     <div class="view-head">
       <h2 id="slateTitle">Tonight's slate</h2>
       <span id="autoRefreshNote" class="muted small">Auto-refreshes every 30s while open</span>
     </div>
     <div id="gamesGrid" class="games-grid"></div>
+  </section>
+
+  <section id="view-goals" class="view">
+    <div class="view-head">
+      <h2>Goal feed</h2>
+      <span class="muted small">Auto-refreshes every 30s while open</span>
+    </div>
+    <div id="goalsFeed"></div>
   </section>
 
   <section id="view-board" class="view">
@@ -74,6 +86,45 @@
       </table>
     </div>
     <p class="muted small">Probabilities are model anytime-goal estimates. See <a href="MODEL.md">MODEL.md</a> for the exact formula.</p>
+  </section>
+
+  <section id="view-anytime" class="view active">
+    <div class="view-head">
+      <h2>Anytime goals <span class="muted small">ranked by model probability · fair odds</span></h2>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Skater</th><th>Team</th><th class="num">Prob</th><th class="num">Fair</th></tr></thead>
+        <tbody id="anytimeBody"></tbody>
+      </table>
+    </div>
+    <p class="muted small">Model anytime-goal probability with no-vig fair American odds. See <a href="MODEL.md">MODEL.md</a> for the exact formula.</p>
+  </section>
+
+  <section id="view-firstgoal" class="view">
+    <div class="view-head">
+      <h2>First goal <span class="muted small">each skater's share of their matchup's scoring rate</span></h2>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Skater</th><th>Team</th><th class="num">Prob</th><th class="num">Fair</th></tr></thead>
+        <tbody id="firstgoalBody"></tbody>
+      </table>
+    </div>
+    <p class="muted small">First-goal probability = the skater's goal rate ÷ the sum of every skater's rate in that game. See <a href="MODEL.md">MODEL.md</a> for the exact formula.</p>
+  </section>
+
+  <section id="view-twoplus" class="view">
+    <div class="view-head">
+      <h2>2+ goals <span class="muted small">probability of scoring at least twice</span></h2>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Skater</th><th>Team</th><th class="num">Prob</th><th class="num">Fair</th></tr></thead>
+        <tbody id="twoplusBody"></tbody>
+      </table>
+    </div>
+    <p class="muted small">From each skater's Poisson goal rate: 1 − e<sup>−λ</sup> − λe<sup>−λ</sup>. See <a href="MODEL.md">MODEL.md</a> for the exact formula.</p>
   </section>
 
   <section id="view-longshots" class="view">
