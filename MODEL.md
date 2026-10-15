@@ -216,13 +216,21 @@ For each selected game, all in the browser — no backend:
 1. **Team goal rate.** Each skater's anytime-goal probability `p` is converted
    back to a Poisson rate: `λᵢ = −ln(1 − p)`. A team's rate is the sum over
    its skaters: `Λ = Σ λᵢ`.
-2. **Goals.** Each team's goals are drawn from `Poisson(Λ)` (Knuth's algorithm).
-3. **Scorers.** Each goal is assigned to a skater with probability
-   `λᵢ / Λ` (weighted draw over the team's skaters).
+2. **Minute-by-minute with score effects.** Each of the 60 minutes draws
+   goals from `Poisson(Λ/60 × multiplier)`, where the multiplier follows
+   the score: trailers push (×1.15 down one, ×1.25 down two-plus),
+   leaders protect (×0.95/×0.90). A 1–2 goal deficit inside the final
+   3 minutes pulls the goalie: 6-on-5 boost (×1.6) for the trailer and an
+   empty-net lane for the leader (marked EN).
+3. **Line-based scorers (teammate correlation).** Each goal first selects
+   a forward line (estimated L1–L4, weighted by line scoring rate) plus a
+   defense pair (TOI-ranked), then the scorer and 0–2 assists are drawn
+   only from within that 5-man unit — so linemates' points move together.
 4. **Results.** Over N sims (1,000 / 5,000 / 10,000): average final score,
    win probability per team plus tie probability, the five most common
-   scorelines, and a sample box score (the final sim's goals, each with a
-   random regulation period/time) per game.
+   scorelines, and a sample box score (the final sim's goals, in
+   chronological order with scorer, assists, line tag, and EN marks)
+   per game.
 
 ## Limitations
 

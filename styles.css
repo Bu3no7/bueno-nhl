@@ -259,6 +259,7 @@ main { max-width: 1120px; margin: 0 auto; padding: 1.4rem 1rem 2.2rem; }
 }
 .sim-box ul { list-style: none; margin: .4rem 0 0; padding: 0; display: flex; flex-direction: column; gap: .3rem; }
 .sim-box li { font-size: .86rem; padding: .3rem .1rem; border-bottom: 1px dashed var(--border-soft); }
+.sim-en { display: inline-block; font-size: .68rem; font-weight: 800; color: #0b0e14; background: var(--teal); border-radius: 4px; padding: .05rem .3rem; margin-right: .3rem; vertical-align: 1px; }
 .sim-box li:last-child { border-bottom: 0; }
 .sim-team { font-weight: 800; color: var(--teal); margin-right: .35rem; font-size: .78rem; }
 

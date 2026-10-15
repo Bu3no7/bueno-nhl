@@ -1435,16 +1435,6 @@ function poissonSample(lam) {
   return k - 1;
 }
 
-function teamPool(gameId, team) {
-  const pool = [];
-  for (const sk of state.skaters) {
-    if (sk.gameId !== gameId || sk.team !== team) continue;
-    const lam = simLambda(sk.p);
-    if (lam > 0) pool.push({ name: sk.name, lam });
-  }
-  return pool;
-}
-
 function pickWeighted(pool, total) {
   if (!pool.length || total <= 0) return { name: '—' };
   let r = Math.random() * total;
@@ -1452,33 +1442,145 @@ function pickWeighted(pool, total) {
   return pool[pool.length - 1];
 }
 
-function randGoalTime() {
-  const period = 1 + Math.floor(Math.random() * 3);
-  const mm = String(Math.floor(Math.random() * 20)).padStart(2, '0');
-  const ss = String(Math.floor(Math.random() * 60)).padStart(2, '0');
-  return { period, clock: mm + ':' + ss, ord: period * 3600 + (+mm) * 60 + (+ss) };
+// key-weighted pick (used for assists, weighted by assist rate)
+function pickWeightedBy(pool, keyFn) {
+  let total = 0;
+  for (const s of pool) total += Math.max(keyFn(s), 0);
+  if (!pool.length || total <= 0) return pool[pool.length - 1] || { name: '—' };
+  let r = Math.random() * total;
+  for (const s of pool) { r -= Math.max(keyFn(s), 0); if (r <= 0) return s; }
+  return pool[pool.length - 1];
+}
+
+/* ---------------- sim line units ----------------
+   Correlation upgrade: each goal is assigned to a LINE first (forwards by
+   the site's estimated L1–L4, defense paired by TOI), then the scorer
+   and assists are drawn only from within that 5-man unit — so
+   linemates' points move together the way they do in real hockey. */
+function simUnits(gameId, team) {
+  const fwdLines = {};
+  const dmen = [];
+  for (const sk of state.skaters) {
+    if (sk.gameId !== gameId || sk.team !== team) continue;
+    const lam = simLambda(sk.p);
+    if (lam <= 0) continue;
+    const aLam = regress(sk.apg || 0, Math.max(sk.gp, 1), priorsFor(sk.pos).a);
+    const e = { name: sk.name, lam, aLam };
+    if (sk.pos === 'D') dmen.push({ ...e, toi: sk.toiMin || 0 });
+    else {
+      const tag = sk.line || 'L4';
+      (fwdLines[tag] = fwdLines[tag] || []).push(e);
+    }
+  }
+  const lines = Object.keys(fwdLines).sort().map((tag) => {
+    const members = fwdLines[tag];
+    return { tag, members, lam: members.reduce((s, x) => s + x.lam, 0) };
+  });
+  dmen.sort((a, b) => b.toi - a.toi);
+  const pairs = [];
+  for (let i = 0; i < dmen.length; i += 2) {
+    const members = dmen.slice(i, i + 2);
+    pairs.push({ tag: 'D' + (pairs.length + 1), members, lam: members.reduce((s, x) => s + x.lam, 0) });
+  }
+  const lineLam = lines.reduce((s, x) => s + x.lam, 0);
+  const pairLam = pairs.reduce((s, x) => s + x.lam, 0);
+  return { lines, pairs, lineLam, pairLam, total: lineLam + pairLam };
+}
+
+// number of assists on a goal: ~68% get two, ~22% get one, ~10% unassisted
+function drawAssistCount() {
+  const r = Math.random();
+  return r < 0.68 ? 2 : r < 0.90 ? 1 : 0;
+}
+
+// Pick the scoring line + D pair (weighted by unit scoring rate), then the
+// scorer and assists from inside that unit.
+function assignGoal(units) {
+  const line = units.lines.length ? pickWeighted(units.lines, units.lineLam) : null;
+  const pair = units.pairs.length ? pickWeighted(units.pairs, units.pairLam) : null;
+  let unit = [];
+  if (line) unit = unit.concat(line.members);
+  if (pair) unit = unit.concat(pair.members);
+  if (!unit.length) return { scorer: '—', assists: [], line: null };
+  const scorer = pickWeighted(unit, unit.reduce((s, x) => s + x.lam, 0));
+  const helpers = [];
+  const rest = unit.filter((x) => x !== scorer);
+  const nA = Math.min(drawAssistCount(), rest.length);
+  for (let i = 0; i < nA; i++) {
+    const h = pickWeightedBy(rest, (x) => x.aLam);
+    helpers.push(h.name);
+    rest.splice(rest.indexOf(h), 1);
+  }
+  return { scorer: scorer.name, assists: helpers, line: line ? line.tag : null,
+           unit: unit.map((x) => x.name) };
+}
+
+/* ---------------- score-state rates ----------------
+   Goals no longer arrive on a metronome. Every simulated minute re-prices
+   both teams: trailers push (scoring boost), leaders protect (suppressed),
+   and a 1–2 goal deficit inside the final 3 minutes pulls the goalie —
+   6-on-5 boost for the trailer, an empty-net lane for the leader (marked
+   EN on the goal). */
+const EN_RATE = 0.06; // per-minute EN goal rate for the leader, goalie pulled
+
+function scoreStateRates(d, min) {
+  // d = score differential from team A's perspective (a ‒ b)
+  let mA = 1, mB = 1, enA = 0, enB = 0;
+  if (d < 0) { // A trailing: push
+    mA = d <= -2 ? 1.25 : 1.15;
+    mB = d <= -2 ? 0.90 : 0.95;
+  } else if (d > 0) { // B trailing: push
+    mB = d >= 2 ? 1.25 : 1.15;
+    mA = d >= 2 ? 0.90 : 0.95;
+  }
+  if (min >= 57) { // pulled-goalie window: trailing by 1–2
+    if (d === -1 || d === -2) { mA *= 1.6; enB = EN_RATE; }
+    else if (d === 1 || d === 2) { mB *= 1.6; enA = EN_RATE; }
+  }
+  return { mA, mB, enA, enB };
+}
+
+// Minute-by-minute discrete-event sim. Returns final score + goal trace.
+function simGameTrace(g, unitsA, unitsB, lamA, lamB) {
+  let a = 0, b = 0;
+  const goals = [];
+  for (let min = 0; min < 60; min++) {
+    const { mA, mB, enA, enB } = scoreStateRates(a - b, min);
+    const ga = poissonSample((lamA / 60) * mA);
+    const gb = poissonSample((lamB / 60) * mB);
+    const gea = poissonSample(enA); // A scores into B's empty net
+    const geb = poissonSample(enB); // B scores into A's empty net
+    for (let q = 0; q < ga; q++) goals.push({ team: g.away, min, ...assignGoal(unitsA) });
+    for (let q = 0; q < gb; q++) goals.push({ team: g.home, min, ...assignGoal(unitsB) });
+    for (let q = 0; q < gea; q++) goals.push({ team: g.away, min, en: true, ...assignGoal(unitsA) });
+    for (let q = 0; q < geb; q++) goals.push({ team: g.home, min, en: true, ...assignGoal(unitsB) });
+    a += ga + gea;
+    b += gb + geb;
+  }
+  return { a, b, goals };
 }
 
 function simOneGame(g, n) {
-  const poolA = teamPool(g.id, g.away);
-  const poolB = teamPool(g.id, g.home);
-  const lamA = poolA.reduce((s, x) => s + x.lam, 0);
-  const lamB = poolB.reduce((s, x) => s + x.lam, 0);
+  const unitsA = simUnits(g.id, g.away);
+  const unitsB = simUnits(g.id, g.home);
+  const lamA = unitsA.total, lamB = unitsB.total;
   let sumA = 0, sumB = 0, winA = 0, winB = 0, tie = 0;
   const lines = {};
   let sample = [];
   for (let i = 0; i < n; i++) {
-    const a = poissonSample(lamA), b = poissonSample(lamB);
+    const { a, b, goals } = simGameTrace(g, unitsA, unitsB, lamA, lamB);
     sumA += a; sumB += b;
     if (a > b) winA++; else if (b > a) winB++; else tie++;
     const k = a + '-' + b;
     lines[k] = (lines[k] || 0) + 1;
     if (i === n - 1) {
       // keep the final sim as the sample box score
-      sample = [];
-      for (let q = 0; q < a; q++) sample.push({ team: g.away, scorer: pickWeighted(poolA, lamA).name, ...randGoalTime() });
-      for (let q = 0; q < b; q++) sample.push({ team: g.home, scorer: pickWeighted(poolB, lamB).name, ...randGoalTime() });
-      sample.sort((x, y) => x.ord - y.ord);
+      sample = goals.map((gl) => {
+        const period = Math.floor(gl.min / 20) + 1;
+        const mm = String(gl.min % 20).padStart(2, '0');
+        const ss = String(Math.floor(Math.random() * 60)).padStart(2, '0');
+        return { ...gl, period, clock: mm + ':' + ss, ord: gl.min * 60 + (+ss) };
+      }).sort((x, y) => x.ord - y.ord);
     }
   }
   const top = Object.entries(lines).sort((x, y) => y[1] - x[1]).slice(0, 5);
@@ -1498,7 +1600,7 @@ function renderSimResults(results) {
     const box = r.sample.length
       ? `<details class="sim-box"><summary>Sample box score — ${r.sample.length} goal${r.sample.length === 1 ? '' : 's'}</summary>
          <ul>${r.sample.map((gl) =>
-           `<li><span class="sim-team">${esc(gl.team)}</span>${esc(gl.scorer)} <span class="muted small">P${gl.period} ${gl.clock}</span></li>`).join('')}</ul>
+           `<li><span class="sim-team">${esc(gl.team)}</span>${gl.en ? '<span class="sim-en">EN</span>' : ''}${esc(gl.scorer)}${(gl.assists || []).length ? ` <span class="muted small">(${gl.assists.map(esc).join(', ')})</span>` : ''} <span class="muted small">P${gl.period} ${gl.clock}${gl.line ? ' \u00b7 ' + esc(gl.line) : ''}</span></li>`).join('')}</ul>
          </details>`
       : '<p class="muted small goal-none">Sample sim finished scoreless.</p>';
     const prow = (label, v) =>
