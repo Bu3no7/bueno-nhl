@@ -1071,7 +1071,7 @@ function renderSlate() {
     const asog = pbp && typeof pbp.awayTeam.sog === 'number' ? pbp.awayTeam.sog : null;
     const hsog = pbp && typeof pbp.homeTeam.sog === 'number' ? pbp.homeTeam.sog : null;
     const sogHtml = (asog !== null && hsog !== null) ? `<span>SOG ${asog}–${hsog}</span>` : '';
-    return `<div class="game-card">
+    return `<div class="game-card" data-gid="${g.id}" title="Tap for matchup">
       <div class="matchup">
         <span class="team"><img src="${teamLogoUrl(g.away)}" alt="" ${imgFallback}>${esc(g.away)}</span>
         <span class="muted">@</span>
@@ -1086,7 +1086,146 @@ function renderSlate() {
   if (ud) ud.textContent = d.toLocaleDateString([], { weekday: 'long', month: 'short', day: 'numeric' });
   const ug = $('utilGames');
   if (ug) ug.textContent = state.games.length + (state.games.length === 1 ? ' game' : ' games');
+  grid.querySelectorAll('.game-card').forEach((c) =>
+    c.addEventListener('click', (e) => {
+      if (e.target.closest('details')) return; // let the Goals toggle work
+      openMatchup(c.dataset.gid);
+    }));
 }
+
+/* ---------------- matchup card (tale of the tape) ----------------
+   Win probability is computed on tap from the sims' own team λ values
+   (sum of simLambda(sk.p) per team) via an exact Poisson race — no full
+   sims run, nothing precomputed upfront. Regulation ties are split
+   evenly between the teams for the two-way display. */
+const FACT = [1];
+for (let _i = 1; _i <= 20; _i++) FACT[_i] = FACT[_i - 1] * _i;
+function poissonPmf(k, lam) {
+  if (!(lam > 0)) return k === 0 ? 1 : 0;
+  if (k < 0 || k > 20) return 0;
+  return Math.exp(-lam) * Math.pow(lam, k) / FACT[k];
+}
+function matchupWinProb(lamA, lamB) {
+  const KMAX = 15;
+  let pA = 0, pTie = 0;
+  for (let i = 0; i <= KMAX; i++) {
+    const pa = poissonPmf(i, lamA);
+    if (pa === 0) continue;
+    let less = 0, eq = 0;
+    for (let j = 0; j <= KMAX; j++) {
+      const pb = poissonPmf(j, lamB);
+      if (j < i) less += pb;
+      else if (j === i) { eq = pb; break; }
+    }
+    pA += pa * less;
+    pTie += pa * eq;
+  }
+  const pB = Math.max(0, 1 - pA - pTie);
+  const half = pTie / 2;
+  return { a: pA + half, b: pB + half, tie: pTie };
+}
+
+/* Team stats: ONE standings fetch per date, cached for the session.
+   NOTE: /v1/standings/now 307-redirects off-proxy (CORS-killed) like
+   /roster/{team}/current did — the date-specific path returns 200. */
+async function getStandings() {
+  const key = state.date;
+  if (state.standingsCache && state.standingsCache.key === key) return state.standingsCache.map;
+  const map = {};
+  try {
+    const d = await fetchJSON(`${API}/standings/${key}`);
+    for (const s of (d.standings || [])) {
+      const ab = s.teamAbbrev && s.teamAbbrev.default;
+      if (ab) map[ab] = s;
+    }
+  } catch (e) { /* stats stay blank; win prob still shows */ }
+  state.standingsCache = { key, map };
+  return map;
+}
+
+function tapeRow(aVal, label, hVal, better) {
+  const ac = better === 'a' ? ' class="better"' : '';
+  const hc = better === 'h' ? ' class="better"' : '';
+  return `<div class="tape-row"><span${ac}>${aVal}</span><span class="tape-label">${label}</span><span${hc}>${hVal}</span></div>`;
+}
+// cmp returns 'a' | 'h' | null — higher wins unless lower=true
+function cmpRow(aV, hV, lower) {
+  if (aV === null || hV === null || aV === hV) return null;
+  const aBetter = lower ? aV < hV : aV > hV;
+  return aBetter ? 'a' : 'h';
+}
+
+function matchupHtml(g, lamA, lamB, wp, st) {
+  const A = g.away, H = g.home;
+  const sa = st ? st[A] : null, sh = st ? st[H] : null;
+  const rec = (s) => s ? `${s.wins}-${s.losses}-${s.otLosses}` : '–';
+  const per = (s, f) => (s && s.gamesPlayed > 0) ? f(s) : null;
+  const gfA = per(sa, (s) => s.goalFor / s.gamesPlayed);
+  const gfH = per(sh, (s) => s.goalFor / s.gamesPlayed);
+  const gaA = per(sa, (s) => s.goalAgainst / s.gamesPlayed);
+  const gaH = per(sh, (s) => s.goalAgainst / s.gamesPlayed);
+  const ptA = per(sa, (s) => s.pointPctg);
+  const ptH = per(sh, (s) => s.pointPctg);
+  const l10A = per(sa, (s) => (s.l10Wins + s.l10OtLosses * 0.5) / Math.max(s.l10GamesPlayed, 1));
+  const l10H = per(sh, (s) => (s.l10Wins + s.l10OtLosses * 0.5) / Math.max(s.l10GamesPlayed, 1));
+  const fmt2 = (v) => v === null ? '–' : v.toFixed(2);
+  const streak = (s) => (s && s.streakCode) ? `${s.streakCode}${s.streakCount}` : '–';
+  const l10rec = (s) => s ? `${s.l10Wins}-${s.l10Losses}-${s.l10OtLosses}` : '–';
+
+  const pbp = g.pbp;
+  const hasScore = pbp && (g.state === 'LIVE' || g.state === 'CRIT' || g.state === 'OFF' || g.state === 'FINAL');
+  const liveHtml = hasScore
+    ? `<div class="matchup-live"><span>${esc(A)} ${pbp.awayTeam.score}</span><span class="muted">–</span><span>${pbp.homeTeam.score} ${esc(H)}</span></div>
+       <div class="matchup-status muted small">${gameStatusText(g)}</div>`
+    : '';
+
+  const pctA = Math.round(wp.a * 100), pctH = Math.round(wp.b * 100);
+  return `
+  <div class="matchup-top">
+    <div class="matchup-team">
+      <img src="${teamLogoUrl(A)}" alt="${esc(A)}" ${imgFallback}>
+      <div class="matchup-abbr">${esc(A)}</div>
+      <div class="muted small">${esc(rec(sa))}</div>
+    </div>
+    <div class="matchup-vs">vs</div>
+    <div class="matchup-team">
+      <img src="${teamLogoUrl(H)}" alt="${esc(H)}" ${imgFallback}>
+      <div class="matchup-abbr">${esc(H)}</div>
+      <div class="muted small">${esc(rec(sh))}</div>
+    </div>
+  </div>
+  ${liveHtml}
+  <div class="split-bar" aria-label="Win probability">
+    <div class="split-a" style="width:${(wp.a * 100).toFixed(1)}%"></div><div class="split-b" style="width:${(wp.b * 100).toFixed(1)}%"></div>
+  </div>
+  <div class="split-labels"><span><strong>${pctA}%</strong> ${esc(A)}</span><span>${esc(H)} <strong>${pctH}%</strong></span></div>
+  <div class="matchup-proj">Projected <strong>${esc(A)} ${lamA.toFixed(1)} – ${lamB.toFixed(1)} ${esc(H)}</strong></div>
+  <h4 class="tape-title">Tale of the tape</h4>
+  <div class="tape">
+    ${tapeRow(fmt2(gfA), 'Goals for / game', fmt2(gfH), cmpRow(gfA, gfH))}
+    ${tapeRow(fmt2(gaA), 'Goals against / game', fmt2(gaH), cmpRow(gaA, gaH, true))}
+    ${tapeRow(rec(sa), 'Record', rec(sh), cmpRow(ptA, ptH))}
+    ${tapeRow(streak(sa), 'Streak', streak(sh), null)}
+    ${tapeRow(l10rec(sa), 'Last 10', l10rec(sh), cmpRow(l10A, l10H))}
+  </div>
+  <p class="muted small matchup-note">Win % from each team's Poisson scoring rate (regulation ties split evenly). Team stats via NHL standings, cached per date.</p>`;
+}
+
+async function openMatchup(gameId) {
+  const g = state.games.find((gg) => String(gg.id) === String(gameId));
+  if (!g) return;
+  const lamA = simUnits(g.id, g.away).total;
+  const lamB = simUnits(g.id, g.home).total;
+  const wp = matchupWinProb(lamA, lamB);
+  // show win prob + projection immediately; fill in standings when they arrive
+  $('matchupBody').innerHTML = matchupHtml(g, lamA, lamB, wp, null);
+  $('matchupModal').classList.remove('hidden');
+  const st = await getStandings();
+  if (!$('matchupModal').classList.contains('hidden')) {
+    $('matchupBody').innerHTML = matchupHtml(g, lamA, lamB, wp, st);
+  }
+}
+function closeMatchup() { $('matchupModal').classList.add('hidden'); }
 
 function sortedSkaters() {
   let rows = state.skaters.slice();
@@ -1681,7 +1820,9 @@ $('refreshBtn').addEventListener('click', () => boot(true));
 $('datePicker').addEventListener('change', (e) => boot(true, e.target.value || state.date));
 $('modalClose').addEventListener('click', closePlayer);
 $('playerModal').addEventListener('click', (e) => { if (e.target.id === 'playerModal') closePlayer(); });
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePlayer(); });
+$('matchupClose').addEventListener('click', closeMatchup);
+$('matchupModal').addEventListener('click', (e) => { if (e.target.id === 'matchupModal') closeMatchup(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closePlayer(); closeMatchup(); } });
 
 async function boot(isReload, date) {
   try {
