@@ -643,3 +643,23 @@ canvas.rink {
 .tape-label { color: var(--muted-2); font-size: .82rem; padding: 0 .9rem; white-space: nowrap; }
 .tape-row .better { color: var(--teal); font-weight: 750; }
 .matchup-note { text-align: center; margin-top: .9rem; }
+.goalie-panels { display: grid; grid-template-columns: 1fr 1fr; gap: .7rem; margin-top: .2rem; }
+@media (max-width: 560px) { .goalie-panels { grid-template-columns: 1fr; } }
+.goalie-panel { background: var(--panel2); border: 1px solid var(--border-soft); border-radius: var(--radius-sm); padding: .7rem .75rem; }
+.goalie-head { display: flex; align-items: center; gap: .5rem; margin-bottom: .5rem; flex-wrap: wrap; }
+.goalie-head strong { font-size: 1.02rem; }
+.g-tag { font-size: .68rem; text-transform: uppercase; letter-spacing: .12em; padding: .18rem .5rem; border-radius: 999px; background: var(--teal-wash); color: var(--teal); border: 1px solid rgba(58,219,227,.35); }
+canvas.grink { width: 100%; height: auto; background: #f4f6f8; border-radius: 10px; border: 1px solid var(--border); }
+.goalie-zone { margin-top: .5rem; font-size: .92rem; color: var(--muted); }
+.goalie-zone strong { color: var(--gold); }
+.posbar { display: flex; height: 9px; border-radius: 999px; overflow: hidden; background: var(--panel3); margin-top: .55rem; border: 1px solid var(--border-soft); }
+.pos-seg.pos-C { background: var(--teal); }
+.pos-seg.pos-LW { background: var(--blue); }
+.pos-seg.pos-RW { background: #9a7bff; }
+.pos-seg.pos-D { background: var(--gold); }
+.pos-legend { display: flex; gap: .7rem; flex-wrap: wrap; font-size: .76rem; color: var(--muted); margin-top: .35rem; font-variant-numeric: tabular-nums; }
+.pos-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 4px; vertical-align: baseline; }
+.pos-dot.pos-C { background: var(--teal); }
+.pos-dot.pos-LW { background: var(--blue); }
+.pos-dot.pos-RW { background: #9a7bff; }
+.pos-dot.pos-D { background: var(--gold); }
