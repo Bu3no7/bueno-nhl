@@ -595,3 +595,15 @@ canvas.rink {
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+/* Ice Breaker */
+.ib-game { margin-bottom: 1.6rem; }
+.ib-game-head { display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; margin-bottom: .5rem; }
+.ib-shares { margin-left: auto; }
+.book-input {
+  width: 4.6em; background: var(--bg2); border: 1px solid var(--border);
+  color: var(--text); border-radius: 6px; padding: .22rem .4rem; font: inherit; font-size: .85rem;
+}
+.book-input:focus { outline: none; border-color: var(--teal-deep); }
+.edge-pos { color: var(--teal); }
+.edge-neg { color: var(--danger); }

@@ -31,6 +31,7 @@
       <span class="nav-label">Run</span>
       <div class="nav-grid">
         <button class="tab active" data-view="goalprobs" role="tab">Goals</button>
+        <button class="tab" data-view="icebreaker" role="tab">Ice Breaker</button>
         <button class="tab" data-view="sims" role="tab">Sims</button>
         <button class="tab" data-view="markets" role="tab">Markets</button>
         <button class="tab" data-view="longshots" role="tab">Longshots</button>
@@ -131,6 +132,22 @@
       </table>
     </div>
     <p class="muted small">Model goal probabilities with no-vig fair American odds. See <a href="MODEL.md">MODEL.md</a> for the exact formulas.</p>
+  </section>
+
+  <section id="view-icebreaker" class="view">
+    <div class="view-head">
+      <div>
+        <p class="kicker">First goal</p>
+        <h2>Ice Breaker</h2>
+        <p class="view-sub muted">Who scores first? Model first-goal probabilities &middot; fair no-vig odds.</p>
+      </div>
+      <div class="seg" role="group" aria-label="Ice Breaker scope">
+        <button type="button" id="iceLeagueBtn" class="seg-btn active">League best</button>
+        <button type="button" id="iceGameBtn" class="seg-btn">Per game</button>
+      </div>
+    </div>
+    <div id="icebreakerWrap"></div>
+    <p class="muted small">Method: each skater's share of their game's scoring rate, with a +25% opening-line premium for estimated L1 skaters and a small home-ice tilt, renormalized per game. The starter premium and home tilt are research-backed baselines — not validated absolute rates. Lines are estimated from ice time, never official. See <a href="MODEL.md">MODEL.md</a> for the exact formula.</p>
   </section>
 
   <section id="view-sims" class="view">

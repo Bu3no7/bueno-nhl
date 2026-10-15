@@ -90,6 +90,8 @@ const state = {
   playerCache: new Map(),
   view: 'goalprobs',
   goalType: 'atg',    // 'atg' | 'twoplus' | 'firstgoal'
+  iceView: 'league',  // 'league' | 'game'
+  bookOdds: {},       // pid -> raw book-odds input string (Ice Breaker)
   sortBy: 'prob',
   teamFilter: '',
   refreshTimer: null,
@@ -858,6 +860,124 @@ function wirePnameClicks(tbody) {
     b.addEventListener('click', () => openPlayer(b.dataset.pid, b.dataset.gid)));
 }
 
+/* ---------------- ice breaker (first-goal) tool ----------------
+   Base: the SAME competing-rates math as the Goals tab first-goal
+   view — P(i) = λ_i / Σ_j λ_j within each game. We start from
+   firstGoalProbs() itself, so pre-boost numbers match by construction.
+   Adjustments (research-backed baselines, clearly labeled):
+     +25% weight for estimated L1 skaters — opening-shift starters score
+       first ~25–45% more often than their overall rate implies; we use
+       the conservative end because our L1–L4 lines are estimated from
+       TOI, not official.
+     +8% weight for home-team skaters — blends to ~52% home first-goal
+       rate per research.
+   Renormalized per game, so team shares always sum to 100%. */
+const ICE_L1_BOOST = 1.25;
+const ICE_HOME_BOOST = 1.08;
+function iceBreakerProbs() {
+  const base = firstGoalProbs(); // fgP identical to the Goals tab
+  const gmap = new Map(state.games.map((g) => [g.id, g]));
+  const weighted = base.map((r) => {
+    let w = 1;
+    if (r.line === 'L1') w *= ICE_L1_BOOST;
+    const g = gmap.get(r.gameId);
+    if (g && g.home === r.team) w *= ICE_HOME_BOOST;
+    return { ...r, ibW: (r.fgP || 0) * w };
+  });
+  const sumByGame = {};
+  for (const r of weighted) sumByGame[r.gameId] = (sumByGame[r.gameId] || 0) + r.ibW;
+  return weighted.map((r) => {
+    const denom = sumByGame[r.gameId] || 1;
+    const p = denom > 0 ? r.ibW / denom : 0;
+    return { ...r, ibP: p, ibFair: fairOddsSafe(p) };
+  }).sort((a, b) => b.ibP - a.ibP);
+}
+
+// American odds -> implied (no-vig) probability; null when unparseable
+function impliedProb(raw) {
+  const o = parseFloat(String(raw == null ? '' : raw).replace(/[+\s,]/g, ''));
+  if (!isFinite(o) || o === 0) return null;
+  return o > 0 ? 100 / (o + 100) : (-o) / ((-o) + 100);
+}
+function iceEdge(p, bookRaw) {
+  const imp = impliedProb(bookRaw);
+  if (imp == null) return { txt: '—', cls: 'muted' };
+  const e = (p - imp) * 100;
+  const sign = e > 0 ? '+' : '';
+  return { txt: `${sign}${e.toFixed(1)}pp edge`, cls: e > 0 ? 'edge-pos' : (e < 0 ? 'edge-neg' : 'muted') };
+}
+function iceRowHtml(r, matchup) {
+  const book = state.bookOdds[r.pid] || '';
+  const edge = iceEdge(r.ibP, book);
+  const l1tag = r.line === 'L1' ? ' <span class="muted small" title="Estimated first line — opening-shift premium applied">L1</span>' : '';
+  return `<tr>
+    <td>${pnameBtn(r)}</td>
+    <td><span class="team-cell"><img src="${teamLogoUrl(r.team)}" alt="" ${imgFallback}>${esc(r.team)}</span></td>
+    ${matchup ? `<td class="muted small">${esc(matchup)}</td>` : ''}
+    <td class="num"><strong>${pct1(r.ibP)}</strong>${l1tag}</td>
+    <td class="num">${r.ibFair}</td>
+    <td class="num"><input class="book-input" data-pid="${r.pid}" data-p="${r.ibP}" value="${esc(book)}" placeholder="+800" inputmode="text" aria-label="Book odds for ${esc(r.name)}"><div class="small edge-out ${edge.cls}">${esc(edge.txt)}</div></td>
+  </tr>`;
+}
+function iceLeagueHtml(rows) {
+  const gmap = new Map(state.games.map((g) => [g.id, g]));
+  const body = rows.map((r) => {
+    const g = gmap.get(r.gameId);
+    const matchup = g ? `${g.away} @ ${g.home}` : '';
+    return iceRowHtml(r, matchup);
+  }).join('');
+  return `<div class="table-wrap"><table>
+    <thead><tr><th>Skater</th><th>Team</th><th>Matchup</th><th class="num">1st-goal %</th><th class="num">Fair</th><th class="num">Book / edge</th></tr></thead>
+    <tbody>${body || '<tr><td colspan="6" class="muted">No skaters.</td></tr>'}</tbody>
+  </table></div>`;
+}
+function iceGameHtml(g, rows) {
+  const gr = rows.filter((r) => r.gameId === g.id);
+  let homeShare = 0, awayShare = 0;
+  for (const r of gr) { if (r.team === g.home) homeShare += r.ibP; else awayShare += r.ibP; }
+  const body = gr.slice(0, 15).map((r) => iceRowHtml(r, null)).join('');
+  return `<div class="ib-game">
+    <div class="ib-game-head">
+      <span class="team-cell"><img src="${teamLogoUrl(g.away)}" alt="" ${imgFallback}><strong>${esc(g.away)}</strong></span>
+      <span class="muted">@</span>
+      <span class="team-cell"><img src="${teamLogoUrl(g.home)}" alt="" ${imgFallback}><strong>${esc(g.home)}</strong></span>
+      <span class="ib-shares muted small">First-goal share&nbsp; ${esc(g.away)} ${pct1(awayShare)} · ${esc(g.home)} ${pct1(homeShare)}</span>
+    </div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Skater</th><th>Team</th><th class="num">1st-goal %</th><th class="num">Fair</th><th class="num">Book / edge</th></tr></thead>
+      <tbody>${body || '<tr><td colspan="5" class="muted">No skaters.</td></tr>'}</tbody>
+    </table></div>
+  </div>`;
+}
+function renderIcebreaker() {
+  const wrap = $('icebreakerWrap');
+  if (!wrap) return;
+  const rows = iceBreakerProbs();
+  if (!rows.length) { wrap.innerHTML = '<p class="muted">No skaters on this slate.</p>'; return; }
+  if (state.iceView === 'league') {
+    wrap.innerHTML = iceLeagueHtml(rows.slice(0, 50));
+  } else {
+    wrap.innerHTML = state.games.map((g) => iceGameHtml(g, rows)).join('');
+  }
+  wrap.querySelectorAll('.pname').forEach((b) =>
+    b.addEventListener('click', () => openPlayer(b.dataset.pid, b.dataset.gid)));
+  wrap.querySelectorAll('.book-input').forEach((inp) => {
+    inp.addEventListener('input', () => {
+      state.bookOdds[inp.dataset.pid] = inp.value;
+      const e = iceEdge(parseFloat(inp.dataset.p), inp.value);
+      const out = inp.parentElement.querySelector('.edge-out');
+      if (out) { out.textContent = e.txt; out.className = 'small edge-out ' + e.cls; }
+    });
+  });
+}
+function setIceView(v) {
+  state.iceView = v;
+  const lb = $('iceLeagueBtn'), gb = $('iceGameBtn');
+  if (lb) lb.classList.toggle('active', v === 'league');
+  if (gb) gb.classList.toggle('active', v === 'game');
+  renderIcebreaker();
+}
+
 /* ---------------- consolidated goal-probabilities view ----------------
    One "Goals" tab; the goalTypeSelect dropdown switches between
    anytime (ATG), 2+ goals, and first-goal tables. */
@@ -1204,6 +1324,7 @@ function renderAll() {
   renderGoals();
   renderBoard();
   renderGoalProbs();
+  renderIcebreaker();
   renderLongshots();
   renderMarkets();
   renderParlay();
@@ -1395,6 +1516,9 @@ if (simOneBtn) simOneBtn.addEventListener('click', () => { simState.scope = 'one
 if (simAllBtn) simAllBtn.addEventListener('click', () => { simState.scope = 'all'; applySimScope(); });
 const simRunBtn = $('simRunBtn');
 if (simRunBtn) simRunBtn.addEventListener('click', runSims);
+const iceLeagueBtn = $('iceLeagueBtn'), iceGameBtn = $('iceGameBtn');
+if (iceLeagueBtn) iceLeagueBtn.addEventListener('click', () => setIceView('league'));
+if (iceGameBtn) iceGameBtn.addEventListener('click', () => setIceView('game'));
 $('refreshBtn').addEventListener('click', () => boot(true));
 $('datePicker').addEventListener('change', (e) => boot(true, e.target.value || state.date));
 $('modalClose').addEventListener('click', closePlayer);

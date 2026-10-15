@@ -129,6 +129,27 @@ Every goal type gets its own tab; Anytime is the hero view.
 - **2+ goals** — from the skater's Poisson goal rate:
   `P(2+) = 1 − e^(−λ) − λ·e^(−λ)`.
 
+## Ice Breaker (first-goal tool)
+
+Prices who scores each game's first goal. Starts from the same
+competing-rates math as the First goal view (`P(i) = λ_i / Σ_j λ_j`
+within each game), then applies two research-backed adjustments and
+renormalizes per game:
+
+- **Opening-line premium** — estimated L1 skaters get 1.25× weight.
+  Research finds opening-shift starters score first ~25–45% more often
+  than their overall rate implies; we use the conservative end because
+  our L1–L4 lines are estimated from ice time, not official.
+- **Home-ice tilt** — home-team skaters get 1.08× weight, blending to
+  roughly a 52% home first-goal rate per research.
+
+Team first-goal shares are the summed skater probabilities per side and
+always reconcile to 100% per matchup. The premium and tilt are
+research-backed baselines, not validated absolute rates — the method
+section on the page says so plainly. Book-odds inputs convert American
+odds to no-vig implied probability; edge = model probability minus
+implied, in percentage points.
+
 ## Parlay builder
 
 Legs are added from any player card (anytime goal or a specific
