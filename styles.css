@@ -618,3 +618,28 @@ canvas.rink {
 .book-input:focus { outline: none; border-color: var(--teal-deep); }
 .edge-pos { color: var(--teal); }
 .edge-neg { color: var(--danger); }
+
+/* ---------- matchup card (tale of the tape) ---------- */
+.game-card[data-gid] { cursor: pointer; }
+.matchup-top { display: flex; align-items: center; justify-content: center; gap: 1.4rem; margin: .4rem 0 .9rem; }
+.matchup-team { display: flex; flex-direction: column; align-items: center; gap: .25rem; min-width: 96px; }
+.matchup-team img { width: 76px; height: 76px; }
+.matchup-abbr { font-size: 1.25rem; font-weight: 800; letter-spacing: .06em; }
+.matchup-vs { color: var(--muted-2); font-size: .85rem; text-transform: uppercase; letter-spacing: .25em; }
+.matchup-live { display: flex; justify-content: center; align-items: baseline; gap: .5rem; font-size: 1.6rem; font-weight: 800; margin-bottom: .15rem; }
+.matchup-status { text-align: center; margin-bottom: .9rem; }
+.split-bar { display: flex; height: 14px; border-radius: 999px; overflow: hidden; background: var(--panel3); border: 1px solid var(--border); }
+.split-a { background: linear-gradient(90deg, var(--teal-deep), var(--teal)); }
+.split-b { background: linear-gradient(90deg, var(--blue), #2b5f9e); }
+.split-labels { display: flex; justify-content: space-between; margin: .35rem 0 .8rem; font-size: .95rem; color: var(--muted); }
+.split-labels strong { color: var(--text); }
+.matchup-proj { text-align: center; font-size: 1.05rem; margin-bottom: .4rem; color: var(--muted); }
+.matchup-proj strong { color: var(--text); }
+.tape-title { font-size: .8rem; text-transform: uppercase; letter-spacing: .22em; color: var(--teal); margin: 1.1rem 0 .55rem !important; padding-top: .9rem; border-top: 1px solid var(--border-soft); text-align: center; }
+.tape { display: flex; flex-direction: column; gap: .1rem; }
+.tape-row { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: .42rem .2rem; border-bottom: 1px solid var(--border-soft); font-variant-numeric: tabular-nums; }
+.tape-row span:first-child { text-align: left; }
+.tape-row span:last-child { text-align: right; }
+.tape-label { color: var(--muted-2); font-size: .82rem; padding: 0 .9rem; white-space: nowrap; }
+.tape-row .better { color: var(--teal); font-weight: 750; }
+.matchup-note { text-align: center; margin-top: .9rem; }
