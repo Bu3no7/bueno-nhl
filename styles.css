@@ -133,7 +133,7 @@ input[type="date"] { padding: .35rem .5rem; font-size: .82rem; }
 input[type="number"] { width: 5.5rem; font-variant-numeric: tabular-nums; }
 select:disabled { opacity: .45; }
 
-#goalTypeSelect {
+#mktKindFilter {
   min-height: 2.75rem; min-width: 10rem; font-size: 1rem; font-weight: 600;
   cursor: pointer;
 }

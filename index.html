@@ -30,10 +30,9 @@
     <div class="nav-group">
       <span class="nav-label">Run</span>
       <div class="nav-grid">
-        <button class="tab active" data-view="goalprobs" role="tab">Goals</button>
         <button class="tab" data-view="icebreaker" role="tab">Ice Breaker</button>
         <button class="tab" data-view="sims" role="tab">Sims</button>
-        <button class="tab" data-view="markets" role="tab">Markets</button>
+        <button class="tab active" data-view="markets" role="tab">Markets</button>
         <button class="tab" data-view="longshots" role="tab">Longshots</button>
         <button class="tab" data-view="parlay" role="tab">Parlay</button>
       </div>
@@ -110,37 +109,6 @@
     <p class="muted small">Probabilities are model anytime-goal estimates..</p>
   </section>
 
-  <section id="view-goalprobs" class="view active">
-    <div class="view-head">
-      <div>
-        <p class="kicker">Probabilities</p>
-        <h2>Goals</h2>
-        <p id="goalprobsSub" class="view-sub muted">Ranked by model probability &middot; fair no-vig odds.</p>
-      </div>
-      <label class="small muted">Type
-        <select id="goalTypeSelect">
-          <option value="atg" selected>Anytime goals</option>
-          <option value="twoplus">2+ goals</option>
-          <option value="firstgoal">First goal</option>
-        </select>
-      </label>
-    </div>
-    <div class="goal-filters">
-      <input type="text" id="goalSearchInput" placeholder="Search players…" autocomplete="off" aria-label="Search players">
-      <select id="goalGameSelect" aria-label="Filter by game">
-        <option value="all">All games</option>
-      </select>
-      <button id="goalFilterClear" class="ghost-btn" type="button" title="Clear filters" aria-label="Clear filters">✕</button>
-    </div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Skater</th><th>Team</th><th class="num">Prob</th><th class="num">Fair</th></tr></thead>
-        <tbody id="goalprobsBody"></tbody>
-      </table>
-    </div>
-    <p class="muted small">Model goal probabilities with no-vig fair American odds..</p>
-  </section>
-
   <section id="view-icebreaker" class="view">
     <div class="view-head">
       <div>
@@ -199,19 +167,45 @@
     <div id="longshotsList" class="longshots-list"></div>
   </section>
 
-  <section id="view-markets" class="view">
+  <section id="view-markets" class="view active">
     <div class="view-head">
       <div>
         <p class="kicker">Model</p>
         <h2>Markets</h2>
-        <p class="view-sub muted">Poisson over/under on shots, assists, points.</p>
+        <p id="marketsSub" class="view-sub muted">Ranked by model probability &middot; fair no-vig odds.</p>
       </div>
-      <label class="small muted">Team
+      <label class="small muted">Market
+        <select id="mktKindFilter">
+          <option value="atg" selected>Anytime goal</option>
+          <option value="twoplus">Brace</option>
+          <option value="firstgoal">First goal</option>
+          <option value="shots">Shots on goal</option>
+          <option value="assists">Assists</option>
+          <option value="points">Points</option>
+        </select>
+      </label>
+      <label class="small muted" id="mktTeamFilterWrap">Team
         <select id="mktTeamFilter"><option value="">All teams</option></select>
       </label>
     </div>
-    <div id="marketsWrap"></div>
-    <p class="muted small">Over probabilities from each skater's Poisson rate (shots, assists, points per game). Tap a name for beat/miss snapshots..</p>
+    <div class="goal-filters" id="mktGoalFilters">
+      <input type="text" id="goalSearchInput" placeholder="Search players…" autocomplete="off" aria-label="Search players">
+      <select id="goalGameSelect" aria-label="Filter by game">
+        <option value="all">All games</option>
+      </select>
+      <button id="goalFilterClear" class="ghost-btn" type="button" title="Clear filters" aria-label="Clear filters">✕</button>
+    </div>
+    <div id="goalprobsWrap">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Skater</th><th>Team</th><th class="num">Prob</th><th class="num">Fair</th></tr></thead>
+          <tbody id="goalprobsBody"></tbody>
+        </table>
+      </div>
+      <p class="muted small">Model goal probabilities with no-vig fair American odds..</p>
+    </div>
+    <div id="marketsWrap" class="hidden"></div>
+    <p class="muted small hidden" id="marketsNote">Over probabilities from each skater's Poisson rate (shots, assists, points per game). Tap a name for beat/miss snapshots..</p>
   </section>
 
   <section id="view-parlay" class="view">
