@@ -1,0 +1,52 @@
+name: Publish sims
+
+# Twice daily in America/Phoenix. Arizona does not observe DST, so MST is
+# always UTC-7:
+#   17:00 UTC = 10:00 AM MST
+#   23:00 UTC =  4:00 PM MST
+on:
+  schedule:
+    - cron: '0 17 * * *'
+    - cron: '0 23 * * *'
+  workflow_dispatch:
+
+jobs:
+  publish-sims:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # needed for GITHUB_TOKEN to push sims/
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # Runs the site's own correlated Monte Carlo engine (sims-runner reuses
+      # ../engine.js — the exact same math as the browser). Hits the public
+      # NHL API directly; Node has no CORS issue, so no proxy is needed.
+      # --no-push: the runner writes sims/<date>.json locally only; this
+      # workflow commits it via git below. The --push GitHub-CLI path stays
+      # for manual VM runs.
+      - name: Run sims runner
+        run: node sims-runner/run.js --no-push
+
+      # Idempotent: commit + push only when sims/ actually changed.
+      - name: Commit and push sims if changed
+        run: |
+          PHX_DATE=$(TZ=America/Phoenix date +%F)
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if [ -d sims ] && [ -n "$(ls -A sims 2>/dev/null)" ]; then
+            git add sims/
+            if ! git diff --cached --quiet; then
+              git commit -m "sims: publish ${PHX_DATE}"
+              git push
+            else
+              echo "sims unchanged — nothing to commit"
+            fi
+          else
+            echo "no sims output — nothing to commit"
+          fi
