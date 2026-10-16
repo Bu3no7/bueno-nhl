@@ -1,0 +1,3 @@
+# Cloudflare Pages equivalent of the netlify.toml redirect rules.
+# Keep internal docs off the live site:
+/MODEL.md /404 404
