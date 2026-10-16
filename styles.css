@@ -632,7 +632,7 @@ canvas.rink {
 
 /* Ice Breaker */
 .ib-game { margin-bottom: 1.6rem; }
-.ib-game-head { display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; margin-bottom: .5rem; }
+.ib-bar { max-width: 26rem; margin: .2rem 0 .8rem; }.ib-game-head { display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; margin-bottom: .5rem; }
 .ib-shares { margin-left: auto; }
 .book-input {
   width: 4.6em; background: var(--bg2); border: 1px solid var(--border);
