@@ -947,6 +947,65 @@ function iceBreakerScores(rows) {
   return scored;
 }
 
+/* First-goal timing. Stamped winner time for started games comes from
+   the pbp already in memory (first non-shootout goal play); expected
+   time to first goal for pre-game games is the Poisson waiting time
+   60 / total λ from the sims' skater rates (no new data fetched). */
+function firstGoalStamp(pbp) {
+  if (!pbp) return null;
+  const names = {};
+  for (const r of (pbp.rosterSpots || [])) {
+    names[r.playerId] = `${r.firstName.default} ${r.lastName.default}`;
+  }
+  for (const p of (pbp.plays || [])) {
+    if (p.typeDescKey !== 'goal') continue;
+    if ((p.periodDescriptor || {}).periodType === 'SO') continue;
+    const det = p.details || {};
+    const full = names[det.scoringPlayerId] || '';
+    const parts = full.split(' ');
+    const short = parts.length > 1 ? `${parts[0][0]}. ${parts.slice(1).join(' ')}` : full;
+    return {
+      scorer: short || '—',
+      time: p.timeInPeriod || '',
+      period: (p.periodDescriptor || {}).number || 0,
+    };
+  }
+  return null;
+}
+function periodOrd(n) {
+  if (!n) return '';
+  if (n > 3) return 'OT';
+  return n + (n === 1 ? 'st' : n === 2 ? 'nd' : 'rd');
+}
+function fmtFirstGoalStamp(st) {
+  const per = periodOrd(st.period);
+  return `${st.scorer} — ${st.time}${per ? ' ' + per : ''}`;
+}
+function expectedFirstGoalMin(gameId) {
+  let lam = 0;
+  for (const sk of state.skaters) if (sk.gameId === gameId) lam += simLambda(sk.p);
+  return lam > 0 ? 60 / lam : null;
+}
+function fmtExpFirstGoal(min) {
+  const s = Math.round(min * 60);
+  return `≈ ${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+}
+// Compact timing string for a game: stamped winner if scored, else expected time.
+function iceTimingShort(g) {
+  const st = firstGoalStamp(g.pbp);
+  if (st) { const per = periodOrd(st.period); return `${st.time}${per ? ' ' + per : ''}`; }
+  const exp = expectedFirstGoalMin(g.id);
+  return exp != null ? fmtExpFirstGoal(exp) : '';
+}
+// Full timing line for the per-game view header.
+function iceTimingLine(g) {
+  const st = firstGoalStamp(g.pbp);
+  if (st) return `First goal: <strong>${esc(fmtFirstGoalStamp(st))}</strong>`;
+  const exp = expectedFirstGoalMin(g.id);
+  if (exp != null) return `Expected first goal <strong>${esc(fmtExpFirstGoal(exp))}</strong>`;
+  return '';
+}
+
 // American odds -> implied (no-vig) probability; null when unparseable
 function impliedProb(raw) {
   const o = parseFloat(String(raw == null ? '' : raw).replace(/[+\s,]/g, ''));
@@ -979,7 +1038,8 @@ function iceLeagueHtml(rows) {
   const body = rows.map((r) => {
     const g = gmap.get(r.gameId);
     const matchup = g ? `${g.away} @ ${g.home}` : '';
-    return iceRowHtml(r, matchup);
+    const timing = g ? iceTimingShort(g) : '';
+    return iceRowHtml(r, timing ? `${matchup} · ${timing}` : matchup);
   }).join('');
   return `<div class="table-wrap"><table>
     <thead><tr><th>Skater</th><th>Team</th><th>Matchup</th><th class="num">Score</th><th class="num">1st-goal %</th><th class="num">Fair</th><th class="num">Book / edge</th></tr></thead>
@@ -991,12 +1051,14 @@ function iceGameHtml(g, rows) {
   let homeShare = 0, awayShare = 0;
   for (const r of gr) { if (r.team === g.home) homeShare += r.ibP; else awayShare += r.ibP; }
   const body = gr.slice(0, 15).map((r) => iceRowHtml(r, null)).join('');
+  const timing = iceTimingLine(g);
   return `<div class="ib-game">
     <div class="ib-game-head">
       <span class="team-cell"><img src="${teamLogoUrl(g.away)}" alt="" ${imgFallback}><strong>${esc(g.away)}</strong></span>
       <span class="muted">@</span>
       <span class="team-cell"><img src="${teamLogoUrl(g.home)}" alt="" ${imgFallback}><strong>${esc(g.home)}</strong></span>
       <span class="ib-shares muted small">First-goal share&nbsp; ${esc(g.away)} ${pct1(awayShare)} · ${esc(g.home)} ${pct1(homeShare)}</span>
+      ${timing ? `<span class="ib-timing muted small">${timing}</span>` : ''}
     </div>
     <div class="table-wrap"><table>
       <thead><tr><th>Skater</th><th>Team</th><th class="num">Score</th><th class="num">1st-goal %</th><th class="num">Fair</th><th class="num">Book / edge</th></tr></thead>
@@ -1014,8 +1076,17 @@ function renderIcebreaker() {
     const ranked = rows.slice().sort((a, b) => (b.ibScore - a.ibScore) || (b.ibP - a.ibP));
     wrap.innerHTML = iceLeagueHtml(ranked.slice(0, 50));
   } else {
-    // Per game: keep first-goal % order, show the Score alongside
-    wrap.innerHTML = state.games.map((g) => iceGameHtml(g, rows)).join('');
+    // Per game: fastest expected first goal first (games with no λ data last);
+    // started games show the stamped winner time in their header.
+    const expByGame = new Map(state.games.map((g) => [g.id, expectedFirstGoalMin(g.id)]));
+    const ordered = state.games.slice().sort((a, b) => {
+      const ea = expByGame.get(a.id), eb = expByGame.get(b.id);
+      if (ea == null && eb == null) return 0;
+      if (ea == null) return 1;
+      if (eb == null) return -1;
+      return ea - eb;
+    });
+    wrap.innerHTML = ordered.map((g) => iceGameHtml(g, rows)).join('');
   }
   wrap.querySelectorAll('.pname').forEach((b) =>
     b.addEventListener('click', () => openPlayer(b.dataset.pid, b.dataset.gid)));
@@ -1038,34 +1109,42 @@ function setIceView(v) {
 
 /* ---------------- consolidated markets view ----------------
    One "Markets" tab; the mktKindFilter dropdown switches between the
-   goal markets (anytime, brace, first goal) and the Poisson over/under
-   markets (shots, assists, points). Only the selected market renders. */
+   goal markets (anytime, brace, first goal), the Ice Breaker first-goal
+   tool, and the Poisson over/under markets (shots, assists, points).
+   Only the selected market renders. */
 const GOAL_KINDS = ['atg', 'twoplus', 'firstgoal'];
+const ICE_KIND = 'icebreaker';
 const MARKET_SUBS = {
   atg: 'Ranked by model probability &middot; fair no-vig odds.',
   twoplus: 'Probability of scoring a brace.',
   firstgoal: "Each skater's share of their matchup's scoring rate.",
+  icebreaker: 'Who scores first? Model first-goal probabilities &middot; fair no-vig odds.',
   shots: 'Poisson over/under on shots &middot; λ from SOG/game.',
   assists: 'Poisson over/under on assists &middot; λ from AST/game.',
   points: 'Poisson over/under on points &middot; λ from PTS/game.',
 };
 /* Show exactly one market: goal markets get the search + game filters
-   and the goal-probability table; Poisson markets get the team filter
-   and the over/under table. */
+   and the goal-probability table; Ice Breaker gets its toggle + content;
+   Poisson markets get the team filter and the over/under table. */
 function setMarketKind(kind) {
   if (!MARKET_SUBS[kind]) kind = 'atg';
   state.marketKind = kind;
   const sel = $('mktKindFilter');
   if (sel) sel.value = kind;
   const isGoal = GOAL_KINDS.includes(kind);
+  const isIce = kind === ICE_KIND;
+  const isPoisson = !isGoal && !isIce;
   $('goalprobsWrap').classList.toggle('hidden', !isGoal);
   $('mktGoalFilters').classList.toggle('hidden', !isGoal);
-  $('marketsWrap').classList.toggle('hidden', isGoal);
-  $('marketsNote').classList.toggle('hidden', isGoal);
-  $('mktTeamFilterWrap').classList.toggle('hidden', isGoal);
+  $('icebreakerSection').classList.toggle('hidden', !isIce);
+  $('marketsWrap').classList.toggle('hidden', !isPoisson);
+  $('marketsNote').classList.toggle('hidden', !isPoisson);
+  $('mktTeamFilterWrap').classList.toggle('hidden', !isPoisson);
   const sub = $('marketsSub');
   if (sub) sub.innerHTML = MARKET_SUBS[kind];
-  if (isGoal) renderGoalProbs(); else renderMarkets();
+  if (isGoal) renderGoalProbs();
+  else if (isIce) renderIcebreaker();
+  else renderMarkets();
 }
 /* Goals tab filters: player-name search + game dropdown. Both combine
    with each other and with the goal-type dropdown; they filter the
