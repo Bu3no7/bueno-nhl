@@ -161,7 +161,6 @@
           <option value="atg" selected>Anytime goal</option>
           <option value="twoplus">Brace</option>
           <option value="firstgoal">First goal</option>
-          <option value="icebreaker">Ice Breaker</option>
           <option value="shots">Shots on goal</option>
           <option value="assists">Assists</option>
           <option value="points">Points</option>
@@ -190,14 +189,9 @@
     <div id="marketsWrap" class="hidden"></div>
     <p class="muted small hidden" id="marketsNote">Over probabilities from each skater's Poisson rate (shots, assists, points per game). Tap a name for beat/miss snapshots..</p>
     <div id="icebreakerSection" class="hidden">
-      <div class="ib-bar">
-        <div class="seg" role="group" aria-label="Ice Breaker scope">
-          <button type="button" id="iceLeagueBtn" class="seg-btn active">League best</button>
-          <button type="button" id="iceGameBtn" class="seg-btn">Per game</button>
-        </div>
-      </div>
+      <h3 class="mkt-title">Ice Breaker spotlight</h3>
+      <div id="iceSpotWrap" class="ib-spot-grid"></div>
       <p class="muted small"><strong>Score:</strong> each player's first-goal chance in his game, weighted by how much scoring his game is expected to have versus tonight's slate average — tonight's top pick is 100.</p>
-      <div id="icebreakerWrap"></div>
       <p class="muted small">Method: each skater's share of their game's scoring rate, with a +25% opening-line premium for estimated L1 skaters and a small home-ice tilt, renormalized per game. The starter premium and home tilt are research-backed baselines — not validated absolute rates. Lines are estimated from ice time, never official..</p>
     </div>
   </section>

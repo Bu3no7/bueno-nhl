@@ -631,9 +631,34 @@ canvas.rink {
 }
 
 /* Ice Breaker */
-.ib-game { margin-bottom: 1.6rem; }
-.ib-bar { max-width: 26rem; margin: .2rem 0 .8rem; }.ib-game-head { display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; margin-bottom: .5rem; }
-.ib-shares { margin-left: auto; }
+/* ---------- ice breaker spotlight ---------- */
+.ib-spot-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: .8rem; margin: .2rem 0 1rem; }
+.ib-spot-card {
+  background: linear-gradient(180deg, var(--panel), #0a0f19);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 1rem; box-shadow: var(--shadow-sm);
+}
+.ib-spot-label {
+  font-size: .72rem; text-transform: uppercase; letter-spacing: .08em;
+  color: var(--gold); font-weight: 800; margin-bottom: .45rem;
+}
+.ib-spot-name .pname {
+  color: var(--teal); cursor: pointer; font-weight: 700; font-family: inherit;
+  background: none; border: 0; padding: 0; font-size: 1.05rem; text-align: left;
+  display: inline-flex; align-items: center; gap: .5rem;
+}
+.ib-spot-name .pname:hover { color: #7cebf1; }
+.ib-spot-name .pavatar { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; background: var(--panel2); }
+.ib-spot-meta { margin-top: .35rem; display: flex; align-items: center; gap: .35rem; flex-wrap: wrap; }
+.ib-spot-score { margin-top: .55rem; display: flex; align-items: baseline; gap: .5rem; }
+.ib-spot-score-num {
+  font-size: 2rem; font-weight: 800; color: var(--teal); letter-spacing: -.02em;
+  font-variant-numeric: tabular-nums; text-shadow: 0 0 18px rgba(45, 226, 230, .25);
+}
+.ib-spot-stats { margin-top: .25rem; font-size: .88rem; font-variant-numeric: tabular-nums; }
+.ib-spot-timing { margin-top: .35rem; font-size: .85rem; color: var(--muted); }
+.ib-spot-book { margin-top: .5rem; }
+.ib-spot-book .book-input { width: 7.5rem; }
 .book-input {
   width: 4.6em; background: var(--bg2); border: 1px solid var(--border);
   color: var(--text); border-radius: 6px; padding: .22rem .4rem; font: inherit; font-size: .85rem;
