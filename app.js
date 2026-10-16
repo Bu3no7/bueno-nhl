@@ -90,6 +90,8 @@ const state = {
   playerCache: new Map(),
   view: 'goalprobs',
   goalType: 'atg',    // 'atg' | 'twoplus' | 'firstgoal'
+  goalSearch: '',     // Goals tab player-name search filter
+  goalGame: 'all',    // Goals tab game filter ('all' or game id)
   iceView: 'league',  // 'league' | 'game'
   bookOdds: {},       // pid -> raw book-odds input string (Ice Breaker)
   sortBy: 'prob',
@@ -479,6 +481,10 @@ async function loadDate(dateStr) {
   state.date = dateStr;
   state.games = [];
   state.skaters = [];
+  state.goalSearch = '';
+  state.goalGame = 'all';
+  const gsi = $('goalSearchInput');
+  if (gsi) gsi.value = '';
 
   const sched = await fetchJSON(`${API}/schedule/${dateStr}`);
   const day = (sched.gameWeek || []).find((w) => w.date === dateStr);
@@ -651,6 +657,7 @@ async function loadDate(dateStr) {
 
   showLoading('');
   populateTeamFilter();
+  populateGoalGameFilter();
   renderAll();
 }
 
@@ -1037,19 +1044,42 @@ const GOALPROB_SUBS = {
   twoplus: 'Probability of scoring at least twice.',
   firstgoal: "Each skater's share of their matchup's scoring rate.",
 };
+/* Goals tab filters: player-name search + game dropdown. Both combine
+   with each other and with the goal-type dropdown; they filter the
+   already-loaded rows, no new requests. */
+function populateGoalGameFilter() {
+  const sel = $('goalGameSelect');
+  if (!sel) return;
+  const prev = state.goalGame;
+  sel.innerHTML = '<option value="all">All games</option>' +
+    state.games.map((g) => `<option value="${g.id}">${esc(g.away)} vs ${esc(g.home)}</option>`).join('');
+  // keep selection when the slate still has that game, else reset
+  state.goalGame = state.games.some((g) => String(g.id) === String(prev)) ? prev : 'all';
+  sel.value = state.goalGame;
+}
+function filterGoalRows(rows) {
+  let out = rows;
+  if (state.goalGame !== 'all') {
+    out = out.filter((r) => String(r.gameId) === String(state.goalGame));
+  }
+  const q = (state.goalSearch || '').trim().toLowerCase();
+  if (q) out = out.filter((r) => (r.name || '').toLowerCase().includes(q));
+  return out;
+}
 function renderGoalProbs() {
   const tb = $('goalprobsBody');
   if (!tb) return;
   const sel = $('goalTypeSelect');
   const type = sel ? sel.value : state.goalType;
   state.goalType = type;
+  let html;
   if (type === 'twoplus') {
-    tb.innerHTML = probTableHtml(twoPlusProbs(), 'tpP', 'tpFair');
+    html = probTableHtml(filterGoalRows(twoPlusProbs()), 'tpP', 'tpFair');
   } else if (type === 'firstgoal') {
-    tb.innerHTML = probTableHtml(firstGoalProbs(), 'fgP', 'fgFair');
+    html = probTableHtml(filterGoalRows(firstGoalProbs()), 'fgP', 'fgFair');
   } else {
-    const rows = state.skaters.slice().sort((a, b) => b.p - a.p);
-    tb.innerHTML = rows.map((r) => `
+    const rows = filterGoalRows(state.skaters.slice().sort((a, b) => b.p - a.p));
+    html = rows.map((r) => `
     <tr>
       <td>${pnameBtn(r)}</td>
       <td><span class="team-cell"><img src="${teamLogoUrl(r.team)}" alt="" ${imgFallback}>${esc(r.team)}</span></td>
@@ -1057,6 +1087,7 @@ function renderGoalProbs() {
       <td class="num">${r.fair}</td>
     </tr>`).join('');
   }
+  tb.innerHTML = html || '<tr><td colspan="4" class="muted">No skaters match.</td></tr>';
   const sub = $('goalprobsSub');
   if (sub) sub.innerHTML = GOALPROB_SUBS[type] || GOALPROB_SUBS.atg;
   wirePnameClicks(tb);
@@ -1972,6 +2003,18 @@ document.querySelectorAll('.tab').forEach((t) =>
 $('sortSelect').addEventListener('change', (e) => { state.sortBy = e.target.value; renderBoard(); });
 const goalTypeSelect = $('goalTypeSelect');
 if (goalTypeSelect) goalTypeSelect.addEventListener('change', (e) => { state.goalType = e.target.value; renderGoalProbs(); });
+// Goals tab filters: live search + game dropdown (persist across goal-type switches)
+const goalSearchInput = $('goalSearchInput');
+if (goalSearchInput) goalSearchInput.addEventListener('input', (e) => { state.goalSearch = e.target.value; renderGoalProbs(); });
+const goalGameSelect = $('goalGameSelect');
+if (goalGameSelect) goalGameSelect.addEventListener('change', (e) => { state.goalGame = e.target.value; renderGoalProbs(); });
+const goalFilterClear = $('goalFilterClear');
+if (goalFilterClear) goalFilterClear.addEventListener('click', () => {
+  state.goalSearch = ''; state.goalGame = 'all';
+  if (goalSearchInput) goalSearchInput.value = '';
+  if (goalGameSelect) goalGameSelect.value = 'all';
+  renderGoalProbs();
+});
 $('teamFilter').addEventListener('change', (e) => applyTeamFilter(e.target.value));
 const mktFilter = $('mktTeamFilter');
 if (mktFilter) mktFilter.addEventListener('change', (e) => applyTeamFilter(e.target.value));
