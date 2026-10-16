@@ -1,0 +1,51 @@
+name: Build slate data
+
+# Precomputes data/<date>.json 3x daily in America/Phoenix. Arizona does not
+# observe DST, so MST is always UTC-7:
+#   16:00 UTC =  9:00 AM MST  (morning refresh)
+#   21:00 UTC =  2:00 PM MST  (afternoon, pre-slate)
+#   01:00 UTC =  6:00 PM MST  (evening, lineups locking)
+on:
+  schedule:
+    - cron: '0 16 * * *'
+    - cron: '0 21 * * *'
+    - cron: '0 1 * * *'
+  workflow_dispatch:
+
+jobs:
+  build-data:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # needed for GITHUB_TOKEN to push data/
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # Fetches the full slate bundle (schedule, pbps, rosters, zone pbps,
+      # ~220 player landings, standings) and writes data/<date>.json.
+      # Hits the public NHL API directly; Node has no CORS issue.
+      - name: Build slate data
+        run: node data-builder/build.js
+
+      # Idempotent: commit + push only when data/ actually changed.
+      - name: Commit and push data if changed
+        run: |
+          PHX_DATE=$(TZ=America/Phoenix date +%F)
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if [ -d data ] && [ -n "$(ls -A data 2>/dev/null)" ]; then
+            git add data/
+            if ! git diff --cached --quiet; then
+              git commit -m "data: build ${PHX_DATE}"
+              git push
+            else
+              echo "data unchanged — nothing to commit"
+            fi
+          else
+            echo "no data output — nothing to commit"
+          fi
