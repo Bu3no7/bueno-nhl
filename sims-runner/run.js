@@ -18,10 +18,15 @@ Re-runs:      a game is (re)simmed only when newly locked or when the dressed
               roster changed since the published sim (rosterHash).
 
 Usage:
-  node sims-runner/run.js [--date=YYYY-MM-DD] [--push] [--sims=N]
-  --date  slate date (default: today in America/Phoenix)
-  --push  push sims/<date>.json to GitHub (Bu3no7/bueno-nhl, branch main)
-  --sims  Monte Carlo iterations per game (default 20000)
+  node sims-runner/run.js [--date=YYYY-MM-DD] [--push] [--no-push] [--sims=N]
+  --date    slate date (default: today in America/Phoenix)
+  --push    push sims/<date>.json to GitHub (Bu3no7/bueno-nhl, branch main)
+            via the local GitHub CLI (/opt/hatch/bin/github) — VM only
+  --no-push force-skip the CLI push even if --push is given
+  --sims    Monte Carlo iterations per game (default 20000)
+
+  GitHub Actions (.github/workflows/sims.yml) runs WITHOUT --push and commits
+  sims/ itself via git + GITHUB_TOKEN. The CLI push path stays for manual VM runs.
 ============================================================================ */
 
 const fs = require('fs');
@@ -49,7 +54,8 @@ const argv = Object.fromEntries(
 const phoenixToday = () =>
   new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Phoenix', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
 const dateStr = argv.date || phoenixToday();
-const DO_PUSH = argv.push === true || argv.push === 'true';
+const NO_PUSH = argv['no-push'] === true || argv['no-push'] === 'true';
+const DO_PUSH = !NO_PUSH && (argv.push === true || argv.push === 'true');
 const SIMS_N = parseInt(argv.sims, 10) || 20000;
 
 const playerCache = new Map();
@@ -188,6 +194,11 @@ async function buildAndSim(g, box) {
 }
 
 function pushToGitHub(fp, content) {
+  if (!fs.existsSync(GITHUB_BIN)) {
+    // e.g. inside GitHub Actions — the workflow commits sims/ itself via git
+    console.warn(`[sims-runner] GitHub CLI not found at ${GITHUB_BIN} — skipping CLI push`);
+    return;
+  }
   const args = {
     owner: GH_OWNER, repo: GH_REPO, branch: GH_BRANCH,
     message: `sims: publish ${dateStr}`,
