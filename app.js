@@ -294,25 +294,62 @@ async function getPlayer(pid) {
   return d;
 }
 
-async function loadDate(dateStr) {
-  showLoading(`Loading ${dateStr}…`);
-  hideError();
-  state.date = dateStr;
-  state.games = [];
-  state.skaters = [];
-  state.goalSearch = '';
-  state.goalGame = 'all';
-  const gsi = $('goalSearchInput');
-  if (gsi) gsi.value = '';
+/* ---------------- precomputed slate bundle ----------------
+   data/<date>.json is built 3x daily by data-builder/build.js (see its
+   header for the full endpoint catalog). One request replaces ~300.
+   The bundle keeps the exact field names the renderers read — slimmed,
+   not reshaped — so all downstream code works unchanged. If the bundle
+   is missing or stale, we fall back to the live /nhl-api/* proxy. */
+async function ctxFromPrecomputed(dateStr) {
+  let pre = null;
+  try {
+    const r = await fetch(`data/${dateStr}.json`, { headers: { 'Accept': 'application/json' } });
+    if (!r.ok) return null;
+    const d = await r.json();
+    if (!d || d.date !== dateStr || !Array.isArray(d.games)) return null;
+    pre = d;
+  } catch (e) { return null; }
+  if (!pre.games.length) return { empty: true };
 
+  // reshape the slim games to the schedule-like shape the shared code reads
+  const games = pre.games.map((g) => ({
+    id: g.id,
+    awayTeam: { abbrev: g.away },
+    homeTeam: { abbrev: g.home },
+    gameState: g.state,
+    startTimeUTC: g.startUTC,
+  }));
+  const pbps = pre.games.map((g) => pre.pbps[String(g.id)] || null);
+  const rosterMap = {};
+  for (const [t, r] of Object.entries(pre.rosters || {})) {
+    rosterMap[t] = [...(r.forwards || []), ...(r.defensemen || [])];
+  }
+  const recentIds = pre.recentIds || {};
+  const zonePbps = {};
+  for (const [id, pbp] of Object.entries(pre.zonePbps || {})) zonePbps[id] = pbp;
+
+  // pre-populate the player cache: bundle players are already in the site's
+  // slimLanding() shape, so unslimLanding() restores exactly what
+  // skaterSeason() and the goalie lookup consume. getPlayer() then never
+  // fetches in bundle mode.
+  state.playerCache.clear();
+  for (const [pid, slim] of Object.entries(pre.players || {})) {
+    try { state.playerCache.set(Number(pid), unslimLanding(slim)); }
+    catch (e) { /* skip bad entry */ }
+  }
+  // standings straight into the cache getStandings() checks
+  state.standingsCache = { key: dateStr, map: pre.standings || {} };
+  state.zonePbps = zonePbps;
+  state.recentIds = recentIds;
+
+  return { games, pbps, rosterMap, recentIds, zonePbps, goalieSv: pre.goalieSv || {} };
+}
+
+async function ctxFromLive(dateStr) {
   const sched = await fetchJSON(`${API}/schedule/${dateStr}`);
   const day = (sched.gameWeek || []).find((w) => w.date === dateStr);
   const games = day ? day.games : [];
-  if (!games.length) {
-    showLoading('');
-    renderEmpty('No NHL games scheduled for this date.');
-    return;
-  }
+  if (!games.length) return null;
   lsSweepPlayers(); // drop yesterday's cached landings so they can't eat quota
 
   // play-by-play per game (null for unstarted)
@@ -363,6 +400,35 @@ async function loadDate(dateStr) {
       goalieSv[g.id] = sub.savePctg || 0.900;
     } catch (e) { goalieSv[g.id] = 0.900; }
   });
+
+  return { games, pbps, rosterMap, recentIds, zonePbps, goalieSv };
+}
+
+async function loadDate(dateStr) {
+  showLoading(`Loading ${dateStr}…`);
+  hideError();
+  state.date = dateStr;
+  state.games = [];
+  state.skaters = [];
+  state.goalSearch = '';
+  state.goalGame = 'all';
+  const gsi = $('goalSearchInput');
+  if (gsi) gsi.value = '';
+
+  // Precomputed bundle first (one request); live proxy only as fallback.
+  let ctx = await ctxFromPrecomputed(dateStr);
+  if (ctx && ctx.empty) {
+    showLoading('');
+    renderEmpty('No NHL games scheduled for this date.');
+    return;
+  }
+  if (!ctx) ctx = await ctxFromLive(dateStr);
+  if (!ctx) {
+    showLoading('');
+    renderEmpty('No NHL games scheduled for this date.');
+    return;
+  }
+  const { games, pbps, rosterMap, recentIds, zonePbps, goalieSv } = ctx;
 
   // build skater list
   const skaterDefs = []; // {pid, name, pos, team, gameId, headshot}
@@ -1091,6 +1157,12 @@ function goalieStarter(pbp, teamAbbrev) {
   if (!pbp) return null;
   const home = pbp.homeTeam || {}, away = pbp.awayTeam || {};
   if (teamAbbrev !== home.abbrev && teamAbbrev !== away.abbrev) return null;
+  // precomputed bundle: the builder ran this same scan on the full pbp
+  if (pbp._starters) {
+    const s = teamAbbrev === home.abbrev ? pbp._starters.home
+      : teamAbbrev === away.abbrev ? pbp._starters.away : null;
+    return s && s.id ? { id: s.id, name: s.name } : null;
+  }
   const info = {};
   for (const r of (pbp.rosterSpots || [])) {
     if (r.positionCode !== 'G') continue;
