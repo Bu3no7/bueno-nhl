@@ -88,10 +88,10 @@ const state = {
   games: [],          // {id, away, home, awayId, homeId, state, startUTC, pbp}
   skaters: [],        // computed model rows
   playerCache: new Map(),
-  view: 'goalprobs',
-  goalType: 'atg',    // 'atg' | 'twoplus' | 'firstgoal'
-  goalSearch: '',     // Goals tab player-name search filter
-  goalGame: 'all',    // Goals tab game filter ('all' or game id)
+  view: 'markets',
+  marketKind: 'atg',  // Markets tab: one market at a time — 'atg' | 'twoplus' | 'firstgoal' | 'shots' | 'assists' | 'points'
+  goalSearch: '',     // Markets tab player-name search filter
+  goalGame: 'all',    // Markets tab game filter ('all' or game id)
   iceView: 'league',  // 'league' | 'game'
   bookOdds: {},       // pid -> raw book-odds input string (Ice Breaker)
   sortBy: 'prob',
@@ -842,10 +842,10 @@ function renderGoals() {
     b.addEventListener('click', () => openPlayer(b.dataset.pid, b.dataset.gid)));
 }
 
-/* ---------------- first-goal & 2+ goals views ----------------
+/* ---------------- first-goal & brace views ----------------
    First goal: competing scoring rates within a matchup —
      P(first goal by i) = λ_i / Σ_j λ_j   (all skaters in that game)
-   2+ goals: from the Poisson goal rate —
+   Brace: from the Poisson goal rate —
      P(2+) = 1 − e^(−λ) − λ·e^(−λ) */
 function firstGoalProbs() {
   const sumByGame = {};
@@ -1036,14 +1036,37 @@ function setIceView(v) {
   renderIcebreaker();
 }
 
-/* ---------------- consolidated goal-probabilities view ----------------
-   One "Goals" tab; the goalTypeSelect dropdown switches between
-   anytime (ATG), 2+ goals, and first-goal tables. */
-const GOALPROB_SUBS = {
+/* ---------------- consolidated markets view ----------------
+   One "Markets" tab; the mktKindFilter dropdown switches between the
+   goal markets (anytime, brace, first goal) and the Poisson over/under
+   markets (shots, assists, points). Only the selected market renders. */
+const GOAL_KINDS = ['atg', 'twoplus', 'firstgoal'];
+const MARKET_SUBS = {
   atg: 'Ranked by model probability &middot; fair no-vig odds.',
-  twoplus: 'Probability of scoring at least twice.',
+  twoplus: 'Probability of scoring a brace.',
   firstgoal: "Each skater's share of their matchup's scoring rate.",
+  shots: 'Poisson over/under on shots &middot; λ from SOG/game.',
+  assists: 'Poisson over/under on assists &middot; λ from AST/game.',
+  points: 'Poisson over/under on points &middot; λ from PTS/game.',
 };
+/* Show exactly one market: goal markets get the search + game filters
+   and the goal-probability table; Poisson markets get the team filter
+   and the over/under table. */
+function setMarketKind(kind) {
+  if (!MARKET_SUBS[kind]) kind = 'atg';
+  state.marketKind = kind;
+  const sel = $('mktKindFilter');
+  if (sel) sel.value = kind;
+  const isGoal = GOAL_KINDS.includes(kind);
+  $('goalprobsWrap').classList.toggle('hidden', !isGoal);
+  $('mktGoalFilters').classList.toggle('hidden', !isGoal);
+  $('marketsWrap').classList.toggle('hidden', isGoal);
+  $('marketsNote').classList.toggle('hidden', isGoal);
+  $('mktTeamFilterWrap').classList.toggle('hidden', isGoal);
+  const sub = $('marketsSub');
+  if (sub) sub.innerHTML = MARKET_SUBS[kind];
+  if (isGoal) renderGoalProbs(); else renderMarkets();
+}
 /* Goals tab filters: player-name search + game dropdown. Both combine
    with each other and with the goal-type dropdown; they filter the
    already-loaded rows, no new requests. */
@@ -1069,9 +1092,7 @@ function filterGoalRows(rows) {
 function renderGoalProbs() {
   const tb = $('goalprobsBody');
   if (!tb) return;
-  const sel = $('goalTypeSelect');
-  const type = sel ? sel.value : state.goalType;
-  state.goalType = type;
+  const type = GOAL_KINDS.includes(state.marketKind) ? state.marketKind : 'atg';
   let html;
   if (type === 'twoplus') {
     html = probTableHtml(filterGoalRows(twoPlusProbs()), 'tpP', 'tpFair');
@@ -1088,8 +1109,6 @@ function renderGoalProbs() {
     </tr>`).join('');
   }
   tb.innerHTML = html || '<tr><td colspan="4" class="muted">No skaters match.</td></tr>';
-  const sub = $('goalprobsSub');
-  if (sub) sub.innerHTML = GOALPROB_SUBS[type] || GOALPROB_SUBS.atg;
   wirePnameClicks(tb);
 }
 
@@ -1488,7 +1507,8 @@ function renderMarkets() {
   if (!wrap) return;
   let rows = state.skaters.slice();
   if (state.teamFilter) rows = rows.filter((r) => r.team === state.teamFilter);
-  wrap.innerHTML = ['shots', 'assists', 'points'].map((kind) => {
+  const kinds = MARKET_META[state.marketKind] ? [state.marketKind] : ['shots'];
+  wrap.innerHTML = kinds.map((kind) => {
     const meta = MARKET_META[kind];
     const sorted = rows.slice()
       .sort((a, b) => marketOver(b, kind, MARKET_HEADLINE[kind]) - marketOver(a, kind, MARKET_HEADLINE[kind]))
@@ -1584,7 +1604,7 @@ function applyTeamFilter(v) {
   if ($('teamFilter')) $('teamFilter').value = v;
   if ($('mktTeamFilter')) $('mktTeamFilter').value = v;
   renderBoard();
-  renderMarkets();
+  setMarketKind(state.marketKind);
 }
 
 /* ---------------- player card ---------------- */
@@ -1717,10 +1737,9 @@ function renderAll() {
   renderSlate();
   renderGoals();
   renderBoard();
-  renderGoalProbs();
   renderIcebreaker();
   renderLongshots();
-  renderMarkets();
+  setMarketKind(state.marketKind);
   renderParlay();
   renderSimSetup();
 }
@@ -2001,9 +2020,7 @@ function runSims() {
 document.querySelectorAll('.tab').forEach((t) =>
   t.addEventListener('click', () => setView(t.dataset.view)));
 $('sortSelect').addEventListener('change', (e) => { state.sortBy = e.target.value; renderBoard(); });
-const goalTypeSelect = $('goalTypeSelect');
-if (goalTypeSelect) goalTypeSelect.addEventListener('change', (e) => { state.goalType = e.target.value; renderGoalProbs(); });
-// Goals tab filters: live search + game dropdown (persist across goal-type switches)
+// Markets goal filters: live search + game dropdown (persist across market switches)
 const goalSearchInput = $('goalSearchInput');
 if (goalSearchInput) goalSearchInput.addEventListener('input', (e) => { state.goalSearch = e.target.value; renderGoalProbs(); });
 const goalGameSelect = $('goalGameSelect');
@@ -2018,6 +2035,8 @@ if (goalFilterClear) goalFilterClear.addEventListener('click', () => {
 $('teamFilter').addEventListener('change', (e) => applyTeamFilter(e.target.value));
 const mktFilter = $('mktTeamFilter');
 if (mktFilter) mktFilter.addEventListener('change', (e) => applyTeamFilter(e.target.value));
+const mktKindFilter = $('mktKindFilter');
+if (mktKindFilter) mktKindFilter.addEventListener('change', (e) => setMarketKind(e.target.value));
 const stakeInput = $('parlayStake');
 if (stakeInput) stakeInput.addEventListener('input', renderParlayTotals);
 const simOneBtn = $('simOneBtn'), simAllBtn = $('simAllBtn');
