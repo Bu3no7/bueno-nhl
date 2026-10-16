@@ -246,6 +246,15 @@ main { max-width: 1120px; margin: 0 auto; padding: 1.4rem 1rem 2.2rem; }
   border: 1px solid var(--border); border-radius: var(--radius);
   padding: 1rem 1.1rem; box-shadow: var(--shadow-sm);
 }
+.sim-badge {
+  display: inline-block; font-size: .68rem; font-weight: 700; letter-spacing: .02em;
+  padding: .12rem .5rem; border-radius: 99px; margin: 0 .15rem;
+  background: #1a2233; color: var(--muted); border: 1px solid var(--border);
+}
+.sim-badge.ok { background: rgba(45, 212, 191, .12); color: #2dd4bf; border-color: rgba(45, 212, 191, .35); }
+.sim-meta { margin-top: .8rem; line-height: 1.9; }
+.sim-ondemand { margin-top: .5rem; }
+.sim-ondemand > summary { cursor: pointer; padding: .4rem 0; }
 .sim-matchup { display: flex; align-items: center; gap: .6rem; margin-bottom: .7rem; }
 .sim-avg {
   display: flex; align-items: baseline; justify-content: center; gap: .7rem;

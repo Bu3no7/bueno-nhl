@@ -112,30 +112,34 @@
     <div class="view-head">
       <div>
         <p class="kicker">Simulation</p>
-        <h2>Run the slate</h2>
-        <p class="view-sub muted">Monte Carlo &middot; Poisson team goals &middot; scorers by model share.</p>
+        <h2>Best sims</h2>
+        <p class="view-sub muted">Precomputed twice daily once lineups lock. One best sim per game.</p>
       </div>
       <span id="simGameCount" class="muted small"></span>
     </div>
-    <div class="sim-controls">
-      <div class="seg" role="group" aria-label="Simulation scope">
-        <button type="button" id="simOneBtn" class="seg-btn">One game</button>
-        <button type="button" id="simAllBtn" class="seg-btn active">Full slate</button>
-      </div>
-      <label class="sim-pick small muted">Matchup
-        <select id="simGameSelect"></select>
-      </label>
-      <label class="small muted">Sims
-        <select id="simCountSelect">
-          <option value="1000" selected>1,000</option>
-          <option value="5000">5,000</option>
-          <option value="10000">10,000</option>
-        </select>
-      </label>
-    </div>
-    <button id="simRunBtn" class="cta" type="button">Run simulation</button>
+    <div id="simPublished"></div>
     <div class="rule" aria-hidden="true"></div>
-    <div id="simResults"></div>
+    <details id="simOndemand" class="sim-ondemand">
+      <summary class="muted">Run your own sim instead</summary>
+      <div class="sim-controls">
+        <div class="seg" role="group" aria-label="Simulation scope">
+          <button type="button" id="simOneBtn" class="seg-btn">One game</button>
+          <button type="button" id="simAllBtn" class="seg-btn active">Full slate</button>
+        </div>
+        <label class="sim-pick small muted">Matchup
+          <select id="simGameSelect"></select>
+        </label>
+        <label class="small muted">Sims
+          <select id="simCountSelect">
+            <option value="1000" selected>1,000</option>
+            <option value="5000">5,000</option>
+            <option value="10000">10,000</option>
+          </select>
+        </label>
+      </div>
+      <button id="simRunBtn" class="cta" type="button">Run simulation</button>
+      <div id="simResults"></div>
+    </details>
   </section>
 
   <section id="view-longshots" class="view">
@@ -230,6 +234,7 @@
   <p class="muted small">Data: official NHL API (api-web.nhle.com), fetched live in your browser. No accounts, no tracking, no cookies. Not betting advice.</p>
 </footer>
 
+<script src="engine.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
