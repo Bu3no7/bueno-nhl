@@ -125,6 +125,13 @@
         </select>
       </label>
     </div>
+    <div class="goal-filters">
+      <input type="text" id="goalSearchInput" placeholder="Search players…" autocomplete="off" aria-label="Search players">
+      <select id="goalGameSelect" aria-label="Filter by game">
+        <option value="all">All games</option>
+      </select>
+      <button id="goalFilterClear" class="ghost-btn" type="button" title="Clear filters" aria-label="Clear filters">✕</button>
+    </div>
     <div class="table-wrap">
       <table>
         <thead><tr><th>Skater</th><th>Team</th><th class="num">Prob</th><th class="num">Fair</th></tr></thead>
