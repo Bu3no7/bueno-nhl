@@ -131,6 +131,16 @@ function pOverLine(lam, n) {
   for (let k = 0; k <= n; k++) s += poissonPmf(k, lam);
   return clamp(1 - s, 0, 1);
 }
+// median of Poisson(λ): smallest k with P(X ≤ k) ≥ 0.5
+function poissonMedian(lam) {
+  if (!(lam > 0)) return 0;
+  let s = 0;
+  for (let k = 0; k <= Math.ceil(lam) + 10; k++) {
+    s += poissonPmf(k, lam);
+    if (s >= 0.5) return k;
+  }
+  return Math.round(lam);
+}
 function fairOddsSafe(p) {
   if (!(p > 0.0005) || !(p < 0.9995)) return '–';
   return fairOdds(p);
@@ -1260,7 +1270,7 @@ function goaliePosCounts(goals) {
   return c;
 }
 
-function goaliePanelHtml(g, teamAbbrev) {
+function goaliePanelHtml(g, teamAbbrev, st) {
   const pg = panelGoalie(g, teamAbbrev);
   const tag = pg.tag ? `<span class="g-tag">${esc(pg.tag)}</span>` : '';
   if (!pg.id) {
@@ -1290,16 +1300,76 @@ function goaliePanelHtml(g, teamAbbrev) {
     ${pTot ? `<div class="posbar" aria-label="Goals by shooter position">${segs}</div>
     <div class="pos-legend">${legs}</div>` : ''}
     ${sample}
+    ${goalieProjTableHtml(g, teamAbbrev, st)}
   </div>`;
 }
 
-function goalieSectionHtml(g) {
+function goalieSectionHtml(g, st) {
   pendingGoalieDraw = [];
   return `<h4 class="tape-title">Goalies</h4>
   <div class="goalie-panels">
-    ${goaliePanelHtml(g, g.away)}
-    ${goaliePanelHtml(g, g.home)}
+    ${goaliePanelHtml(g, g.away, st)}
+    ${goaliePanelHtml(g, g.home, st)}
   </div>`;
+}
+
+/* ---------------- goalie projections (Poisson over/under) ----------------
+   Per-starter table: Saves / Shots against / Goals against, each with
+   Model (λ), Median, Threshold (median − 0.5, the standard book line),
+   and Over % = P(X > threshold). All model estimates, not official lines. */
+const goalieSvCache = {}; // goalieId -> season savePct
+async function getGoalieSvPct(goalieId) {
+  if (!goalieId) return null;
+  if (goalieSvCache[goalieId] != null) return goalieSvCache[goalieId];
+  try {
+    const gl = await getPlayer(goalieId);
+    const sv = gl && gl.featuredStats && gl.featuredStats.regularSeason &&
+      gl.featuredStats.regularSeason.subSeason
+      ? gl.featuredStats.regularSeason.subSeason.savePctg : null;
+    goalieSvCache[goalieId] = (sv > 0 && sv < 1) ? sv : 0.900;
+  } catch (e) { goalieSvCache[goalieId] = 0.900; }
+  return goalieSvCache[goalieId];
+}
+// shots the goalie's team is expected to face: opponent's goals/game ÷ league-avg shooting%
+function oppShotsPerGame(st, oppAbbr) {
+  const s = st && st[oppAbbr];
+  if (!s || !(s.gamesPlayed > 0)) return null;
+  const gpg = s.goalFor / s.gamesPlayed;
+  return gpg / 0.105; // 0.105 = league-average shooting%, same as the skater model
+}
+function goalieProjRow(label, lam) {
+  const med = poissonMedian(lam);
+  const thresh = med - 0.5;
+  const over = pOverLine(lam, med - 1); // P(X > med−0.5) = P(X ≥ med)
+  return `<tr><td>${label}</td><td>${lam.toFixed(1)}</td><td>${med}</td>` +
+    `<td>${thresh.toFixed(1)}</td><td class="gproj-over">${(over * 100).toFixed(2)}%</td></tr>`;
+}
+function goalieProjTableHtml(g, teamAbbrev, st) {
+  const pg = panelGoalie(g, teamAbbrev);
+  if (!pg.id) return '';
+  const opp = teamAbbrev === g.away ? g.home : g.away;
+  const shots = oppShotsPerGame(st, opp);
+  const sv = goalieSvCache[pg.id];
+  if (shots == null || sv == null) {
+    return `<div class="gproj"><div class="muted small">Loading projections…</div></div>`;
+  }
+  const lamShots = shots, lamSaves = shots * sv, lamGA = shots * (1 - sv);
+  return `<div class="gproj">
+    <table class="gproj-table">
+      <thead><tr><th>Stat</th><th>Model</th><th>Median</th><th>Threshold</th><th>Over %</th></tr></thead>
+      <tbody>
+        ${goalieProjRow('Saves', lamSaves)}
+        ${goalieProjRow('Shots against', lamShots)}
+        ${goalieProjRow('Goals against', lamGA)}
+      </tbody>
+    </table>
+    <div class="muted small">Projected time on ice: 58.5 min <span class="est">est.</span></div>
+  </div>`;
+}
+// fetch both starters' save% so the second matchup render has real numbers
+async function ensureGoalieProj(g) {
+  const ids = [g.away, g.home].map((t) => panelGoalie(g, t).id).filter(Boolean);
+  await Promise.all(ids.map((id) => getGoalieSvPct(id)));
 }
 
 function drawGoalieRinks() {
@@ -1424,7 +1494,7 @@ function matchupHtml(g, lamA, lamB, wp, st) {
     ${tapeRow(streak(sa), 'Streak', streak(sh), null)}
     ${tapeRow(l10rec(sa), 'Last 10', l10rec(sh), cmpRow(l10A, l10H))}
   </div>
-  ${goalieSectionHtml(g)}
+  ${goalieSectionHtml(g, st)}
   ${matchupLineupHtml(g.id)}
   <p class="muted small matchup-note">Win % from each team's Poisson scoring rate (regulation ties split evenly). Team stats via NHL standings, cached per date. Goalie maps chart non-shootout goals with this goalie in net, from tonight's and recent games.</p>`;
 }
@@ -1440,6 +1510,7 @@ async function openMatchup(gameId) {
   drawGoalieRinks();
   $('matchupModal').classList.remove('hidden');
   const st = await getStandings();
+  await ensureGoalieProj(g);
   if (!$('matchupModal').classList.contains('hidden')) {
     $('matchupBody').innerHTML = matchupHtml(g, lamA, lamB, wp, st);
     drawGoalieRinks();
