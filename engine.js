@@ -22,6 +22,7 @@ const CALIBRATION = 0.88;
 const TAIL_DAMP = 0.85;
 
 const LONGSHOT_P = 1 / 6;
+const LONGSHOT_DISPLAY_P = 1 / 11; // +1000 cutoff for the Longshots tab (backtest: value lives in the deep tail)
 
 const HD_NEUTRAL = 0.30;
 
