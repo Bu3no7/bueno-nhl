@@ -653,6 +653,15 @@ canvas.rink {
 .goalie-panels { display: grid; grid-template-columns: 1fr 1fr; gap: .7rem; margin-top: .2rem; }
 @media (max-width: 560px) { .goalie-panels { grid-template-columns: 1fr; } }
 .goalie-panel { background: var(--panel2); border: 1px solid var(--border-soft); border-radius: var(--radius-sm); padding: .7rem .75rem; }
+/* goalie projections: Stat | Model | Median | Threshold | Over % */
+.gproj { margin-top: .7rem; }
+.gproj-table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+.gproj-table th, .gproj-table td { padding: .4rem .25rem; text-align: right; font-variant-numeric: tabular-nums; }
+.gproj-table th { color: var(--muted); font-weight: 600; font-size: .72rem; text-transform: uppercase; letter-spacing: .6px; border-bottom: 1px solid var(--border); }
+.gproj-table td { border-bottom: 1px dashed var(--border-soft); }
+.gproj-table th:first-child, .gproj-table td:first-child { text-align: left; color: var(--muted); }
+.gproj-table .gproj-over { color: #5ec8f8; font-weight: 700; }
+.gproj .muted { margin-top: .35rem; }
 .goalie-head { display: flex; align-items: center; gap: .5rem; margin-bottom: .5rem; flex-wrap: wrap; }
 .goalie-head strong { font-size: 1.02rem; }
 .g-tag { font-size: .68rem; text-transform: uppercase; letter-spacing: .12em; padding: .18rem .5rem; border-radius: 999px; background: var(--teal-wash); color: var(--teal); border: 1px solid rgba(58,219,227,.35); }
