@@ -1887,8 +1887,92 @@ function rerenderLiveViews() {
   if (state.view === 'board') renderBoard();
 }
 
+/* ---------------- GitHub Actions live-score file ----------------
+   The live.yml workflow polls the NHL API every 5 min and writes
+   live/YYYY-MM-DD.json (UTC date). When the file exists and is fresh
+   (updatedAt within 10 min), its scores are used instead of hitting
+   /nhl-api/* — zero proxy cost. Falls back to proxy polling below when
+   the file is missing or stale. */
+async function tryLiveFileTick() {
+  const utcDate = new Date().toISOString().slice(0, 10);
+  let data;
+  try {
+    const r = await fetch(`live/${utcDate}.json`, { headers: { 'Accept': 'application/json' } });
+    if (!r.ok) return false;
+    data = await r.json();
+  } catch (e) { return false; }
+  if (!data || !Array.isArray(data.games) || !data.updatedAt) return false;
+  const ageMs = Date.now() - new Date(data.updatedAt).getTime();
+  if (!(ageMs >= 0 && ageMs <= 10 * 60 * 1000)) return false; // stale
+
+  let applied = 0;
+  for (const entry of data.games) {
+    const g = state.games.find((gg) => String(gg.id) === String(entry.id));
+    if (!g) continue;
+    const prev = liveScoreCache[g.id];
+    const cur = {
+      a: entry.awayScore | 0, h: entry.homeScore | 0,
+      period: entry.period | 0, clock: entry.clock || '',
+      state: entry.state || '',
+    };
+    if (g.pbp && g.pbp.awayTeam) {
+      g.pbp.awayTeam.score = cur.a;
+      g.pbp.homeTeam.score = cur.h;
+      g.pbp.periodDescriptor = { number: cur.period };
+      g.pbp.clock = { timeRemaining: cur.clock, inIntermission: !!entry.inIntermission };
+      g.pbp.gameState = cur.state;
+    } else {
+      g.pbp = {
+        awayTeam: { abbrev: entry.away, score: cur.a },
+        homeTeam: { abbrev: entry.home, score: cur.h },
+        clock: { timeRemaining: cur.clock, inIntermission: !!entry.inIntermission },
+        periodDescriptor: { number: cur.period },
+        gameState: cur.state, plays: [], rosterSpots: [],
+      };
+    }
+    if ((cur.state === 'LIVE' || cur.state === 'CRIT') && g.state !== 'LIVE' && g.state !== 'CRIT') {
+      g.state = cur.state; // game just went live
+    }
+    const meaningfulChange = !prev ||
+      prev.a !== cur.a || prev.h !== cur.h ||
+      prev.period !== cur.period || prev.state !== cur.state;
+    liveScoreCache[g.id] = cur;
+    if (meaningfulChange) {
+      try {
+        const pbp = await fetchJSON(`${API}/gamecenter/${g.id}/play-by-play`);
+        g.pbp = pbp;
+        if (pbp.gameState === 'OFF' || pbp.gameState === 'FINAL') {
+          g.state = 'OFF';
+          delete liveScoreCache[g.id];
+        }
+      } catch (e) { /* keep file scores; backstop retries in 30s */ }
+    }
+    if (cur.state === 'OFF' || cur.state === 'FINAL') {
+      g.state = 'OFF';
+      delete liveScoreCache[g.id];
+    }
+    applied++;
+  }
+  if (applied) rerenderLiveViews();
+  return applied > 0;
+}
+
+// A game is "watchable" if it's marked live, OR if its start time has passed
+// but the bundle still says FUT (stale bundle — e.g. data built before puck drop).
+function isWatchable(g) {
+  if (g.state === 'LIVE' || g.state === 'CRIT') return true;
+  if (g.state === 'FUT' && g.startUTC) {
+    try { return new Date(g.startUTC).getTime() <= Date.now(); } catch (e) { return false; }
+  }
+  return false;
+}
+
 async function fastScoreTick() {
-  const live = state.games.filter((g) => g.state === 'LIVE' || g.state === 'CRIT');
+  // Prefer the GitHub Actions live file (no proxy cost); fall back to proxy.
+  try {
+    if (await tryLiveFileTick()) return;
+  } catch (e) { /* fall through to proxy */ }
+  const live = state.games.filter(isWatchable);
   if (!live.length) return;
   for (const g of live) {
     try {
@@ -1920,7 +2004,7 @@ async function fastScoreTick() {
 
 async function refreshScores() {
   // 30s backstop: full pbp for live games (unchanged behavior)
-  const live = state.games.filter((g) => g.state === 'LIVE' || g.state === 'CRIT');
+  const live = state.games.filter(isWatchable);
   if (!live.length) return;
   for (const g of live) {
     try {
