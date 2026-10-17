@@ -30,7 +30,6 @@
     <div class="nav-group">
       <span class="nav-label">Run</span>
       <div class="nav-grid">
-        <button class="tab" data-view="sims" role="tab">Sims</button>
         <button class="tab active" data-view="markets" role="tab">Markets</button>
         <button class="tab" data-view="longshots" role="tab">Longshots</button>
         <button class="tab" data-view="parlay" role="tab">Parlay</button>
@@ -106,40 +105,6 @@
       </table>
     </div>
     <p class="muted small">Probabilities are model anytime-goal estimates..</p>
-  </section>
-
-  <section id="view-sims" class="view">
-    <div class="view-head">
-      <div>
-        <p class="kicker">Simulation</p>
-        <h2>Best sims</h2>
-        <p class="view-sub muted">Precomputed twice daily once lineups lock. One best sim per game.</p>
-      </div>
-      <span id="simGameCount" class="muted small"></span>
-    </div>
-    <div id="simPublished"></div>
-    <div class="rule" aria-hidden="true"></div>
-    <details id="simOndemand" class="sim-ondemand">
-      <summary class="muted">Run your own sim instead</summary>
-      <div class="sim-controls">
-        <div class="seg" role="group" aria-label="Simulation scope">
-          <button type="button" id="simOneBtn" class="seg-btn">One game</button>
-          <button type="button" id="simAllBtn" class="seg-btn active">Full slate</button>
-        </div>
-        <label class="sim-pick small muted">Matchup
-          <select id="simGameSelect"></select>
-        </label>
-        <label class="small muted">Sims
-          <select id="simCountSelect">
-            <option value="1000" selected>1,000</option>
-            <option value="5000">5,000</option>
-            <option value="10000">10,000</option>
-          </select>
-        </label>
-      </div>
-      <button id="simRunBtn" class="cta" type="button">Run simulation</button>
-      <div id="simResults"></div>
-    </details>
   </section>
 
   <section id="view-longshots" class="view">

@@ -232,69 +232,6 @@ main { max-width: 1120px; margin: 0 auto; padding: 1.4rem 1rem 2.2rem; }
 .cta:active { transform: translateY(0); }
 .cta:disabled { opacity: .6; cursor: wait; transform: none; }
 
-/* ---------- sims ---------- */
-.sim-controls {
-  display: flex; gap: .8rem; align-items: end; flex-wrap: wrap;
-  margin-bottom: 1rem;
-}
-.sim-controls .seg { flex: 1 1 280px; }
-.sim-pick { display: flex; flex-direction: column; gap: .25rem; font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; }
-.sim-pick select { min-width: 11rem; }
-#simResults { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: .9rem; }
-.sim-card {
-  background: linear-gradient(180deg, var(--panel), #0a0f19);
-  border: 1px solid var(--border); border-radius: var(--radius);
-  padding: 1rem 1.1rem; box-shadow: var(--shadow-sm);
-}
-.sim-badge {
-  display: inline-block; font-size: .68rem; font-weight: 700; letter-spacing: .02em;
-  padding: .12rem .5rem; border-radius: 99px; margin: 0 .15rem;
-  background: #1a2233; color: var(--muted); border: 1px solid var(--border);
-}
-.sim-badge.ok { background: rgba(45, 212, 191, .12); color: #2dd4bf; border-color: rgba(45, 212, 191, .35); }
-.sim-meta { margin-top: .8rem; line-height: 1.9; }
-.sim-ondemand { margin-top: .5rem; }
-.sim-ondemand > summary { cursor: pointer; padding: .4rem 0; }
-.sim-matchup { display: flex; align-items: center; gap: .6rem; margin-bottom: .7rem; }
-.sim-avg {
-  display: flex; align-items: baseline; justify-content: center; gap: .7rem;
-  font-size: 1.9rem; font-weight: 800; letter-spacing: -.02em;
-  font-variant-numeric: tabular-nums; margin-bottom: .8rem;
-}
-.sim-avg .muted { font-size: .85rem; font-weight: 600; }
-.sim-probs { display: flex; flex-direction: column; gap: .45rem; margin-bottom: .8rem; }
-.sim-prow { display: grid; grid-template-columns: 3.2rem 1fr 3.4rem; gap: .6rem; align-items: center; }
-.sim-prow.tie { opacity: .75; }
-.sim-plabel { font-size: .82rem; font-weight: 700; color: var(--muted); }
-.sim-pbar { height: 8px; background: #182031; border-radius: 99px; overflow: hidden; }
-.sim-pbar i {
-  display: block; height: 100%; border-radius: 99px;
-  background: linear-gradient(90deg, var(--teal-deep), var(--teal));
-  box-shadow: 0 0 10px rgba(58, 219, 227, .45);
-}
-.sim-prow .num { font-size: .88rem; font-weight: 700; font-variant-numeric: tabular-nums; }
-.sim-sub {
-  margin: .2rem 0 .45rem; font-size: .72rem; font-weight: 800;
-  letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted);
-}
-.score-chips { display: flex; flex-wrap: wrap; gap: .4rem; margin-bottom: .7rem; }
-.score-chip {
-  background: var(--panel2); border: 1px solid var(--border);
-  border-radius: 99px; padding: .25rem .7rem; font-size: .83rem;
-  font-variant-numeric: tabular-nums; color: var(--muted);
-}
-.score-chip strong { color: var(--text); }
-.sim-box { margin-top: .2rem; }
-.sim-box summary {
-  cursor: pointer; color: var(--teal); font-weight: 650; font-size: .86rem;
-  padding: .2rem 0;
-}
-.sim-box ul { list-style: none; margin: .4rem 0 0; padding: 0; display: flex; flex-direction: column; gap: .3rem; }
-.sim-box li { font-size: .86rem; padding: .3rem .1rem; border-bottom: 1px dashed var(--border-soft); }
-.sim-en { display: inline-block; font-size: .68rem; font-weight: 800; color: #0b0e14; background: var(--teal); border-radius: 4px; padding: .05rem .3rem; margin-right: .3rem; vertical-align: 1px; }
-.sim-box li:last-child { border-bottom: 0; }
-.sim-team { font-weight: 800; color: var(--teal); margin-right: .35rem; font-size: .78rem; }
-
 /* ---------- states ---------- */
 .error-banner {
   background: #2a1512; border: 1px solid var(--danger); border-left: 4px solid var(--danger);
@@ -308,7 +245,7 @@ main { max-width: 1120px; margin: 0 auto; padding: 1.4rem 1rem 2.2rem; }
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-#gamesGrid > p, #longshotsList > p, #simResults > p {
+#gamesGrid > p, #longshotsList > p {
   text-align: center; padding: 2.6rem 1rem; color: var(--muted);
   border: 1px dashed var(--border); border-radius: var(--radius); width: 100%;
   background: rgba(255, 255, 255, .015); grid-column: 1 / -1;
@@ -631,8 +568,6 @@ canvas.rink {
   .score-line { font-size: 1.5rem; }
   .parlay-add { flex-direction: column; }
   .parlay-add .cta { width: 100%; }
-  .sim-controls .seg { flex-basis: 100%; }
-  .sim-prow { grid-template-columns: 2.8rem 1fr 3.2rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {

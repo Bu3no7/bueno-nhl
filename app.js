@@ -1680,8 +1680,6 @@ function renderAll() {
   renderLongshots();
   setMarketKind(state.marketKind);
   renderParlay();
-  renderSimSetup();
-  loadPublishedSims();
 }
 
 /* ---------------- two-tier live refresh ----------------
@@ -1802,172 +1800,6 @@ function startAutoRefresh() {
   }, 30000);
 }
 
-/* ---------------- sims (Monte Carlo, client-side) ---------------- */
-const simState = { scope: 'all' };
-
-// Recover each skater's Poisson goal rate from their anytime-goal probability.
-
-// Knuth's algorithm — exact Poisson draws, fast for the small rates here.
-
-// key-weighted pick (used for assists, weighted by assist rate)
-
-/* ---------------- sim line units ----------------
-   Correlation upgrade: each goal is assigned to a LINE first (forwards by
-   the site's estimated L1–L4, defense paired by TOI), then the scorer
-   and assists are drawn only from within that 5-man unit — so
-   linemates' points move together the way they do in real hockey. */
-
-// number of assists on a goal: ~68% get two, ~22% get one, ~10% unassisted
-
-// Pick the scoring line + D pair (weighted by unit scoring rate), then the
-// scorer and assists from inside that unit.
-
-/* ---------------- score-state rates ----------------
-   Goals no longer arrive on a metronome. Every simulated minute re-prices
-   both teams: trailers push (scoring boost), leaders protect (suppressed),
-   and a 1–2 goal deficit inside the final 3 minutes pulls the goalie —
-   6-on-5 boost for the trailer, an empty-net lane for the leader (marked
-   EN on the goal). */
-// per-minute EN goal rate for the leader, goalie pulled
-
-// Minute-by-minute discrete-event sim. Returns final score + goal trace.
-
-const simPct = (x) => (x * 100).toFixed(1) + '%';
-
-function renderSimResults(results) {
-  const wrap = $('simResults');
-  if (!wrap) return;
-  if (!results.length) { wrap.innerHTML = '<p class="muted">No games on this slate.</p>'; return; }
-  wrap.innerHTML = results.map((r) => {
-    const g = r.g;
-    const chips = r.top.map(([sc, c]) =>
-      `<span class="score-chip"><strong>${esc(sc)}</strong> ${simPct(c / r.n)}</span>`).join('');
-    const box = r.sample.length
-      ? `<details class="sim-box"><summary>Sample box score — ${r.sample.length} goal${r.sample.length === 1 ? '' : 's'}</summary>
-         <ul>${r.sample.map((gl) =>
-           `<li><span class="sim-team">${esc(gl.team)}</span>${gl.en ? '<span class="sim-en">EN</span>' : ''}${esc(gl.scorer)}${(gl.assists || []).length ? ` <span class="muted small">(${gl.assists.map(esc).join(', ')})</span>` : ''} <span class="muted small">P${gl.period} ${gl.clock}${gl.line ? ' \u00b7 ' + esc(gl.line) : ''}</span></li>`).join('')}</ul>
-         </details>`
-      : '<p class="muted small goal-none">Sample sim finished scoreless.</p>';
-    const prow = (label, v) =>
-      `<div class="sim-prow"><span class="sim-plabel">${label}</span><div class="sim-pbar"><i style="width:${(v * 100).toFixed(1)}%"></i></div><span class="num">${simPct(v)}</span></div>`;
-    return `<div class="sim-card">
-      <div class="sim-matchup">
-        <span class="team"><img src="${teamLogoUrl(g.away)}" alt="" ${imgFallback}>${esc(g.away)}</span>
-        <span class="muted">@</span>
-        <span class="team"><img src="${teamLogoUrl(g.home)}" alt="" ${imgFallback}>${esc(g.home)}</span>
-      </div>
-      <div class="sim-avg"><span>${r.avgA.toFixed(2)}</span><span class="muted">avg</span><span>${r.avgB.toFixed(2)}</span></div>
-      <div class="sim-probs">
-        ${prow(esc(g.away), r.winA)}
-        ${prow(esc(g.home), r.winB)}
-        <div class="sim-prow tie"><span class="sim-plabel">Tie</span><div class="sim-pbar"><i style="width:${(r.tie * 100).toFixed(1)}%"></i></div><span class="num">${simPct(r.tie)}</span></div>
-      </div>
-      <p class="sim-sub">Most common scorelines</p>
-      <div class="score-chips">${chips}</div>
-      ${box}
-    </div>`;
-  }).join('');
-}
-
-/* ---------------- published sims ----------------
-   The Sims tab displays the canonical "best sim" per game, precomputed twice
-   daily by sims-runner/run.js (only once lineups lock) and published to
-   sims/<date>.json. One fetch, no on-demand sims. The old on-demand UI lives
-   on inside the collapsed <details> as a fallback. */
-function simStatusBadge(ok, label) {
-  return `<span class="sim-badge${ok ? ' ok' : ''}">${esc(label)}</span>`;
-}
-function fmtSimTime(iso) {
-  try {
-    return new Date(iso).toLocaleString('en-US', { timeZone: 'America/Phoenix', hour: 'numeric', minute: '2-digit' });
-  } catch (e) { return ''; }
-}
-function renderPublishedSims(pub) {
-  const wrap = $('simPublished');
-  if (!wrap) return;
-  const prow = (label, v) =>
-    `<div class="sim-prow"><span class="sim-plabel">${label}</span><div class="sim-pbar"><i style="width:${(v * 100).toFixed(1)}%"></i></div><span class="num">${simPct(v)}</span></div>`;
-  wrap.innerHTML = state.games.map((g) => {
-    const r = pub.games[String(g.id)] || pub.games[g.id];
-    const head = `<div class="sim-matchup">
-        <span class="team"><img src="${teamLogoUrl(g.away)}" alt="" ${imgFallback}>${esc(g.away)}</span>
-        <span class="muted">@</span>
-        <span class="team"><img src="${teamLogoUrl(g.home)}" alt="" ${imgFallback}>${esc(g.home)}</span>
-      </div>`;
-    if (!r) {
-      return `<div class="sim-card">${head}
-        <p class="muted small">No published sim yet — lineups haven't locked. Check back closer to puck drop, or run your own below.</p>
-      </div>`;
-    }
-    const chips = (r.top || []).map(([sc, p]) =>
-      `<span class="score-chip"><strong>${esc(sc)}</strong> ${simPct(p)}</span>`).join('');
-    const gl = (x, tag) => x ? `${esc(x.name)} ${simStatusBadge(x.confirmed, x.confirmed ? 'confirmed' : 'projected')}` : tag;
-    return `<div class="sim-card">${head}
-      <div class="sim-avg"><span>${Number(r.avgA).toFixed(2)}</span><span class="muted">avg</span><span>${Number(r.avgB).toFixed(2)}</span></div>
-      <div class="sim-probs">
-        ${prow(esc(r.away), r.winA)}
-        ${prow(esc(r.home), r.winB)}
-        <div class="sim-prow tie"><span class="sim-plabel">Tie</span><div class="sim-pbar"><i style="width:${(r.tie * 100).toFixed(1)}%"></i></div><span class="num">${simPct(r.tie)}</span></div>
-      </div>
-      <p class="sim-sub">Most common scorelines</p>
-      <div class="score-chips">${chips}</div>
-      <p class="sim-meta muted small">Best sim &middot; ${esc(fmtSimTime(r.simAt))} &middot; ${r.n.toLocaleString()} sims<br>
-        ${simStatusBadge(true, 'lineups locked')}
-        <span class="muted">G:</span> ${gl(r.goalieAway, 'away')} <span class="muted">/</span> ${gl(r.goalieHome, 'home')}
-      </p>
-    </div>`;
-  }).join('');
-}
-async function loadPublishedSims() {
-  const wrap = $('simPublished');
-  const d = state.date;
-  try {
-    const res = await fetch(`sims/${d}.json`, { headers: { 'Accept': 'application/json' } });
-    if (!res.ok) throw new Error('missing');
-    const pub = await res.json();
-    if (d !== state.date) return; // date changed mid-fetch
-    if (!pub || !pub.games || !Object.keys(pub.games).length) throw new Error('empty');
-    renderPublishedSims(pub);
-  } catch (e) {
-    if (d !== state.date || !wrap) return;
-    wrap.innerHTML = '<p class="muted small">No published sims for this date yet — they go up twice daily once lineups lock. Run your own below.</p>';
-  }
-}
-
-function renderSimSetup() {
-  const sel = $('simGameSelect');
-  if (!sel) return;
-  sel.innerHTML = state.games.map((g) =>
-    `<option value="${g.id}">${esc(g.away)} @ ${esc(g.home)}</option>`).join('');
-  const gc = $('simGameCount');
-  if (gc) gc.textContent = state.games.length + (state.games.length === 1 ? ' game' : ' games');
-  applySimScope();
-}
-
-function applySimScope() {
-  const one = $('simOneBtn'), all = $('simAllBtn'), sel = $('simGameSelect');
-  if (!one || !all || !sel) return;
-  one.classList.toggle('active', simState.scope === 'one');
-  all.classList.toggle('active', simState.scope === 'all');
-  sel.disabled = simState.scope !== 'one';
-}
-
-function runSims() {
-  const n = parseInt((($('simCountSelect') || {}).value), 10) || 1000;
-  const games = simState.scope === 'one'
-    ? state.games.filter((g) => String(g.id) === String(($('simGameSelect') || {}).value))
-    : state.games.slice();
-  const btn = $('simRunBtn');
-  if (btn) { btn.disabled = true; btn.textContent = 'Simulating…'; }
-  setTimeout(() => {
-    try {
-      renderSimResults(games.map((g) => simOneGame(state.skaters, g, n)));
-    } finally {
-      if (btn) { btn.disabled = false; btn.textContent = 'Run simulation'; }
-    }
-  }, 30);
-}
-
 /* ---------------- boot ---------------- */
 document.querySelectorAll('.tab').forEach((t) =>
   t.addEventListener('click', () => setView(t.dataset.view)));
@@ -1991,11 +1823,6 @@ const mktKindFilter = $('mktKindFilter');
 if (mktKindFilter) mktKindFilter.addEventListener('change', (e) => setMarketKind(e.target.value));
 const stakeInput = $('parlayStake');
 if (stakeInput) stakeInput.addEventListener('input', renderParlayTotals);
-const simOneBtn = $('simOneBtn'), simAllBtn = $('simAllBtn');
-if (simOneBtn) simOneBtn.addEventListener('click', () => { simState.scope = 'one'; applySimScope(); });
-if (simAllBtn) simAllBtn.addEventListener('click', () => { simState.scope = 'all'; applySimScope(); });
-const simRunBtn = $('simRunBtn');
-if (simRunBtn) simRunBtn.addEventListener('click', runSims);
 $('refreshBtn').addEventListener('click', () => boot(true));
 $('datePicker').addEventListener('change', (e) => boot(true, e.target.value || state.date));
 $('modalClose').addEventListener('click', closePlayer);
