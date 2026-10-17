@@ -222,12 +222,23 @@ function slimStandings(d) {
 }
 
 const playerCache = new Map();
-async function getPlayer(pid) {
+async function getPlayer(pid, retries = 3) {
   if (playerCache.has(pid)) return playerCache.get(pid);
-  const p = E.fetchJSON(`${API}/player/${pid}/landing`).then((d) => {
-    playerCache.set(pid, d);
-    return d;
-  }).catch(() => { playerCache.set(pid, null); return null; });
+  const attempt = async (n) => {
+    try {
+      const d = await E.fetchJSON(`${API}/player/${pid}/landing`);
+      playerCache.set(pid, d);
+      return d;
+    } catch (e) {
+      if (n < retries) {
+        await new Promise((r) => setTimeout(r, 1000 * Math.pow(2, n))); // 1s, 2s, 4s backoff
+        return attempt(n + 1);
+      }
+      playerCache.set(pid, null);
+      return null;
+    }
+  };
+  const p = attempt(0);
   playerCache.set(pid, p);
   return p;
 }
@@ -329,7 +340,7 @@ async function main() {
   }
   const allPids = [...pidSet, ...goalieIds];
   console.log(`[data-builder] ${pidSet.size} skaters + ${goalieIds.size} goalies = ${allPids.length} landings`);
-  await E.limitedMap(allPids, 6, async (pid) => {
+  await E.limitedMap(allPids, 4, async (pid) => {
     const d = await getPlayer(pid).catch(() => null);
     nFetch++;
     if (d) out.players[String(pid)] = slimPlayer(d);
