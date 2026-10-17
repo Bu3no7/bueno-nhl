@@ -1311,6 +1311,66 @@ function drawGoalieRinks() {
   pendingGoalieDraw = [];
 }
 
+/* ---------------- lineup (estimated from TOI rank) ---------------- */
+function lineupCellHtml(r, isSelf) {
+  const last = r.name.split(' ').slice(-1)[0];
+  return `<div class="lu-cell${isSelf ? ' self' : ''}">
+    <img class="lu-head" src="${esc(r.headshot)}" alt="" ${imgFallback}>
+    <div class="lu-name">${esc(last)}</div>
+    <div class="lu-sub muted">${esc(r.pos)} · ${r.toiMin.toFixed(1)}</div>
+  </div>`;
+}
+
+function teamLineupHtml(teamAbbr, gameId) {
+  const rows = state.skaters.filter((s) => s.team === teamAbbr && String(s.gameId) === String(gameId));
+  const fwds = rows.filter((s) => ['C', 'L', 'R'].includes(s.pos) && s.line).sort((a, b) => b.toiMin - a.toiMin);
+  const defs = rows.filter((s) => s.pos === 'D').sort((a, b) => b.toiMin - a.toiMin);
+  if (!fwds.length && !defs.length) return '';
+  let html = `<div class="lu-team"><div class="lu-teamhead">${esc(teamAbbr)}</div>`;
+  for (let i = 1; i <= 4; i++) {
+    const line = fwds.filter((s) => s.line === 'L' + i);
+    if (!line.length) continue;
+    html += `<div class="lu-row"><div class="lu-label">L${i}</div><div class="lu-players">${line.map((s) => lineupCellHtml(s, false)).join('')}</div></div>`;
+  }
+  for (let i = 0; i < 3; i++) {
+    const pair = defs.slice(i * 2, i * 2 + 2);
+    if (!pair.length) continue;
+    html += `<div class="lu-row"><div class="lu-label">D${i + 1}</div><div class="lu-players">${pair.map((s) => lineupCellHtml(s, false)).join('')}</div></div>`;
+  }
+  return html + '</div>';
+}
+
+function matchupLineupHtml(gameId) {
+  const g = state.games.find((gg) => String(gg.id) === String(gameId));
+  if (!g) return '';
+  const a = teamLineupHtml(g.away, gameId);
+  const h = teamLineupHtml(g.home, gameId);
+  if (!a && !h) return '';
+  return `<h4 class="tape-title">Lineup <span class="muted small">est. from ice time</span></h4><div class="lu-wrap">${a}${h}</div>`;
+}
+
+function linematesHtml(r) {
+  const mates = state.skaters.filter((s) => s.team === r.team && String(s.gameId) === String(r.gameId) && String(s.pid) !== String(r.pid));
+  let title = '', cells = '';
+  if (['C', 'L', 'R'].includes(r.pos) && r.line) {
+    const line = mates.filter((s) => s.line === r.line).sort((a, b) => b.toiMin - a.toiMin);
+    if (!line.length) return '';
+    title = `Line ${r.line} — linemates`;
+    cells = [r, ...line].sort((a, b) => b.toiMin - a.toiMin)
+      .map((s) => lineupCellHtml(s, String(s.pid) === String(r.pid))).join('');
+  } else if (r.pos === 'D') {
+    const defs = [r, ...mates.filter((s) => s.pos === 'D')].sort((a, b) => b.toiMin - a.toiMin);
+    const idx = defs.findIndex((s) => String(s.pid) === String(r.pid));
+    const pair = defs.slice(Math.floor(idx / 2) * 2, Math.floor(idx / 2) * 2 + 2);
+    if (pair.length < 2) return '';
+    title = `Pair D${Math.floor(idx / 2) + 1} — partner`;
+    cells = pair.map((s) => lineupCellHtml(s, String(s.pid) === String(r.pid))).join('');
+  } else {
+    return '';
+  }
+  return `<h4 style="margin:.8rem 0 .2rem">${esc(title)} <span class="muted small">est.</span></h4><div class="lu-row"><div class="lu-players">${cells}</div></div>`;
+}
+
 function matchupHtml(g, lamA, lamB, wp, st) {
   const A = g.away, H = g.home;
   const sa = st ? st[A] : null, sh = st ? st[H] : null;
@@ -1365,6 +1425,7 @@ function matchupHtml(g, lamA, lamB, wp, st) {
     ${tapeRow(l10rec(sa), 'Last 10', l10rec(sh), cmpRow(l10A, l10H))}
   </div>
   ${goalieSectionHtml(g)}
+  ${matchupLineupHtml(g.id)}
   <p class="muted small matchup-note">Win % from each team's Poisson scoring rate (regulation ties split evenly). Team stats via NHL standings, cached per date. Goalie maps chart non-shootout goals with this goalie in net, from tonight's and recent games.</p>`;
 }
 
@@ -1742,6 +1803,7 @@ function openPlayer(pid, gameId) {
       </div>
     </div>
     <div class="pc-status">${lineBadge}${statusPill}</div>
+    ${linematesHtml(r)}
     <table class="factor-table">${factorRows}
       <tr><td>Expected goals (λ)</td><td>${r.lam.toFixed(3)}</td></tr>
       <tr><td>Opponent</td><td>${esc(r.oppAbbr)} goalie ${(r.oppSv * 100).toFixed(1)}% SV</td></tr>

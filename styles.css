@@ -423,6 +423,27 @@ tr.scored td:first-child .pname { color: #8ff5f7; text-shadow: 0 0 14px rgba(58,
 .status-pill.ok { background: var(--teal-wash); color: var(--teal); border: 1px solid rgba(58, 219, 227, .35); }
 .status-pill.proj { background: var(--gold-wash); color: var(--gold); border: 1px solid rgba(245, 185, 66, .35); }
 
+/* ---------- lineup (estimated lines) ---------- */
+.lu-wrap { display: flex; flex-direction: column; gap: 1.1rem; margin-top: .4rem; }
+.lu-teamhead { font-weight: 800; font-size: .95rem; letter-spacing: .02em; margin-bottom: .1rem; }
+.lu-row { display: flex; gap: .7rem; align-items: flex-start; padding: .5rem 0; border-top: 1px solid var(--border-soft); }
+.lu-row:first-of-type { border-top: 0; }
+.lu-label {
+  flex-shrink: 0; width: 2rem; padding-top: .65rem;
+  font-size: .72rem; font-weight: 800; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--muted);
+}
+.lu-players { flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); gap: .55rem; }
+.lu-cell { text-align: center; min-width: 0; }
+.lu-head {
+  width: 44px; height: 44px; border-radius: 50%; object-fit: cover;
+  background: var(--panel2); border: 2px solid var(--border); display: inline-block;
+}
+.lu-cell.self .lu-head { border-color: var(--teal); box-shadow: 0 0 10px rgba(58, 219, 227, .35); }
+.lu-name { font-size: .82rem; font-weight: 650; margin-top: .25rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lu-cell.self .lu-name { font-weight: 800; color: var(--teal); }
+.lu-sub { font-size: .72rem; font-variant-numeric: tabular-nums; }
+
 .factor-table { width: 100%; font-size: .86rem; margin: .7rem 0; border-collapse: collapse; }
 .factor-table td { padding: .45rem .2rem; border-bottom: 1px dashed var(--border); white-space: normal; }
 .factor-table td:first-child { color: var(--muted); }
