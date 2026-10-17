@@ -1684,20 +1684,102 @@ function renderAll() {
   loadPublishedSims();
 }
 
+/* ---------------- two-tier live refresh ----------------
+   Fast tier (15s): lightweight boxscore per live game (~13KB vs ~118KB pbp).
+   Scores, SOG, clock, and period update immediately; the full pbp fires only
+   when the fast tier sees a score, period, or game-state change (that's when
+   goal details, scorer names, and goal-type badges need refreshing).
+   Slow tier (30s): the original full-pbp refresh, kept as a safety backstop. */
+const liveScoreCache = {}; // gameId -> {a,h,period,clock,state}
+
+function scoreSnapshot(bs) {
+  return {
+    a: bs.awayTeam ? bs.awayTeam.score : 0,
+    h: bs.homeTeam ? bs.homeTeam.score : 0,
+    period: bs.periodDescriptor ? bs.periodDescriptor.number : 0,
+    clock: bs.clock ? bs.clock.timeRemaining : '',
+    state: bs.gameState || '',
+  };
+}
+
+function applyBoxscoreToGame(g, bs) {
+  // Patch the scoreboard fields in place so renderers pick them up instantly.
+  // Goal details (plays/rosterSpots) stay as-is until the slow tier refreshes
+  // the full pbp — scores and clocks never wait on it.
+  const snap = scoreSnapshot(bs);
+  if (g.pbp && g.pbp.awayTeam) {
+    g.pbp.awayTeam.score = snap.a;
+    g.pbp.homeTeam.score = snap.h;
+    g.pbp.awayTeam.sog = bs.awayTeam.sog;
+    g.pbp.homeTeam.sog = bs.homeTeam.sog;
+    g.pbp.clock = bs.clock;
+    g.pbp.periodDescriptor = bs.periodDescriptor;
+    g.pbp.gameState = bs.gameState;
+  } else {
+    // No pbp yet (game just went live): minimal stub so the slate, goal
+    // feed, and status text render. Team ids/abbrevs keep extractGoals safe.
+    g.pbp = {
+      awayTeam: { id: bs.awayTeam.id, abbrev: bs.awayTeam.abbrev, score: snap.a, sog: bs.awayTeam.sog },
+      homeTeam: { id: bs.homeTeam.id, abbrev: bs.homeTeam.abbrev, score: snap.h, sog: bs.homeTeam.sog },
+      clock: bs.clock, periodDescriptor: bs.periodDescriptor,
+      gameState: bs.gameState, plays: [], rosterSpots: [],
+    };
+  }
+  return snap;
+}
+
+function rerenderLiveViews() {
+  if (state.view === 'slate') renderSlate();
+  if (state.view === 'goals') renderGoals();
+  if (state.view === 'board') renderBoard();
+}
+
+async function fastScoreTick() {
+  const live = state.games.filter((g) => g.state === 'LIVE' || g.state === 'CRIT');
+  if (!live.length) return;
+  for (const g of live) {
+    try {
+      const bs = await fetchJSON(`${API}/gamecenter/${g.id}/boxscore`);
+      const prev = liveScoreCache[g.id];
+      const cur = applyBoxscoreToGame(g, bs);
+      const meaningfulChange = !prev ||
+        prev.a !== cur.a || prev.h !== cur.h ||
+        prev.period !== cur.period || prev.state !== cur.state;
+      liveScoreCache[g.id] = cur;
+      if (meaningfulChange) {
+        try {
+          const pbp = await fetchJSON(`${API}/gamecenter/${g.id}/play-by-play`);
+          g.pbp = pbp;
+          if (pbp.gameState === 'OFF' || pbp.gameState === 'FINAL') {
+            g.state = 'OFF';
+            delete liveScoreCache[g.id];
+          }
+        } catch (e) { /* keep old pbp; backstop retries in 30s */ }
+      }
+      if (cur.state === 'OFF' || cur.state === 'FINAL') {
+        g.state = 'OFF';
+        delete liveScoreCache[g.id];
+      }
+    } catch (e) { /* boxscore failed: keep old data, UI untouched */ }
+  }
+  rerenderLiveViews();
+}
+
 async function refreshScores() {
-  // light 30s refresh: re-fetch pbp for live games, update slate only
+  // 30s backstop: full pbp for live games (unchanged behavior)
   const live = state.games.filter((g) => g.state === 'LIVE' || g.state === 'CRIT');
   if (!live.length) return;
   for (const g of live) {
     try {
       const pbp = await fetchJSON(`${API}/gamecenter/${g.id}/play-by-play`);
       g.pbp = pbp;
-      if (pbp.gameState === 'OFF' || pbp.gameState === 'FINAL') g.state = 'OFF';
+      if (pbp.gameState === 'OFF' || pbp.gameState === 'FINAL') {
+        g.state = 'OFF';
+        delete liveScoreCache[g.id];
+      }
     } catch (e) { /* keep old */ }
   }
-  if (state.view === 'slate') renderSlate();
-  if (state.view === 'goals') renderGoals();
-  if (state.view === 'board') renderBoard();
+  rerenderLiveViews();
 }
 
 function setView(v) {
@@ -1709,6 +1791,11 @@ function setView(v) {
 
 function startAutoRefresh() {
   if (state.refreshTimer) clearInterval(state.refreshTimer);
+  if (state.fastTimer) clearInterval(state.fastTimer);
+  state.fastTimer = setInterval(() => {
+    if (document.hidden) return;
+    fastScoreTick().catch(() => {});
+  }, 15000);
   state.refreshTimer = setInterval(() => {
     if (document.hidden) return;
     refreshScores().catch(() => {});
