@@ -1529,6 +1529,99 @@ function renderParlayTotals() {
     <p class="muted small">Same-game legs are correlated — books may restrict or shade these, and the joint model rate assumes independence. Fair (no-vig) odds. Not betting advice.</p>`;
 }
 
+/* ---------------- book parlay calculator (manual odds) ---------------- */
+const bookLegs = []; // { id, odds }
+let bookLegSeq = 0;
+function validAmericanOdds(v) {
+  const n = parseFloat(String(v).replace(/−/g, '-').replace('+', '').trim());
+  if (!isFinite(n)) return null;
+  return (n <= -100 || n >= 100) ? n : null;
+}
+function syncBookRow(inp) {
+  const bad = inp.value.trim() !== '' && validAmericanOdds(inp.value) === null;
+  inp.classList.toggle('invalid', bad);
+  const hint = inp.closest('.book-leg').querySelector('.book-hint');
+  if (hint) hint.classList.toggle('hidden', !bad);
+}
+function renderBookLegs() {
+  const el = $('bookLegs');
+  if (!el) return;
+  el.innerHTML = bookLegs.map((l, i) => `
+    <div class="book-leg">
+      <span class="leg-num">Leg ${i + 1}</span>
+      <input type="text" data-leg="${l.id}" value="${esc(l.odds)}" inputmode="numeric" placeholder="-110" aria-label="Leg ${i + 1} odds">
+      <button class="linklike" data-leg-rm="${l.id}" aria-label="Remove leg">✕</button>
+      <span class="book-hint hidden" data-hint="${l.id}">needs American odds (e.g. -110 or +150)</span>
+    </div>`).join('');
+  el.querySelectorAll('input[data-leg]').forEach((inp) => {
+    inp.addEventListener('input', () => {
+      const leg = bookLegs.find((x) => x.id === +inp.dataset.leg);
+      if (leg) leg.odds = inp.value;
+      syncBookRow(inp);
+      renderBookTotals();
+    });
+    syncBookRow(inp);
+  });
+  el.querySelectorAll('[data-leg-rm]').forEach((b) => b.addEventListener('click', () => {
+    const ix = bookLegs.findIndex((x) => x.id === +b.dataset.legRm);
+    if (ix > -1) bookLegs.splice(ix, 1);
+    renderBookLegs();
+    renderBookTotals();
+  }));
+}
+function addBookLeg(odds) {
+  bookLegs.push({ id: ++bookLegSeq, odds: odds == null ? '' : String(odds) });
+  renderBookLegs();
+  renderBookTotals();
+}
+function renderBookTotals() {
+  const box = $('bookTotals');
+  if (!box) return;
+  const stake = Math.max(0, parseFloat(($('bookStake') || {}).value) || 0);
+  const decs = bookLegs
+    .map((l) => validAmericanOdds(l.odds))
+    .map(americanToDecimal)
+    .filter((d) => d && d > 1);
+  if (decs.length < 2 || decs.length !== bookLegs.length || !stake) {
+    box.innerHTML = '<p class="muted small">Enter valid odds for at least 2 legs and a stake to see the math.</p>';
+    return;
+  }
+  const dec = decs.reduce((a, b) => a * b, 1);
+  box.innerHTML = `
+    <div class="totals-grid">
+      <div><div class="t-label">Combined odds</div><div class="t-val">${decimalToAmerican(dec)}</div></div>
+      <div><div class="t-label">Payout</div><div class="t-val">$${(stake * dec).toFixed(2)}</div></div>
+      <div><div class="t-label">Profit</div><div class="t-val">$${(stake * (dec - 1)).toFixed(2)}</div></div>
+      <div><div class="t-label">Implied prob</div><div class="t-val">${pct1(1 / dec)}</div></div>
+    </div>`;
+}
+
+/* ---------------- vig checker (two-sided market) ---------------- */
+function renderVig() {
+  const box = $('vigOut');
+  if (!box) return;
+  const a = validAmericanOdds(($('vigA') || {}).value || '');
+  const b = validAmericanOdds(($('vigB') || {}).value || '');
+  const da = a === null ? null : americanToDecimal(a);
+  const db = b === null ? null : americanToDecimal(b);
+  if (!da || !db) {
+    box.innerHTML = '<p class="muted small">Enter valid American odds for both sides.</p>';
+    return;
+  }
+  const pa = 1 / da, pb = 1 / db;
+  const total = pa + pb;
+  const vig = (total - 1) / total; // book's margin as a share of total handle (-110/-110 = 4.55%)
+  const fa = pa / total, fb = pb / total; // no-vig fair probabilities
+  box.innerHTML = `
+    <div class="totals-grid">
+      <div><div class="t-label">Side A implied</div><div class="t-val">${pct1(pa)}</div></div>
+      <div><div class="t-label">Side B implied</div><div class="t-val">${pct1(pb)}</div></div>
+      <div><div class="t-label">Vig</div><div class="t-val">${pct1(vig)}</div></div>
+      <div><div class="t-label">Fair A</div><div class="t-val">${decimalToAmerican(1 / fa)}</div></div>
+      <div><div class="t-label">Fair B</div><div class="t-val">${decimalToAmerican(1 / fb)}</div></div>
+    </div>`;
+}
+
 function populateTeamFilter() {
   const sel = $('teamFilter');
   const teams = [...new Set(state.skaters.map((r) => r.team))].sort();
@@ -1823,6 +1916,17 @@ const mktKindFilter = $('mktKindFilter');
 if (mktKindFilter) mktKindFilter.addEventListener('change', (e) => setMarketKind(e.target.value));
 const stakeInput = $('parlayStake');
 if (stakeInput) stakeInput.addEventListener('input', renderParlayTotals);
+// book parlay calculator + vig checker (parlay view, below the leg builder)
+const bookStakeInput = $('bookStake');
+if (bookStakeInput) bookStakeInput.addEventListener('input', renderBookTotals);
+const bookAddLeg = $('bookAddLeg');
+if (bookAddLeg) bookAddLeg.addEventListener('click', () => addBookLeg());
+const vigA = $('vigA'), vigB = $('vigB');
+if (vigA) vigA.addEventListener('input', renderVig);
+if (vigB) vigB.addEventListener('input', renderVig);
+addBookLeg(-110);
+addBookLeg(-110);
+renderVig();
 $('refreshBtn').addEventListener('click', () => boot(true));
 $('datePicker').addEventListener('change', (e) => boot(true, e.target.value || state.date));
 $('modalClose').addEventListener('click', closePlayer);
