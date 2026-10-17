@@ -1238,6 +1238,93 @@ function goalsAgainstGoalie(goalieId) {
   return out;
 }
 
+function shotsAgainstGoalie(goalieId) {
+  // every saved shot-on-goal with this goalie in net, across tonight's + recent pbps
+  const out = [];
+  if (!goalieId) return out;
+  const pbps = [];
+  for (const g of state.games) if (g.pbp) pbps.push(g.pbp);
+  for (const id of Object.keys(state.zonePbps || {})) pbps.push(state.zonePbps[id]);
+  const seen = new Set();
+  for (const pbp of pbps) {
+    if (!pbp || seen.has(pbp)) continue;
+    seen.add(pbp);
+    const homeId = (pbp.homeTeam || {}).id;
+    const homeDefSide = pbp.homeTeamDefendingSide;
+    for (const p of (pbp.plays || [])) {
+      if (p.typeDescKey !== 'shot-on-goal') continue;
+      const det = p.details || {};
+      if (det.goalieInNetId !== goalieId) continue;
+      let x = null, y = null;
+      if (det.xCoord != null && det.yCoord != null) {
+        const n = normalizeShot(det.xCoord, det.yCoord, det.eventOwnerTeamId, homeId, homeDefSide);
+        x = Math.abs(n.x); y = n.y;
+      }
+      out.push({ x, y });
+    }
+  }
+  return out;
+}
+
+function netZone(x, y) {
+  // 6 net zones, shooter's perspective: y<0 is the shooter's left
+  // (goalie's right). Feed is top-down so high/low = shot distance:
+  // "Low" = in tight (x>=75), "High" = from distance.
+  if (x == null || y == null) return null;
+  const col = y < -12 ? 'Left' : y > 12 ? 'Right' : 'Center';
+  const row = x >= 75 ? 'Low' : 'High';
+  return `${col}-${row}`;
+}
+const NET_ZONES = ['Left-High', 'Center-High', 'Right-High', 'Left-Low', 'Center-Low', 'Right-Low'];
+
+function zoneSvColor(sv) {
+  // red (weak) -> yellow (~.900 league avg) -> green (strong); dark-UI friendly
+  const c = Math.max(0, Math.min(1, sv));
+  let r, g, b;
+  if (c < 0.90) { const t = Math.max(0, Math.min(1, (c - 0.78) / 0.12)); r = 200; g = Math.round(70 + 130 * t); b = 70; }
+  else { const t = Math.max(0, Math.min(1, (c - 0.90) / 0.08)); r = Math.round(200 - 140 * t); g = 200; b = 70; }
+  return { bg: `rgba(${r},${g},${b},0.22)`, border: `rgba(${r},${g},${b},0.65)`, text: `rgb(${Math.min(255, r + 40)},${Math.min(255, g + 40)},${Math.min(255, b + 40)})` };
+}
+
+function goalieZoneGridHtml(goalieId) {
+  const stats = {};
+  for (const z of NET_ZONES) stats[z] = { shots: 0, goals: 0 };
+  let located = 0;
+  for (const s of shotsAgainstGoalie(goalieId)) {
+    const z = netZone(s.x, s.y);
+    if (z) { stats[z].shots++; located++; }
+  }
+  for (const gl of goalsAgainstGoalie(goalieId)) {
+    const z = netZone(gl.x, gl.y);
+    if (z) { stats[z].shots++; stats[z].goals++; located++; }
+  }
+  if (!located) return '';
+  const cells = NET_ZONES.map((z) => {
+    const st = stats[z];
+    if (st.shots < 3) {
+      return `<div class="gz-cell gz-small"><div class="gz-sv muted">—</div><div class="gz-n muted small">n&lt;3</div><div class="gz-z muted">${z}</div></div>`;
+    }
+    const sv = 1 - st.goals / st.shots;
+    const col = zoneSvColor(sv);
+    return `<div class="gz-cell" style="background:${col.bg};border-color:${col.border}">` +
+      `<div class="gz-sv" style="color:${col.text}">${(sv * 100).toFixed(1)}%</div>` +
+      `<div class="gz-n muted small">${st.shots} shots</div><div class="gz-z muted">${z}</div></div>`;
+  }).join('');
+  // weakest zone with a real sample
+  let worst = null;
+  for (const z of NET_ZONES) {
+    const st = stats[z];
+    if (st.shots < 3) continue;
+    const sv = 1 - st.goals / st.shots;
+    if (!worst || sv < worst.sv) worst = { z, sv, shots: st.shots };
+  }
+  const summary = worst
+    ? `<div class="gz-sum">Weakest: <strong>${worst.z.toLowerCase()}</strong> — ${(worst.sv * 100).toFixed(1)}% SV on ${worst.shots} shots</div>`
+    : '';
+  return `<div class="gz-wrap"><div class="gz-grid">${cells}</div>${summary}` +
+    `<div class="muted small">Sides from shooter's view · high/low = shot distance (feed is top-down).</div></div>`;
+}
+
 function goalZoneLabel(x, y) {
   // net at (89,0); side from the goalie's perspective facing the shooter
   const side = y < -10 ? "goalie's right" : y > 10 ? "goalie's left" : 'middle';
@@ -1296,6 +1383,7 @@ function goaliePanelHtml(g, teamAbbrev, st) {
   return `<div class="goalie-panel">
     <div class="goalie-head"><strong>${esc(pg.name)}</strong>${tag}<span class="muted small">${esc(teamAbbrev)}</span></div>
     ${map}
+    ${goalieZoneGridHtml(pg.id)}
     ${zone ? `<div class="goalie-zone">Most beaten: <strong>${esc(zone)}</strong></div>` : ''}
     ${pTot ? `<div class="posbar" aria-label="Goals by shooter position">${segs}</div>
     <div class="pos-legend">${legs}</div>` : ''}
