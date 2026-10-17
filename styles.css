@@ -668,6 +668,16 @@ canvas.rink {
 canvas.grink { width: 100%; height: auto; background: #f4f6f8; border-radius: 10px; border: 1px solid var(--border); }
 .goalie-zone { margin-top: .5rem; font-size: .92rem; color: var(--muted); }
 .goalie-zone strong { color: var(--gold); }
+/* goalie net-zone grid: 2x3 like a net, red->green by save% */
+.gz-wrap { margin-top: .6rem; }
+.gz-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .4rem; }
+.gz-cell { border: 1px solid var(--border-soft); border-radius: 8px; padding: .45rem .2rem .35rem; text-align: center; }
+.gz-cell.gz-small { opacity: .45; }
+.gz-sv { font-size: 1.05rem; font-weight: 800; }
+.gz-n { margin-top: .1rem; }
+.gz-z { font-size: .68rem; text-transform: uppercase; letter-spacing: .8px; margin-top: .15rem; }
+.gz-sum { margin-top: .5rem; font-size: .92rem; color: var(--muted); }
+.gz-sum strong { color: var(--text); }
 .posbar { display: flex; height: 9px; border-radius: 999px; overflow: hidden; background: var(--panel3); margin-top: .55rem; border: 1px solid var(--border-soft); }
 .pos-seg.pos-C { background: var(--teal); }
 .pos-seg.pos-LW { background: var(--blue); }
