@@ -93,11 +93,6 @@ a:hover { text-decoration: underline; }
   display: flex; flex-direction: column; gap: .7rem;
 }
 .nav-group { display: flex; gap: .9rem; align-items: stretch; }
-.nav-label {
-  flex-shrink: 0; width: 3.4rem; padding-top: .85rem;
-  font-size: .72rem; font-weight: 800; letter-spacing: 2.5px;
-  text-transform: uppercase; color: var(--muted);
-}
 .nav-grid {
   flex: 1; display: grid; grid-template-columns: repeat(3, 1fr);
   gap: .45rem; background: var(--panel);
@@ -553,7 +548,6 @@ canvas.rink {
   .util-right input[type="date"] { flex: 1; }
   .nav-groups { padding: .6rem .8rem .7rem; }
   .nav-group { gap: .55rem; }
-  .nav-label { width: 2.9rem; font-size: .64rem; letter-spacing: 1.8px; padding-top: .8rem; }
   .nav-grid { gap: .35rem; padding: .35rem; }
   .tab { font-size: .82rem; padding: .7rem .2rem .55rem; }
   main { padding: 1rem .7rem 1.8rem; }
