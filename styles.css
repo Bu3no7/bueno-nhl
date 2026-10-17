@@ -649,3 +649,33 @@ canvas.grink { width: 100%; height: auto; background: #f4f6f8; border-radius: 10
 .pos-dot.pos-LW { background: var(--blue); }
 .pos-dot.pos-RW { background: #9a7bff; }
 .pos-dot.pos-D { background: var(--gold); }
+
+/* ---------- calculators (parlay view) ---------- */
+.calc-sep { border-top: 1px solid var(--border-soft); margin: 1.4rem 0 1rem; }
+.calc-head { font-size: 1rem; margin: 0 0 .25rem; }
+.calc-row { display: flex; align-items: center; gap: .9rem; flex-wrap: wrap; margin-top: .7rem; }
+.calc-row input[type="text"] {
+  width: 5.5rem; background: var(--panel2); color: var(--text);
+  border: 1px solid var(--border); border-radius: 10px;
+  padding: .5rem .65rem; font-size: .9rem; font-family: inherit;
+  font-variant-numeric: tabular-nums;
+  transition: border-color .12s ease, box-shadow .12s ease;
+}
+.calc-row input[type="text"]:focus {
+  outline: none; border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(58, 219, 227, .16);
+}
+.book-leg { display: flex; align-items: center; gap: .7rem; margin-bottom: .55rem; flex-wrap: wrap; }
+.book-leg .leg-num { color: var(--muted); font-size: .85rem; min-width: 3.2rem; }
+.book-leg input[type="text"] {
+  width: 5.5rem; background: var(--panel2); color: var(--text);
+  border: 1px solid var(--border); border-radius: 10px;
+  padding: .5rem .65rem; font-size: .9rem; font-family: inherit;
+  font-variant-numeric: tabular-nums;
+}
+.book-leg input[type="text"]:focus {
+  outline: none; border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(58, 219, 227, .16);
+}
+.book-leg input.invalid { border-color: var(--danger); }
+.book-hint { font-size: .75rem; color: var(--danger); }

@@ -176,6 +176,31 @@
     </div>
     <div id="parlayLegs"></div>
     <div id="parlayTotals" style="margin-top:.8rem"></div>
+
+    <div class="calc-sep"></div>
+    <h3 class="calc-head">Book parlay</h3>
+    <p class="muted small">Enter the book's odds yourself — no player cards needed.</p>
+    <div id="bookLegs"></div>
+    <div class="calc-row">
+      <button class="ghost-btn" id="bookAddLeg" type="button">+ Add leg</button>
+      <label class="small muted">Stake $
+        <input type="number" id="bookStake" value="10" min="0" step="1">
+      </label>
+    </div>
+    <div id="bookTotals" style="margin-top:.8rem"></div>
+
+    <div class="calc-sep"></div>
+    <h3 class="calc-head">Vig checker</h3>
+    <p class="muted small">Two-sided market — see the book's margin and the no-vig fair odds.</p>
+    <div class="calc-row">
+      <label class="small muted">Side A
+        <input type="text" id="vigA" value="-110" inputmode="numeric" placeholder="-110">
+      </label>
+      <label class="small muted">Side B
+        <input type="text" id="vigB" value="-110" inputmode="numeric" placeholder="-110">
+      </label>
+    </div>
+    <div id="vigOut" style="margin-top:.8rem"></div>
   </section>
 </main>
 
