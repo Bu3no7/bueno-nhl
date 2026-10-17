@@ -1472,7 +1472,7 @@ function drawGoalieRinks() {
 /* ---------------- lineup (estimated from TOI rank) ---------------- */
 function lineupCellHtml(r, isSelf) {
   const last = r.name.split(' ').slice(-1)[0];
-  return `<div class="lu-cell${isSelf ? ' self' : ''}">
+  return `<div class="lu-cell${isSelf ? ' self' : ''}" data-pid="${r.pid}" data-gid="${r.gameId}" role="button" tabindex="0" title="${esc(r.name)}">
     <img class="lu-head" src="${esc(r.headshot)}" alt="" ${imgFallback}>
     <div class="lu-name">${esc(last)}</div>
     <div class="lu-sub muted">${esc(r.pos)} · ${r.toiMin.toFixed(1)}</div>
@@ -2239,6 +2239,11 @@ $('playerModal').addEventListener('click', (e) => { if (e.target.id === 'playerM
 $('matchupClose').addEventListener('click', closeMatchup);
 $('matchupModal').addEventListener('click', (e) => { if (e.target.id === 'matchupModal') closeMatchup(); });
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closePlayer(); closeMatchup(); } });
+// lineup cells (matchup popup + player card linemates) open the player card
+document.addEventListener('click', (e) => {
+  const cell = e.target.closest('.lu-cell[data-pid]');
+  if (cell && cell.dataset.pid) openPlayer(cell.dataset.pid, cell.dataset.gid);
+});
 
 async function boot(isReload, date) {
   try {
