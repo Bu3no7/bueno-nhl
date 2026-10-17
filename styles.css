@@ -434,7 +434,8 @@ tr.scored td:first-child .pname { color: #8ff5f7; text-shadow: 0 0 14px rgba(58,
   text-transform: uppercase; color: var(--muted);
 }
 .lu-players { flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); gap: .55rem; }
-.lu-cell { text-align: center; min-width: 0; }
+.lu-cell { text-align: center; min-width: 0; cursor: pointer; }
+.lu-cell:hover .lu-head { border-color: var(--teal); }
 .lu-head {
   width: 44px; height: 44px; border-radius: 50%; object-fit: cover;
   background: var(--panel2); border: 2px solid var(--border); display: inline-block;
