@@ -2027,6 +2027,7 @@ function openPlayer(pid, gameId) {
         <div class="snap-under muted small">u${m.line} ${pct1(m.under)} (${m.underFair})</div>
       </div>`;
     }).join('');
+    if (!r.markets[kind] || !r.markets[kind].length) return '';
     return `<details class="mkt-group"${ki === 0 ? ' open' : ''}><summary class="mkt-h">${meta.label} <span class="muted small">λ ${r.markets[kind][0].lam.toFixed(2)}/g</span><span class="mkt-chev">▾</span></summary><div class="mkt-body">${rows}</div></details>`;
   }).join('');
   // parlay leg picker
