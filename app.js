@@ -1584,6 +1584,41 @@ function matchupLineupHtml(gameId) {
   return `<h4 class="tape-title">Lineup <span class="muted small">est. from ice time</span></h4><div class="lu-wrap">${a}${h}</div>`;
 }
 
+/* ---------------- stat bars (sideways bar graph per stat) ---------------- */
+const STATBAR_DEFS = [
+  { key: 'gpg', label: 'Goals/GP', max: 0.7, avgF: 0.25, avgD: 0.08, fmt: (v) => v.toFixed(2) },
+  { key: 'apg', label: 'Assists/GP', max: 1.0, avgF: 0.35, avgD: 0.25, fmt: (v) => v.toFixed(2) },
+  { key: 'ptspg', label: 'Points/GP', max: 1.5, avgF: 0.60, avgD: 0.33, fmt: (v) => v.toFixed(2) },
+  { key: 'sogpg', label: 'Shots/GP', max: 5.0, avgF: 2.2, avgD: 1.6, fmt: (v) => v.toFixed(1) },
+  { key: 'toi', label: 'TOI', max: 26, avgF: 16, avgD: 20, fmt: (v) => fmtToi(v) },
+  { key: 'shpct', label: 'Shoot %', max: 0.20, avgF: 0.105, avgD: 0.06, fmt: (v) => (v * 100).toFixed(1) + '%' },
+];
+function statBarsHtml(r) {
+  const gp = Math.max(r.gp, 1);
+  const isD = r.pos === 'D';
+  const vals = {
+    gpg: r.goals / gp,
+    apg: r.assists / gp,
+    ptspg: r.points / gp,
+    sogpg: (r.shots || 0) / gp,
+    toi: r.toiMin || 0,
+    shpct: (r.shots || 0) > 0 ? r.goals / r.shots : 0,
+  };
+  const rows = STATBAR_DEFS.map((d) => {
+    const v = vals[d.key];
+    const avg = isD ? d.avgD : d.avgF;
+    const pct = Math.min(100, (v / d.max) * 100);
+    const avgPct = Math.min(100, (avg / d.max) * 100);
+    const elite = pct >= 75;
+    return `<div class="sbar-row"><div class="sbar-label">${d.label}</div>`
+      + `<div class="sbar-track"><div class="sbar-fill${elite ? ' elite' : ''}" style="width:${pct.toFixed(1)}%"></div>`
+      + `<div class="sbar-avg" style="left:${avgPct.toFixed(1)}%"></div></div>`
+      + `<div class="sbar-val">${d.fmt(v)}</div></div>`;
+  }).join('');
+  return `<h4 style="margin:.8rem 0 .3rem">Stat bars <span class="muted small">vs ${isD ? 'defense' : 'forward'} avg</span></h4>`
+    + `<div class="sbar-wrap">${rows}</div>`;
+}
+
 function linematesHtml(r) {
   const mates = state.skaters.filter((s) => s.team === r.team && String(s.gameId) === String(r.gameId) && String(s.pid) !== String(r.pid));
   let title = '', cells = '';
@@ -2139,6 +2174,7 @@ function openPlayer(pid, gameId) {
       <tr><td>Opponent</td><td>${esc(r.oppAbbr)} goalie ${(r.oppSv * 100).toFixed(1)}% SV</td></tr>
     </table>
     <p class="small muted">Season: ${r.goals}G ${r.assists}A ${r.points}P / ${r.gp}GP · Last 5: ${l5g}G, ${l5s} SOG${r.zone.lowSample ? ' · <em>zone share uses league-average (small sample)</em>' : ''}</p>
+    ${statBarsHtml(r)}
     <h4 style="margin:.8rem 0 .2rem">Markets <span class="muted small">Poisson over/under</span></h4>
     ${marketsHtml}
     <div class="parlay-add">
