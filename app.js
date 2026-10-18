@@ -1238,6 +1238,83 @@ function goalsAgainstGoalie(goalieId) {
   return out;
 }
 
+function goalieZoneStats(goalieId) {
+  // per-zone {shots, goals, sv} — shared by the zone grid and the vs-goalie matchup
+  const stats = {};
+  for (const z of NET_ZONES) stats[z] = { shots: 0, goals: 0, sv: null };
+  for (const s of shotsAgainstGoalie(goalieId)) {
+    const z = netZone(s.x, s.y);
+    if (z) stats[z].shots++;
+  }
+  for (const gl of goalsAgainstGoalie(goalieId)) {
+    const z = netZone(gl.x, gl.y);
+    if (z) { stats[z].shots++; stats[z].goals++; }
+  }
+  for (const z of NET_ZONES) {
+    if (stats[z].shots >= 3) stats[z].sv = 1 - stats[z].goals / stats[z].shots;
+  }
+  return stats;
+}
+
+function skaterGoalsVsGoalie(skaterPid, goalieId) {
+  // goals by this skater with this specific goalie in net (all scanned pbps)
+  if (!skaterPid || !goalieId) return 0;
+  let n = 0;
+  const pbps = [];
+  for (const g of state.games) if (g.pbp) pbps.push(g.pbp);
+  for (const id of Object.keys(state.zonePbps || {})) pbps.push(state.zonePbps[id]);
+  const seen = new Set();
+  for (const pbp of pbps) {
+    if (!pbp || seen.has(pbp)) continue;
+    seen.add(pbp);
+    for (const p of (pbp.plays || [])) {
+      if (p.typeDescKey !== 'goal') continue;
+      if ((p.periodDescriptor || {}).periodType === 'SO') continue;
+      const det = p.details || {};
+      if (String(det.scoringPlayerId) === String(skaterPid) &&
+          String(det.goalieInNetId) === String(goalieId)) n++;
+    }
+  }
+  return n;
+}
+
+function vsGoalieHtml(r, g) {
+  // "vs [Goalie]" head-to-head section for a skater's player card
+  const pg = panelGoalie(g, r.oppAbbr);
+  if (!pg.id) return '';
+  const h2h = skaterGoalsVsGoalie(r.pid, pg.id);
+  // skater's top shot zones (min 8 located shots for a read)
+  const zCount = {};
+  for (const s of (r.shots || [])) {
+    const z = netZone(s.x, s.y);
+    if (z) zCount[z] = (zCount[z] || 0) + 1;
+  }
+  const zTotal = Object.values(zCount).reduce((a, b) => a + b, 0);
+  const topZones = Object.entries(zCount).sort((a, b) => b[1] - a[1]).slice(0, 2);
+  // goalie's weakest zones with a real sample
+  const gz = goalieZoneStats(pg.id);
+  const weakZones = NET_ZONES.filter((z) => gz[z].sv != null)
+    .sort((a, b) => gz[a].sv - gz[b].sv).slice(0, 2);
+  let overlap = '';
+  if (zTotal >= 8 && topZones.length && weakZones.length) {
+    const hits = topZones.filter(([z]) => weakZones.includes(z));
+    if (hits.length) {
+      const [z, n] = hits[0];
+      const pct = Math.round(n / zTotal * 100);
+      overlap = `<div>Shoots <strong>${pct}%</strong> to <strong>${z.toLowerCase()}</strong> — ${esc(pg.name.split(' ').slice(-1)[0])}'s weakest zone (${(gz[z].sv * 100).toFixed(1)}% SV).</div>`;
+    } else {
+      const [z, n] = topZones[0];
+      const pct = Math.round(n / zTotal * 100);
+      overlap = `<div class="muted">Favors <strong>${z.toLowerCase()}</strong> (${pct}% of shots) — not ${esc(pg.name.split(' ').slice(-1)[0])}'s weak spot.</div>`;
+    }
+  }
+  return `<h4 style="margin:.8rem 0 .2rem">vs ${esc(pg.name)} <span class="muted small">head-to-head · model</span></h4>
+    <div class="small" style="display:flex;flex-direction:column;gap:.25rem">
+      <div><strong>${h2h}</strong> career-tracked goal${h2h === 1 ? '' : 's'} with ${esc(pg.name.split(' ').slice(-1)[0])} in net <span class="muted">(recent games)</span>.</div>
+      ${overlap}
+    </div>`;
+}
+
 function shotsAgainstGoalie(goalieId) {
   // every saved shot-on-goal with this goalie in net, across tonight's + recent pbps
   const out = [];
@@ -1287,17 +1364,9 @@ function zoneSvColor(sv) {
 }
 
 function goalieZoneGridHtml(goalieId) {
-  const stats = {};
-  for (const z of NET_ZONES) stats[z] = { shots: 0, goals: 0 };
+  const stats = goalieZoneStats(goalieId);
   let located = 0;
-  for (const s of shotsAgainstGoalie(goalieId)) {
-    const z = netZone(s.x, s.y);
-    if (z) { stats[z].shots++; located++; }
-  }
-  for (const gl of goalsAgainstGoalie(goalieId)) {
-    const z = netZone(gl.x, gl.y);
-    if (z) { stats[z].shots++; stats[z].goals++; located++; }
-  }
+  for (const z of NET_ZONES) located += stats[z].shots;
   if (!located) return '';
   const cells = NET_ZONES.map((z) => {
     const st = stats[z];
@@ -1381,7 +1450,7 @@ function goaliePanelHtml(g, teamAbbrev, st) {
     ? `<canvas class="grink" id="${canvasId}"></canvas>`
     : `<div class="muted small">No located goals charted.</div>`;
   return `<div class="goalie-panel">
-    <div class="goalie-head"><strong>${esc(pg.name)}</strong>${tag}<span class="muted small">${esc(teamAbbrev)}</span></div>
+    <div class="goalie-head goalie-open" data-goalie="${pg.id}" data-team="${esc(teamAbbrev)}" data-game="${g.id}" role="button" tabindex="0" title="Open ${esc(pg.name)} card"><strong>${esc(pg.name)}</strong>${tag}<span class="muted small">${esc(teamAbbrev)}</span></div>
     ${map}
     ${goalieZoneGridHtml(pg.id)}
     ${zone ? `<div class="goalie-zone">Most beaten: <strong>${esc(zone)}</strong></div>` : ''}
@@ -1866,37 +1935,129 @@ function drawRink(canvas, shots, teamColor) {
   canvas.width = W; canvas.height = H;
   const ctx = canvas.getContext('2d');
   // map normalized coords: x in [0,100] -> px, y in [-42.5,42.5] -> py
+  // (identical mapping to before — all callers unaffected)
   const X = (x) => 20 + (x / 100) * (W - 40);
   const Y = (y) => 20 + ((y + 42.5) / 85) * (H - 40);
-  ctx.fillStyle = '#f4f6f8'; ctx.fillRect(0, 0, W, H);
-  ctx.strokeStyle = '#c33'; ctx.lineWidth = 2;
-  // rink outline (offensive half)
-  ctx.strokeRect(X(0), Y(-42.5), X(100) - X(0), Y(42.5) - Y(-42.5));
-  // goal line + net
-  ctx.beginPath(); ctx.moveTo(X(89), Y(-6)); ctx.lineTo(X(89), Y(6)); ctx.stroke();
-  ctx.strokeStyle = '#999';
-  // blue line
-  ctx.beginPath(); ctx.moveTo(X(25), Y(-42.5)); ctx.lineTo(X(25), Y(42.5)); ctx.stroke();
-  // faceoff circles
-  for (const fy of [-22, 22]) {
-    ctx.beginPath(); ctx.arc(X(69), Y(fy), 15, 0, Math.PI * 2); ctx.stroke();
-  }
-  // high-danger circle
+  const pxFt = (W - 40) / 100; // px per foot (x axis)
+
+  // ---- dark ice surface ----
+  const bg = ctx.createRadialGradient(W / 2, H * 0.45, 40, W / 2, H / 2, 300);
+  bg.addColorStop(0, '#182747');
+  bg.addColorStop(0.6, '#101b31');
+  bg.addColorStop(1, '#0a1120');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, W, H);
+
+  // subtle ice sheen: faint diagonal highlight
   ctx.save();
-  ctx.strokeStyle = '#e8a13d'; ctx.setLineDash([6, 4]); ctx.lineWidth = 2;
-  ctx.beginPath(); ctx.arc(X(89), Y(0), (30 / 100) * (W - 40), 0, Math.PI * 2); ctx.stroke();
+  ctx.globalAlpha = 0.05;
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath();
+  ctx.moveTo(0, H); ctx.lineTo(W * 0.55, 0); ctx.lineTo(W * 0.8, 0); ctx.lineTo(W * 0.25, H);
+  ctx.closePath(); ctx.fill();
   ctx.restore();
-  // shots
+
+  const rinkL = X(0), rinkR = X(100), rinkT = Y(-42.5), rinkB = Y(42.5);
+
+  // ---- home-plate danger zone (subtle filled amber, under the lines) ----
+  ctx.save();
+  const hpGrad = ctx.createRadialGradient(X(89), Y(0), 4, X(89), Y(0), 30 * pxFt);
+  hpGrad.addColorStop(0, 'rgba(232,161,61,0.28)');
+  hpGrad.addColorStop(0.7, 'rgba(232,161,61,0.10)');
+  hpGrad.addColorStop(1, 'rgba(232,161,61,0)');
+  ctx.fillStyle = hpGrad;
+  ctx.beginPath();
+  // home-plate pentagon in front of the net
+  ctx.moveTo(X(89), Y(-9)); ctx.lineTo(X(78), Y(-9)); ctx.lineTo(X(70), Y(0));
+  ctx.lineTo(X(78), Y(9)); ctx.lineTo(X(89), Y(9)); ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+
+  // ---- rink outline: crisp white ----
+  ctx.strokeStyle = 'rgba(235,242,255,0.9)'; ctx.lineWidth = 2.5;
+  ctx.strokeRect(rinkL, rinkT, rinkR - rinkL, rinkB - rinkT);
+
+  // ---- blue line (x=25), broadcast blue, full weight ----
+  ctx.strokeStyle = '#3b82f6'; ctx.lineWidth = 5;
+  ctx.beginPath(); ctx.moveTo(X(25), rinkT); ctx.lineTo(X(25), rinkB); ctx.stroke();
+
+  // ---- goal line (x=89), red, full width ----
+  ctx.strokeStyle = '#e5484d'; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.moveTo(X(89), rinkT); ctx.lineTo(X(89), rinkB); ctx.stroke();
+
+  // ---- goal crease: light-blue semicircle ----
+  ctx.save();
+  ctx.fillStyle = 'rgba(94,200,248,0.30)';
+  ctx.strokeStyle = 'rgba(94,200,248,0.85)'; ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.ellipse(X(89), Y(0), 6 * pxFt, 6 * pxFt * 1.12, 0, -Math.PI / 2, Math.PI / 2);
+  ctx.closePath(); ctx.fill(); ctx.stroke();
+  ctx.restore();
+
+  // ---- faceoff circles + dots ----
+  for (const fy of [-22, 22]) {
+    ctx.strokeStyle = 'rgba(235,242,255,0.75)'; ctx.lineWidth = 1.8;
+    ctx.beginPath(); ctx.arc(X(69), Y(fy), 15, 0, Math.PI * 2); ctx.stroke();
+    ctx.fillStyle = 'rgba(235,242,255,0.9)';
+    ctx.beginPath(); ctx.arc(X(69), Y(fy), 3.2, 0, Math.PI * 2); ctx.fill();
+    // hash marks
+    ctx.strokeStyle = 'rgba(235,242,255,0.5)'; ctx.lineWidth = 1.5;
+    for (const s of [-1, 1]) {
+      ctx.beginPath(); ctx.moveTo(X(69) - 22, Y(fy) + s * 10); ctx.lineTo(X(69) - 14, Y(fy) + s * 10); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(X(69) + 22, Y(fy) + s * 10); ctx.lineTo(X(69) + 14, Y(fy) + s * 10); ctx.stroke();
+    }
+  }
+
+  // ---- net: posts + crossbar + mesh, top-down at the goal line ----
+  const netX = X(89), netHW = 3 * pxFt; // 6ft wide
+  ctx.save();
+  // mesh (behind the line, into the zone end)
+  ctx.fillStyle = 'rgba(200,215,235,0.10)';
+  ctx.strokeStyle = 'rgba(200,215,235,0.35)'; ctx.lineWidth = 0.8;
+  const netDepth = 2.2 * pxFt;
+  ctx.beginPath();
+  ctx.moveTo(netX, Y(0) - netHW); ctx.lineTo(netX + netDepth, Y(0) - netHW * 0.8);
+  ctx.lineTo(netX + netDepth, Y(0) + netHW * 0.8); ctx.lineTo(netX, Y(0) + netHW);
+  ctx.closePath(); ctx.fill(); ctx.stroke();
+  // mesh crosshatch
+  ctx.strokeStyle = 'rgba(200,215,235,0.18)';
+  for (let i = 1; i < 4; i++) {
+    const t = i / 4;
+    ctx.beginPath();
+    ctx.moveTo(netX + netDepth * t, Y(0) - netHW * (1 - t * 0.2));
+    ctx.lineTo(netX + netDepth * t, Y(0) + netHW * (1 - t * 0.2));
+    ctx.stroke();
+  }
+  // posts + crossbar in goal red
+  ctx.strokeStyle = '#e5484d'; ctx.lineWidth = 3.5; ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(netX, Y(0) - netHW); ctx.lineTo(netX, Y(0) + netHW); ctx.stroke();
+  ctx.fillStyle = '#e5484d';
+  ctx.beginPath(); ctx.arc(netX, Y(0) - netHW, 2.6, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(netX, Y(0) + netHW, 2.6, 0, Math.PI * 2); ctx.fill();
+  ctx.restore();
+
+  // ---- shots: visual hierarchy — goals glow, others dim ----
   for (const s of shots) {
     const px = X(Math.max(0, Math.min(100, s.x)));
     const py = Y(Math.max(-42.5, Math.min(42.5, s.y)));
-    ctx.beginPath();
-    ctx.arc(px, py, s.goal ? 7 : 4.5, 0, Math.PI * 2);
-    ctx.fillStyle = s.goal ? '#d4a017' : teamColor;
-    ctx.globalAlpha = s.goal ? 1 : 0.75;
-    ctx.fill();
-    if (s.goal) { ctx.lineWidth = 2; ctx.strokeStyle = '#7a5b00'; ctx.stroke(); }
-    ctx.globalAlpha = 1;
+    ctx.save();
+    if (s.goal) {
+      // glowing goal marker: halo + gold core + white ring
+      ctx.shadowColor = '#ffd54a'; ctx.shadowBlur = 14;
+      ctx.beginPath(); ctx.arc(px, py, 7, 0, Math.PI * 2);
+      ctx.fillStyle = '#ffd54a'; ctx.fill();
+      ctx.shadowBlur = 0;
+      ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(255,255,255,0.9)'; ctx.stroke();
+      ctx.fillStyle = '#7a5b00';
+      ctx.beginPath(); ctx.arc(px, py, 2.2, 0, Math.PI * 2); ctx.fill();
+    } else {
+      ctx.globalAlpha = 0.55;
+      ctx.beginPath(); ctx.arc(px, py, 4, 0, Math.PI * 2);
+      ctx.fillStyle = teamColor; ctx.fill();
+      ctx.globalAlpha = 0.9;
+      ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(255,255,255,0.35)'; ctx.stroke();
+    }
+    ctx.restore();
   }
   if (!shots.length) {
     ctx.fillStyle = '#8b98ab'; ctx.font = '14px sans-serif'; ctx.textAlign = 'center';
@@ -1963,6 +2124,7 @@ function openPlayer(pid, gameId) {
     </div>
     <div class="pc-status">${lineBadge}${statusPill}</div>
     ${linematesHtml(r)}
+    ${vsGoalieHtml(r, g)}
     <table class="factor-table">${factorRows}
       <tr><td>Expected goals (λ)</td><td>${r.lam.toFixed(3)}</td></tr>
       <tr><td>Opponent</td><td>${esc(r.oppAbbr)} goalie ${(r.oppSv * 100).toFixed(1)}% SV</td></tr>
@@ -1985,6 +2147,57 @@ function openPlayer(pid, gameId) {
 }
 
 function closePlayer() { $('playerModal').classList.add('hidden'); }
+
+/* ---------------- goalie card ---------------- */
+async function openGoalie(goalieId, teamAbbrev, gameId) {
+  const g = state.games.find((gg) => String(gg.id) === String(gameId));
+  if (!g || !goalieId) return;
+  const pg = panelGoalie(g, teamAbbrev);
+  if (!pg.id) return;
+  const tag = pg.tag ? `<span class="status-pill ${pg.tag === 'Confirmed' ? 'ok' : 'proj'}">${esc(pg.tag)}</span>` : '';
+  // season stats from the landing (same fetch the projection code uses)
+  let season = null;
+  try {
+    const gl = await getPlayer(goalieId);
+    const sub = gl && gl.featuredStats && gl.featuredStats.regularSeason && gl.featuredStats.regularSeason.subSeason;
+    if (sub) season = sub;
+  } catch (e) { /* keep null */ }
+  const statRow = season ? `<div class="totals-grid" style="margin:.6rem 0">
+      <div><div class="t-label">Record</div><div class="t-val">${season.wins || 0}-${season.losses || 0}-${season.otLosses || 0}</div></div>
+      <div><div class="t-label">Save %</div><div class="t-val">${((season.savePctg || 0) * 100).toFixed(1)}%</div></div>
+      <div><div class="t-label">GAA</div><div class="t-val">${(season.goalsAgainstAvg || 0).toFixed(2)}</div></div>
+      <div><div class="t-label">Shots against</div><div class="t-val">${season.shotsAgainst || '–'}</div></div>
+    </div>` : `<p class="muted small">Season stats unavailable.</p>`;
+  // rink map of goals allowed
+  const goals = goalsAgainstGoalie(pg.id);
+  const canvasId = `gcard-rink-${pg.id}`;
+  pendingGoalieDraw.push({ canvasId, goals });
+  const map = goals.some((gl) => gl.x != null)
+    ? `<canvas class="grink" id="${canvasId}" style="max-width:100%"></canvas>`
+    : `<div class="muted small">No located goals charted.</div>`;
+  // ensure save% + standings for the projection table
+  await getGoalieSvPct(pg.id);
+  const st = await getStandings().catch(() => null);
+  $('modalBody').innerHTML = `
+    <div class="pc-head">
+      <img class="headshot" src="${esc(headshotUrl(teamAbbrev, pg.id))}" alt="" ${imgFallback}>
+      <div>
+        <h3 class="pc-name">${esc(pg.name)}</h3>
+        <div><img class="tlogo" src="${teamLogoUrl(teamAbbrev)}" alt="" ${imgFallback}>
+          <span class="muted">${esc(teamAbbrev)} · Goalie · ${g ? esc(g.away + ' @ ' + g.home) : ''}</span></div>
+      </div>
+      <div style="margin-left:auto;text-align:right">${tag}</div>
+    </div>
+    ${statRow}
+    <h4 style="margin:.8rem 0 .2rem">Projections <span class="muted small">model</span></h4>
+    ${goalieProjTableHtml(g, teamAbbrev, st)}
+    <h4 style="margin:.8rem 0 .2rem">Weak zones <span class="muted small">save% by zone</span></h4>
+    ${goalieZoneGridHtml(pg.id)}
+    <h4 style="margin:.8rem 0 .2rem">Goals allowed <span class="muted small">locations</span></h4>
+    ${map}`;
+  $('playerModal').classList.remove('hidden');
+  drawGoalieRinks();
+}
 
 /* ---------------- views & refresh ---------------- */
 function renderAll() {
@@ -2243,6 +2456,11 @@ document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closePla
 document.addEventListener('click', (e) => {
   const cell = e.target.closest('.lu-cell[data-pid]');
   if (cell && cell.dataset.pid) openPlayer(cell.dataset.pid, cell.dataset.gid);
+});
+// goalie heads in the matchup popup open the goalie card
+document.addEventListener('click', (e) => {
+  const gh = e.target.closest('.goalie-open[data-goalie]');
+  if (gh && gh.dataset.goalie) openGoalie(gh.dataset.goalie, gh.dataset.team, gh.dataset.game);
 });
 
 async function boot(isReload, date) {
