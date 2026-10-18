@@ -2,7 +2,6 @@
 NHL GOAL MODEL — anytime-goal probability engine (static client version)
 ----------------------------------------------------------------------------
 MODEL FORMULA (see MODEL.md for the full write-up):
-
   Inputs per skater (season to date):
     GP        games played
     G         goals
@@ -12,40 +11,31 @@ MODEL FORMULA (see MODEL.md for the full write-up):
     HD_SHARE  share of the skater's shot attempts from the high-danger zone
               (slot / home-plate circle around the net, from play-by-play x/y)
     OPP_SV    opposing goalie's season save percentage
-
   Step 1 — base expected goals (form blended with volume):
     gpg       = G / GP
     sogpg     = SHOTS / GP
     lam_base  = 0.6 * gpg + 0.4 * (sogpg * 0.105)
               (0.105 = league-average shooting percentage; scoring form is
                weighted first, shot volume second)
-
   Step 2 — multiplicative adjustments, each clamped:
     m_toi   = clamp(0.6 + 0.4 * (TOI_MIN / 20), 0.7, 1.3)
     m_pp    = 1 + clamp((PPG / GP) * 2, 0, 0.35)
     m_goal  = clamp((1 - OPP_SV) / 0.10, 0.7, 1.4)      # vs .900 baseline
     m_zone  = 1 + clamp((HD_SHARE - 0.30) * 1.2, -0.25, 0.35)
-
   Step 3 — calibration dampening (low end must not run hot):
     lam     = lam_base * m_toi * m_pp * m_goal * m_zone
     lam    *= 0.88                                          # global factor
     if (lam < 1/6) lam *= 0.85      # extra tail dampening below the +500 line
-
   Step 4 — Poisson anytime-goal probability:
     p = 1 - exp(-lam)
-
   Fair American odds from p:
     p >= 0.5  ->  -round(100 * p / (1 - p))
     p <  0.5  ->  +round(100 * (1 - p) / p)
-
   High-danger definition (normalized attacking coordinates, net at x=89):
     x <= 89 AND sqrt((89 - x)^2 + y^2) < 30   (30-ft circle around the net)
-
   Longshot = fair odds of +1000 or longer  <=>  p <= 1/11.
 ============================================================================ */
-
 'use strict';
-
 // API access: the NHL API does not send CORS headers, so browsers block direct
 // cross-origin fetch(). The site therefore talks to a same-origin proxy path.
 // On Netlify the included netlify.toml rewrites /nhl-api/* to the NHL API.
@@ -60,13 +50,11 @@ const API = (() => {
   return '/nhl-api';
 })();
 const NHL_DIRECT = 'https://api-web.nhle.com/v1';
-
 // --- regression to the mean ---
 // Early in the season raw per-game rates are noisy: 2 goals in 2 games reads as
 // a 1.00 G/GP scorer. Shrink observed rates toward league-average priors, with
 // the weight on the observed rate growing as games accumulate.
 // games of prior
-
 const state = {
   date: '2026-10-14',
   games: [],          // {id, away, home, awayId, homeId, state, startUTC, pbp}
@@ -83,7 +71,6 @@ const state = {
   refreshTimer: null,
   parlay: [],         // {key, name, team, label, prob, fair}
 };
-
 /* ---------------- utils ---------------- */
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) =>
@@ -91,7 +78,6 @@ const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) =>
 const headshotUrl = (team, pid) => `https://assets.nhle.com/mugs/nhl/${SEASON}/${team}/${pid}.png`;
 const teamLogoUrl = (abbr) => `https://assets.nhle.com/logos/nhl/svg/${abbr}_light.svg`;
 const imgFallback = `onerror="this.style.display='none'"`;
-
 // Team primary colors for glowing bars (playoff odds, etc.)
 const TEAM_COLORS = {
   ANA: '#F47A38', BOS: '#FFB81C', BUF: '#003087', CGY: '#C8102E',
@@ -102,16 +88,13 @@ const TEAM_COLORS = {
   STL: '#002F87', TBL: '#002868', TOR: '#00205B', UTA: '#6CACE4', VAN: '#00205B',
   VGK: '#ffb81c', WSH: '#C8102E', WPG: '#041E42',
 };
-
 // run fn over items with at most n in flight
 const pct1 = (p) => (p * 100).toFixed(1) + '%';
 function fairOdds(p) {
   if (p >= 0.5) return '−' + Math.round(100 * p / (1 - p));
   return '+' + Math.round(100 * (1 - p) / p);
 }
-
 /* ---------------- model ---------------- */
-
 /* ---------------- markets: shots / assists / points over-under ----------------
    Each skater gets a Poisson rate per market:
      shots   λ = shots on goal per game
@@ -131,7 +114,6 @@ const MARKET_META = {
   assists: { label: 'Assists', short: 'AST', unit: 'A', rateKey: 'apg', last5Key: 'assists' },
   points: { label: 'Points', short: 'PTS', unit: 'P', rateKey: 'ptspg', last5Key: 'points' },
 };
-
 function fact(n) { let f = 1; for (let i = 2; i <= n; i++) f *= i; return f; }
 function poissonPmf(k, lam) {
   if (lam <= 0) return k === 0 ? 1 : 0;
@@ -157,7 +139,6 @@ function fairOddsSafe(p) {
   if (!(p > 0.0005) || !(p < 0.9995)) return '–';
   return fairOdds(p);
 }
-
 function computeMarkets(s, pos) {
   const out = {};
   const pr = priorsFor(pos);
@@ -179,7 +160,6 @@ function marketOver(r, kind, line) {
   const m = (r.markets[kind] || []).find((x) => x.line === line);
   return m ? m.over : 0;
 }
-
 /* ---------------- beat/miss snapshots ----------------
    Compact per-line rationale: lean, one-line beat case, one-line miss case,
    grounded in season rate, last-5 hit rate, ice time, and PP involvement. */
@@ -192,7 +172,6 @@ function marketSnapshot(r, kind, line, over) {
   const last2 = vals.slice(0, 2).reduce((a, b) => a + b, 0);
   const edge = Math.abs(over - 0.5);
   const lean = (edge >= 0.18 ? 'Strong ' : edge >= 0.08 ? '' : 'Slight ') + (over >= 0.5 ? 'OVER' : 'UNDER');
-
   let beat;
   if (rate >= line + 0.75) beat = `Averaging ${rate.toFixed(1)} ${meta.unit}/g — clears ${line} with room`;
   else if (n >= 4 && hitN >= 3) beat = `Beat ${line} in ${hitN} of last ${n}`;
@@ -200,16 +179,13 @@ function marketSnapshot(r, kind, line, over) {
   else if (r.toiMin >= 19) beat = `Heavy minutes (${fmtToi(r.toiMin)} avg) fuel ${meta.unit} volume`;
   else if (last2 > line) beat = `Heating up: ${last2} ${meta.unit} in last 2`;
   else beat = `Ceiling case: ${rate.toFixed(1)} ${meta.unit}/g season rate`;
-
   let miss;
   if (rate < line) miss = `Averaging ${rate.toFixed(1)} ${meta.unit}/g — sits below the line`;
   else if (n >= 4 && (n - hitN) >= 3) miss = `Missed in ${n - hitN} of last ${n}`;
   else if (r.toiMin < 14) miss = `Limited role (${fmtToi(r.toiMin)} avg) caps ${meta.unit}`;
   else miss = `Cold patch: just ${last2} ${meta.unit} in last 2`;
-
   return { lean, leanOver: over >= 0.5, beat, miss };
 }
-
 /* ---------------- parlay math (fair odds, no-vig) ---------------- */
 function americanToDecimal(o) {
   const v = parseFloat(String(o).replace(/−/g, '-').replace('+', ''));
@@ -221,14 +197,12 @@ function decimalToAmerican(d) {
   if (d >= 2) return '+' + Math.round((d - 1) * 100);
   return '−' + Math.round(100 / (d - 1));
 }
-
 /* ---------------- shot zones ---------------- */
 // Normalize so the shooting team always attacks +x (net at x=89).
 function isHighDanger(x, y) {
   if (x > 89) return false;
   return Math.hypot(89 - x, y) < 30;
 }
-
 /* ---------------- data loading ---------------- */
 /* ---------------- player landing cache ----------------
    Landings are ~25KB each and change at most once a day. Keep a slimmed copy
@@ -315,7 +289,6 @@ async function getPlayer(pid) {
   lsSetPlayer(pid, d);
   return d;
 }
-
 /* ---------------- precomputed slate bundle ----------------
    data/<date>.json is built 3x daily by data-builder/build.js (see its
    header for the full endpoint catalog). One request replaces ~300.
@@ -332,7 +305,6 @@ async function ctxFromPrecomputed(dateStr) {
     pre = d;
   } catch (e) { return null; }
   if (!pre.games.length) return { empty: true };
-
   // reshape the slim games to the schedule-like shape the shared code reads
   const games = pre.games.map((g) => ({
     id: g.id,
@@ -349,7 +321,6 @@ async function ctxFromPrecomputed(dateStr) {
   const recentIds = pre.recentIds || {};
   const zonePbps = {};
   for (const [id, pbp] of Object.entries(pre.zonePbps || {})) zonePbps[id] = pbp;
-
   // pre-populate the player cache: bundle players are already in the site's
   // slimLanding() shape, so unslimLanding() restores exactly what
   // skaterSeason() and the goalie lookup consume. getPlayer() then never
@@ -363,23 +334,19 @@ async function ctxFromPrecomputed(dateStr) {
   state.standingsCache = { key: dateStr, map: pre.standings || {} };
   state.zonePbps = zonePbps;
   state.recentIds = recentIds;
-
   return { games, pbps, rosterMap, recentIds, zonePbps, goalieSv: pre.goalieSv || {} };
 }
-
 async function ctxFromLive(dateStr) {
   const sched = await fetchJSON(`${API}/schedule/${dateStr}`);
   const day = (sched.gameWeek || []).find((w) => w.date === dateStr);
   const games = day ? day.games : [];
   if (!games.length) return null;
   lsSweepPlayers(); // drop yesterday's cached landings so they can't eat quota
-
   // play-by-play per game (null for unstarted)
   const pbps = await limitedMap(games, 4, async (g) => {
     try { return await fetchJSON(`${API}/gamecenter/${g.id}/play-by-play`); }
     catch (e) { return null; }
   });
-
   // rosters for games without usable pbp rosters (future games return empty rosterSpots)
   // NOTE: /roster/{team}/current 307-redirects to an absolute api-web.nhle.com URL,
   // which escapes the same-origin proxy and dies on CORS. Use the season path directly.
@@ -394,7 +361,6 @@ async function ctxFromLive(dateStr) {
       rosterMap[t] = [...(r.forwards || []), ...(r.defensemen || [])];
     } catch (e) { rosterMap[t] = []; }
   });
-
   // zone data: recent finals per team (max 1) + tonight's pbp
   const teams = [...new Set(games.flatMap((g) => [g.awayTeam.abbrev, g.homeTeam.abbrev]))];
   const recentByTeam = await recentFinalsByTeam(API, dateStr, 1);
@@ -408,7 +374,6 @@ async function ctxFromLive(dateStr) {
   });
   state.zonePbps = zonePbps;   // recent finals, reused by matchup goalie panels (no refetch)
   state.recentIds = recentIds; // teamAbbrev -> [recent final gameIds]
-
   // goalie save pct per game
   const goalieSv = {};
   await limitedMap(games, 4, async (g, i) => {
@@ -422,10 +387,8 @@ async function ctxFromLive(dateStr) {
       goalieSv[g.id] = sub.savePctg || 0.900;
     } catch (e) { goalieSv[g.id] = 0.900; }
   });
-
   return { games, pbps, rosterMap, recentIds, zonePbps, goalieSv };
 }
-
 async function loadDate(dateStr) {
   showLoading(`Loading ${dateStr}…`);
   hideError();
@@ -436,7 +399,6 @@ async function loadDate(dateStr) {
   state.goalGame = 'all';
   const gsi = $('goalSearchInput');
   if (gsi) gsi.value = '';
-
   // Precomputed bundle first (one request); live proxy only as fallback.
   let ctx = await ctxFromPrecomputed(dateStr);
   if (ctx && ctx.empty) {
@@ -451,7 +413,6 @@ async function loadDate(dateStr) {
     return;
   }
   const { games, pbps, rosterMap, recentIds, zonePbps, goalieSv } = ctx;
-
   // build skater list
   const skaterDefs = []; // {pid, name, pos, team, gameId, headshot}
   games.forEach((g, i) => {
@@ -489,12 +450,10 @@ async function loadDate(dateStr) {
     if (seen.has(k)) return false;
     seen.add(k); return true;
   });
-
   // season stats per skater (cached)
   const landings = await limitedMap(defs, 4, async (d) => {
     try { return await getPlayer(d.pid); } catch (e) { return null; }
   });
-
   // zone shots per skater: tonight's pbp + recent finals for their team
   const zoneByPid = {};
   defs.forEach((d) => { zoneByPid[d.pid + ':' + d.gameId] = []; });
@@ -515,7 +474,6 @@ async function loadDate(dateStr) {
       if (zonePbps[id]) pushZone(zonePbps[id]);
     }
   }
-
   // compute model rows
   state.skaters = defs.map((d, i) => {
     const land = landings[i];
@@ -534,7 +492,6 @@ async function loadDate(dateStr) {
       shots: zoneByPid[d.pid + ':' + d.gameId] || [],
     };
   });
-
   /* ---------------- line estimates ----------------
      The NHL API exposes no official line combinations, so lines are
      ESTIMATED: forwards on each team+game are ranked by average TOI —
@@ -554,20 +511,17 @@ async function loadDate(dateStr) {
       r.lineEst = true;
     });
   }
-
   state.games = games.map((g, i) => ({
     id: g.id,
     away: g.awayTeam.abbrev, home: g.homeTeam.abbrev,
     state: g.gameState, startUTC: g.startTimeUTC,
     pbp: pbps[i],
   }));
-
   showLoading('');
   populateTeamFilter();
   populateGoalGameFilter();
   renderAll();
 }
-
 /* ---------------- rendering ---------------- */
 function showLoading(t) {
   const bar = $('loadingBar');
@@ -589,7 +543,6 @@ function renderEmpty(msg) {
   if ($('goalprobsBody')) $('goalprobsBody').innerHTML = '';
   if ($('marketsWrap')) $('marketsWrap').innerHTML = '';
 }
-
 function gameStatusText(g) {
   const pbp = g.pbp;
   if (g.state === 'LIVE' || g.state === 'CRIT') {
@@ -604,7 +557,6 @@ function gameStatusText(g) {
   const dt = new Date(g.startUTC);
   return dt.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
 }
-
 function scorersHtml(g) {
   if (!g.pbp) return '';
   const names = {};
@@ -618,7 +570,6 @@ function scorersHtml(g) {
   });
   return `<details class="scorers"><summary>Goals (${goals.length})</summary>${items.join('<br>')}</details>`;
 }
-
 /* ---------------- live goal feed ----------------
    Goal type is derived from the NHL situationCode, a 4-char string:
      [awayGoalie][awaySkaters][homeSkaters][homeGoalie]
@@ -628,7 +579,6 @@ const GOAL_TYPE_LABEL = {
   EV: 'Even strength', PP: 'Power play', SH: 'Shorthanded',
   EN: 'Empty net', SO: 'Shootout', PS: 'Penalty shot',
 };
-
 function goalTypeFromSituation(code, scoredByHome, isShootout, isPenaltyShot) {
   if (isPenaltyShot) return 'PS';
   if (isShootout) return 'SO';
@@ -644,7 +594,6 @@ function goalTypeFromSituation(code, scoredByHome, isShootout, isPenaltyShot) {
   if (myS < oppS) return 'SH';
   return 'EV';
 }
-
 function extractGoals(pbp, game) {
   if (!pbp) return [];
   const names = {}, shots = {};
@@ -680,7 +629,6 @@ function extractGoals(pbp, game) {
     })
     .sort((a, b) => b.order - a.order); // newest first
 }
-
 // Anytime-goal scorer counts for one game: playerId -> goals scored.
 // Shootout goals are excluded (periodType 'SO'), matching anytime-goal
 // semantics and the Live feed's goal-type logic. No new fetches.
@@ -696,7 +644,6 @@ function scorerCounts(game) {
   }
   return counts;
 }
-
 function goalItemHtml(gl) {
   const perLabel = gl.periodType === 'OT' ? 'OT' : gl.periodType === 'SO' ? 'SO' : `P${gl.period}`;
   const assists = gl.assists.length
@@ -719,7 +666,6 @@ function goalItemHtml(gl) {
     </div>
   </div>`;
 }
-
 function renderGoals() {
   const feed = $('goalsFeed');
   if (!feed) return;
@@ -748,7 +694,6 @@ function renderGoals() {
   feed.querySelectorAll('.pname').forEach((b) =>
     b.addEventListener('click', () => openPlayer(b.dataset.pid, b.dataset.gid)));
 }
-
 /* ---------------- first-goal & brace views ----------------
    First goal: competing scoring rates within a matchup —
      P(first goal by i) = λ_i / Σ_j λ_j   (all skaters in that game)
@@ -765,7 +710,6 @@ function firstGoalProbs() {
     return { ...r, fgP: p, fgFair: fairOddsSafe(p) };
   }).sort((a, b) => b.fgP - a.fgP);
 }
-
 function twoPlusProbs() {
   return state.skaters.map((r) => {
     const lam = Math.max(r.lam, 0);
@@ -773,7 +717,6 @@ function twoPlusProbs() {
     return { ...r, tpP: p, tpFair: fairOddsSafe(p) };
   }).sort((a, b) => b.tpP - a.tpP);
 }
-
 function pnameBtn(r) {
   const hs = r.headshot || headshotUrl(r.team, r.pid);
   return `<button class="pname" data-pid="${r.pid}" data-gid="${r.gameId}"><img class="pavatar" src="${esc(hs)}" alt="" ${imgFallback}>${esc(r.name)}</button>`;
@@ -791,7 +734,6 @@ function wirePnameClicks(tbody) {
   tbody.querySelectorAll('.pname').forEach((b) =>
     b.addEventListener('click', () => openPlayer(b.dataset.pid, b.dataset.gid)));
 }
-
 /* ---------------- ice breaker (first-goal) tool ----------------
    Base: the SAME competing-rates math as the Goals tab first-goal
    view — P(i) = λ_i / Σ_j λ_j within each game. We start from
@@ -824,7 +766,6 @@ function iceBreakerProbs() {
     return { ...r, ibP: p, ibFair: fairOddsSafe(p) };
   }).sort((a, b) => b.ibP - a.ibP);
 }
-
 /* Ice Breaker Score (0–100): one number blending game context and
    league context. raw = boosted first-goal probability × pace factor,
    where pace factor = this game's expected total goals / slate-average
@@ -853,7 +794,6 @@ function iceBreakerScores(rows) {
   for (const r of scored) r.ibScore = maxRaw > 0 ? Math.round(100 * r.ibScoreRaw / maxRaw) : 0;
   return scored;
 }
-
 /* First-goal timing. Stamped winner time for started games comes from
    the pbp already in memory (first non-shootout goal play); expected
    time to first goal for pre-game games is the Poisson waiting time
@@ -979,8 +919,6 @@ function renderIceSpotlight() {
       : '<div class="ib-spot-card"><div class="ib-spot-label">Best Longshot Ice Breaker</div><p class="muted">No +1000 longshot on this slate.</p></div>');
   wireBookInputs(wrap);
 }
-
-
 /* ---------------- consolidated markets view ----------------
    One "Markets" tab; the mktKindFilter dropdown switches between the
    goal markets (anytime, brace, first goal) and the Poisson over/under
@@ -1067,7 +1005,6 @@ function renderGoalProbs() {
   tb.innerHTML = html || '<tr><td colspan="4" class="muted">No skaters match.</td></tr>';
   wirePnameClicks(tb);
 }
-
 function renderSlate() {
   const grid = $('gamesGrid');
   const d = new Date(state.date + 'T12:00:00');
@@ -1108,7 +1045,6 @@ function renderSlate() {
       openMatchup(c.dataset.gid);
     }));
 }
-
 /* ---------------- matchup card (tale of the tape) ----------------
    Win probability is computed on tap from the sims' own team λ values
    (sum of simLambda(sk.p) per team) via an exact Poisson race — no full
@@ -1140,7 +1076,6 @@ function matchupWinProb(lamA, lamB) {
   const half = pTie / 2;
   return { a: pA + half, b: pB + half, tie: pTie };
 }
-
 /* Team stats: ONE standings fetch per date, cached for the session.
    NOTE: /v1/standings/now 307-redirects off-proxy (CORS-killed) like
    /roster/{team}/current did — the date-specific path returns 200. */
@@ -1158,7 +1093,6 @@ async function getStandings() {
   state.standingsCache = { key, map };
   return map;
 }
-
 function tapeRow(aVal, label, hVal, better) {
   const ac = better === 'a' ? ' class="better"' : '';
   const hc = better === 'h' ? ' class="better"' : '';
@@ -1170,7 +1104,6 @@ function cmpRow(aV, hV, lower) {
   const aBetter = lower ? aV < hV : aV > hV;
   return aBetter ? 'a' : 'h';
 }
-
 /* ---------------- goalie vulnerability (matchup card) ----------------
    Where each goalie gets beaten: goal locations from already-loaded pbps
    (tonight's + recent finals kept in state), plus which shooter positions
@@ -1181,7 +1114,6 @@ function cmpRow(aV, hV, lower) {
    longer sent by the API), so every goal-against lands in the attacking
    half. Side labels are from the goalie's perspective facing the shooter. */
 let pendingGoalieDraw = []; // [{canvasId, goals}] filled by goalieSectionHtml, drawn after inject
-
 function goalieStarter(pbp, teamAbbrev) {
   // starting goalie for teamAbbrev: first goalieInNetId seen defending for them
   if (!pbp) return null;
@@ -1209,7 +1141,6 @@ function goalieStarter(pbp, teamAbbrev) {
   }
   return null;
 }
-
 function panelGoalie(g, teamAbbrev) {
   // tonight's starter when the game has begun, else the most recent starter
   const pbp = g.pbp;
@@ -1224,7 +1155,6 @@ function panelGoalie(g, teamAbbrev) {
   }
   return { id: null, name: 'TBD', tag: null };
 }
-
 function goalsAgainstGoalie(goalieId) {
   // every non-shootout goal with this goalie in net, across tonight's + recent pbps
   const out = [];
@@ -1257,7 +1187,6 @@ function goalsAgainstGoalie(goalieId) {
   }
   return out;
 }
-
 function goalieZoneStats(goalieId) {
   // per-zone {shots, goals, sv} — shared by the zone grid and the vs-goalie matchup
   const stats = {};
@@ -1275,7 +1204,6 @@ function goalieZoneStats(goalieId) {
   }
   return stats;
 }
-
 function skaterGoalsVsGoalie(skaterPid, goalieId) {
   // goals by this skater with this specific goalie in net (all scanned pbps)
   if (!skaterPid || !goalieId) return 0;
@@ -1297,7 +1225,6 @@ function skaterGoalsVsGoalie(skaterPid, goalieId) {
   }
   return n;
 }
-
 function vsGoalieHtml(r, g) {
   // "vs [Goalie]" head-to-head section for a skater's player card
   const pg = panelGoalie(g, r.oppAbbr);
@@ -1334,7 +1261,6 @@ function vsGoalieHtml(r, g) {
       ${overlap}
     </div>`;
 }
-
 function shotsAgainstGoalie(goalieId) {
   // every saved shot-on-goal with this goalie in net, across tonight's + recent pbps
   const out = [];
@@ -1362,7 +1288,6 @@ function shotsAgainstGoalie(goalieId) {
   }
   return out;
 }
-
 function netZone(x, y) {
   // 6 net zones, shooter's perspective: y<0 is the shooter's left
   // (goalie's right). Feed is top-down so high/low = shot distance:
@@ -1373,7 +1298,6 @@ function netZone(x, y) {
   return `${col}-${row}`;
 }
 const NET_ZONES = ['Left-High', 'Center-High', 'Right-High', 'Left-Low', 'Center-Low', 'Right-Low'];
-
 function zoneSvColor(sv) {
   // red (weak) -> yellow (~.900 league avg) -> green (strong); dark-UI friendly
   const c = Math.max(0, Math.min(1, sv));
@@ -1382,7 +1306,6 @@ function zoneSvColor(sv) {
   else { const t = Math.max(0, Math.min(1, (c - 0.90) / 0.08)); r = Math.round(200 - 140 * t); g = 200; b = 70; }
   return { bg: `rgba(${r},${g},${b},0.22)`, border: `rgba(${r},${g},${b},0.65)`, text: `rgb(${Math.min(255, r + 40)},${Math.min(255, g + 40)},${Math.min(255, b + 40)})` };
 }
-
 function goalieZoneGridHtml(goalieId) {
   const stats = goalieZoneStats(goalieId);
   let located = 0;
@@ -1413,7 +1336,6 @@ function goalieZoneGridHtml(goalieId) {
   return `<div class="gz-wrap"><div class="gz-grid">${cells}</div>${summary}` +
     `<div class="muted small">Sides from shooter's view · high/low = shot distance (feed is top-down).</div></div>`;
 }
-
 function goalZoneLabel(x, y) {
   // net at (89,0); side from the goalie's perspective facing the shooter
   const side = y < -10 ? "goalie's right" : y > 10 ? "goalie's left" : 'middle';
@@ -1434,7 +1356,6 @@ function topZone(goals) {
   const top = Object.entries(counts).sort((a, b) => b[1] - a[1])[0];
   return top ? top[0] : null;
 }
-
 const GOALIE_POS = ['C', 'LW', 'RW', 'D'];
 const POS_FIX = { C: 'C', L: 'LW', R: 'RW', D: 'D' };
 function goaliePosCounts(goals) {
@@ -1445,7 +1366,6 @@ function goaliePosCounts(goals) {
   }
   return c;
 }
-
 function goaliePanelHtml(g, teamAbbrev, st) {
   const pg = panelGoalie(g, teamAbbrev);
   const tag = pg.tag ? `<span class="g-tag">${esc(pg.tag)}</span>` : '';
@@ -1480,7 +1400,6 @@ function goaliePanelHtml(g, teamAbbrev, st) {
     ${goalieProjTableHtml(g, teamAbbrev, st)}
   </div>`;
 }
-
 function goalieSectionHtml(g, st) {
   pendingGoalieDraw = [];
   return `<h4 class="tape-title">Goalies</h4>
@@ -1489,7 +1408,6 @@ function goalieSectionHtml(g, st) {
     ${goaliePanelHtml(g, g.home, st)}
   </div>`;
 }
-
 /* ---------------- goalie projections (Poisson over/under) ----------------
    Per-starter table: Saves / Shots against / Goals against, each with
    Model (λ), Median, Threshold (median − 0.5, the standard book line),
@@ -1548,7 +1466,6 @@ async function ensureGoalieProj(g) {
   const ids = [g.away, g.home].map((t) => panelGoalie(g, t).id).filter(Boolean);
   await Promise.all(ids.map((id) => getGoalieSvPct(id)));
 }
-
 function drawGoalieRinks() {
   for (const d of pendingGoalieDraw) {
     const cv = document.getElementById(d.canvasId);
@@ -1557,7 +1474,6 @@ function drawGoalieRinks() {
   }
   pendingGoalieDraw = [];
 }
-
 /* ---------------- lineup (estimated from TOI rank) ---------------- */
 function lineupCellHtml(r, isSelf) {
   const last = r.name.split(' ').slice(-1)[0];
@@ -1567,7 +1483,6 @@ function lineupCellHtml(r, isSelf) {
     <div class="lu-sub muted">${esc(r.pos)} · ${r.toiMin.toFixed(1)}</div>
   </div>`;
 }
-
 function teamLineupHtml(teamAbbr, gameId) {
   const rows = state.skaters.filter((s) => s.team === teamAbbr && String(s.gameId) === String(gameId));
   const fwds = rows.filter((s) => ['C', 'L', 'R'].includes(s.pos) && s.line).sort((a, b) => b.toiMin - a.toiMin);
@@ -1586,7 +1501,6 @@ function teamLineupHtml(teamAbbr, gameId) {
   }
   return html + '</div>';
 }
-
 function matchupLineupHtml(gameId) {
   const g = state.games.find((gg) => String(gg.id) === String(gameId));
   if (!g) return '';
@@ -1595,7 +1509,6 @@ function matchupLineupHtml(gameId) {
   if (!a && !h) return '';
   return `<h4 class="tape-title">Lineup <span class="muted small">est. from ice time</span></h4><div class="lu-wrap">${a}${h}</div>`;
 }
-
 /* ---------------- stat bars (sideways bar graph per stat) ---------------- */
 const STATBAR_DEFS = [
   { key: 'gpg', label: 'Goals/GP', max: 0.7, avgF: 0.25, avgD: 0.08, fmt: (v) => v.toFixed(2) },
@@ -1630,7 +1543,6 @@ function statBarsHtml(r) {
   return `<h4 style="margin:.8rem 0 .3rem">Stat bars <span class="muted small">vs ${isD ? 'defense' : 'forward'} avg</span></h4>`
     + `<div class="sbar-wrap">${rows}</div>`;
 }
-
 function linematesHtml(r) {
   const mates = state.skaters.filter((s) => s.team === r.team && String(s.gameId) === String(r.gameId) && String(s.pid) !== String(r.pid));
   let title = '', cells = '';
@@ -1652,7 +1564,6 @@ function linematesHtml(r) {
   }
   return `<h4 style="margin:.8rem 0 .2rem">${esc(title)} <span class="muted small">est.</span></h4><div class="lu-row"><div class="lu-players">${cells}</div></div>`;
 }
-
 function matchupHtml(g, lamA, lamB, wp, st) {
   const A = g.away, H = g.home;
   const sa = st ? st[A] : null, sh = st ? st[H] : null;
@@ -1669,14 +1580,12 @@ function matchupHtml(g, lamA, lamB, wp, st) {
   const fmt2 = (v) => v === null ? '–' : v.toFixed(2);
   const streak = (s) => (s && s.streakCode) ? `${s.streakCode}${s.streakCount}` : '–';
   const l10rec = (s) => s ? `${s.l10Wins}-${s.l10Losses}-${s.l10OtLosses}` : '–';
-
   const pbp = g.pbp;
   const hasScore = pbp && (g.state === 'LIVE' || g.state === 'CRIT' || g.state === 'OFF' || g.state === 'FINAL');
   const liveHtml = hasScore
     ? `<div class="matchup-live"><span>${esc(A)} ${pbp.awayTeam.score}</span><span class="muted">–</span><span>${pbp.homeTeam.score} ${esc(H)}</span></div>
        <div class="matchup-status muted small">${gameStatusText(g)}</div>`
     : '';
-
   const pctA = Math.round(wp.a * 100), pctH = Math.round(wp.b * 100);
   return `
   <div class="matchup-top">
@@ -1710,7 +1619,6 @@ function matchupHtml(g, lamA, lamB, wp, st) {
   ${matchupLineupHtml(g.id)}
   <p class="muted small matchup-note">Win % from each team's Poisson scoring rate (regulation ties split evenly). Team stats via NHL standings, cached per date. Goalie maps chart non-shootout goals with this goalie in net, from tonight's and recent games.</p>`;
 }
-
 async function openMatchup(gameId) {
   const g = state.games.find((gg) => String(gg.id) === String(gameId));
   if (!g) return;
@@ -1729,7 +1637,6 @@ async function openMatchup(gameId) {
   }
 }
 function closeMatchup() { $('matchupModal').classList.add('hidden'); }
-
 function sortedSkaters() {
   let rows = state.skaters.slice();
   if (state.teamFilter) rows = rows.filter((r) => r.team === state.teamFilter);
@@ -1740,7 +1647,6 @@ function sortedSkaters() {
     : b.p - a.p);
   return rows;
 }
-
 function renderBoard() {
   const tb = $('boardBody');
   const scorerByGame = {};
@@ -1765,7 +1671,6 @@ function renderBoard() {
   tb.querySelectorAll('.pname').forEach((b) =>
     b.addEventListener('click', () => openPlayer(b.dataset.pid, b.dataset.gid)));
 }
-
 function renderLongshots() {
   const ls = state.skaters.filter((r) => r.isLongshot).sort((a, b) => b.p - a.p);
   const el = $('longshotsList');
@@ -1782,10 +1687,8 @@ function renderLongshots() {
   el.querySelectorAll('.pname').forEach((b) =>
     b.addEventListener('click', () => openPlayer(b.dataset.pid, b.dataset.gid)));
 }
-
 /* ---------------- markets view ---------------- */
 const MARKET_HEADLINE = { shots: 2.5, assists: 0.5, points: 1.5 };
-
 function renderMarkets() {
   const wrap = $('marketsWrap');
   if (!wrap) return;
@@ -1812,7 +1715,6 @@ function renderMarkets() {
   wrap.querySelectorAll('.pname').forEach((b) =>
     b.addEventListener('click', () => openPlayer(b.dataset.pid, b.dataset.gid)));
 }
-
 /* ---------------- parlay builder ---------------- */
 function addParlayLeg(r, v) {
   let leg;
@@ -1831,7 +1733,6 @@ function addParlayLeg(r, v) {
   setView('parlay');
   renderParlay();
 }
-
 function renderParlay() {
   const el = $('parlayLegs');
   if (!el) return;
@@ -1850,7 +1751,6 @@ function renderParlay() {
   }
   renderParlayTotals();
 }
-
 function renderParlayTotals() {
   const box = $('parlayTotals');
   if (!box) return;
@@ -1872,7 +1772,6 @@ function renderParlayTotals() {
     </div>
     <p class="muted small">Same-game legs are correlated — books may restrict or shade these, and the joint model rate assumes independence. Fair (no-vig) odds. Not betting advice.</p>`;
 }
-
 /* ---------------- book parlay calculator (manual odds) ---------------- */
 const bookLegs = []; // { id, odds }
 let bookLegSeq = 0;
@@ -1939,7 +1838,6 @@ function renderBookTotals() {
       <div><div class="t-label">Implied prob</div><div class="t-val">${pct1(1 / dec)}</div></div>
     </div>`;
 }
-
 /* ---------------- vig checker (two-sided market) ---------------- */
 function renderVig() {
   const box = $('vigOut');
@@ -1965,7 +1863,6 @@ function renderVig() {
       <div><div class="t-label">Fair B</div><div class="t-val">${decimalToAmerican(1 / fb)}</div></div>
     </div>`;
 }
-
 function populateTeamFilter() {
   const sel = $('teamFilter');
   const teams = [...new Set(state.skaters.map((r) => r.team))].sort();
@@ -1983,7 +1880,6 @@ function applyTeamFilter(v) {
   renderBoard();
   setMarketKind(state.marketKind);
 }
-
 /* ---------------- player card ---------------- */
 function drawRink(canvas, shots, teamColor) {
   const W = 420, H = 400;
@@ -1994,7 +1890,6 @@ function drawRink(canvas, shots, teamColor) {
   const X = (x) => 20 + (x / 100) * (W - 40);
   const Y = (y) => 20 + ((y + 42.5) / 85) * (H - 40);
   const pxFt = (W - 40) / 100; // px per foot (x axis)
-
   // ---- dark ice surface ----
   const bg = ctx.createRadialGradient(W / 2, H * 0.45, 40, W / 2, H / 2, 300);
   bg.addColorStop(0, '#182747');
@@ -2002,7 +1897,6 @@ function drawRink(canvas, shots, teamColor) {
   bg.addColorStop(1, '#0a1120');
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, W, H);
-
   // subtle ice sheen: faint diagonal highlight
   ctx.save();
   ctx.globalAlpha = 0.05;
@@ -2011,9 +1905,7 @@ function drawRink(canvas, shots, teamColor) {
   ctx.moveTo(0, H); ctx.lineTo(W * 0.55, 0); ctx.lineTo(W * 0.8, 0); ctx.lineTo(W * 0.25, H);
   ctx.closePath(); ctx.fill();
   ctx.restore();
-
   const rinkL = X(0), rinkR = X(100), rinkT = Y(-42.5), rinkB = Y(42.5);
-
   // ---- home-plate danger zone (subtle filled amber, under the lines) ----
   ctx.save();
   const hpGrad = ctx.createRadialGradient(X(89), Y(0), 4, X(89), Y(0), 30 * pxFt);
@@ -2027,19 +1919,15 @@ function drawRink(canvas, shots, teamColor) {
   ctx.lineTo(X(78), Y(9)); ctx.lineTo(X(89), Y(9)); ctx.closePath();
   ctx.fill();
   ctx.restore();
-
   // ---- rink outline: crisp white ----
   ctx.strokeStyle = 'rgba(235,242,255,0.9)'; ctx.lineWidth = 2.5;
   ctx.strokeRect(rinkL, rinkT, rinkR - rinkL, rinkB - rinkT);
-
   // ---- blue line (x=25), broadcast blue, full weight ----
   ctx.strokeStyle = '#3b82f6'; ctx.lineWidth = 5;
   ctx.beginPath(); ctx.moveTo(X(25), rinkT); ctx.lineTo(X(25), rinkB); ctx.stroke();
-
   // ---- goal line (x=89), red, full width ----
   ctx.strokeStyle = '#e5484d'; ctx.lineWidth = 3;
   ctx.beginPath(); ctx.moveTo(X(89), rinkT); ctx.lineTo(X(89), rinkB); ctx.stroke();
-
   // ---- goal crease: light-blue semicircle ----
   ctx.save();
   ctx.fillStyle = 'rgba(94,200,248,0.30)';
@@ -2048,7 +1936,6 @@ function drawRink(canvas, shots, teamColor) {
   ctx.ellipse(X(89), Y(0), 6 * pxFt, 6 * pxFt * 1.12, 0, -Math.PI / 2, Math.PI / 2);
   ctx.closePath(); ctx.fill(); ctx.stroke();
   ctx.restore();
-
   // ---- faceoff circles + dots ----
   for (const fy of [-22, 22]) {
     ctx.strokeStyle = 'rgba(235,242,255,0.75)'; ctx.lineWidth = 1.8;
@@ -2062,7 +1949,6 @@ function drawRink(canvas, shots, teamColor) {
       ctx.beginPath(); ctx.moveTo(X(69) + 22, Y(fy) + s * 10); ctx.lineTo(X(69) + 14, Y(fy) + s * 10); ctx.stroke();
     }
   }
-
   // ---- net: posts + crossbar + mesh, top-down at the goal line ----
   const netX = X(89), netHW = 3 * pxFt; // 6ft wide
   ctx.save();
@@ -2090,7 +1976,6 @@ function drawRink(canvas, shots, teamColor) {
   ctx.beginPath(); ctx.arc(netX, Y(0) - netHW, 2.6, 0, Math.PI * 2); ctx.fill();
   ctx.beginPath(); ctx.arc(netX, Y(0) + netHW, 2.6, 0, Math.PI * 2); ctx.fill();
   ctx.restore();
-
   // ---- shots: visual hierarchy — goals glow, others dim ----
   for (const s of shots) {
     const px = X(Math.max(0, Math.min(100, s.x)));
@@ -2119,7 +2004,6 @@ function drawRink(canvas, shots, teamColor) {
     ctx.fillText('No located shots in recent games', W / 2, H / 2);
   }
 }
-
 function openPlayer(pid, gameId) {
   const r = state.skaters.find((s) => String(s.pid) === String(pid) && String(s.gameId) === String(gameId));
   if (!r) return;
@@ -2129,7 +2013,6 @@ function openPlayer(pid, gameId) {
   const l5s = l5.reduce((a, x) => a + (x.shots || 0), 0);
   const factorRows = r.factors.map((f) => `
     <tr><td>${esc(f.label)}</td><td>${esc(f.value)}${f.mult != null ? ` <span class="muted">×${f.mult.toFixed(2)}</span>` : ''}</td></tr>`).join('');
-
   // markets + beat/miss snapshots
   const marketsHtml = ['shots', 'assists', 'points'].map((kind, ki) => {
     const meta = MARKET_META[kind];
@@ -2146,7 +2029,6 @@ function openPlayer(pid, gameId) {
     }).join('');
     return `<details class="mkt-group"${ki === 0 ? ' open' : ''}><summary class="mkt-h">${meta.label} <span class="muted small">λ ${r.markets[kind][0].lam.toFixed(2)}/g</span><span class="mkt-chev">▾</span></summary><div class="mkt-body">${rows}</div></details>`;
   }).join('');
-
   // parlay leg picker
   const legOpts = [`<option value="atg">Anytime goal — ${pct1(r.p)} (${r.fair})</option>`];
   for (const kind of ['shots', 'assists', 'points']) {
@@ -2155,7 +2037,6 @@ function openPlayer(pid, gameId) {
       legOpts.push(`<option value="${kind}|${m.line}">${esc(MARKET_META[kind].label)} o${m.line} — ${pct1(m.over)} (${m.overFair})</option>`);
     }
   }
-
   // line badge (estimated from TOI rank) + dressed status
   const lineBadge = r.line
     ? `<span class="line-badge" title="Estimated from average ice time — not official">${r.line}<span class="est">est.</span></span>`
@@ -2163,7 +2044,6 @@ function openPlayer(pid, gameId) {
   const statusPill = r.lineup === 'confirmed'
     ? '<span class="status-pill ok">In lineup</span>'
     : '<span class="status-pill proj">Projected</span>';
-
   $('modalBody').innerHTML = `
     <div class="pc-head">
       <img class="headshot" src="${esc(r.headshot)}" alt="" ${imgFallback}>
@@ -2215,9 +2095,7 @@ function openPlayer(pid, gameId) {
   drawRinkMode();
   $('parlayAddBtn').addEventListener('click', () => addParlayLeg(r, $('parlayLegSelect').value));
 }
-
 function closePlayer() { $('playerModal').classList.add('hidden'); }
-
 /* ---------------- goalie card ---------------- */
 async function openGoalie(goalieId, teamAbbrev, gameId) {
   const g = state.games.find((gg) => String(gg.id) === String(gameId));
@@ -2268,253 +2146,8 @@ async function openGoalie(goalieId, teamAbbrev, gameId) {
   $('playerModal').classList.remove('hidden');
   drawGoalieRinks();
 }
-
 /* ---------------- views & refresh ---------------- */
-/* ================= Home + NHL Lab ================= */
-let nhlStandingsCache = null;
-let nhlStandingsCacheTime = 0;
-
-async function fetchStandings() {
-  const now = Date.now();
-  if (nhlStandingsCache && now - nhlStandingsCacheTime < 5 * 60 * 1000) return nhlStandingsCache;
-  try {
-    // NOTE: /standings/now 307-redirects off-proxy (CORS-killed) — use date-specific path
-    const data = await fetchJSON(`${API}/standings/${state.date}`);
-    nhlStandingsCache = data.standings || [];
-    nhlStandingsCacheTime = now;
-  } catch (e) {
-    nhlStandingsCache = [];
-  }
-  return nhlStandingsCache;
-}
-
-const DIV_NAMES = { A: 'Atlantic', M: 'Metropolitan', C: 'Central', P: 'Pacific' };
-const DIV_ORDER = ['A', 'M', 'C', 'P'];
-
-function groupStandingsByDiv(all) {
-  const byDiv = { A: [], M: [], C: [], P: [] };
-  for (const s of (all || [])) {
-    const div = s.divisionAbbrev;
-    if (byDiv[div]) byDiv[div].push(s);
-  }
-  return byDiv;
-}
-
-function teamLogoCell(abbr) {
-  return `<span class="team-cell"><img class="team-logo" src="${teamLogoUrl(abbr)}" alt="" ${imgFallback}>${esc(abbr)}</span>`;
-}
-
-/* ---- section switching (bottom nav) ---- */
-function setSection(sec) {
-  state.section = sec;
-  document.querySelectorAll('.bnav-btn').forEach((b) => b.classList.toggle('active', b.dataset.section === sec));
-  const labNav = $('labNav');
-  if (labNav) labNav.hidden = sec !== 'lab';
-  if (sec === 'home') {
-    setView('home');
-  } else {
-    // NHL Lab: show the lab sub-view (default to markets)
-    const labViews = ['markets', 'longshots', 'parlay', 'slate', 'goals', 'board'];
-    setView(labViews.includes(state.view) ? state.view : 'markets');
-  }
-}
-
-/* ---- Home: top picks ---- */
-function renderHomePicks() {
-  const el = $('homePicksBody');
-  if (!el) return;
-  const skaters = (state.skaters || []).filter((s) => s.pos !== 'G' && s.p > 0);
-  if (!skaters.length) {
-    el.innerHTML = `<p class="muted">Loading…</p>`;
-    return;
-  }
-  const top = [...skaters].sort((a, b) => b.p - a.p).slice(0, 5);
-  el.innerHTML = top.map((r) => {
-    const g = state.games.find((gg) => String(gg.id) === String(r.gameId));
-    const matchup = g ? `${g.away} @ ${g.home}` : esc(r.team);
-    return `<div class="pick-row" data-pid="${r.pid}" data-gid="${r.gameId}" role="button" tabindex="0">
-      <img class="pick-head" src="${esc(r.headshot || '')}" alt="" ${imgFallback}>
-      <div><div class="pick-name">${esc(r.name)}</div>
-      <div class="pick-meta">${esc(r.team)} · ${esc(matchup)} · ${r.goals}G</div></div>
-      <div class="pick-prob">${pct1(r.p)}</div>
-    </div>`;
-  }).join('');
-}
-
-/* ---- Home: yesterday's results (placeholder — graded data is local-only) ---- */
-function renderHomeResults() {
-  const el = $('homeResultsBody');
-  if (!el) return;
-  el.innerHTML = `<p class="muted">Results post after last night's games.</p>`;
-}
-
-/* ---- Home: standings preview (compact, by division) ---- */
-async function renderHomeStandings() {
-  const el = $('homeStandingsBody');
-  if (!el) return;
-  const all = await fetchStandings();
-  if (!all.length) {
-    el.innerHTML = `<p class="muted">Couldn't load standings.</p>`;
-    return;
-  }
-  const byDiv = groupStandingsByDiv(all);
-  let html = '';
-  for (const div of DIV_ORDER) {
-    const teams = byDiv[div].slice(0, 4);
-    if (!teams.length) continue;
-    html += `<p class="home-div-label">${DIV_NAMES[div]}</p>`;
-    html += `<div class="table-wrap"><table class="standings-mini"><tbody>`;
-    html += teams.map((s) => `<tr class="team-row" data-team="${esc(s.teamAbbrev.default)}" role="button" tabindex="0">
-      <td>${teamLogoCell(s.teamAbbrev.default)}</td>
-      <td class="num"><strong>${s.points}</strong></td>
-    </tr>`).join('');
-    html += `</tbody></table></div>`;
-  }
-  html += `<button class="ghost-btn home-standings-more" id="homeStandingsMore" type="button">Full standings &rarr;</button>`;
-  el.innerHTML = html;
-  const more = $('homeStandingsMore');
-  if (more) more.addEventListener('click', (e) => { e.stopPropagation(); setView('standings'); });
-}
-
-/* ---- Full standings view ---- */
-function standingsRowHtml(s) {
-  const diff = (s.goalFor || 0) - (s.goalAgainst || 0);
-  const diffStr = diff > 0 ? '+' + diff : String(diff);
-  const streak = (s.streakCode || '') + (s.streakCount || '');
-  return `<tr class="team-row" data-team="${esc(s.teamAbbrev.default)}" role="button" tabindex="0">
-    <td>${teamLogoCell(s.teamAbbrev.default)}</td>
-    <td class="num">${s.gamesPlayed}</td>
-    <td class="num">${s.wins}</td>
-    <td class="num">${s.losses}</td>
-    <td class="num">${s.otLosses}</td>
-    <td class="num"><strong>${s.points}</strong></td>
-    <td class="num">${diffStr}</td>
-    <td class="num">${esc(streak)}</td>
-  </tr>`;
-}
-
-const STANDINGS_HEAD = `<thead><tr><th>Team</th><th class="num">GP</th><th class="num">W</th><th class="num">L</th><th class="num">OTL</th><th class="num">PTS</th><th class="num">DIFF</th><th class="num">STRK</th></tr></thead>`;
-
-async function renderStandings() {
-  const el = $('standingsBody');
-  if (!el) return;
-  const all = await fetchStandings();
-  if (!all.length) {
-    el.innerHTML = `<p class="muted">Couldn't load standings. Check your connection.</p>`;
-    return;
-  }
-  const byDiv = groupStandingsByDiv(all);
-  let html = '';
-  for (const div of DIV_ORDER) {
-    if (!byDiv[div].length) continue;
-    html += `<h3 class="standings-div">${DIV_NAMES[div]}</h3>`;
-    html += `<div class="table-wrap"><table class="standings-table">${STANDINGS_HEAD}<tbody>`;
-    html += byDiv[div].map(standingsRowHtml).join('');
-    html += `</tbody></table></div>`;
-  }
-  el.innerHTML = html;
-}
-
-/* ---- Team lineup view (from standings) ---- */
-function openTeamLineup(abbr) {
-  state.teamLineupAbbr = abbr;
-  setView('teamlineup');
-  renderTeamLineup();
-}
-
-function renderTeamLineup() {
-  const abbr = state.teamLineupAbbr;
-  const titleEl = $('teamLineupTitle');
-  const bodyEl = $('teamLineupBody');
-  if (!bodyEl) return;
-  if (titleEl) titleEl.innerHTML = `${teamLogoCell(abbr)} ${esc(abbr)}`;
-  // Find the team's most relevant game (today's slate, prefer unstarted)
-  const games = (state.games || []).filter((g) =>
-    g.away === abbr || g.home === abbr);
-  let gameId = null;
-  if (games.length) {
-    const unstarted = games.find((g) => g.state !== 'LIVE' && g.state !== 'OFF');
-    gameId = String((unstarted || games[0]).id);
-  }
-  if (!gameId) {
-    bodyEl.innerHTML = `<p class="muted">No game data for ${esc(abbr)} on this slate.</p>`;
-    return;
-  }
-  const html = teamLineupHtml(abbr, gameId);
-  bodyEl.innerHTML = html ? `<div class="lu-wrap">${html}</div>`
-    : `<p class="muted">Lineup not available yet.</p>`;
-}
-
-/* ---- Playoff odds: donut + table (placeholder data, final visual) ---- */
-const ODDS_PREVIEW = [
-  { abbr: 'CAR', po: 96.5, cup: 10.3 }, { abbr: 'VGK', po: 94.4, cup: 8.3 },
-  { abbr: 'COL', po: 92.5, cup: 8.4 }, { abbr: 'MIN', po: 88.1, cup: 5.2 },
-  { abbr: 'EDM', po: 84.7, cup: 7.1 }, { abbr: 'TBL', po: 82.3, cup: 4.8 },
-  { abbr: 'DAL', po: 80.9, cup: 5.9 }, { abbr: 'FLA', po: 78.4, cup: 4.1 },
-];
-
-function playoffDonutSvg(teams) {
-  const cx = 90, cy = 90, r = 62, sw = 24;
-  const circ = 2 * Math.PI * r;
-  const total = teams.reduce((a, t) => a + t.po, 0) || 1;
-  let offset = 25; // start at top
-  const segs = teams.map((t) => {
-    const frac = t.po / total;
-    const len = frac * circ;
-    const color = TEAM_COLORS[t.abbr] || '#3adbe3';
-    const s = `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${color}" stroke-width="${sw}" stroke-dasharray="${len.toFixed(1)} ${(circ - len).toFixed(1)}" stroke-dashoffset="${(-offset).toFixed(1)}" style="filter:drop-shadow(0 0 6px ${color})"/>`;
-    offset += len;
-    return s;
-  }).join('');
-  return `<svg class="po-donut" viewBox="0 0 180 180" width="180" height="180">
-    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#1d2839" stroke-width="${sw}"/>
-    ${segs}
-    <text x="${cx}" y="${cy - 4}" text-anchor="middle" fill="#f2f5f9" font-size="15" font-weight="700">Make</text>
-    <text x="${cx}" y="${cy + 14}" text-anchor="middle" fill="#f2f5f9" font-size="15" font-weight="700">Playoffs</text>
-  </svg>`;
-}
-
-function oddsClass(p) {
-  return p >= 85 ? 'odds-high' : p >= 60 ? 'odds-mid' : 'odds-low';
-}
-
-function renderPlayoffOdds() {
-  const homeEl = $('homeOddsBody');
-  if (homeEl) {
-    homeEl.innerHTML = `
-      <div class="po-donut-wrap">${playoffDonutSvg(ODDS_PREVIEW.slice(0, 8))}</div>
-      <div class="po-legend">${ODDS_PREVIEW.slice(0, 4).map((t) => {
-        const color = TEAM_COLORS[t.abbr] || '#3adbe3';
-        return `<div class="legend-item"><div class="legend-dot" style="background:${color};box-shadow:0 0 6px ${color}"></div>${esc(t.abbr)} ${t.po.toFixed(1)}%</div>`;
-      }).join('')}</div>
-      <button class="ghost-btn" id="homeOddsMore" type="button">Full odds &rarr;</button>
-      <p class="muted small po-note">Preview — live simulation coming soon.</p>`;
-    const more = $('homeOddsMore');
-    if (more) more.addEventListener('click', () => setView('playoffodds'));
-  }
-  const fullEl = $('oddsBody');
-  if (fullEl) {
-    fullEl.innerHTML = `
-      <div class="po-donut-wrap">${playoffDonutSvg(ODDS_PREVIEW)}</div>
-      <div class="table-wrap"><table class="odds-table">
-        <thead><tr><th>Team</th><th class="num">Playoffs</th><th class="num">Cup</th></tr></thead>
-        <tbody>${ODDS_PREVIEW.map((t) => `<tr class="team-row" data-team="${esc(t.abbr)}" role="button" tabindex="0">
-          <td>${teamLogoCell(t.abbr)}</td>
-          <td class="num ${oddsClass(t.po)}">${t.po.toFixed(1)}%</td>
-          <td class="num muted">${t.cup.toFixed(1)}%</td>
-        </tr>`).join('')}</tbody>
-      </table></div>
-      <p class="muted small po-note">Preview data — live season simulation coming soon.</p>`;
-  }
-}
-
-function renderHome() {
-  renderHomePicks();
-  renderHomeResults();
-  renderHomeStandings();
-  renderPlayoffOdds();
-}
-
+/* Home + NHL Lab code lives in home.js */
 function renderAll() {
   renderSlate();
   renderGoals();
@@ -2524,7 +2157,6 @@ function renderAll() {
   renderParlay();
   renderHome();
 }
-
 /* ---------------- two-tier live refresh ----------------
    Fast tier (15s): lightweight boxscore per live game (~13KB vs ~118KB pbp).
    Scores, SOG, clock, and period update immediately; the full pbp fires only
@@ -2532,7 +2164,6 @@ function renderAll() {
    goal details, scorer names, and goal-type badges need refreshing).
    Slow tier (30s): the original full-pbp refresh, kept as a safety backstop. */
 const liveScoreCache = {}; // gameId -> {a,h,period,clock,state}
-
 function scoreSnapshot(bs) {
   return {
     a: bs.awayTeam ? bs.awayTeam.score : 0,
@@ -2542,7 +2173,6 @@ function scoreSnapshot(bs) {
     state: bs.gameState || '',
   };
 }
-
 function applyBoxscoreToGame(g, bs) {
   // Patch the scoreboard fields in place so renderers pick them up instantly.
   // Goal details (plays/rosterSpots) stay as-is until the slow tier refreshes
@@ -2568,13 +2198,11 @@ function applyBoxscoreToGame(g, bs) {
   }
   return snap;
 }
-
 function rerenderLiveViews() {
   if (state.view === 'slate') renderSlate();
   if (state.view === 'goals') renderGoals();
   if (state.view === 'board') renderBoard();
 }
-
 /* ---------------- GitHub Actions live-score file ----------------
    The live.yml workflow polls the NHL API every 5 min and writes
    live/YYYY-MM-DD.json (UTC date). When the file exists and is fresh
@@ -2592,7 +2220,6 @@ async function tryLiveFileTick() {
   if (!data || !Array.isArray(data.games) || !data.updatedAt) return false;
   const ageMs = Date.now() - new Date(data.updatedAt).getTime();
   if (!(ageMs >= 0 && ageMs <= 10 * 60 * 1000)) return false; // stale
-
   let applied = 0;
   for (const entry of data.games) {
     const g = state.games.find((gg) => String(gg.id) === String(entry.id));
@@ -2644,7 +2271,6 @@ async function tryLiveFileTick() {
   if (applied) rerenderLiveViews();
   return applied > 0;
 }
-
 // A game is "watchable" if it's marked live, OR if its start time has passed
 // but the bundle still says FUT (stale bundle — e.g. data built before puck drop).
 function isWatchable(g) {
@@ -2654,7 +2280,6 @@ function isWatchable(g) {
   }
   return false;
 }
-
 async function fastScoreTick() {
   // Prefer the GitHub Actions live file (no proxy cost); fall back to proxy.
   try {
@@ -2689,7 +2314,6 @@ async function fastScoreTick() {
   }
   rerenderLiveViews();
 }
-
 async function refreshScores() {
   // 30s backstop: full pbp for live games (unchanged behavior)
   const live = state.games.filter(isWatchable);
@@ -2706,10 +2330,8 @@ async function refreshScores() {
   }
   rerenderLiveViews();
 }
-
 const HOME_VIEWS = ['home', 'standings', 'teamlineup', 'playoffodds'];
 const LAB_VIEWS = ['markets', 'longshots', 'parlay', 'slate', 'goals', 'board'];
-
 function setView(v) {
   state.view = v;
   // Keep the section in sync with the view
@@ -2728,7 +2350,6 @@ function setView(v) {
   if (v === 'playoffodds') renderPlayoffOdds();
   window.scrollTo(0, 0);
 }
-
 function startAutoRefresh() {
   if (state.refreshTimer) clearInterval(state.refreshTimer);
   if (state.fastTimer) clearTimeout(state.fastTimer);
@@ -2751,7 +2372,6 @@ function startAutoRefresh() {
     refreshScores().catch(() => {});
   }, 30000);
 }
-
 /* ---------------- boot ---------------- */
 document.querySelectorAll('.tab').forEach((t) =>
   t.addEventListener('click', () => setView(t.dataset.view)));
@@ -2832,7 +2452,6 @@ document.addEventListener('click', (e) => {
   const gh = e.target.closest('.goalie-open[data-goalie]');
   if (gh && gh.dataset.goalie) openGoalie(gh.dataset.goalie, gh.dataset.team, gh.dataset.game);
 });
-
 async function boot(isReload, date) {
   try {
     await loadDate(date || state.date);
@@ -2843,7 +2462,6 @@ async function boot(isReload, date) {
     showError('Couldn\'t reach the NHL API (' + err.message + '). Check your connection and retry.');
   }
 }
-
 startAutoRefresh();
 // default the picker to today (local date); the HTML ships a stale fallback value
 (() => {
