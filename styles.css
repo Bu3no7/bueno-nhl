@@ -109,6 +109,15 @@ a:hover { text-decoration: underline; }
 }
 .pill { appearance: none; border: 1px solid var(--border-soft); border-radius: 20px; background: transparent; color: var(--muted); font-size: .72rem; font-weight: 650; padding: .25rem .7rem; cursor: pointer; }
 .pill.on { background: var(--teal); border-color: var(--teal); color: #062a2e; }
+/* stat bars */
+.sbar-wrap { margin: .2rem 0 .4rem; }
+.sbar-row { display: flex; align-items: center; gap: .6rem; margin: .32rem 0; }
+.sbar-label { width: 72px; font-size: .76rem; color: var(--muted); text-align: right; flex-shrink: 0; }
+.sbar-track { flex: 1; height: 13px; background: rgba(255,255,255,.06); border-radius: 7px; overflow: hidden; position: relative; }
+.sbar-fill { height: 100%; border-radius: 7px; background: linear-gradient(90deg, var(--teal-deep), var(--teal)); }
+.sbar-fill.elite { background: linear-gradient(90deg, #b8860b, var(--gold)); }
+.sbar-avg { position: absolute; top: 0; bottom: 0; width: 2px; background: rgba(255,255,255,.35); }
+.sbar-val { width: 48px; font-size: .78rem; font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; flex-shrink: 0; }
 .tab:hover { color: var(--text); background: rgba(255, 255, 255, .04); }
 .tab.active {
   color: var(--text); background: #05080e;
