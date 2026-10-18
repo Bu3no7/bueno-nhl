@@ -72,7 +72,8 @@ const state = {
   games: [],          // {id, away, home, awayId, homeId, state, startUTC, pbp}
   skaters: [],        // computed model rows
   playerCache: new Map(),
-  view: 'markets',
+  view: 'home',
+  section: 'home',    // bottom-nav section: 'home' | 'lab'
   marketKind: 'atg',  // Markets tab: one market at a time — 'atg' | 'twoplus' | 'firstgoal' | 'shots' | 'assists' | 'points'
   goalSearch: '',     // Markets tab player-name search filter
   goalGame: 'all',    // Markets tab game filter ('all' or game id)
@@ -90,6 +91,17 @@ const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) =>
 const headshotUrl = (team, pid) => `https://assets.nhle.com/mugs/nhl/${SEASON}/${team}/${pid}.png`;
 const teamLogoUrl = (abbr) => `https://assets.nhle.com/logos/nhl/svg/${abbr}_light.svg`;
 const imgFallback = `onerror="this.style.display='none'"`;
+
+// Team primary colors for glowing bars (playoff odds, etc.)
+const TEAM_COLORS = {
+  ANA: '#F47A38', BOS: '#FFB81C', BUF: '#003087', CGY: '#C8102E',
+  CAR: '#a6192e', CHI: '#CF0A2C', COL: '#6F263D', CBJ: '#002654', DAL: '#006847',
+  DET: '#CE1126', EDM: '#FF4C00', FLA: '#C8102E', LAK: '#A2AAAD', MIN: '#006847',
+  MTL: '#AF1E2D', NSH: '#FFB81C', NJD: '#CE1126', NYI: '#00539B', NYR: '#0038A8',
+  OTT: '#C8102E', PHI: '#F74902', PIT: '#FCB514', SJS: '#006D75', SEA: '#68A2B9',
+  STL: '#002F87', TBL: '#002868', TOR: '#00205B', UTA: '#6CACE4', VAN: '#00205B',
+  VGK: '#ffb81c', WSH: '#C8102E', WPG: '#041E42',
+};
 
 // run fn over items with at most n in flight
 const pct1 = (p) => (p * 100).toFixed(1) + '%';
@@ -2258,6 +2270,250 @@ async function openGoalie(goalieId, teamAbbrev, gameId) {
 }
 
 /* ---------------- views & refresh ---------------- */
+/* ================= Home + NHL Lab ================= */
+let nhlStandingsCache = null;
+let nhlStandingsCacheTime = 0;
+
+async function fetchStandings() {
+  const now = Date.now();
+  if (nhlStandingsCache && now - nhlStandingsCacheTime < 5 * 60 * 1000) return nhlStandingsCache;
+  try {
+    const data = await fetchJSON(`${API}/standings/now`);
+    nhlStandingsCache = data.standings || [];
+    nhlStandingsCacheTime = now;
+  } catch (e) {
+    nhlStandingsCache = [];
+  }
+  return nhlStandingsCache;
+}
+
+const DIV_NAMES = { A: 'Atlantic', M: 'Metropolitan', C: 'Central', P: 'Pacific' };
+const DIV_ORDER = ['A', 'M', 'C', 'P'];
+
+function groupStandingsByDiv(all) {
+  const byDiv = { A: [], M: [], C: [], P: [] };
+  for (const s of (all || [])) {
+    const div = s.divisionAbbrev;
+    if (byDiv[div]) byDiv[div].push(s);
+  }
+  return byDiv;
+}
+
+function teamLogoCell(abbr) {
+  return `<span class="team-cell"><img class="team-logo" src="${teamLogoUrl(abbr)}" alt="" ${imgFallback}>${esc(abbr)}</span>`;
+}
+
+/* ---- section switching (bottom nav) ---- */
+function setSection(sec) {
+  state.section = sec;
+  document.querySelectorAll('.bnav-btn').forEach((b) => b.classList.toggle('active', b.dataset.section === sec));
+  const labNav = $('labNav');
+  if (labNav) labNav.hidden = sec !== 'lab';
+  if (sec === 'home') {
+    setView('home');
+  } else {
+    // NHL Lab: show the lab sub-view (default to markets)
+    const labViews = ['markets', 'longshots', 'parlay', 'slate', 'goals', 'board'];
+    setView(labViews.includes(state.view) ? state.view : 'markets');
+  }
+}
+
+/* ---- Home: top picks ---- */
+function renderHomePicks() {
+  const el = $('homePicksBody');
+  if (!el) return;
+  const skaters = (state.skaters || []).filter((s) => s.pos !== 'G' && s.p > 0);
+  if (!skaters.length) {
+    el.innerHTML = `<p class="muted">Loading…</p>`;
+    return;
+  }
+  const top = [...skaters].sort((a, b) => b.p - a.p).slice(0, 5);
+  el.innerHTML = top.map((r) => {
+    const g = state.games.find((gg) => String(gg.id) === String(r.gameId));
+    const matchup = g ? `${g.away} @ ${g.home}` : esc(r.team);
+    return `<div class="pick-row" data-pid="${r.pid}" data-gid="${r.gameId}" role="button" tabindex="0">
+      <img class="pick-head" src="${esc(r.headshot || '')}" alt="" ${imgFallback}>
+      <div><div class="pick-name">${esc(r.name)}</div>
+      <div class="pick-meta">${esc(r.team)} · ${esc(matchup)} · ${r.goals}G</div></div>
+      <div class="pick-prob">${pct1(r.p)}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ---- Home: yesterday's results (placeholder — graded data is local-only) ---- */
+function renderHomeResults() {
+  const el = $('homeResultsBody');
+  if (!el) return;
+  el.innerHTML = `<p class="muted">Results post after last night's games.</p>`;
+}
+
+/* ---- Home: standings preview (compact, by division) ---- */
+async function renderHomeStandings() {
+  const el = $('homeStandingsBody');
+  if (!el) return;
+  const all = await fetchStandings();
+  if (!all.length) {
+    el.innerHTML = `<p class="muted">Couldn't load standings.</p>`;
+    return;
+  }
+  const byDiv = groupStandingsByDiv(all);
+  let html = '';
+  for (const div of DIV_ORDER) {
+    const teams = byDiv[div].slice(0, 4);
+    if (!teams.length) continue;
+    html += `<p class="home-div-label">${DIV_NAMES[div]}</p>`;
+    html += `<div class="table-wrap"><table class="standings-mini"><tbody>`;
+    html += teams.map((s) => `<tr class="team-row" data-team="${esc(s.teamAbbrev.default)}" role="button" tabindex="0">
+      <td>${teamLogoCell(s.teamAbbrev.default)}</td>
+      <td class="num"><strong>${s.points}</strong></td>
+    </tr>`).join('');
+    html += `</tbody></table></div>`;
+  }
+  html += `<button class="ghost-btn home-standings-more" id="homeStandingsMore" type="button">Full standings &rarr;</button>`;
+  el.innerHTML = html;
+  const more = $('homeStandingsMore');
+  if (more) more.addEventListener('click', (e) => { e.stopPropagation(); setView('standings'); });
+}
+
+/* ---- Full standings view ---- */
+function standingsRowHtml(s) {
+  const diff = (s.goalFor || 0) - (s.goalAgainst || 0);
+  const diffStr = diff > 0 ? '+' + diff : String(diff);
+  const streak = (s.streakCode || '') + (s.streakCount || '');
+  return `<tr class="team-row" data-team="${esc(s.teamAbbrev.default)}" role="button" tabindex="0">
+    <td>${teamLogoCell(s.teamAbbrev.default)}</td>
+    <td class="num">${s.gamesPlayed}</td>
+    <td class="num">${s.wins}</td>
+    <td class="num">${s.losses}</td>
+    <td class="num">${s.otLosses}</td>
+    <td class="num"><strong>${s.points}</strong></td>
+    <td class="num">${diffStr}</td>
+    <td class="num">${esc(streak)}</td>
+  </tr>`;
+}
+
+const STANDINGS_HEAD = `<thead><tr><th>Team</th><th class="num">GP</th><th class="num">W</th><th class="num">L</th><th class="num">OTL</th><th class="num">PTS</th><th class="num">DIFF</th><th class="num">STRK</th></tr></thead>`;
+
+async function renderStandings() {
+  const el = $('standingsBody');
+  if (!el) return;
+  const all = await fetchStandings();
+  if (!all.length) {
+    el.innerHTML = `<p class="muted">Couldn't load standings. Check your connection.</p>`;
+    return;
+  }
+  const byDiv = groupStandingsByDiv(all);
+  let html = '';
+  for (const div of DIV_ORDER) {
+    if (!byDiv[div].length) continue;
+    html += `<h3 class="standings-div">${DIV_NAMES[div]}</h3>`;
+    html += `<div class="table-wrap"><table class="standings-table">${STANDINGS_HEAD}<tbody>`;
+    html += byDiv[div].map(standingsRowHtml).join('');
+    html += `</tbody></table></div>`;
+  }
+  el.innerHTML = html;
+}
+
+/* ---- Team lineup view (from standings) ---- */
+function openTeamLineup(abbr) {
+  state.teamLineupAbbr = abbr;
+  setView('teamlineup');
+  renderTeamLineup();
+}
+
+function renderTeamLineup() {
+  const abbr = state.teamLineupAbbr;
+  const titleEl = $('teamLineupTitle');
+  const bodyEl = $('teamLineupBody');
+  if (!bodyEl) return;
+  if (titleEl) titleEl.innerHTML = `${teamLogoCell(abbr)} ${esc(abbr)}`;
+  // Find the team's most relevant game (today's slate, prefer unstarted)
+  const games = (state.games || []).filter((g) =>
+    g.away === abbr || g.home === abbr);
+  let gameId = null;
+  if (games.length) {
+    const unstarted = games.find((g) => g.state !== 'LIVE' && g.state !== 'OFF');
+    gameId = String((unstarted || games[0]).id);
+  }
+  if (!gameId) {
+    bodyEl.innerHTML = `<p class="muted">No game data for ${esc(abbr)} on this slate.</p>`;
+    return;
+  }
+  const html = teamLineupHtml(abbr, gameId);
+  bodyEl.innerHTML = html ? `<div class="lu-wrap">${html}</div>`
+    : `<p class="muted">Lineup not available yet.</p>`;
+}
+
+/* ---- Playoff odds: donut + table (placeholder data, final visual) ---- */
+const ODDS_PREVIEW = [
+  { abbr: 'CAR', po: 96.5, cup: 10.3 }, { abbr: 'VGK', po: 94.4, cup: 8.3 },
+  { abbr: 'COL', po: 92.5, cup: 8.4 }, { abbr: 'MIN', po: 88.1, cup: 5.2 },
+  { abbr: 'EDM', po: 84.7, cup: 7.1 }, { abbr: 'TBL', po: 82.3, cup: 4.8 },
+  { abbr: 'DAL', po: 80.9, cup: 5.9 }, { abbr: 'FLA', po: 78.4, cup: 4.1 },
+];
+
+function playoffDonutSvg(teams) {
+  const cx = 90, cy = 90, r = 62, sw = 24;
+  const circ = 2 * Math.PI * r;
+  const total = teams.reduce((a, t) => a + t.po, 0) || 1;
+  let offset = 25; // start at top
+  const segs = teams.map((t) => {
+    const frac = t.po / total;
+    const len = frac * circ;
+    const color = TEAM_COLORS[t.abbr] || '#3adbe3';
+    const s = `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${color}" stroke-width="${sw}" stroke-dasharray="${len.toFixed(1)} ${(circ - len).toFixed(1)}" stroke-dashoffset="${(-offset).toFixed(1)}" style="filter:drop-shadow(0 0 6px ${color})"/>`;
+    offset += len;
+    return s;
+  }).join('');
+  return `<svg class="po-donut" viewBox="0 0 180 180" width="180" height="180">
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#1d2839" stroke-width="${sw}"/>
+    ${segs}
+    <text x="${cx}" y="${cy - 4}" text-anchor="middle" fill="#f2f5f9" font-size="15" font-weight="700">Make</text>
+    <text x="${cx}" y="${cy + 14}" text-anchor="middle" fill="#f2f5f9" font-size="15" font-weight="700">Playoffs</text>
+  </svg>`;
+}
+
+function oddsClass(p) {
+  return p >= 85 ? 'odds-high' : p >= 60 ? 'odds-mid' : 'odds-low';
+}
+
+function renderPlayoffOdds() {
+  const homeEl = $('homeOddsBody');
+  if (homeEl) {
+    homeEl.innerHTML = `
+      <div class="po-donut-wrap">${playoffDonutSvg(ODDS_PREVIEW.slice(0, 8))}</div>
+      <div class="po-legend">${ODDS_PREVIEW.slice(0, 4).map((t) => {
+        const color = TEAM_COLORS[t.abbr] || '#3adbe3';
+        return `<div class="legend-item"><div class="legend-dot" style="background:${color};box-shadow:0 0 6px ${color}"></div>${esc(t.abbr)} ${t.po.toFixed(1)}%</div>`;
+      }).join('')}</div>
+      <button class="ghost-btn" id="homeOddsMore" type="button">Full odds &rarr;</button>
+      <p class="muted small po-note">Preview — live simulation coming soon.</p>`;
+    const more = $('homeOddsMore');
+    if (more) more.addEventListener('click', () => setView('playoffodds'));
+  }
+  const fullEl = $('oddsBody');
+  if (fullEl) {
+    fullEl.innerHTML = `
+      <div class="po-donut-wrap">${playoffDonutSvg(ODDS_PREVIEW)}</div>
+      <div class="table-wrap"><table class="odds-table">
+        <thead><tr><th>Team</th><th class="num">Playoffs</th><th class="num">Cup</th></tr></thead>
+        <tbody>${ODDS_PREVIEW.map((t) => `<tr class="team-row" data-team="${esc(t.abbr)}" role="button" tabindex="0">
+          <td>${teamLogoCell(t.abbr)}</td>
+          <td class="num ${oddsClass(t.po)}">${t.po.toFixed(1)}%</td>
+          <td class="num muted">${t.cup.toFixed(1)}%</td>
+        </tr>`).join('')}</tbody>
+      </table></div>
+      <p class="muted small po-note">Preview data — live season simulation coming soon.</p>`;
+  }
+}
+
+function renderHome() {
+  renderHomePicks();
+  renderHomeResults();
+  renderHomeStandings();
+  renderPlayoffOdds();
+}
+
 function renderAll() {
   renderSlate();
   renderGoals();
@@ -2265,6 +2521,7 @@ function renderAll() {
   renderLongshots();
   setMarketKind(state.marketKind);
   renderParlay();
+  renderHome();
 }
 
 /* ---------------- two-tier live refresh ----------------
@@ -2449,11 +2706,26 @@ async function refreshScores() {
   rerenderLiveViews();
 }
 
+const HOME_VIEWS = ['home', 'standings', 'teamlineup', 'playoffodds'];
+const LAB_VIEWS = ['markets', 'longshots', 'parlay', 'slate', 'goals', 'board'];
+
 function setView(v) {
   state.view = v;
+  // Keep the section in sync with the view
+  if (HOME_VIEWS.includes(v)) state.section = 'home';
+  else if (LAB_VIEWS.includes(v)) state.section = 'lab';
+  document.querySelectorAll('.bnav-btn').forEach((b) => b.classList.toggle('active', b.dataset.section === state.section));
+  const labNav = $('labNav');
+  if (labNav) labNav.hidden = state.section !== 'lab';
   document.querySelectorAll('.tab').forEach((t) => t.classList.toggle('active', t.dataset.view === v));
   document.querySelectorAll('.view').forEach((s) => s.classList.toggle('active', s.id === 'view-' + v));
-  $('autoRefreshNote').style.visibility = v === 'slate' ? 'visible' : 'hidden';
+  const arn = $('autoRefreshNote');
+  if (arn) arn.style.visibility = v === 'slate' ? 'visible' : 'hidden';
+  if (v === 'home') renderHome();
+  if (v === 'standings') renderStandings();
+  if (v === 'teamlineup') renderTeamLineup();
+  if (v === 'playoffodds') renderPlayoffOdds();
+  window.scrollTo(0, 0);
 }
 
 function startAutoRefresh() {
@@ -2482,6 +2754,35 @@ function startAutoRefresh() {
 /* ---------------- boot ---------------- */
 document.querySelectorAll('.tab').forEach((t) =>
   t.addEventListener('click', () => setView(t.dataset.view)));
+// Bottom nav: Home / NHL Lab section switching
+document.querySelectorAll('.bnav-btn').forEach((b) =>
+  b.addEventListener('click', () => setSection(b.dataset.section)));
+// Back buttons
+const standingsBack = $('standingsBack');
+if (standingsBack) standingsBack.addEventListener('click', () => setView('home'));
+const teamLineupBack = $('teamLineupBack');
+if (teamLineupBack) teamLineupBack.addEventListener('click', () => setView('standings'));
+const oddsBack = $('oddsBack');
+if (oddsBack) oddsBack.addEventListener('click', () => setView('home'));
+// Home: pick rows open the player card
+document.addEventListener('click', (e) => {
+  const pr = e.target.closest('.pick-row[data-pid]');
+  if (pr && pr.dataset.pid) openPlayer(pr.dataset.pid, pr.dataset.gid);
+});
+// Home + standings + odds: team rows open the team lineup view
+document.addEventListener('click', (e) => {
+  const tr = e.target.closest('.team-row[data-team]');
+  if (tr && tr.dataset.team) openTeamLineup(tr.dataset.team);
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Enter' && e.key !== ' ') return;
+  const pr = e.target.closest && e.target.closest('.pick-row[data-pid]');
+  if (pr && pr.dataset.pid) { e.preventDefault(); openPlayer(pr.dataset.pid, pr.dataset.gid); return; }
+  const tr = e.target.closest && e.target.closest('.team-row[data-team]');
+  if (tr && tr.dataset.team) { e.preventDefault(); openTeamLineup(tr.dataset.team); }
+});
+// Home is the default section on boot
+state.section = 'home';
 $('sortSelect').addEventListener('change', (e) => { state.sortBy = e.target.value; renderBoard(); });
 // Markets goal filters: live search + game dropdown (persist across market switches)
 const goalSearchInput = $('goalSearchInput');
