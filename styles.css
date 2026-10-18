@@ -355,6 +355,12 @@ tr.scored td:first-child .pname { color: #8ff5f7; text-shadow: 0 0 14px rgba(58,
 .mkt-title { margin: 1.3rem 0 .55rem; font-size: 1.02rem; font-weight: 750; letter-spacing: -.01em; }
 .mkt-title:first-child { margin-top: .2rem; }
 .mkt-h { margin: .9rem 0 .15rem; font-size: .95rem; font-weight: 700; }
+.mkt-group { margin-bottom: .2rem; }
+.mkt-group summary.mkt-h { cursor: pointer; list-style: none; display: flex; align-items: center; gap: .4rem; }
+.mkt-group summary.mkt-h::-webkit-details-marker { display: none; }
+.mkt-chev { margin-left: auto; color: var(--muted); font-size: .8rem; transition: transform .15s; }
+.mkt-group[open] .mkt-chev { transform: rotate(180deg); }
+.mkt-group summary.mkt-h:hover .mkt-chev { color: var(--teal); }
 
 /* ---------- player modal ---------- */
 .modal {
