@@ -1545,21 +1545,44 @@ function statBarsHtml(r) {
     + `<div class="sbar-wrap">${rows}</div>`;
 }
 /* Player bio strip: number, age, position, height, weight, shoots, birthplace */
-function playerBioHtml(r) {
+function playerBioHtml(r, compact) {
   const b = r.bio;
-  if (!b) return '';
+  if (!b) return `<div class="pc-bio${compact ? ' compact' : ''}" data-bio-loading="${esc(String(r.pid))}"><span class="muted small">Loading bio…</span></div>`;
   const age = b.dob ? Math.floor((Date.now() - new Date(b.dob).getTime()) / 3.15576e10) : null;
   const items = [];
   if (b.number != null) items.push(`<span><strong>#${esc(String(b.number))}</strong></span>`);
   if (r.pos) items.push(`<span>${esc(r.pos)}</span>`);
   if (age != null) items.push(`<span>Age ${age}</span>`);
-  if (b.dob) items.push(`<span class="muted">Born ${esc(b.dob)}</span>`);
-  if (b.height) items.push(`<span>${esc(b.height)}</span>`);
-  if (b.weight) items.push(`<span>${esc(b.weight)}</span>`);
-  if (b.shoots) items.push(`<span>Shoots ${esc(b.shoots)}</span>`);
-  if (b.birthplace) items.push(`<span class="muted">${esc(b.birthplace)}</span>`);
+  if (!compact) {
+    if (b.dob) items.push(`<span class="muted">Born ${esc(b.dob)}</span>`);
+    if (b.height) items.push(`<span>${esc(b.height)}</span>`);
+    if (b.weight) items.push(`<span>${esc(b.weight)}</span>`);
+    if (b.shoots) items.push(`<span>Shoots ${esc(b.shoots)}</span>`);
+    if (b.birthplace) items.push(`<span class="muted">${esc(b.birthplace)}</span>`);
+  } else {
+    if (b.shoots) items.push(`<span class="muted small">${esc(b.shoots)}</span>`);
+  }
   if (!items.length) return '';
-  return `<div class="pc-bio">${items.join('<span class="pc-bio-sep">·</span>')}</div>`;
+  return `<div class="pc-bio${compact ? ' compact' : ''}">${items.join('<span class="pc-bio-sep">·</span>')}</div>`;
+}
+/* Lazy-load bio for players who don't have it yet (e.g. live game skaters) */
+async function ensurePlayerBio(r) {
+  if (r.bio || r._bioLoading) return;
+  r._bioLoading = true;
+  try {
+    const d = await fetchJSON(`${API}/player/${r.pid}/landing`);
+    r.bio = {
+      number: d.sweaterNumber,
+      dob: d.birthDate,
+      birthplace: [d.birthCity?.default, d.birthCountry].filter(Boolean).join(', '),
+      height: d.heightInInches ? `${Math.floor(d.heightInInches/12)}'${d.heightInInches%12}"` : null,
+      weight: d.weightInPounds ? `${d.weightInPounds} lbs` : null,
+      shoots: d.shootsCatches,
+    };
+    const el = document.querySelector(`[data-bio-loading="${r.pid}"]`);
+    if (el) el.outerHTML = playerBioHtml(r, true);
+  } catch (e) { /* bio stays empty */ }
+  r._bioLoading = false;
 }
 function linematesHtml(r) {
   const mates = state.skaters.filter((s) => s.team === r.team && String(s.gameId) === String(r.gameId) && String(s.pid) !== String(r.pid));
@@ -2078,7 +2101,7 @@ function openPlayer(pid, gameId) {
       </div>
     </div>
     <div class="pc-status">${lineBadge}${statusPill}</div>
-    ${playerBioHtml(r)}
+    ${playerBioHtml(r, !r.bio)}
     ${linematesHtml(r)}
     ${vsGoalieHtml(r, g)}
     <table class="factor-table">${factorRows}
@@ -2100,6 +2123,7 @@ function openPlayer(pid, gameId) {
       <span><span class="dot" style="background:#d4a017"></span>goal</span>
       <span><span class="dot" style="border:2px dashed #e8a13d;background:none"></span>high-danger zone</span></div>`;
   $('playerModal').classList.remove('hidden');
+  ensurePlayerBio(r);
   // map follows the Markets dropdown on open; pills let you switch without closing
   const mk = state.marketKind;
   let rinkMode = ['atg', 'twoplus', 'firstgoal'].includes(mk) ? 'goals' : 'shots';
