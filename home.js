@@ -182,7 +182,10 @@ async function renderTeamRoster(abbr) {
   if (!bodyEl) return;
   bodyEl.innerHTML = `<p class="muted">Loading roster…</p>`;
   try {
-    const data = await fetchJSON(`${API}/roster/${abbr}/current`);
+    // NOTE: /roster/{team}/current 307-redirects off-proxy — use season path
+    const d = new Date();
+    const seasonId = `${d.getMonth() >= 6 ? d.getFullYear() : d.getFullYear() - 1}${(d.getMonth() >= 6 ? d.getFullYear() : d.getFullYear() - 1) + 1}`;
+    const data = await fetchJSON(`${API}/roster/${abbr}/${seasonId}`);
     const skaters = (data.forwards || []).concat(data.defensemen || []);
     const goalies = data.goalies || [];
     if (!skaters.length && !goalies.length) throw new Error('empty');
