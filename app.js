@@ -1067,6 +1067,11 @@ function renderSlate() {
     const asog = pbp && typeof pbp.awayTeam.sog === 'number' ? pbp.awayTeam.sog : null;
     const hsog = pbp && typeof pbp.homeTeam.sog === 'number' ? pbp.homeTeam.sog : null;
     const sogHtml = (asog !== null && hsog !== null) ? `<span>SOG ${asog}–${hsog}</span>` : '';
+    const ga = panelGoalie(g, g.away), gh = panelGoalie(g, g.home);
+    const goalieHtml = (ga.id || gh.id) ? `<div class="game-goalies">` +
+      [ga, gh].map((pg, i) => pg.id
+        ? `<button class="gg-name" data-goid="${pg.id}" data-gteam="${i ? g.home : g.away}" data-ggid="${g.id}" title="Open goalie card">${esc(pg.name.split(' ').slice(-1)[0])}<span class="g-tag ${pg.tag === 'Confirmed' ? 'ok' : 'proj'}">${esc(pg.tag)}</span></button>`
+        : '').join('<span class="muted"> vs </span>') + `</div>` : '';
     return `<div class="game-card" data-gid="${g.id}" title="Tap for matchup">
       <div class="matchup">
         <span class="team"><img src="${teamLogoUrl(g.away)}" alt="" ${imgFallback}>${esc(g.away)}</span>
@@ -1075,6 +1080,7 @@ function renderSlate() {
       </div>
       <div class="score-line"><span>${as}</span><span>${hs}</span></div>
       <div class="game-meta"><span>${gameStatusText(g)}</span>${sogHtml}</div>
+      ${goalieHtml}
       ${scorersHtml(g)}
     </div>`;
   }).join('');
@@ -1085,6 +1091,8 @@ function renderSlate() {
   grid.querySelectorAll('.game-card').forEach((c) =>
     c.addEventListener('click', (e) => {
       if (e.target.closest('details')) return; // let the Goals toggle work
+      const gg = e.target.closest('.gg-name');
+      if (gg) { e.stopPropagation(); openGoalie(+gg.dataset.goid, gg.dataset.gteam, +gg.dataset.ggid); return; }
       openMatchup(c.dataset.gid);
     }));
 }
