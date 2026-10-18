@@ -451,7 +451,7 @@ tr.scored td:first-child .pname { color: #8ff5f7; text-shadow: 0 0 14px rgba(58,
 .factor-table td:last-child { text-align: right; font-weight: 650; font-variant-numeric: tabular-nums; }
 
 canvas.rink {
-  width: 100%; height: auto; background: #f4f6f8;
+  width: 100%; height: auto; background: #0a1120;
   border-radius: 12px; margin-top: .55rem; border: 1px solid var(--border);
   box-shadow: var(--shadow-sm);
 }
@@ -664,9 +664,11 @@ canvas.rink {
 .gproj-table .gproj-over { color: #5ec8f8; font-weight: 700; }
 .gproj .muted { margin-top: .35rem; }
 .goalie-head { display: flex; align-items: center; gap: .5rem; margin-bottom: .5rem; flex-wrap: wrap; }
+.goalie-head.goalie-open { cursor: pointer; }
+.goalie-head.goalie-open:hover strong { color: var(--teal); }
 .goalie-head strong { font-size: 1.02rem; }
 .g-tag { font-size: .68rem; text-transform: uppercase; letter-spacing: .12em; padding: .18rem .5rem; border-radius: 999px; background: var(--teal-wash); color: var(--teal); border: 1px solid rgba(58,219,227,.35); }
-canvas.grink { width: 100%; height: auto; background: #f4f6f8; border-radius: 10px; border: 1px solid var(--border); }
+canvas.grink { width: 100%; height: auto; background: #0a1120; border-radius: 10px; border: 1px solid var(--border); }
 .goalie-zone { margin-top: .5rem; font-size: .92rem; color: var(--muted); }
 .goalie-zone strong { color: var(--gold); }
 /* goalie net-zone grid: 2x3 like a net, red->green by save% */
