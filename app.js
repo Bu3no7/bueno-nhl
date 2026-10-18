@@ -41,7 +41,7 @@ MODEL FORMULA (see MODEL.md for the full write-up):
   High-danger definition (normalized attacking coordinates, net at x=89):
     x <= 89 AND sqrt((89 - x)^2 + y^2) < 30   (30-ft circle around the net)
 
-  Longshot = fair odds of +500 or longer  <=>  p <= 1/6.
+  Longshot = fair odds of +1000 or longer  <=>  p <= 1/11.
 ============================================================================ */
 
 'use strict';
@@ -517,7 +517,7 @@ async function loadDate(dateStr) {
       ...d, ...s, zone: z, oppSv, oppAbbr,
       p: m.p, lam: m.lam, factors: m.factors,
       fair: fairOdds(m.p),
-      isLongshot: m.p <= LONGSHOT_P,
+      isLongshot: m.p <= LONGSHOT_DISPLAY_P,
       markets: computeMarkets(s, d.pos),
       shots: zoneByPid[d.pid + ':' + d.gameId] || [],
     };
@@ -901,7 +901,7 @@ function iceEdge(p, bookRaw) {
 /* Ice Breaker spotlight: two featured picks inside the First goal
    market view — the slate's best Ice Breaker (highest Ice Breaker
    Score) and the best longshot Ice Breaker (highest score among
-   skaters at fair +500 or longer, i.e. ibP <= LONGSHOT_P). The
+   skaters at fair +1000 or longer, i.e. ibP <= LONGSHOT_DISPLAY_P). The
    longshot pick excludes the best pick's skater so the two cards are
    never identical. */
 function wireBookInputs(wrap) {
@@ -951,7 +951,7 @@ function iceSpotCard(r, label) {
 function iceSpotPicks(rows) {
   const ranked = rows.slice().sort((a, b) => (b.ibScore - a.ibScore) || (b.ibP - a.ibP));
   const best = ranked[0] || null;
-  const bestLS = ranked.find((r) => r.ibP <= LONGSHOT_P && (!best || r.pid !== best.pid)) || null;
+  const bestLS = ranked.find((r) => r.ibP <= LONGSHOT_DISPLAY_P && (!best || r.pid !== best.pid)) || null;
   return { best, bestLS };
 }
 function renderIceSpotlight() {
@@ -964,7 +964,7 @@ function renderIceSpotlight() {
     iceSpotCard(best, 'Best Ice Breaker') +
     (bestLS
       ? iceSpotCard(bestLS, 'Best Longshot Ice Breaker')
-      : '<div class="ib-spot-card"><div class="ib-spot-label">Best Longshot Ice Breaker</div><p class="muted">No +500 longshot on this slate.</p></div>');
+      : '<div class="ib-spot-card"><div class="ib-spot-label">Best Longshot Ice Breaker</div><p class="muted">No +1000 longshot on this slate.</p></div>');
   wireBookInputs(wrap);
 }
 
