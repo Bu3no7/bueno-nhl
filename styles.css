@@ -264,6 +264,12 @@ main { max-width: 1120px; margin: 0 auto; padding: 1.4rem 1rem 2.2rem; }
   margin: .25rem 0 .35rem; font-variant-numeric: tabular-nums;
 }
 .game-meta { display: flex; justify-content: space-between; align-items: center; color: var(--muted); font-size: .82rem; gap: .5rem; font-variant-numeric: tabular-nums; }
+.game-goalies { display: flex; align-items: center; justify-content: center; gap: .4rem; margin-top: .35rem; font-size: .78rem; }
+.gg-name { background: none; border: none; color: var(--teal); font: inherit; cursor: pointer; padding: .1rem .2rem; display: inline-flex; align-items: center; gap: .3rem; }
+.gg-name:hover { text-decoration: underline; }
+.g-tag { font-size: .62rem; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; padding: .1rem .35rem; border-radius: 4px; }
+.g-tag.ok { background: rgba(46, 204, 113, .15); color: #2ecc71; }
+.g-tag.proj { background: rgba(241, 196, 15, .12); color: #f1c40f; }
 .live-dot {
   color: var(--danger); font-weight: 800; font-size: .76rem; letter-spacing: .8px;
   animation: pulse-dot 1.6s ease-in-out infinite;
