@@ -2144,13 +2144,26 @@ function openPlayer(pid, gameId) {
       <select id="parlayLegSelect" aria-label="Choose a parlay leg">${legOpts.join('')}</select>
       <button class="btn" id="parlayAddBtn">Add to parlay</button>
     </div>
-    <h4 style="margin:.6rem 0 .2rem">Shot map <span class="muted small">recent games, attacking →</span></h4>
+    <h4 style="margin:.6rem 0 .2rem"><span id="rinkTitle">Shot map</span> <span class="muted small">recent games, attacking →</span>
+      <span style="float:right"><button class="pill on" id="rinkShots">Shots</button> <button class="pill" id="rinkGoals">Goals</button></span></h4>
     <canvas class="rink" id="rinkCanvas"></canvas>
     <div class="legend"><span><span class="dot" style="background:#2f6fed"></span>attempt</span>
       <span><span class="dot" style="background:#d4a017"></span>goal</span>
       <span><span class="dot" style="border:2px dashed #e8a13d;background:none"></span>high-danger zone</span></div>`;
   $('playerModal').classList.remove('hidden');
-  drawRink($('rinkCanvas'), r.shots, '#2f6fed');
+  // map follows the Markets dropdown on open; pills let you switch without closing
+  const mk = state.marketKind;
+  let rinkMode = ['atg', 'twoplus', 'firstgoal'].includes(mk) ? 'goals' : 'shots';
+  const drawRinkMode = () => {
+    const data = rinkMode === 'goals' ? r.shots.filter((s) => s.goal) : r.shots;
+    $('rinkTitle').textContent = rinkMode === 'goals' ? 'Goal map' : 'Shot map';
+    $('rinkShots').classList.toggle('on', rinkMode === 'shots');
+    $('rinkGoals').classList.toggle('on', rinkMode === 'goals');
+    drawRink($('rinkCanvas'), data, '#2f6fed');
+  };
+  $('rinkShots').addEventListener('click', () => { rinkMode = 'shots'; drawRinkMode(); });
+  $('rinkGoals').addEventListener('click', () => { rinkMode = 'goals'; drawRinkMode(); });
+  drawRinkMode();
   $('parlayAddBtn').addEventListener('click', () => addParlayLeg(r, $('parlayLegSelect').value));
 }
 
