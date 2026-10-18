@@ -2128,7 +2128,7 @@ function openPlayer(pid, gameId) {
       <div style="margin-left:auto;text-align:right">
         <div class="pc-prob">${pct1(r.p)}</div>
         <div class="pc-fair">${r.fair} fair</div>
-        <div class="pc-goals">${r.goals}G / ${r.gp}GP</div>
+        <div class="pc-goals">Total Season Goals: ${r.goals}</div>
       </div>
     </div>
     <div class="pc-status">${lineBadge}${statusPill}</div>
