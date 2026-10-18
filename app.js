@@ -2076,7 +2076,7 @@ function openPlayer(pid, gameId) {
     <tr><td>${esc(f.label)}</td><td>${esc(f.value)}${f.mult != null ? ` <span class="muted">×${f.mult.toFixed(2)}</span>` : ''}</td></tr>`).join('');
 
   // markets + beat/miss snapshots
-  const marketsHtml = ['shots', 'assists', 'points'].map((kind) => {
+  const marketsHtml = ['shots', 'assists', 'points'].map((kind, ki) => {
     const meta = MARKET_META[kind];
     const rows = r.markets[kind].map((m) => {
       const snap = marketSnapshot(r, kind, m.line, m.over);
@@ -2089,7 +2089,7 @@ function openPlayer(pid, gameId) {
         <div class="snap-under muted small">u${m.line} ${pct1(m.under)} (${m.underFair})</div>
       </div>`;
     }).join('');
-    return `<h4 class="mkt-h">${meta.label} <span class="muted small">λ ${r.markets[kind][0].lam.toFixed(2)}/g</span></h4>${rows}`;
+    return `<details class="mkt-group"${ki === 0 ? ' open' : ''}><summary class="mkt-h">${meta.label} <span class="muted small">λ ${r.markets[kind][0].lam.toFixed(2)}/g</span><span class="mkt-chev">▾</span></summary><div class="mkt-body">${rows}</div></details>`;
   }).join('');
 
   // parlay leg picker
