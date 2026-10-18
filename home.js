@@ -285,3 +285,40 @@ function renderHome() {
   renderHomeStandings();
   renderPlayoffOdds();
 }
+/* ---- Share: screenshot the current view ---- */
+function ensureHtml2Canvas(cb) {
+  if (window.html2canvas) return cb();
+  const s = document.createElement('script');
+  s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+  s.onload = cb;
+  s.onerror = () => alert('Could not load screenshot tool. Try again.');
+  document.head.appendChild(s);
+}
+async function shareCurrentView() {
+  const btn = $('shareBtn');
+  if (btn) btn.textContent = 'Capturing…';
+  ensureHtml2Canvas(async () => {
+    try {
+      // capture the active view only
+      const target = document.querySelector('.view.active') || document.body;
+      const canvas = await html2canvas(target, { backgroundColor: '#070b12', scale: 2, useCORS: true });
+      const blob = await new Promise((res) => canvas.toBlob(res, 'image/png'));
+      const file = new File([blob], `bueno-sports-${state.view || 'home'}.png`, { type: 'image/png' });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: 'Bueno Sports' });
+      } else {
+        // fallback: download the image
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = file.name;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+      }
+    } catch (e) {
+      alert('Screenshot failed. Try again.');
+    }
+    if (btn) btn.textContent = 'Share';
+  });
+}
+const _shareBtn = $('shareBtn');
+if (_shareBtn) _shareBtn.addEventListener('click', shareCurrentView);
