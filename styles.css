@@ -419,6 +419,7 @@ tr.scored td:first-child .pname { color: #8ff5f7; text-shadow: 0 0 14px rgba(58,
   color: var(--gold); border-radius: 99px; padding: .18rem .65rem;
   font-weight: 700; font-size: .83rem; font-variant-numeric: tabular-nums; letter-spacing: .01em;
 }
+.pc-goals { margin-top: .3rem; font-size: .85rem; font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; }
 
 .pc-status { display: flex; gap: .5rem; align-items: center; margin: 0 0 .7rem; flex-wrap: wrap; }
 .line-badge {
