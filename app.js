@@ -1544,6 +1544,23 @@ function statBarsHtml(r) {
   return `<h4 style="margin:.8rem 0 .3rem">Stat bars <span class="muted small">vs ${isD ? 'defense' : 'forward'} avg</span></h4>`
     + `<div class="sbar-wrap">${rows}</div>`;
 }
+/* Player bio strip: number, age, position, height, weight, shoots, birthplace */
+function playerBioHtml(r) {
+  const b = r.bio;
+  if (!b) return '';
+  const age = b.dob ? Math.floor((Date.now() - new Date(b.dob).getTime()) / 3.15576e10) : null;
+  const items = [];
+  if (b.number != null) items.push(`<span><strong>#${esc(String(b.number))}</strong></span>`);
+  if (r.pos) items.push(`<span>${esc(r.pos)}</span>`);
+  if (age != null) items.push(`<span>Age ${age}</span>`);
+  if (b.dob) items.push(`<span class="muted">Born ${esc(b.dob)}</span>`);
+  if (b.height) items.push(`<span>${esc(b.height)}</span>`);
+  if (b.weight) items.push(`<span>${esc(b.weight)}</span>`);
+  if (b.shoots) items.push(`<span>Shoots ${esc(b.shoots)}</span>`);
+  if (b.birthplace) items.push(`<span class="muted">${esc(b.birthplace)}</span>`);
+  if (!items.length) return '';
+  return `<div class="pc-bio">${items.join('<span class="pc-bio-sep">·</span>')}</div>`;
+}
 function linematesHtml(r) {
   const mates = state.skaters.filter((s) => s.team === r.team && String(s.gameId) === String(r.gameId) && String(s.pid) !== String(r.pid));
   let title = '', cells = '';
@@ -2061,6 +2078,7 @@ function openPlayer(pid, gameId) {
       </div>
     </div>
     <div class="pc-status">${lineBadge}${statusPill}</div>
+    ${playerBioHtml(r)}
     ${linematesHtml(r)}
     ${vsGoalieHtml(r, g)}
     <table class="factor-table">${factorRows}
