@@ -191,7 +191,21 @@ async function renderTeamRoster(abbr) {
     if (!skaters.length && !goalies.length) throw new Error('empty');
     const fwds = skaters.filter((p) => (p.positionCode || '') !== 'D' && (p.positionCode || '') !== 'G');
     const defs = skaters.filter((p) => (p.positionCode || '') === 'D');
-    const cell = (p) => `<div class="lu-cell"><span>${esc(p.firstName?.default || '')} ${esc(p.lastName?.default || '')}</span><span class="muted small">${esc(p.positionCode || '')}</span></div>`;
+    const cell = (p) => {
+      const pid = p.id;
+      const name = `${p.firstName?.default || ''} ${p.lastName?.default || ''}`.trim();
+      const last = name.split(' ').slice(-1)[0];
+      const hs = headshotUrl(abbr, pid);
+      // stash minimal skater so openPlayer can find them
+      if (!state.skaters.some((s) => String(s.pid) === String(pid))) {
+        state.skaters.push({ pid, gameId: 'roster', name, pos: p.positionCode || '', team: abbr, headshot: hs, goals: 0, assists: 0, points: 0, gp: 0, shots: 0, toiMin: 0, p: 0, fair: '—', lam: 0, factors: [], markets: { shots: [], assists: [], points: [] }, zone: {}, last5: [] });
+      }
+      return `<div class="lu-cell" data-pid="${pid}" data-gid="roster" role="button" tabindex="0" title="${esc(name)}">
+        <img class="lu-head" src="${esc(hs)}" alt="" ${typeof imgFallback !== 'undefined' ? imgFallback : ''}>
+        <div class="lu-name">${esc(last)}</div>
+        <div class="lu-sub muted">${esc(p.positionCode || '')}</div>
+      </div>`;
+    };
     let html = `<div class="lu-team"><div class="lu-teamhead">${esc(teamFullName(abbr))} — roster</div>`;
     if (fwds.length) html += `<div class="lu-row"><div class="lu-label">F</div><div class="lu-players">${fwds.map(cell).join('')}</div></div>`;
     if (defs.length) html += `<div class="lu-row"><div class="lu-label">D</div><div class="lu-players">${defs.map(cell).join('')}</div></div>`;
