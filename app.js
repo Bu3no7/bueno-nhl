@@ -1227,6 +1227,7 @@ function skaterGoalsVsGoalie(skaterPid, goalieId) {
 }
 function vsGoalieHtml(r, g) {
   // "vs [Goalie]" head-to-head section for a skater's player card
+  if (!g) return '';
   const pg = panelGoalie(g, r.oppAbbr);
   if (!pg.id) return '';
   const h2h = skaterGoalsVsGoalie(r.pid, pg.id);
