@@ -432,6 +432,7 @@ tr.scored td:first-child .pname { color: #8ff5f7; text-shadow: 0 0 14px rgba(58,
 
 .pc-status { display: flex; gap: .5rem; align-items: center; margin: 0 0 .7rem; flex-wrap: wrap; }
 .pc-bio { display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; font-size: .82rem; margin: 0 0 .7rem; padding: .5rem .7rem; background: rgba(255,255,255,.03); border-radius: 8px; }
+.pc-bio.compact { font-size: .75rem; padding: .35rem .6rem; margin-bottom: .5rem; }
 .pc-bio-sep { color: var(--muted-2); }
 .line-badge {
   display: inline-flex; align-items: baseline; gap: .3rem;
