@@ -26,7 +26,7 @@
       <button id="refreshBtn" class="refresh-link" title="Reload all data">Refresh</button>
     </div>
   </div>
-  <nav class="nav-groups" aria-label="Sections">
+  <nav class="nav-groups lab-nav" id="labNav" aria-label="Sections" hidden>
     <div class="nav-group">
       <div class="nav-grid">
         <button class="tab active" data-view="markets" role="tab">Markets</button>
@@ -47,6 +47,68 @@
 <main>
   <div id="errorBanner" class="error-banner hidden" role="alert"></div>
   <div id="loadingBar" class="loading hidden"><span id="loadingText">Loading…</span></div>
+
+  <section id="view-home" class="view active">
+    <div class="home-hero">
+      <img src="https://assets.nhle.com/logos/nhl/svg/NHL_light.svg" alt="NHL" class="home-nhl-logo">
+      <h2>Bueno Sports</h2>
+      <p class="muted small">NHL anytime-goal probabilities &middot; live data</p>
+    </div>
+    <div class="home-grid">
+      <div class="home-card" id="homePicksCard">
+        <h3>Top picks <span class="muted small">tap for player card</span></h3>
+        <div id="homePicksBody"><p class="muted">Loading…</p></div>
+      </div>
+      <div class="home-card" id="homeResultsCard">
+        <h3>Yesterday's results <span class="muted small">tap for player card</span></h3>
+        <div id="homeResultsBody"><p class="muted">Results post after last night's games.</p></div>
+      </div>
+      <div class="home-card" id="homeStandingsCard">
+        <h3>Standings <span class="muted small">tap a team for lineup</span></h3>
+        <div id="homeStandingsBody"><p class="muted">Loading…</p></div>
+      </div>
+      <div class="home-card" id="homeOddsCard">
+        <h3>Playoff odds <span class="po-preview-tag">Preview</span></h3>
+        <div id="homeOddsBody"><p class="muted">Loading…</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="view-standings" class="view">
+    <div class="view-head">
+      <div>
+        <p class="kicker">Season</p>
+        <h2>Standings</h2>
+        <p class="view-sub muted">Live from the official NHL API. Tap a team for its lineup.</p>
+      </div>
+      <button class="ghost-btn" id="standingsBack" type="button">&larr; Home</button>
+    </div>
+    <div id="standingsBody"><p class="muted">Loading standings…</p></div>
+  </section>
+
+  <section id="view-teamlineup" class="view">
+    <div class="view-head">
+      <div>
+        <p class="kicker">Lineup</p>
+        <h2 id="teamLineupTitle">Team</h2>
+        <p class="view-sub muted">Estimated from ice time.</p>
+      </div>
+      <button class="ghost-btn" id="teamLineupBack" type="button">&larr; Standings</button>
+    </div>
+    <div id="teamLineupBody"><p class="muted">Loading…</p></div>
+  </section>
+
+  <section id="view-playoffodds" class="view">
+    <div class="view-head">
+      <div>
+        <p class="kicker">Season</p>
+        <h2>Playoff Odds</h2>
+        <p class="view-sub muted">Season simulation — coming soon.</p>
+      </div>
+      <button class="ghost-btn" id="oddsBack" type="button">&larr; Home</button>
+    </div>
+    <div id="oddsBody"><p class="muted">Loading…</p></div>
+  </section>
 
   <section id="view-slate" class="view">
     <div class="view-head">
@@ -116,7 +178,7 @@
     <div id="longshotsList" class="longshots-list"></div>
   </section>
 
-  <section id="view-markets" class="view active">
+  <section id="view-markets" class="view">
     <div class="view-head">
       <div>
         <p class="kicker">Model</p>
@@ -221,6 +283,11 @@
 <footer class="site-footer">
   <p class="muted small">Data: official NHL API (api-web.nhle.com), fetched live in your browser. No accounts, no tracking, no cookies. Not betting advice.</p>
 </footer>
+
+<nav class="bottom-nav" aria-label="Main">
+  <button class="bnav-btn active" data-section="home" type="button"><span class="bnav-ico">⌂</span><span>Home</span></button>
+  <button class="bnav-btn" data-section="lab" type="button"><span class="bnav-ico">🧪</span><span>NHL Lab</span></button>
+</nav>
 
 <script src="engine.js"></script>
 <script src="app.js"></script>
