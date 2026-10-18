@@ -746,3 +746,107 @@ canvas.grink { width: 100%; height: auto; background: #0a1120; border-radius: 10
 }
 .book-leg input.invalid { border-color: var(--danger); }
 .book-hint { font-size: .75rem; color: var(--danger); }
+
+/* ---------------- Home tab ---------------- */
+.home-hero { text-align: center; padding: 1.2rem 0 .6rem; }
+.home-nhl-logo { width: 72px; height: 72px; filter: drop-shadow(0 4px 12px rgba(0, 0, 0, .6)); }
+.home-hero h2 { margin: .4rem 0 .1rem; font-size: 1.4rem; letter-spacing: .02em; }
+.home-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: .9rem; margin-top: .8rem; }
+.home-card {
+  background: linear-gradient(180deg, var(--panel), #0a0f19);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 1rem 1.1rem; box-shadow: var(--shadow-sm);
+}
+.home-card h3 { margin: 0 0 .6rem; font-size: 1rem; }
+.home-card-clickable { cursor: pointer; transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease; }
+.home-card-clickable:hover { transform: translateY(-2px); border-color: #2c3a52; box-shadow: var(--shadow); }
+.home-card-clickable:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+.home-card-arrow { color: var(--teal); }
+.home-conf-label { font-size: .78rem; font-weight: 700; color: var(--muted); margin: .5rem 0 .2rem; text-transform: uppercase; letter-spacing: .06em; }
+.home-conf-label:first-child { margin-top: 0; }
+.standings-mini { width: 100%; border-collapse: collapse; font-size: .85rem; }
+.standings-mini td { padding: .22rem .3rem; border-bottom: 1px solid var(--border-soft); }
+.standings-mini tr.in-playoff td:first-child { color: var(--teal); font-weight: 700; }
+
+/* ---------------- Standings view ---------------- */
+.standings-div { margin: 1.1rem 0 .4rem; font-size: 1.05rem; }
+.standings-div:first-of-type { margin-top: .2rem; }
+.standings-table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+.standings-table th, .standings-table td { padding: .35rem .45rem; border-bottom: 1px solid var(--border-soft); text-align: left; }
+.standings-table th.num, .standings-table td.num { text-align: right; font-variant-numeric: tabular-nums; }
+.standings-table thead th { color: var(--muted); font-weight: 600; font-size: .75rem; text-transform: uppercase; letter-spacing: .04em; }
+
+/* ---------------- Playoff odds (glowing team bars) ---------------- */
+.playoff-odds-section { margin-top: 1.6rem; }
+.playoff-odds-section h3 { margin: 0 0 .3rem; }
+.playoff-odds-bars { margin-top: .8rem; display: flex; flex-direction: column; gap: .32rem; }
+.po-row { display: flex; align-items: center; gap: .6rem; }
+.po-team { display: flex; align-items: center; gap: .4rem; width: 74px; flex-shrink: 0; font-size: .8rem; font-weight: 700; }
+.po-team img { width: 22px; height: 22px; }
+.po-track { flex: 1; height: 14px; background: rgba(255,255,255,.06); border-radius: 7px; overflow: hidden; }
+.po-fill { height: 100%; border-radius: 7px; transition: width .4s ease; }
+.po-val { width: 40px; text-align: right; font-size: .78rem; font-variant-numeric: tabular-nums; flex-shrink: 0; }
+
+/* ---------------- Bottom nav (Home / NHL Lab) ---------------- */
+body { padding-bottom: 68px; }
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
+  display: flex; background: rgba(13, 20, 32, .97);
+  border-top: 1px solid var(--border);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+}
+.bnav-btn {
+  flex: 1; background: none; border: none; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: .55rem 0 .6rem; color: var(--muted);
+  font-size: .78rem; font-weight: 600; font-family: inherit;
+}
+.bnav-btn .bnav-ico { font-size: 1.25rem; line-height: 1; }
+.bnav-btn.active { color: var(--teal); }
+.bnav-btn:active { opacity: .7; }
+.lab-nav[hidden] { display: none; }
+
+/* ---------------- Home: picks / results rows ---------------- */
+.pick-row {
+  display: flex; align-items: center; gap: .65rem;
+  padding: .5rem .25rem; border-bottom: 1px solid var(--border-soft);
+  cursor: pointer; border-radius: 8px;
+}
+.pick-row:last-child { border-bottom: none; }
+.pick-row:hover { background: var(--teal-wash); }
+.pick-row:focus-visible { outline: 2px solid var(--teal); outline-offset: 1px; }
+.pick-head { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; background: var(--panel2); flex-shrink: 0; }
+.pick-name { font-weight: 700; font-size: .9rem; }
+.pick-meta { font-size: .76rem; color: var(--muted); margin-top: 1px; }
+.pick-prob { margin-left: auto; font-weight: 800; color: var(--teal); font-size: .95rem; font-variant-numeric: tabular-nums; flex-shrink: 0; }
+.home-div-label { font-size: .76rem; font-weight: 700; color: var(--teal); margin: .55rem 0 .15rem; text-transform: uppercase; letter-spacing: .06em; }
+.home-div-label:first-of-type { margin-top: 0; }
+.home-standings-more { margin-top: .6rem; width: 100%; }
+
+/* ---------------- Standings: clickable team rows ---------------- */
+.team-cell { display: inline-flex; align-items: center; gap: .45rem; font-weight: 700; }
+.team-logo { width: 24px; height: 24px; flex-shrink: 0; }
+tr.team-row { cursor: pointer; }
+tr.team-row:hover td { background: var(--teal-wash); }
+tr.team-row:focus-visible { outline: 2px solid var(--teal); outline-offset: -2px; }
+
+/* ---------------- Playoff odds: donut + table ---------------- */
+.po-preview-tag {
+  font-size: .68rem; font-weight: 700; color: var(--gold);
+  background: var(--gold-wash); border: 1px solid rgba(245, 185, 66, .35);
+  border-radius: 99px; padding: .1rem .5rem; vertical-align: middle;
+}
+.po-donut-wrap { display: flex; justify-content: center; padding: .4rem 0 .2rem; }
+.po-donut { max-width: 200px; height: auto; }
+.po-legend { display: grid; grid-template-columns: 1fr 1fr; gap: .3rem .8rem; margin: .4rem 0 .2rem; font-size: .78rem; }
+.legend-item { display: flex; align-items: center; gap: .4rem; font-variant-numeric: tabular-nums; }
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.odds-table { width: 100%; border-collapse: collapse; font-size: .85rem; margin-top: .5rem; }
+.odds-table th, .odds-table td { padding: .35rem .45rem; border-bottom: 1px solid var(--border-soft); text-align: left; }
+.odds-table th.num, .odds-table td.num { text-align: right; font-variant-numeric: tabular-nums; }
+.odds-table thead th { color: var(--muted); font-weight: 600; font-size: .75rem; text-transform: uppercase; letter-spacing: .04em; }
+.odds-high { color: var(--teal); font-weight: 800; }
+.odds-mid { color: var(--gold); font-weight: 700; }
+.odds-low { color: var(--muted); }
+.po-note { margin-top: .7rem; }
+#homeOddsMore { margin-top: .5rem; width: 100%; }
