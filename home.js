@@ -27,6 +27,9 @@ function groupStandingsByDiv(all) {
 function teamLogoCell(abbr) {
   return `<span class="team-cell"><img class="team-logo" src="${teamLogoUrl(abbr)}" alt="" ${imgFallback}>${esc(abbr)}</span>`;
 }
+function teamLogoOnly(abbr) {
+  return `<img class="team-logo" src="${teamLogoUrl(abbr)}" alt="" ${imgFallback} style="width:28px;height:28px;vertical-align:middle;margin-right:.4rem">`;
+}
 /* ---- section switching (bottom nav) ---- */
 function setSection(sec) {
   state.section = sec;
@@ -142,7 +145,7 @@ function renderTeamLineup() {
   const titleEl = $('teamLineupTitle');
   const bodyEl = $('teamLineupBody');
   if (!bodyEl) return;
-  if (titleEl) titleEl.innerHTML = `${teamLogoCell(abbr)} ${esc(teamFullName(abbr))}`;
+  if (titleEl) titleEl.innerHTML = `${teamLogoOnly(abbr)}${esc(teamFullName(abbr))}`;
   // Find the team's most relevant game (today's slate, prefer unstarted)
   const games = (state.games || []).filter((g) =>
     g.away === abbr || g.home === abbr);
@@ -175,7 +178,7 @@ function teamFullName(abbr) { return TEAM_FULL_NAMES[abbr] || abbr; }
 async function renderTeamRoster(abbr) {
   const bodyEl = $('teamLineupBody');
   const titleEl = $('teamLineupTitle');
-  if (titleEl) titleEl.innerHTML = `${teamLogoCell(abbr)} ${esc(teamFullName(abbr))}`;
+  if (titleEl) titleEl.innerHTML = `${teamLogoOnly(abbr)}${esc(teamFullName(abbr))}`;
   if (!bodyEl) return;
   bodyEl.innerHTML = `<p class="muted">Loading roster…</p>`;
   try {
