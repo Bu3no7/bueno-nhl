@@ -2421,11 +2421,21 @@ function setView(v) {
 
 function startAutoRefresh() {
   if (state.refreshTimer) clearInterval(state.refreshTimer);
-  if (state.fastTimer) clearInterval(state.fastTimer);
-  state.fastTimer = setInterval(() => {
-    if (document.hidden) return;
-    fastScoreTick().catch(() => {});
-  }, 15000);
+  if (state.fastTimer) clearTimeout(state.fastTimer);
+  // Smart polling: 10s during active play, 45s during intermissions.
+  // Checks the intermission flag after each tick and reschedules accordingly.
+  const scheduleFast = (delay) => {
+    state.fastTimer = setTimeout(async () => {
+      if (!document.hidden) {
+        try { await fastScoreTick(); } catch (e) {}
+      }
+      const anyIntermission = state.games.some((g) =>
+        g.pbp && g.pbp.clock && g.pbp.clock.inIntermission && isWatchable(g));
+      const anyLive = state.games.some(isWatchable);
+      scheduleFast(!anyLive ? 30000 : anyIntermission ? 45000 : 10000);
+    }, delay);
+  };
+  scheduleFast(10000);
   state.refreshTimer = setInterval(() => {
     if (document.hidden) return;
     refreshScores().catch(() => {});
