@@ -2278,7 +2278,8 @@ async function fetchStandings() {
   const now = Date.now();
   if (nhlStandingsCache && now - nhlStandingsCacheTime < 5 * 60 * 1000) return nhlStandingsCache;
   try {
-    const data = await fetchJSON(`${API}/standings/now`);
+    // NOTE: /standings/now 307-redirects off-proxy (CORS-killed) — use date-specific path
+    const data = await fetchJSON(`${API}/standings/${state.date}`);
     nhlStandingsCache = data.standings || [];
     nhlStandingsCacheTime = now;
   } catch (e) {
