@@ -28,6 +28,8 @@ const HD_NEUTRAL = 0.30;
 
 const REG_K = 12;
 
+const LEAGUE_XG = 3.15; // league-average team expected goals (for team-level shrinkage)
+
 const PRIORS = {
   F: { g: 0.20, s: 2.0, a: 0.32, p: 0.52 },
   D: { g: 0.07, s: 1.5, a: 0.12, p: 0.19 },
@@ -85,7 +87,10 @@ function computeProb(s, hdShare, oppSv, pos) {
   const mPp = 1 + clamp((s.ppg / gp) * 2, 0, 0.35);
   const mGoal = clamp((1 - oppSv) / 0.10, 0.7, 1.4);
   const mZone = 1 + clamp((hdShare - HD_NEUTRAL) * 1.2, -0.25, 0.35);
-  let lam = lamBase * mToi * mPp * mGoal * mZone;
+  // shooting talent: regressed season SH% vs league average (elite finishers are real)
+  const shPctReg = (s.goals + 10.5) / (s.shots + 100);
+  const mShoot = 1 + clamp((shPctReg - LEAGUE_SH_PCT) * 2.0, -0.15, 0.25);
+  let lam = lamBase * mToi * mPp * mGoal * mZone * mShoot;
   lam *= CALIBRATION;
   if (lam < LONGSHOT_P) lam *= TAIL_DAMP;
   const p = 1 - Math.exp(-lam);
@@ -94,6 +99,7 @@ function computeProb(s, hdShare, oppSv, pos) {
     factors: [
       { label: 'Scoring form', value: `${s.goals} G / ${s.gp} GP`, mult: null },
       { label: 'Shot volume', value: `${sogpg.toFixed(1)} SOG/game`, mult: null },
+      { label: 'Shooting talent', value: `${(shPctReg * 100).toFixed(1)}% reg. SH%`, mult: mShoot },
       { label: 'Ice time', value: `${fmtToi(s.toiMin)} avg`, mult: mToi },
       { label: 'Power play', value: `${s.ppg} PPG`, mult: mPp },
       { label: 'Opponent goalie', value: `${(oppSv * 100).toFixed(1)}% SV`, mult: mGoal },
@@ -333,10 +339,23 @@ function simGameTrace(g, unitsA, unitsB, lamA, lamB) {
   return { a, b, goals };
 }
 
+function regressTeamXG(lamTeam, teamGP) {
+  // shrink a team's summed expected goals toward league average.
+  // early season the sum inherits all the skater-level noise, so pull hard
+  // toward LEAGUE_XG; weight grows as games accumulate.
+  const w = teamGP / (teamGP + 15);
+  return w * lamTeam + (1 - w) * LEAGUE_XG;
+}
+
 function simOneGame(skaters, g, n) {
   const unitsA = simUnits(skaters, g.id, g.away);
   const unitsB = simUnits(skaters, g.id, g.home);
-  const lamA = unitsA.total, lamB = unitsB.total;
+  let lamA = unitsA.total, lamB = unitsB.total;
+  // team-level shrinkage: keep directional edge, kill overconfidence
+  const gpA = Math.max(0, ...skaters.filter((sk) => sk.gameId === g.id && sk.team === g.away).map((sk) => sk.gp || 0));
+  const gpB = Math.max(0, ...skaters.filter((sk) => sk.gameId === g.id && sk.team === g.home).map((sk) => sk.gp || 0));
+  if (lamA > 0) lamA = regressTeamXG(lamA, gpA);
+  if (lamB > 0) lamB = regressTeamXG(lamB, gpB);
   let sumA = 0, sumB = 0, winA = 0, winB = 0, tie = 0;
   const lines = {};
   let sample = [];
@@ -364,9 +383,9 @@ function simOneGame(skaters, g, n) {
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     SEASON, LEAGUE_SH_PCT, CALIBRATION, TAIL_DAMP, LONGSHOT_P, HD_NEUTRAL,
-    REG_K, PRIORS, MIN_ZONE_ATTEMPTS, EN_RATE,
+    REG_K, PRIORS, MIN_ZONE_ATTEMPTS, EN_RATE, LEAGUE_XG,
     clamp, fetchJSON, limitedMap,
-    parseToi, fmtToi, regress, priorsFor, computeProb,
+    parseToi, fmtToi, regress, priorsFor, computeProb, regressTeamXG,
     normalizeShot, zoneShareFor, skaterSeason,
     recentFinalsByTeam, shotsFromPbp, goalieForGame,
     simLambda, poissonSample, pickWeighted, pickWeightedBy, simUnits,
