@@ -107,6 +107,8 @@ a:hover { text-decoration: underline; }
   border-bottom: 3px solid transparent;
   transition: color .12s ease, background .12s ease;
 }
+.pill { appearance: none; border: 1px solid var(--border-soft); border-radius: 20px; background: transparent; color: var(--muted); font-size: .72rem; font-weight: 650; padding: .25rem .7rem; cursor: pointer; }
+.pill.on { background: var(--teal); border-color: var(--teal); color: #062a2e; }
 .tab:hover { color: var(--text); background: rgba(255, 255, 255, .04); }
 .tab.active {
   color: var(--text); background: #05080e;
