@@ -196,9 +196,14 @@ async function renderTeamRoster(abbr) {
       const name = `${p.firstName?.default || ''} ${p.lastName?.default || ''}`.trim();
       const last = name.split(' ').slice(-1)[0];
       const hs = headshotUrl(abbr, pid);
-      // stash minimal skater so openPlayer can find them
+      // stash minimal skater so openPlayer can find them (with bio data)
       if (!state.skaters.some((s) => String(s.pid) === String(pid))) {
-        state.skaters.push({ pid, gameId: 'roster', name, pos: p.positionCode || '', team: abbr, headshot: hs, goals: 0, assists: 0, points: 0, gp: 0, shots: 0, toiMin: 0, p: 0, fair: '—', lam: 0, factors: [], markets: { shots: [], assists: [], points: [] }, zone: {}, last5: [] });
+        state.skaters.push({ pid, gameId: 'roster', name, pos: p.positionCode || '', team: abbr, headshot: hs,
+          goals: 0, assists: 0, points: 0, gp: 0, shots: 0, toiMin: 0, p: 0, fair: '—', lam: 0, factors: [],
+          markets: { shots: [], assists: [], points: [] }, zone: {}, last5: [],
+          bio: { number: p.sweaterNumber, dob: p.birthDate, birthplace: [p.birthCity?.default, p.birthCountry].filter(Boolean).join(', '),
+                 height: p.heightInInches ? `${Math.floor(p.heightInInches/12)}'${p.heightInInches%12}"` : null,
+                 weight: p.weightInPounds ? `${p.weightInPounds} lbs` : null, shoots: p.shootsCatches } });
       }
       return `<div class="lu-cell" data-pid="${pid}" data-gid="roster" role="button" tabindex="0" title="${esc(name)}">
         <img class="lu-head" src="${esc(hs)}" alt="" ${typeof imgFallback !== 'undefined' ? imgFallback : ''}>
