@@ -1666,7 +1666,7 @@ function linematesHtml(r) {
   } else {
     return '';
   }
-  return `<h4 style="margin:.8rem 0 .2rem">${esc(title)} <span class="muted small">est.</span></h4><div class="lu-row"><div class="lu-players">${cells}</div></div>`;
+  return `<h4 style="margin:.5rem 0 .15rem">${esc(title)} <span class="muted small">est.</span></h4><div class="lu-row"><div class="lu-players">${cells}</div></div>`;
 }
 function matchupHtml(g, lamA, lamB, wp, st) {
   const A = g.away, H = g.home;
