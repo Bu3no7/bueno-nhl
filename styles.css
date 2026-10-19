@@ -504,8 +504,9 @@ td.heat.h1 { background: transparent; }
 /* ---------- lineup (estimated lines) ---------- */
 .lu-wrap { display: flex; flex-direction: column; gap: 1.1rem; margin-top: .4rem; }
 .lu-teamhead { font-weight: 800; font-size: .95rem; letter-spacing: .02em; margin-bottom: .1rem; }
-.lu-row { display: flex; gap: .7rem; align-items: flex-start; padding: .5rem 0; border-top: 1px solid var(--border-soft); }
+.lu-row { display: flex; gap: .7rem; align-items: flex-start; padding: .35rem 0; border-top: 1px solid var(--border-soft); }
 .lu-row:first-of-type { border-top: 0; }
+.lu-row:first-of-type { padding-top: .2rem; }
 .lu-label {
   flex-shrink: 0; width: 2rem; padding-top: .65rem;
   font-size: .72rem; font-weight: 800; letter-spacing: 1.5px;
