@@ -1534,6 +1534,15 @@ function teamLineupHtml(teamAbbr, gameId) {
   if (bench.length) {
     html += `<div class="lu-row"><div class="lu-label muted">Bench</div><div class="lu-players">${bench.map((s) => lineupCellHtml(s, false)).join('')}</div></div>`;
   }
+  // PP units: estimated from power-play points per game (top 5 → PP1, next 5 → PP2)
+  const ppRanked = rows.filter((s) => s.gp > 0).sort((a, b) => ((b.ppp || 0) / b.gp) - ((a.ppp || 0) / a.gp));
+  const pp1 = ppRanked.slice(0, 5), pp2 = ppRanked.slice(5, 10);
+  if (pp1.length) {
+    html += `<div class="lu-row"><div class="lu-label" style="color:var(--gold)">PP1</div><div class="lu-players">${pp1.map((s) => lineupCellHtml(s, false)).join('')}</div></div>`;
+  }
+  if (pp2.length) {
+    html += `<div class="lu-row"><div class="lu-label" style="color:var(--gold)">PP2</div><div class="lu-players">${pp2.map((s) => lineupCellHtml(s, false)).join('')}</div></div>`;
+  }
   return html + '</div>';
 }
 function matchupLineupHtml(gameId) {
