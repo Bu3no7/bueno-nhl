@@ -447,6 +447,12 @@ tr.scored td:first-child .pname { color: #8ff5f7; text-shadow: 0 0 14px rgba(58,
 .hero-card-num { font-size: 2.6rem; font-weight: 800; color: var(--teal); line-height: 1; text-shadow: 0 0 20px rgba(58,219,227,.4); }
 .hero-card-num small { font-size: 1.2rem; }
 .hero-card-label { font-size: .65rem; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); }
+/* Home polish */
+.hero-pick + .hero-pick { border-top: 1px solid rgba(255,255,255,.06); }
+.hero-pick { border-radius: 0; }
+.hero-pick:first-child { border-radius: 12px 12px 0 0; }
+.hero-pick:last-child { border-radius: 0 0 12px 12px; }
+.home-card .hero-pick { margin-bottom: 0; }
 /* Board heatmap */
 td.heat.h5 { background: rgba(58,219,227,.32); }
 td.heat.h4 { background: rgba(58,219,227,.22); }
