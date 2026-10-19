@@ -1005,10 +1005,12 @@ function renderGoalProbs() {
   tb.innerHTML = html || '<tr><td colspan="4" class="muted">No skaters match.</td></tr>';
   wirePnameClicks(tb);
 }
-function renderSlate() {
+async function renderSlate() {
   const grid = $('gamesGrid');
   const d = new Date(state.date + 'T12:00:00');
   $('slateTitle').textContent = 'Slate — ' + d.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' });
+  const stMap = await getStandings().catch(() => ({}));
+  const rec = (abbr) => { const s = stMap[abbr]; return s ? `${s.wins}-${s.losses}-${s.otLosses}` : ''; };
   grid.innerHTML = state.games.map((g) => {
     const pbp = g.pbp;
     const as = pbp ? pbp.awayTeam.score : 0;
@@ -1023,9 +1025,9 @@ function renderSlate() {
         : '').join('<span class="muted"> vs </span>') + `</div>` : '';
     return `<div class="game-card" data-gid="${g.id}" title="Tap for matchup">
       <div class="matchup">
-        <span class="team"><img src="${teamLogoUrl(g.away)}" alt="" ${imgFallback}>${esc(g.away)}</span>
+        <span class="team"><img src="${teamLogoUrl(g.away)}" alt="" ${imgFallback}>${esc(g.away)}<span class="team-rec">${rec(g.away)}</span></span>
         <span class="muted">@</span>
-        <span class="team"><img src="${teamLogoUrl(g.home)}" alt="" ${imgFallback}>${esc(g.home)}</span>
+        <span class="team"><img src="${teamLogoUrl(g.home)}" alt="" ${imgFallback}>${esc(g.home)}<span class="team-rec">${rec(g.home)}</span></span>
       </div>
       <div class="score-line"><span>${as}</span><span>${hs}</span></div>
       <div class="game-meta"><span>${gameStatusText(g)}</span>${sogHtml}</div>
