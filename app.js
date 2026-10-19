@@ -601,10 +601,11 @@ function goalTypeFromSituation(code, scoredByHome, isShootout, isPenaltyShot) {
 }
 function extractGoals(pbp, game) {
   if (!pbp) return [];
-  const names = {}, shots = {};
+  const names = {}, shots = {}, nums = {};
   for (const r of (pbp.rosterSpots || [])) {
     names[r.playerId] = `${r.firstName.default} ${r.lastName.default}`;
     if (r.headshot) shots[r.playerId] = r.headshot;
+    if (r.sweaterNumber != null) nums[r.playerId] = r.sweaterNumber;
   }
   const homeId = pbp.homeTeam.id, awayId = pbp.awayTeam.id;
   const teamOf = (tid) => (tid === homeId ? pbp.homeTeam.abbrev
@@ -619,6 +620,8 @@ function extractGoals(pbp, game) {
       return {
         scorerId: det.scoringPlayerId,
         scorer: names[det.scoringPlayerId] || 'Unknown',
+        scorerNum: nums[det.scoringPlayerId] || '',
+        assistNums: aids.map((id) => nums[id] || ''),
         headshot: shots[det.scoringPlayerId] || '',
         assists: aids.map((id) => names[id] || 'Unknown'),
         team: teamOf(det.eventOwnerTeamId),
