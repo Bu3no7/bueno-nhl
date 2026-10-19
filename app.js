@@ -2200,7 +2200,10 @@ function openPlayer(pid, gameId) {
     </div>
     <div class="pc-status">${lineBadge}${statusPill}</div>
     ${playerBioHtml(r, !r.bio)}
+    <div class="stat-inline"><span><strong>${r.goals}</strong> goals</span><span><strong>${r.assists}</strong> assists</span><span><strong>${r.points}</strong> points</span><span><strong>${r.gp}</strong> GP</span></div>
+    <div class="section-div"></div>
     ${linematesHtml(r)}
+    <div class="section-div"></div>
     ${vsGoalieHtml(r, g)}
     <table class="factor-table">${factorRows}
       <tr><td>Expected goals (λ)</td><td>${r.lam.toFixed(3)}</td></tr>
