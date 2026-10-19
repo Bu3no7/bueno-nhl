@@ -806,6 +806,13 @@ canvas.grink { width: 100%; height: auto; background: #0a1120; border-radius: 10
 /* ---------------- Home tab ---------------- */
 .home-hero { text-align: center; padding: 1.2rem 0 .6rem; }
 .home-nhl-logo { width: 72px; height: 72px; filter: drop-shadow(0 4px 12px rgba(0, 0, 0, .6)); }
+.sport-picker { margin: .6rem 0; }
+.sport-picker select {
+  background: var(--panel); color: #e8ecf4; border: 1px solid var(--border);
+  border-radius: 10px; padding: .5rem .8rem; font-size: .9rem; font-weight: 600;
+  cursor: pointer; font-family: inherit;
+}
+.sport-picker select:focus { outline: 2px solid var(--teal); outline-offset: 1px; }
 .home-hero h2 { margin: .4rem 0 .1rem; font-size: 1.4rem; letter-spacing: .02em; }
 .home-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: .9rem; margin-top: .8rem; }
 .home-card {
