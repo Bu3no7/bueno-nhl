@@ -610,6 +610,7 @@ canvas.rink {
   border-radius: var(--radius-sm); padding: .55rem .7rem;
   transition: border-color .15s ease;
 }
+.goal-play { background: var(--teal); color: #000; border: none; border-radius: 50%; width: 32px; height: 32px; font-size: .75rem; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; padding-left: 2px; }
 .goal-item:hover { border-color: #2c3a52; }
 .goal-item img.headshot {
   width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0;
@@ -914,3 +915,25 @@ tr.team-row:focus-visible { outline: 2px solid var(--teal); outline-offset: -2px
 .odds-low { color: var(--muted); }
 .po-note { margin-top: .7rem; }
 #homeOddsMore { margin-top: .5rem; width: 100%; }
+
+/* ---- Video game goal animation ---- */
+.goal-takeover { position: fixed; inset: 0; z-index: 999; display: none; align-items: center; justify-content: center; flex-direction: column; }
+.goal-takeover.go { display: flex; }
+.rink-phase { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(7,11,18,.97); }
+.rink-phase.hide { display: none; }
+#rinkAnim { width: 90vw; max-width: 420px; height: 200px; }
+.goal-phase { position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; }
+.goal-phase.show { display: flex; animation: goalFadeIn .3s ease-out; }
+@keyframes goalFadeIn { from { opacity: 0; } to { opacity: 1; } }
+.goal-bg { position: absolute; inset: 0; background: radial-gradient(ellipse at center, rgba(0,100,0,.4) 0%, rgba(7,11,18,.95) 70%); }
+.goal-text { position: relative; font-size: 5rem; font-weight: 900; letter-spacing: .05em; color: #fff; animation: goalPop .5s ease-out; }
+@keyframes goalPop { 0% { transform: scale(.3); opacity: 0; } 60% { transform: scale(1.15); opacity: 1; } 100% { transform: scale(1); } }
+#goalTypeBadge { position: relative; margin-top: .8rem; font-size: .85rem; font-weight: 700; letter-spacing: .15em; padding: .3rem .8rem; border-radius: 6px; }
+.scorer-card { position: relative; margin-top: 1.5rem; display: flex; align-items: center; gap: 1rem; background: rgba(0,0,0,.6); border: 2px solid var(--teal); border-radius: 16px; padding: .8rem 1.2rem; animation: goalSlideUp .5s ease-out .2s both; }
+@keyframes goalSlideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.scorer-card img { width: 64px; height: 64px; border-radius: 50%; background: #1a2333; }
+.scorer-name { font-size: 1.4rem; font-weight: 800; }
+.scorer-meta { font-size: .85rem; color: var(--muted); }
+.scorer-num { font-size: 2.5rem; font-weight: 900; color: var(--teal); }
+.score-bug { position: relative; margin-top: 1rem; font-size: 1.1rem; font-weight: 700; background: rgba(0,0,0,.6); padding: .4rem 1rem; border-radius: 8px; animation: goalSlideUp .5s ease-out .4s both; }
+.gtype-clickable { cursor: pointer; }
