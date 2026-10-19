@@ -2170,8 +2170,15 @@ function openPlayer(pid, gameId) {
   const l5 = (r.last5 || []).slice(0, 5);
   const l5g = l5.reduce((a, x) => a + (x.goals || 0), 0);
   const l5s = l5.reduce((a, x) => a + (x.shots || 0), 0);
-  const factorRows = r.factors.map((f) => `
-    <tr><td>${esc(f.label)}</td><td>${esc(f.value)}${f.mult != null ? ` <span class="muted">×${f.mult.toFixed(2)}</span>` : ''}</td></tr>`).join('');
+  const factorRows = r.factors.map((f) => {
+    let multHtml = '';
+    if (f.mult != null) {
+      const m = f.mult;
+      const cls = m >= 1.10 ? 'f-boost' : m <= 0.95 ? 'f-drag' : '';
+      multHtml = ` <span class="muted ${cls}">×${m.toFixed(2)}</span>`;
+    }
+    return `\n    <tr><td>${esc(f.label)}</td><td>${esc(f.value)}${multHtml}</td></tr>`;
+  }).join('');
   // markets + beat/miss snapshots
   const marketsHtml = ['shots', 'assists', 'points'].map((kind, ki) => {
     const meta = MARKET_META[kind];
@@ -2225,11 +2232,13 @@ function openPlayer(pid, gameId) {
     ${linematesHtml(r)}
     <div class="section-div"></div>
     ${vsGoalieHtml(r, g)}
-    <div class="sec-title">Factors</div>
-    <table class="factor-table">${factorRows}
-      <tr><td>Expected goals (λ)</td><td>${r.lam.toFixed(3)}</td></tr>
-      <tr><td>Opponent</td><td>${esc(r.oppAbbr)} goalie ${(r.oppSv * 100).toFixed(1)}% SV</td></tr>
-    </table>
+    <details class="factors-details">
+      <summary class="sec-title" style="cursor:pointer">Factors <span class="muted small">how we got here</span></summary>
+      <table class="factor-table">${factorRows}
+        <tr><td>Expected goals (λ)</td><td>${r.lam.toFixed(3)}</td></tr>
+        <tr><td>Opponent</td><td>${esc(r.oppAbbr)} goalie ${(r.oppSv * 100).toFixed(1)}% SV</td></tr>
+      </table>
+    </details>
     <p class="small muted">Season: ${r.goals}G ${r.assists}A ${r.points}P / ${r.gp}GP · Last 5: ${l5g}G, ${l5s} SOG${r.zone.lowSample ? ' · <em>zone share uses league-average (small sample)</em>' : ''}</p>
     <div class="sec-title">vs League Average</div>
     ${statBarsHtml(r)}
