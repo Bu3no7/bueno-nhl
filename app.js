@@ -1788,9 +1788,14 @@ function renderBoard() {
     const badge = ng ? `<span class="goal-badge">${ng > 1 ? ng + 'G' : 'GOAL'}</span>` : '';
     const pct = r.p * 100;
     const heat = pct >= 30 ? 'h5' : pct >= 22 ? 'h4' : pct >= 15 ? 'h3' : pct >= 10 ? 'h2' : 'h1';
+    const fitBadge = state.sortBy === 'fit' && r._fit != null ? `<span class="fit-badge">${Math.round(r._fit * 100)}</span>` : '';
+    // hot/cold: goals in last 5 games
+    const l5g = (r.last5 || []).slice(0, 5).reduce((a, x) => a + (x.goals || 0), 0);
+    const streak = l5g >= 3 ? `<span class="streak hot" title="${l5g} goals in last 5">🔥</span>`
+      : l5g <= 1 && (r.last5 || []).length >= 3 ? `<span class="streak cold" title="${l5g} goals in last 5">❄️</span>` : '';
     return `
     <tr${ng ? ' class="scored"' : ''}>
-      <td>${pnameBtn(r)}${badge}
+      <td>${pnameBtn(r)}${badge}${fitBadge}${streak}
         <div class="prob-bar"><i style="width:${Math.min(100, r.p * 100 * 2.5)}%"></i></div></td>
       <td><span class="team-cell"><img src="${teamLogoUrl(r.team)}" alt="" ${imgFallback}>${esc(r.team)}</span></td>
       <td>${esc(r.pos)}</td>
