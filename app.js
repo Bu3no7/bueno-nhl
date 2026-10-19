@@ -1035,7 +1035,7 @@ async function renderSlate() {
       const favA = wp.a >= wp.b;
       const plFav = favA ? fairOdds(plA) : fairOdds(plB);
       const plDog = favA ? fairOdds(1 - plB) : fairOdds(1 - plA);
-      return `<div class="game-odds"><span>ML ${esc(g.away)} ${mlA} / ${esc(g.home)} ${mlB}</span><span>PL ${favA ? esc(g.away) + ' −1.5' : esc(g.home) + ' −1.5'} ${plFav}</span><span>Total ${total}</span></div>`;
+      return `<div class="game-odds"><span><strong>ML</strong> ${esc(g.away)} ${mlA} · ${esc(g.home)} ${mlB}</span><span><strong>PL</strong> ${favA ? esc(g.away) + ' −1.5' : esc(g.home) + ' −1.5'} ${plFav}</span><span><strong>Total</strong> ${total}</span></div>`;
     } catch (e) { return ''; }
   };
   grid.innerHTML = state.games.map((g) => {
@@ -2130,17 +2130,17 @@ function openPlayer(pid, gameId) {
     ? '<span class="status-pill ok">In lineup</span>'
     : '<span class="status-pill proj">Projected</span>';
   $('modalBody').innerHTML = `
-    <div class="pc-head">
+    <div class="pc-head hero-card-head">
       <img class="headshot" src="${esc(r.headshot)}" alt="" ${imgFallback}>
       <div>
         <h3 class="pc-name">${esc(r.name)}</h3>
         <div><img class="tlogo" src="${teamLogoUrl(r.team)}" alt="" ${imgFallback}>
           <span class="muted">${esc(r.team)} · ${esc(r.pos)} · ${g ? esc(g.away + ' @ ' + g.home) : ''}</span></div>
       </div>
-      <div style="margin-left:auto;text-align:right">
-        <div class="pc-prob">${pct1(r.p)}</div>
+      <div style="margin-left:auto;text-align:center">
+        <div class="hero-card-num">${Math.round(r.p * 100)}<small>%</small></div>
+        <div class="hero-card-label">Anytime Goal</div>
         <div class="pc-fair">${r.fair} fair</div>
-        <div class="pc-goals">Total Season Goals: ${r.goals}</div>
       </div>
     </div>
     <div class="pc-status">${lineBadge}${statusPill}</div>
