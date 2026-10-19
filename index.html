@@ -336,7 +336,10 @@
 <script src="goal-anim.js"></script>
 <!-- Goal animation takeover -->
 <div class="goal-takeover" id="goalTakeover" aria-hidden="true">
-  <div class="rink-phase" id="rinkPhase"><canvas id="rinkAnim" width="420" height="200"></canvas></div>
+  <div class="rink-phase" id="rinkPhase">
+    <video id="goalIntroVid" src="goal-intro.mp4" muted playsinline preload="auto" style="width:90vw;max-width:420px;border-radius:12px;"></video>
+    <canvas id="rinkAnim" width="420" height="200" style="display:none;"></canvas>
+  </div>
   <div class="goal-phase" id="goalPhase">
     <div class="goal-bg"></div>
     <div class="goal-text">GOAL!</div>
