@@ -477,6 +477,7 @@ td.heat.h1 { background: transparent; }
 .stat-inline { display: flex; gap: 1rem; font-size: .8rem; color: var(--muted); margin-bottom: .6rem; }
 .stat-inline strong { color: #e8ecf4; }
 .section-div { height: 1px; background: rgba(255,255,255,.07); margin: .8rem 0; }
+.sec-title { font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: .9rem 0 .3rem; }
 .line-badge {
   display: inline-flex; align-items: baseline; gap: .3rem;
   font-weight: 800; font-size: .85rem; letter-spacing: .02em;
