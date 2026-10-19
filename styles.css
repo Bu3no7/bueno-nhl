@@ -464,6 +464,8 @@ td.heat.h1 { background: transparent; }
 .finder-actions .apply-btn { flex: 1; margin-top: 0; }
 .finder input[type=range] { width: 100%; accent-color: var(--teal); height: 28px; }
 .finder input[type=range]::-webkit-slider-thumb { box-shadow: 0 0 8px rgba(58,219,227,.5); }
+.fit-badge { display: inline-block; font-size: .68rem; font-weight: 700; color: var(--teal); background: rgba(58,219,227,.12); border-radius: 4px; padding: .1rem .35rem; margin-left: .4rem; vertical-align: middle; }
+.streak { margin-left: .35rem; font-size: .95rem; vertical-align: middle; }
 .line-badge {
   display: inline-flex; align-items: baseline; gap: .3rem;
   font-weight: 800; font-size: .85rem; letter-spacing: .02em;
