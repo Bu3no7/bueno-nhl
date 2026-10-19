@@ -628,6 +628,8 @@ function extractGoals(pbp, game) {
         type: goalTypeFromSituation(p.situationCode, scoredByHome, pd.periodType === 'SO', !!det.penaltyShot),
         awayScore: det.awayScore, homeScore: det.homeScore,
         shotType: det.shotType || '',
+        x: det.xCoord != null ? det.xCoord : (p.details && p.details.xCoord),
+        y: det.yCoord != null ? det.yCoord : (p.details && p.details.yCoord),
         order: p.sortOrder || 0,
         gameId: game.id,
       };
