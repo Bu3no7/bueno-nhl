@@ -1738,13 +1738,15 @@ function renderBoard() {
   tb.innerHTML = sortedSkaters().map((r) => {
     const ng = (scorerByGame[r.gameId] || {})[r.pid] || 0;
     const badge = ng ? `<span class="goal-badge">${ng > 1 ? ng + 'G' : 'GOAL'}</span>` : '';
+    const pct = r.p * 100;
+    const heat = pct >= 30 ? 'h5' : pct >= 22 ? 'h4' : pct >= 15 ? 'h3' : pct >= 10 ? 'h2' : 'h1';
     return `
     <tr${ng ? ' class="scored"' : ''}>
       <td>${pnameBtn(r)}${badge}
         <div class="prob-bar"><i style="width:${Math.min(100, r.p * 100 * 2.5)}%"></i></div></td>
       <td><span class="team-cell"><img src="${teamLogoUrl(r.team)}" alt="" ${imgFallback}>${esc(r.team)}</span></td>
       <td>${esc(r.pos)}</td>
-      <td class="num"><strong>${pct1(r.p)}</strong></td>
+      <td class="num heat ${heat}"><strong>${pct1(r.p)}</strong></td>
       <td class="num">${r.fair}</td>
       <td class="num">${(r.goals / Math.max(r.gp, 1)).toFixed(2)}</td>
       <td class="num">${r.gp ? r.sogpg.toFixed(1) : '–'}</td>
