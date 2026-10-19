@@ -852,11 +852,12 @@ body { padding-bottom: 68px; }
 }
 .bnav-btn {
   flex: 1; background: none; border: none; cursor: pointer;
-  display: flex; flex-direction: column; align-items: center; gap: 1px;
-  padding: .4rem 0 .45rem; color: var(--muted);
-  font-size: .72rem; font-weight: 600; font-family: inherit;
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: .65rem 0 .7rem; color: var(--muted);
+  font-size: .82rem; font-weight: 600; font-family: inherit;
+  min-height: 56px;
 }
-.bnav-btn .bnav-ico { font-size: 1.1rem; line-height: 1; }
+.bnav-btn .bnav-ico { font-size: 1.35rem; line-height: 1; }
 .bnav-btn.active { color: var(--teal); }
 .bnav-btn:active { opacity: .7; }
 .lab-nav[hidden] { display: none; }
