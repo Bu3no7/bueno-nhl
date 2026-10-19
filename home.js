@@ -67,11 +67,30 @@ function renderHomePicks() {
     </div>`;
   }).join('');
 }
-/* ---- Home: yesterday's results (placeholder — graded data is local-only) ---- */
-function renderHomeResults() {
+/* ---- Home: yesterday's results ---- */
+async function renderHomeResults() {
   const el = $('homeResultsBody');
   if (!el) return;
-  el.innerHTML = `<p class="muted">Results post after last night's games.</p>`;
+  try {
+    const y = new Date();
+    y.setDate(y.getDate() - 1);
+    const dateStr = y.toISOString().slice(0, 10);
+    const sched = await fetchJSON(`${API}/schedule/${dateStr}`);
+    const day = (sched.gameWeek || []).find((w) => w.date === dateStr);
+    const games = day ? day.games.filter((g) => g.gameState === 'OFF' || g.gameState === 'FINAL') : [];
+    if (!games.length) {
+      el.innerHTML = `<p class="muted">No games yesterday.</p>`;
+      return;
+    }
+    el.innerHTML = games.map((g) => {
+      const a = g.awayTeam, h = g.homeTeam;
+      return `<div class="result-row">
+        <span class="result-teams">${esc(a.abbrev)} ${a.score} — ${h.score} ${esc(h.abbrev)}</span>
+      </div>`;
+    }).join('');
+  } catch (e) {
+    el.innerHTML = `<p class="muted">Couldn't load results.</p>`;
+  }
 }
 /* ---- Home: standings preview (compact, by division) ---- */
 async function renderHomeStandings() {
