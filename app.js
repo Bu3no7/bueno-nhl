@@ -2249,8 +2249,8 @@ function openPlayer(pid, gameId) {
       <button class="btn" id="parlayAddBtn">Add to parlay</button>
     </div>
     <details class="rink-details" open>
-      <summary class="sec-title" style="cursor:pointer"><span id="rinkTitle" style="color:var(--gold)">Shot map</span> <span class="muted small">recent games, attacking →</span>
-        <span style="float:right" onclick="event.stopPropagation()"><button class="pill on" id="rinkShots">Shots</button> <button class="pill" id="rinkGoals">Goals</button></span></summary>
+      <summary class="sec-title" style="cursor:pointer"><span id="rinkTitle" style="color:var(--gold)">Shot map</span> <span class="muted small">recent games, attacking →</span></summary>
+      <div style="margin:.4rem 0"><button class="pill on" id="rinkShots">Shots</button> <button class="pill" id="rinkGoals">Goals</button></div>
       <canvas class="rink" id="rinkCanvas"></canvas>
       <div class="legend"><span><span class="dot" style="background:#2f6fed"></span>attempt</span>
         <span><span class="dot" style="background:#d4a017"></span>goal</span>
