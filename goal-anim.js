@@ -19,10 +19,15 @@ function playGoalAnimation(gl) {
   badge.style.color = cfg.color;
   badge.style.border = `1px solid ${cfg.color}`;
   document.getElementById('goalScorerName').textContent = gl.scorer || '';
+  // Team logos
+  const homeLogo = document.getElementById('goalHomeLogo');
+  const awayLogo = document.getElementById('goalAwayLogo');
+  if (homeLogo) homeLogo.src = teamLogoUrl(gl.homeAbbr || gl.gameHome);
+  if (awayLogo) awayLogo.src = teamLogoUrl(gl.awayAbbr || gl.gameAway);
   document.getElementById('goalScorerMeta').textContent =
     `${gl.team || ''} · ${gl.periodType === 'OT' ? 'OT' : 'P' + gl.period} ${gl.time || ''}` +
     (gl.assists && gl.assists.length ? ` · 🍎 ${gl.assists.join(', ')}` : '');
-  document.getElementById('goalScoreBug').textContent = `${gl.awayScore}–${gl.homeScore}`;
+  document.getElementById('goalScoreText').textContent = ` ${gl.awayScore}–${gl.homeScore} `;
   const hs = gl.headshot || headshotUrl(gl.team, gl.scorerId);
   document.getElementById('goalScorerHs').src = hs;
   // Jersey number from model if available
