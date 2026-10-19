@@ -154,6 +154,35 @@
         </label>
       </div>
     </div>
+    <details class="finder" id="boardFinder">
+      <summary class="finder-toggle">Find players <span class="muted small">filter by what matters</span></summary>
+      <div class="finder-body">
+        <div class="factor">
+          <div class="factor-top"><span class="factor-name">Shooting Talent</span><span class="factor-val" data-f="shoot">15</span></div>
+          <input type="range" min="0" max="30" value="15" data-f="shoot">
+        </div>
+        <div class="factor">
+          <div class="factor-top"><span class="factor-name">Shot Volume</span><span class="factor-val" data-f="vol">15</span></div>
+          <input type="range" min="0" max="30" value="15" data-f="vol">
+        </div>
+        <div class="factor">
+          <div class="factor-top"><span class="factor-name">Power Play Role</span><span class="factor-val" data-f="pp">15</span></div>
+          <input type="range" min="0" max="30" value="15" data-f="pp">
+        </div>
+        <div class="factor">
+          <div class="factor-top"><span class="factor-name">Zone Score</span><span class="factor-val" data-f="zone">15</span></div>
+          <input type="range" min="0" max="30" value="15" data-f="zone">
+        </div>
+        <div class="factor">
+          <div class="factor-top"><span class="factor-name">Ice Time</span><span class="factor-val" data-f="toi">15</span></div>
+          <input type="range" min="0" max="30" value="15" data-f="toi">
+        </div>
+        <div class="finder-actions">
+          <button id="finderApply" class="apply-btn">Find Matches</button>
+          <button id="finderReset" class="refresh-link">Reset</button>
+        </div>
+      </div>
+    </details>
     <div class="table-wrap">
       <table id="boardTable">
         <thead><tr>
