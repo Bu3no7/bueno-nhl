@@ -276,6 +276,8 @@ main { max-width: 1120px; margin: 0 auto; padding: 1.4rem 1rem 2.2rem; }
   margin: .25rem 0 .35rem; font-variant-numeric: tabular-nums;
 }
 .game-meta { display: flex; justify-content: space-between; align-items: center; color: var(--muted); font-size: .82rem; gap: .5rem; font-variant-numeric: tabular-nums; }
+.game-odds { display: flex; flex-wrap: wrap; gap: .4rem .8rem; font-size: .75rem; color: var(--muted-2); margin-top: .3rem; font-variant-numeric: tabular-nums; }
+.game-odds span { white-space: nowrap; }
 .game-goalies { display: flex; align-items: center; justify-content: center; gap: .4rem; margin-top: .35rem; font-size: .78rem; }
 .gg-name { background: none; border: none; color: var(--teal); font: inherit; cursor: pointer; padding: .1rem .2rem; display: inline-flex; align-items: center; gap: .3rem; }
 .gg-name:hover { text-decoration: underline; }
