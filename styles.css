@@ -466,6 +466,9 @@ td.heat.h1 { background: transparent; }
 .finder input[type=range]::-webkit-slider-thumb { box-shadow: 0 0 8px rgba(58,219,227,.5); }
 .fit-badge { display: inline-block; font-size: .68rem; font-weight: 700; color: var(--teal); background: rgba(58,219,227,.12); border-radius: 4px; padding: .1rem .35rem; margin-left: .4rem; vertical-align: middle; }
 .streak { margin-left: .35rem; font-size: .95rem; vertical-align: middle; }
+.stat-inline { display: flex; gap: 1rem; font-size: .8rem; color: var(--muted); margin-bottom: .6rem; }
+.stat-inline strong { color: #e8ecf4; }
+.section-div { height: 1px; background: rgba(255,255,255,.07); margin: .8rem 0; }
 .line-badge {
   display: inline-flex; align-items: baseline; gap: .3rem;
   font-weight: 800; font-size: .85rem; letter-spacing: .02em;
