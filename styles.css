@@ -446,6 +446,12 @@ tr.scored td:first-child .pname { color: #8ff5f7; text-shadow: 0 0 14px rgba(58,
 .hero-card-num { font-size: 2.6rem; font-weight: 800; color: var(--teal); line-height: 1; text-shadow: 0 0 20px rgba(58,219,227,.4); }
 .hero-card-num small { font-size: 1.2rem; }
 .hero-card-label { font-size: .65rem; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); }
+/* Board heatmap */
+td.heat.h5 { background: rgba(58,219,227,.32); }
+td.heat.h4 { background: rgba(58,219,227,.22); }
+td.heat.h3 { background: rgba(58,219,227,.13); }
+td.heat.h2 { background: rgba(58,219,227,.07); }
+td.heat.h1 { background: transparent; }
 .line-badge {
   display: inline-flex; align-items: baseline; gap: .3rem;
   font-weight: 800; font-size: .85rem; letter-spacing: .02em;
