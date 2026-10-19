@@ -810,7 +810,7 @@ canvas.grink { width: 100%; height: auto; background: #0a1120; border-radius: 10
 .home-conf-label { font-size: .78rem; font-weight: 700; color: var(--muted); margin: .5rem 0 .2rem; text-transform: uppercase; letter-spacing: .06em; }
 .home-conf-label:first-child { margin-top: 0; }
 .standings-mini { width: 100%; border-collapse: collapse; font-size: .85rem; }
-.standings-mini td { padding: .22rem .3rem; border-bottom: 1px solid var(--border-soft); }
+.standings-mini td { padding: .12rem .3rem; border-bottom: 1px solid var(--border-soft); }
 .standings-mini tr.in-playoff td:first-child { color: var(--teal); font-weight: 700; }
 
 /* ---------------- Standings view ---------------- */
