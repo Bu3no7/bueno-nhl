@@ -333,5 +333,20 @@
 <script src="season-sim.js"></script>
 <script src="app.js"></script>
 <script src="home.js"></script>
+<!-- Goal animation takeover -->
+<div class="goal-takeover" id="goalTakeover" aria-hidden="true">
+  <div class="rink-phase" id="rinkPhase"><canvas id="rinkAnim" width="420" height="200"></canvas></div>
+  <div class="goal-phase" id="goalPhase">
+    <div class="goal-bg"></div>
+    <div class="goal-text">GOAL!</div>
+    <div id="goalTypeBadge"></div>
+    <div class="scorer-card">
+      <div class="scorer-num" id="goalScorerNum"></div>
+      <img id="goalScorerHs" src="" alt="">
+      <div><div class="scorer-name" id="goalScorerName"></div><div class="scorer-meta" id="goalScorerMeta"></div></div>
+    </div>
+    <div class="score-bug" id="goalScoreBug"></div>
+  </div>
+</div>
 </body>
 </html>
