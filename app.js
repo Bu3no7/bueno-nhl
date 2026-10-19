@@ -659,8 +659,12 @@ function goalItemHtml(gl) {
     ? `<button class="pname" data-pid="${gl.scorerId}" data-gid="${gl.gameId}">${esc(gl.scorer)}</button>`
     : `<span class="pname-static">${esc(gl.scorer)}</span>`;
   const hs = gl.headshot ? esc(gl.headshot) : headshotUrl(gl.team, gl.scorerId);
+  const playBtn = inModel
+    ? `<button class="goal-play" data-pid="${gl.scorerId}" data-gid="${gl.gameId}" aria-label="View ${esc(gl.scorer)}">▶</button>`
+    : '';
   return `<div class="goal-item">
     <img class="headshot" src="${hs}" alt="" ${imgFallback}>
+    ${playBtn}
     <div class="goal-info">
       <div>${nameHtml}${assists}</div>
       <div class="goal-meta muted small">${esc(gl.team)} · ${perLabel} ${esc(gl.time)}${gl.shotType ? ' · ' + esc(gl.shotType) : ''}</div>
@@ -715,6 +719,13 @@ function renderGoals() {
   }).join('')}</div>`;
   feed.querySelectorAll('.pname').forEach((b) =>
     b.addEventListener('click', () => openPlayer(b.dataset.pid, b.dataset.gid)));
+  feed.querySelectorAll('.goal-play').forEach((b) =>
+    b.addEventListener('click', () => openPlayer(b.dataset.pid, b.dataset.gid)));
+  // Goal type badges replay the animation — attach goal data
+  feed.querySelectorAll('.gtype').forEach((badge, i) => {
+    badge.classList.add('gtype-clickable');
+    badge._goal = allGoals[i];
+  });
 }
 /* ---------------- first-goal & brace views ----------------
    First goal: competing scoring rates within a matchup —
@@ -2649,3 +2660,4 @@ startAutoRefresh();
   if (dp && t >= dp.min && t <= dp.max) dp.value = t;
 })();
 boot(false, $('datePicker').value);
+
