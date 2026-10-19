@@ -340,3 +340,12 @@ async function shareCurrentView() {
 }
 const _shareBtn = $('shareBtn');
 if (_shareBtn) _shareBtn.addEventListener('click', shareCurrentView);
+/* Sport picker navigation */
+(function initSportPicker() {
+  const sel = document.getElementById('sportSelect');
+  if (!sel) return;
+  sel.addEventListener('change', () => {
+    const v = sel.value;
+    window.location.href = v === 'nhl' ? 'index.html' : v + '.html';
+  });
+})();
