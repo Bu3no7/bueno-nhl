@@ -2233,7 +2233,7 @@ function openPlayer(pid, gameId) {
     <div class="section-div"></div>
     ${vsGoalieHtml(r, g)}
     <details class="factors-details">
-      <summary class="sec-title" style="cursor:pointer">Factors <span class="muted small">how we got here</span></summary>
+      <summary class="sec-title" style="cursor:pointer">Factors <span style="color:var(--gold)">how we got here</span></summary>
       <table class="factor-table">${factorRows}
         <tr><td>Expected goals (λ)</td><td>${r.lam.toFixed(3)}</td></tr>
         <tr><td>Opponent</td><td>${esc(r.oppAbbr)} goalie ${(r.oppSv * 100).toFixed(1)}% SV</td></tr>
