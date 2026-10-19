@@ -1011,6 +1011,28 @@ async function renderSlate() {
   $('slateTitle').textContent = 'Slate — ' + d.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' });
   const stMap = await getStandings().catch(() => ({}));
   const rec = (abbr) => { const s = stMap[abbr]; return s ? `${s.wins}-${s.losses}-${s.otLosses}` : ''; };
+  // model odds: ML, puck line (-1.5), total — from Poisson team totals
+  const oddsHtml = (g) => {
+    try {
+      const lamA = simUnits(state.skaters, g.id, g.away).total;
+      const lamB = simUnits(state.skaters, g.id, g.home).total;
+      if (!lamA || !lamB) return '';
+      const wp = matchupWinProb(lamA, lamB);
+      const mlA = fairOdds(wp.a), mlB = fairOdds(wp.b);
+      const total = (lamA + lamB).toFixed(1);
+      // puck line: P(win by 2+)
+      let plA = 0, plB = 0;
+      for (let i = 0; i <= 15; i++) for (let j = 0; j <= 15; j++) {
+        const p = poissonPmf(i, lamA) * poissonPmf(j, lamB);
+        if (i - j >= 2) plA += p;
+        if (j - i >= 2) plB += p;
+      }
+      const favA = wp.a >= wp.b;
+      const plFav = favA ? fairOdds(plA) : fairOdds(plB);
+      const plDog = favA ? fairOdds(1 - plB) : fairOdds(1 - plA);
+      return `<div class="game-odds"><span>ML ${esc(g.away)} ${mlA} / ${esc(g.home)} ${mlB}</span><span>PL ${favA ? esc(g.away) + ' −1.5' : esc(g.home) + ' −1.5'} ${plFav}</span><span>Total ${total}</span></div>`;
+    } catch (e) { return ''; }
+  };
   grid.innerHTML = state.games.map((g) => {
     const pbp = g.pbp;
     const as = pbp ? pbp.awayTeam.score : 0;
@@ -1031,6 +1053,7 @@ async function renderSlate() {
       </div>
       <div class="score-line"><span>${as}</span><span>${hs}</span></div>
       <div class="game-meta"><span>${gameStatusText(g)}</span>${sogHtml}</div>
+      ${oddsHtml(g)}
       ${goalieHtml}
       ${scorersHtml(g)}
     </div>`;
@@ -1650,7 +1673,7 @@ function matchupHtml(g, lamA, lamB, wp, st) {
   </div>
   <div class="split-labels"><span><strong>${pctA}%</strong> ${esc(A)}</span><span>${esc(H)} <strong>${pctH}%</strong></span></div>
   <div class="matchup-proj">Projected <strong>${esc(A)} ${lamA.toFixed(1)} – ${lamB.toFixed(1)} ${esc(H)}</strong></div>
-  <h4 class="tape-title">Tale of the tape</h4>
+  <h4 class="tape-title">Game preview</h4>
   <div class="tape">
     ${tapeRow(fmt2(gfA), 'Goals for / game', fmt2(gfH), cmpRow(gfA, gfH))}
     ${tapeRow(fmt2(gaA), 'Goals against / game', fmt2(gaH), cmpRow(gaA, gaH, true))}
