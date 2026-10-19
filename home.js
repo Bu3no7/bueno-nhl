@@ -57,11 +57,13 @@ function renderHomePicks() {
   el.innerHTML = top.map((r) => {
     const g = state.games.find((gg) => String(gg.id) === String(r.gameId));
     const matchup = g ? `${g.away} @ ${g.home}` : esc(r.team);
-    return `<div class="pick-row" data-pid="${r.pid}" data-gid="${r.gameId}" role="button" tabindex="0">
+    const pct = Math.round(r.p * 100);
+    return `<div class="pick-row hero-pick" data-pid="${r.pid}" data-gid="${r.gameId}" role="button" tabindex="0">
+      <div class="hero-num">${pct}<small>%</small></div>
       <img class="pick-head" src="${esc(r.headshot || '')}" alt="" ${imgFallback}>
       <div><div class="pick-name">${esc(r.name)}</div>
-      <div class="pick-meta">${esc(r.team)} · ${esc(matchup)} · ${r.goals}G</div></div>
-      <div class="pick-prob">${pct1(r.p)}</div>
+      <div class="pick-meta">${esc(r.team)} · ${esc(matchup)} · ${r.goals}G</div>
+      <div class="pick-fair">${r.fair} fair</div></div>
     </div>`;
   }).join('');
 }
@@ -220,13 +222,58 @@ async function renderTeamRoster(abbr) {
     bodyEl.innerHTML = `<p class="muted">Roster unavailable right now.</p>`;
   }
 }
-/* ---- Playoff odds: donut + table (placeholder data, final visual) ---- */
-const ODDS_PREVIEW = [
-  { abbr: 'CAR', po: 96.5, cup: 10.3 }, { abbr: 'VGK', po: 94.4, cup: 8.3 },
-  { abbr: 'COL', po: 92.5, cup: 8.4 }, { abbr: 'MIN', po: 88.1, cup: 5.2 },
-  { abbr: 'EDM', po: 84.7, cup: 7.1 }, { abbr: 'TBL', po: 82.3, cup: 4.8 },
-  { abbr: 'DAL', po: 80.9, cup: 5.9 }, { abbr: 'FLA', po: 78.4, cup: 4.1 },
-];
+/* ---- Playoff odds: donut + table (Monte Carlo season sim) ---- */
+let _oddsRun = 0;
+async function renderPlayoffOdds() {
+  const homeEl = $('homeOddsBody');
+  const fullEl = $('oddsBody');
+  const run = ++_oddsRun;
+  const loading = `<p class="muted">Simulating season…</p>`;
+  if (homeEl) homeEl.innerHTML = loading;
+  if (fullEl) fullEl.innerHTML = loading;
+  try {
+    const standings = await fetchStandings();
+    const odds = await getSeasonOdds(state.date, standings, 10000, (done, total) => {
+      if (run !== _oddsRun) return;
+      const msg = `<p class="muted">Simulating ${total.toLocaleString()} seasons… ${Math.round(done / total * 100)}%</p>`;
+      if (homeEl) homeEl.innerHTML = msg;
+      if (fullEl) fullEl.innerHTML = msg;
+    });
+    if (run !== _oddsRun) return; // superseded
+    const rows = Object.entries(odds)
+      .map(([abbr, o]) => ({ abbr, po: o.playoffPct, cup: o.cupPct }))
+      .sort((a, b) => b.po - a.po);
+    if (homeEl) {
+      homeEl.innerHTML = `
+        <div class="po-donut-wrap">${playoffDonutSvg(rows.slice(0, 8))}</div>
+        <div class="po-legend">${rows.slice(0, 4).map((t) => {
+          const color = TEAM_COLORS[t.abbr] || '#3adbe3';
+          return `<div class="legend-item"><div class="legend-dot" style="background:${color};box-shadow:0 0 6px ${color}"></div>${esc(t.abbr)} ${t.po.toFixed(1)}%</div>`;
+        }).join('')}</div>
+        <button class="ghost-btn" id="homeOddsMore" type="button">Full odds &rarr;</button>
+        <p class="muted small po-note">10,000 simulated seasons · model estimates</p>`;
+      const more = $('homeOddsMore');
+      if (more) more.addEventListener('click', () => setView('playoffodds'));
+    }
+    if (fullEl) {
+      fullEl.innerHTML = `
+        <div class="po-donut-wrap">${playoffDonutSvg(rows.slice(0, 8))}</div>
+        <div class="table-wrap"><table class="odds-table">
+          <thead><tr><th>Team</th><th class="num">Playoffs</th><th class="num">Cup</th></tr></thead>
+          <tbody>${rows.map((t) => `<tr class="team-row" data-team="${esc(t.abbr)}" role="button" tabindex="0">
+            <td>${teamLogoCell(t.abbr)}</td>
+            <td class="num ${oddsClass(t.po)}">${t.po.toFixed(1)}%</td>
+            <td class="num muted">${t.cup.toFixed(1)}%</td>
+          </tr>`).join('')}</tbody>
+        </table></div>
+        <p class="muted small po-note">10,000 simulated seasons · model estimates</p>`;
+    }
+  } catch (e) {
+    const msg = `<p class="muted">Couldn't run the simulation. Check your connection.</p>`;
+    if (homeEl) homeEl.innerHTML = msg;
+    if (fullEl) fullEl.innerHTML = msg;
+  }
+}
 function playoffDonutSvg(teams) {
   const cx = 90, cy = 90, r = 62, sw = 24;
   const circ = 2 * Math.PI * r;
@@ -249,35 +296,6 @@ function playoffDonutSvg(teams) {
 }
 function oddsClass(p) {
   return p >= 85 ? 'odds-high' : p >= 60 ? 'odds-mid' : 'odds-low';
-}
-function renderPlayoffOdds() {
-  const homeEl = $('homeOddsBody');
-  if (homeEl) {
-    homeEl.innerHTML = `
-      <div class="po-donut-wrap">${playoffDonutSvg(ODDS_PREVIEW.slice(0, 8))}</div>
-      <div class="po-legend">${ODDS_PREVIEW.slice(0, 4).map((t) => {
-        const color = TEAM_COLORS[t.abbr] || '#3adbe3';
-        return `<div class="legend-item"><div class="legend-dot" style="background:${color};box-shadow:0 0 6px ${color}"></div>${esc(t.abbr)} ${t.po.toFixed(1)}%</div>`;
-      }).join('')}</div>
-      <button class="ghost-btn" id="homeOddsMore" type="button">Full odds &rarr;</button>
-      <p class="muted small po-note">Preview — live simulation coming soon.</p>`;
-    const more = $('homeOddsMore');
-    if (more) more.addEventListener('click', () => setView('playoffodds'));
-  }
-  const fullEl = $('oddsBody');
-  if (fullEl) {
-    fullEl.innerHTML = `
-      <div class="po-donut-wrap">${playoffDonutSvg(ODDS_PREVIEW)}</div>
-      <div class="table-wrap"><table class="odds-table">
-        <thead><tr><th>Team</th><th class="num">Playoffs</th><th class="num">Cup</th></tr></thead>
-        <tbody>${ODDS_PREVIEW.map((t) => `<tr class="team-row" data-team="${esc(t.abbr)}" role="button" tabindex="0">
-          <td>${teamLogoCell(t.abbr)}</td>
-          <td class="num ${oddsClass(t.po)}">${t.po.toFixed(1)}%</td>
-          <td class="num muted">${t.cup.toFixed(1)}%</td>
-        </tr>`).join('')}</tbody>
-      </table></div>
-      <p class="muted small po-note">Preview data — live season simulation coming soon.</p>`;
-  }
 }
 function renderHome() {
   renderHomePicks();
