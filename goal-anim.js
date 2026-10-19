@@ -30,9 +30,8 @@ function playGoalAnimation(gl) {
   document.getElementById('goalScoreText').textContent = ` ${gl.awayScore}–${gl.homeScore} `;
   const hs = gl.headshot || headshotUrl(gl.team, gl.scorerId);
   document.getElementById('goalScorerHs').src = hs;
-  // Jersey number from model if available
-  const sk = state.skaters.find((s) => String(s.pid) === String(gl.scorerId));
-  document.getElementById('goalScorerNum').textContent = (sk && sk.num) || '';
+  // Jersey numbers from pbp (works for yesterday's games too)
+  document.getElementById('goalScorerNum').textContent = gl.scorerNum || '';
   // Show takeover, run rink animation
   takeover.classList.add('go');
   rinkPhase.classList.remove('hide');
