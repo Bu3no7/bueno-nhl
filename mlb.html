@@ -5,28 +5,39 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bueno Sports - MLB</title>
 <link rel="stylesheet" href="styles.css">
+<style>
+:root { --teal: #00FF7F; --teal-wash: rgba(0,255,127,.08); }
+.hero-num, .pick-fair, .fit-badge, .f-boost { color: #00FF7F !important; }
+.hero-num { text-shadow: 0 0 16px rgba(0,255,127,.35); }
+</style>
 </head>
 <body>
-<div style="max-width:480px;margin:0 auto;padding:2rem 1rem;text-align:center">
-  <h2>Bueno Sports</h2>
-  <div class="sport-picker">
-    <select id="sportSelect" aria-label="Choose sport">
-      <option value="nhl">NHL</option>
-      <option value="mlb" selected>MLB</option>
-      <option value="nfl">NFL</option>
-      <option value="nba">NBA</option>
-      <option value="ufc">UFC</option>
-      <option value="soccer">Soccer</option>
-    </select>
+<div style="max-width:480px;margin:0 auto;padding:1rem">
+  <div style="text-align:center;margin-bottom:1.5rem">
+    <h2>Bueno Sports</h2>
+    <div class="sport-picker">
+      <select id="sportSelect" aria-label="Choose sport">
+        <option value="nhl">NHL</option>
+        <option value="mlb" selected>MLB</option>
+        <option value="nfl">NFL</option>
+        <option value="nba">NBA</option>
+        <option value="ufc">UFC</option>
+        <option value="soccer">Soccer</option>
+      </select>
+    </div>
+    <p class="muted small">MLB home run probabilities &middot; live data</p>
   </div>
-  <p class="muted" style="margin-top:2rem">MLB coming soon.</p>
-  <p><a href="index.html" style="color:var(--teal)">← Back to NHL</a></p>
+  <div id="mlbContent">
+    <p class="muted">Loading today's slate…</p>
+  </div>
 </div>
+<script src="mlb-engine.js"></script>
 <script>
 document.getElementById('sportSelect').addEventListener('change', (e) => {
   const v = e.target.value;
   window.location.href = v === 'nhl' ? 'index.html' : v + '.html';
 });
+// MLB content loads when engine is ready
 </script>
 </body>
 </html>
