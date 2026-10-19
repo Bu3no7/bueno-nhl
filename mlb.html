@@ -7,13 +7,22 @@
 <link rel="stylesheet" href="styles.css">
 <style>
 :root { --teal: #228B22; --teal-wash: rgba(34,139,34,.08); }
-.hero-num, .pick-fair, .fit-badge, .f-boost { color: #228B22 !important; }
+.hero-num, .pick-fair, .fit-badge { color: #228B22 !important; }
 .hero-num { text-shadow: 0 0 16px rgba(34,139,34,.35); }
+.mlb-pick { display: flex; align-items: center; gap: .8rem; padding: .7rem 0; border-bottom: 1px solid rgba(255,255,255,.06); }
+.mlb-pick:last-child { border-bottom: none; }
+.mlb-hr-pct { font-size: 1.8rem; font-weight: 800; color: #228B22; min-width: 70px; text-shadow: 0 0 12px rgba(34,139,34,.3); }
+.mlb-hr-pct small { font-size: .9rem; }
+.mlb-info { flex: 1; }
+.mlb-name { font-weight: 700; }
+.mlb-meta { font-size: .78rem; color: var(--muted); }
+.mlb-fair { font-size: .78rem; color: var(--gold); }
+.mlb-game-head { font-size: .85rem; font-weight: 700; color: var(--muted); margin: 1.2rem 0 .5rem; text-transform: uppercase; letter-spacing: .05em; }
 </style>
 </head>
 <body>
 <div style="max-width:480px;margin:0 auto;padding:1rem">
-  <div style="text-align:center;margin-bottom:1.5rem">
+  <div style="text-align:center;margin-bottom:1rem">
     <h2>Bueno Sports</h2>
     <div class="sport-picker">
       <select id="sportSelect" aria-label="Choose sport">
@@ -27,9 +36,7 @@
     </div>
     <p class="muted small">MLB home run probabilities &middot; live data</p>
   </div>
-  <div id="mlbContent">
-    <p class="muted">Loading today's slate…</p>
-  </div>
+  <div id="mlbContent"><p class="muted">Loading today's slate…</p></div>
 </div>
 <script src="mlb-engine.js"></script>
 <script>
@@ -37,7 +44,29 @@ document.getElementById('sportSelect').addEventListener('change', (e) => {
   const v = e.target.value;
   window.location.href = v === 'nhl' ? 'index.html' : v + '.html';
 });
-// MLB content loads when engine is ready
+(async function loadMlb() {
+  const el = document.getElementById('mlbContent');
+  try {
+    const today = new Date().toISOString().slice(0, 10);
+    const games = await fetchMlbSchedule(today);
+    if (!games.length) {
+      el.innerHTML = '<p class="muted">No MLB games today.</p>';
+      return;
+    }
+    let html = '';
+    for (const g of games) {
+      html += `<div class="mlb-game-head">${g.awayAbbr} @ ${g.homeAbbr}</div>`;
+      // For v1, show probable pitchers and note lineups need manual refresh
+      const awayP = g.awayPitcher ? g.awayPitcher.name : 'TBD';
+      const homeP = g.homePitcher ? g.homePitcher.name : 'TBD';
+      html += `<p class="muted small">Probables: ${awayP} vs ${homeP}</p>`;
+      html += '<p class="muted small">Full hitter pricing coming soon — engine is ready.</p>';
+    }
+    el.innerHTML = html;
+  } catch (e) {
+    el.innerHTML = '<p class="muted">Couldn\'t load MLB data.</p>';
+  }
+})();
 </script>
 </body>
 </html>
