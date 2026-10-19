@@ -2222,11 +2222,13 @@ function openPlayer(pid, gameId) {
     ${linematesHtml(r)}
     <div class="section-div"></div>
     ${vsGoalieHtml(r, g)}
+    <div class="sec-title">Factors</div>
     <table class="factor-table">${factorRows}
       <tr><td>Expected goals (λ)</td><td>${r.lam.toFixed(3)}</td></tr>
       <tr><td>Opponent</td><td>${esc(r.oppAbbr)} goalie ${(r.oppSv * 100).toFixed(1)}% SV</td></tr>
     </table>
     <p class="small muted">Season: ${r.goals}G ${r.assists}A ${r.points}P / ${r.gp}GP · Last 5: ${l5g}G, ${l5s} SOG${r.zone.lowSample ? ' · <em>zone share uses league-average (small sample)</em>' : ''}</p>
+    <div class="sec-title">vs League Average</div>
     ${statBarsHtml(r)}
     <h4 style="margin:.8rem 0 .2rem">Markets <span class="muted small">Poisson over/under</span></h4>
     ${marketsHtml}
