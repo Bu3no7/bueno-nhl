@@ -32,34 +32,15 @@ function playGoalAnimation(gl) {
   document.getElementById('goalScorerHs').src = hs;
   // Jersey numbers from pbp (works for yesterday's games too)
   document.getElementById('goalScorerNum').textContent = gl.scorerNum || '';
-  // Show takeover: video intro first, then overlay
+  // Show takeover, run rink animation
   takeover.classList.add('go');
   rinkPhase.classList.remove('hide');
   goalPhase.classList.remove('show');
-  const vid = document.getElementById('goalIntroVid');
-  if (vid) {
-    vid.currentTime = 0;
-    vid.play().catch(() => {});
-    vid.onended = () => {
-      rinkPhase.classList.add('hide');
-      goalPhase.classList.add('show');
-      setTimeout(() => takeover.classList.remove('go'), 3200);
-    };
-    // Fallback if video fails
-    setTimeout(() => {
-      if (!goalPhase.classList.contains('show')) {
-        rinkPhase.classList.add('hide');
-        goalPhase.classList.add('show');
-        setTimeout(() => takeover.classList.remove('go'), 3200);
-      }
-    }, 6000);
-  } else {
-    animateGoalRink(gl, () => {
-      rinkPhase.classList.add('hide');
-      goalPhase.classList.add('show');
-      setTimeout(() => takeover.classList.remove('go'), 3200);
-    });
-  }
+  animateGoalRink(gl, () => {
+    rinkPhase.classList.add('hide');
+    goalPhase.classList.add('show');
+    setTimeout(() => takeover.classList.remove('go'), 3200);
+  });
 }
 function animateGoalRink(gl, onDone) {
   const canvas = document.getElementById('rinkAnim');
