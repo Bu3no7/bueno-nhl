@@ -1725,13 +1725,61 @@ function sortedSkaters() {
   let rows = state.skaters.slice();
   if (state.teamFilter) rows = rows.filter((r) => r.team === state.teamFilter);
   const by = state.sortBy;
+  if (by === 'fit' && state.finderWeights) {
+    const w = state.finderWeights;
+    const fit = (r) => {
+      // normalize each factor to 0-1, weight by slider
+      const shoot = Math.min(1, Math.max(0, ((r.factors.find(f => f.label === 'Shooting talent')?.mult || 1) - 0.85) / 0.4));
+      const vol = Math.min(1, r.sogpg / 5);
+      const pp = Math.min(1, (r.ppp || 0) / Math.max(r.gp, 1) / 0.8);
+      const zone = r.zone.share || 0;
+      const toi = Math.min(1, r.toiMin / 24);
+      return w.shoot * shoot + w.vol * vol + w.pp * pp + w.zone * zone + w.toi * toi;
+    };
+    rows.forEach((r) => r._fit = fit(r));
+    rows.sort((a, b) => b._fit - a._fit);
+    return rows;
+  }
   rows.sort((a, b) => by === 'name' ? a.name.localeCompare(b.name)
     : by === 'team' ? (a.team + a.name).localeCompare(b.team + b.name)
     : by === 'zone' ? b.zone.share - a.zone.share
     : b.p - a.p);
   return rows;
 }
+/* Finder: slider weights → re-sort board by fit */
+function initFinder() {
+  const finder = $('boardFinder');
+  if (!finder || finder._init) return;
+  finder._init = true;
+  finder.querySelectorAll('input[type=range]').forEach((s) => {
+    s.addEventListener('input', () => {
+      finder.querySelector(`.factor-val[data-f="${s.dataset.f}"]`).textContent = s.value;
+    });
+  });
+  $('finderApply').addEventListener('click', () => {
+    const w = {};
+    let total = 0;
+    finder.querySelectorAll('input[type=range]').forEach((s) => { w[s.dataset.f] = +s.value; total += +s.value; });
+    if (!total) return;
+    // normalize to sum to 1
+    for (const k in w) w[k] /= total;
+    state.finderWeights = w;
+    state.sortBy = 'fit';
+    renderBoard();
+  });
+  $('finderReset').addEventListener('click', () => {
+    state.finderWeights = null;
+    state.sortBy = 'prob';
+    $('sortSelect').value = 'prob';
+    finder.querySelectorAll('input[type=range]').forEach((s) => {
+      s.value = 15;
+      finder.querySelector(`.factor-val[data-f="${s.dataset.f}"]`).textContent = '15';
+    });
+    renderBoard();
+  });
+}
 function renderBoard() {
+  initFinder();
   const tb = $('boardBody');
   const scorerByGame = {};
   for (const g of state.games) scorerByGame[g.id] = scorerCounts(g);
