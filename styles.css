@@ -111,7 +111,8 @@ a:hover { text-decoration: underline; }
 .pill.on { background: var(--teal); border-color: var(--teal); color: #062a2e; }
 /* stat bars */
 .sbar-wrap { margin: .2rem 0 .4rem; }
-.sbar-row { display: flex; align-items: center; gap: .6rem; margin: .32rem 0; }
+.sbar-row { display: flex; align-items: center; gap: .6rem; margin: .5rem 0; }
+.sbar-row:first-child { margin-top: .6rem; }
 .sbar-label { width: 72px; font-size: .76rem; color: var(--muted); text-align: right; flex-shrink: 0; }
 .sbar-track { flex: 1; height: 13px; background: rgba(255,255,255,.06); border-radius: 7px; overflow: hidden; position: relative; }
 .sbar-fill { height: 100%; border-radius: 7px; background: linear-gradient(90deg, var(--teal-deep), var(--teal)); }
@@ -514,8 +515,9 @@ td.heat.h1 { background: transparent; }
 .lu-cell.self .lu-name { font-weight: 800; color: var(--teal); }
 .lu-sub { font-size: .72rem; font-variant-numeric: tabular-nums; }
 
-.factor-table { width: 100%; font-size: .86rem; margin: .7rem 0; border-collapse: collapse; }
-.factor-table td { padding: .45rem .2rem; border-bottom: 1px dashed var(--border); white-space: normal; }
+.factor-table { width: 100%; font-size: .86rem; margin: .9rem 0; border-collapse: collapse; }
+.factor-table td { padding: .55rem .2rem; border-bottom: 1px solid rgba(255,255,255,.04); white-space: normal; }
+.factor-table tr:last-child td { border-bottom: none; }
 .factor-table td:first-child { color: var(--muted); }
 .factor-table td:last-child { text-align: right; font-weight: 650; font-variant-numeric: tabular-nums; }
 
