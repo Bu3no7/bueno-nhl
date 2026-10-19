@@ -507,8 +507,13 @@ async function loadDate(dateStr) {
   for (const k of Object.keys(fwdsByTeamGame)) {
     fwdsByTeamGame[k].sort((a, b) => b.toiMin - a.toiMin);
     fwdsByTeamGame[k].forEach((r, i) => {
-      r.line = 'L' + Math.min(4, Math.floor(i / 3) + 1);
-      r.lineEst = true;
+      if (i < 12) {
+        r.line = 'L' + (Math.floor(i / 3) + 1);
+        r.lineEst = true;
+      } else {
+        r.line = null; // extra forward — not on a regular line
+        r.lineEst = true;
+      }
     });
   }
   state.games = games.map((g, i) => ({
