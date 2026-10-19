@@ -1530,6 +1530,10 @@ function teamLineupHtml(teamAbbr, gameId) {
     if (!pair.length) continue;
     html += `<div class="lu-row"><div class="lu-label">D${i + 1}</div><div class="lu-players">${pair.map((s) => lineupCellHtml(s, false)).join('')}</div></div>`;
   }
+  const bench = rows.filter((s) => ['C', 'L', 'R'].includes(s.pos) && !s.line);
+  if (bench.length) {
+    html += `<div class="lu-row"><div class="lu-label muted">Bench</div><div class="lu-players">${bench.map((s) => lineupCellHtml(s, false)).join('')}</div></div>`;
+  }
   return html + '</div>';
 }
 function matchupLineupHtml(gameId) {
