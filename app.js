@@ -1582,13 +1582,14 @@ const STATBAR_DEFS = [
 function statBarsHtml(r) {
   const gp = Math.max(r.gp, 1);
   const isD = r.pos === 'D';
+  const shots = Number.isFinite(r.shots) ? r.shots : 0;
   const vals = {
     gpg: r.goals / gp,
     apg: r.assists / gp,
     ptspg: r.points / gp,
-    sogpg: (r.shots || 0) / gp,
+    sogpg: shots / gp,
     toi: r.toiMin || 0,
-    shpct: (r.shots || 0) > 0 ? r.goals / r.shots : 0,
+    shpct: shots > 0 ? r.goals / shots : 0,
   };
   const rows = STATBAR_DEFS.map((d) => {
     const v = vals[d.key];
