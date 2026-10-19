@@ -2248,12 +2248,14 @@ function openPlayer(pid, gameId) {
       <select id="parlayLegSelect" aria-label="Choose a parlay leg">${legOpts.join('')}</select>
       <button class="btn" id="parlayAddBtn">Add to parlay</button>
     </div>
-    <h4 style="margin:.6rem 0 .2rem"><span id="rinkTitle">Shot map</span> <span class="muted small">recent games, attacking →</span>
-      <span style="float:right"><button class="pill on" id="rinkShots">Shots</button> <button class="pill" id="rinkGoals">Goals</button></span></h4>
-    <canvas class="rink" id="rinkCanvas"></canvas>
-    <div class="legend"><span><span class="dot" style="background:#2f6fed"></span>attempt</span>
-      <span><span class="dot" style="background:#d4a017"></span>goal</span>
-      <span><span class="dot" style="border:2px dashed #e8a13d;background:none"></span>high-danger zone</span></div>`;
+    <details class="rink-details" open>
+      <summary class="sec-title" style="cursor:pointer"><span id="rinkTitle" style="color:var(--gold)">Shot map</span> <span class="muted small">recent games, attacking →</span>
+        <span style="float:right" onclick="event.stopPropagation()"><button class="pill on" id="rinkShots">Shots</button> <button class="pill" id="rinkGoals">Goals</button></span></summary>
+      <canvas class="rink" id="rinkCanvas"></canvas>
+      <div class="legend"><span><span class="dot" style="background:#2f6fed"></span>attempt</span>
+        <span><span class="dot" style="background:#d4a017"></span>goal</span>
+      <span><span class="dot" style="border:2px dashed #e8a13d;background:none"></span>high-danger zone</span></div>
+    </details>`;
   $('playerModal').classList.remove('hidden');
   ensurePlayerBio(r);
   // map follows the Markets dropdown on open; pills let you switch without closing
