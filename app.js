@@ -674,28 +674,45 @@ function goalItemHtml(gl) {
 function renderGoals() {
   const feed = $('goalsFeed');
   if (!feed) return;
-  const blocks = state.games
-    .map((g) => ({ g, goals: extractGoals(g.pbp, g) }))
-    .filter((b) => b.g.pbp);
-  if (!blocks.length) {
-    feed.innerHTML = '<p class="muted">No game data yet — check back once games start.</p>';
+  // Unified league-wide timeline: all goals, newest first
+  const allGoals = [];
+  for (const g of state.games) {
+    if (!g.pbp) continue;
+    for (const gl of extractGoals(g.pbp, g)) {
+      allGoals.push({ ...gl, gameAway: g.away, gameHome: g.home });
+    }
+  }
+  if (!allGoals.length) {
+    const hasData = state.games.some((g) => g.pbp);
+    feed.innerHTML = hasData
+      ? '<p class="muted">No goals yet tonight.</p>'
+      : '<p class="muted">No game data yet — check back once games start.</p>';
     return;
   }
-  feed.innerHTML = blocks.map(({ g, goals }) => {
-    const pbp = g.pbp;
-    const items = goals.length
-      ? goals.map(goalItemHtml).join('')
-      : '<p class="muted small goal-none">No goals yet.</p>';
-    return `<div class="goal-game game-card">
-      <div class="matchup">
-        <span class="team"><img src="${teamLogoUrl(g.away)}" alt="" ${imgFallback}>${esc(g.away)}</span>
-        <span class="score-line goal-final">${pbp.awayTeam.score}–${pbp.homeTeam.score}</span>
-        <span class="team"><img src="${teamLogoUrl(g.home)}" alt="" ${imgFallback}>${esc(g.home)}</span>
+  // sort newest first (by game start + period/time — approximate via reverse)
+  allGoals.reverse();
+  feed.innerHTML = `<div class="goal-timeline">${allGoals.map((gl) => {
+    const perLabel = gl.periodType === 'OT' ? 'OT' : gl.periodType === 'SO' ? 'SO' : `P${gl.period}`;
+    const assists = gl.assists.length
+      ? `<div class="goal-assists muted small">${gl.assists.map(esc).join(', ')}</div>` : '';
+    const inModel = state.skaters.some((s) =>
+      String(s.pid) === String(gl.scorerId) && String(s.gameId) === String(gl.gameId));
+    const nameHtml = inModel
+      ? `<button class="pname" data-pid="${gl.scorerId}" data-gid="${gl.gameId}">${esc(gl.scorer)}</button>`
+      : `<span class="pname-static">${esc(gl.scorer)}</span>`;
+    const hs = gl.headshot ? esc(gl.headshot) : headshotUrl(gl.team, gl.scorerId);
+    return `<div class="goal-item">
+      <img class="headshot" src="${hs}" alt="" ${imgFallback}>
+      <div class="goal-info">
+        <div>${nameHtml}${assists}</div>
+        <div class="goal-meta muted small">${esc(gl.gameAway)} @ ${esc(gl.gameHome)} · ${perLabel} ${esc(gl.time)}${gl.shotType ? ' · ' + esc(gl.shotType) : ''}</div>
       </div>
-      <div class="game-meta"><span>${gameStatusText(g)}</span><span>${goals.length} goal${goals.length === 1 ? '' : 's'}</span></div>
-      <div class="goal-list">${items}</div>
+      <div class="goal-right">
+        <span class="gtype gtype-${gl.type.toLowerCase()}">${GOAL_TYPE_LABEL[gl.type] || gl.type}</span>
+        <div class="goal-score num">${gl.awayScore}–${gl.homeScore}</div>
+      </div>
     </div>`;
-  }).join('');
+  }).join('')}</div>`;
   feed.querySelectorAll('.pname').forEach((b) =>
     b.addEventListener('click', () => openPlayer(b.dataset.pid, b.dataset.gid)));
 }
