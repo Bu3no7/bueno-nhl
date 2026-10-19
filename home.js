@@ -82,12 +82,35 @@ async function renderHomeResults() {
       el.innerHTML = `<p class="muted">No games yesterday.</p>`;
       return;
     }
-    el.innerHTML = games.map((g) => {
+    let html = '';
+    for (const g of games) {
       const a = g.awayTeam, h = g.homeTeam;
-      return `<div class="result-row">
-        <span class="result-teams">${esc(a.abbrev)} ${a.score} — ${h.score} ${esc(h.abbrev)}</span>
+      html += `<div class="result-game">
+        <div class="result-score"><strong>${esc(a.abbrev)} ${a.score} — ${h.score} ${esc(h.abbrev)}</strong></div>
+        <div class="result-goals" id="rg-${g.id}"><span class="muted small">Loading scorers…</span></div>
       </div>`;
-    }).join('');
+    }
+    el.innerHTML = html;
+    // Load scorers per game
+    for (const g of games) {
+      try {
+        const pbp = await fetchJSON(`${API}/gamecenter/${g.id}/play-by-play`);
+        const goals = extractGoals(pbp, g);
+        const gel = $(`rg-${g.id}`);
+        if (!gel) continue;
+        if (!goals.length) { gel.innerHTML = `<span class="muted small">No goals.</span>`; continue; }
+        gel.innerHTML = goals.map((gl, i) => {
+          const t = GOAL_TYPE_LABEL[gl.type] || gl.type;
+          return `<button class="gtype gtype-${gl.type.toLowerCase()} gtype-clickable result-goal-btn" data-gidx="${i}" data-gid="${g.id}">${esc(gl.scorer)} <span class="muted">(${t})</span></button>`;
+        }).join(' ');
+        // Wire replay
+        gel.querySelectorAll('.result-goal-btn').forEach((b) => {
+          const gl = goals[+b.dataset.gidx];
+          b._goal = { ...gl, gameAway: g.awayTeam.abbrev, gameHome: g.homeTeam.abbrev, awayScore: g.awayTeam.score, homeScore: g.homeTeam.score };
+          b.addEventListener('click', () => playGoalAnimation(b._goal));
+        });
+      } catch (e) { /* leave loading text */ }
+    }
   } catch (e) {
     el.innerHTML = `<p class="muted">Couldn't load results.</p>`;
   }
