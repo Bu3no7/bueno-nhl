@@ -1307,7 +1307,9 @@ function vsGoalieHtml(r, g) {
     <div class="small" style="display:flex;flex-direction:column;gap:.25rem">
       <div><strong>${h2h}</strong> career-tracked goal${h2h === 1 ? '' : 's'} with ${esc(pg.name.split(' ').slice(-1)[0])} in net <span class="muted">(recent games)</span>.</div>
       ${overlap}
-    </div>`;
+    </div>
+    <div class="sec-title">Goalie weak zones</div>
+    ${goalieZoneGridHtml(pg.id)}`;
 }
 function shotsAgainstGoalie(goalieId) {
   // every saved shot-on-goal with this goalie in net, across tonight's + recent pbps
