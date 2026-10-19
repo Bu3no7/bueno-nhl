@@ -452,6 +452,16 @@ td.heat.h4 { background: rgba(58,219,227,.22); }
 td.heat.h3 { background: rgba(58,219,227,.13); }
 td.heat.h2 { background: rgba(58,219,227,.07); }
 td.heat.h1 { background: transparent; }
+/* Finder */
+.finder { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 1rem; }
+.finder-toggle { padding: .8rem 1rem; cursor: pointer; font-weight: 600; font-size: .9rem; list-style: none; }
+.finder-toggle::-webkit-details-marker { display: none; }
+.finder-toggle::before { content: '▸ '; color: var(--teal); }
+.finder[open] .finder-toggle::before { content: '▾ '; }
+.finder-body { padding: 0 1rem 1rem; }
+.finder .factor { background: rgba(255,255,255,.02); margin-bottom: .5rem; }
+.finder-actions { display: flex; gap: .7rem; align-items: center; margin-top: .8rem; }
+.finder-actions .apply-btn { flex: 1; margin-top: 0; }
 .line-badge {
   display: inline-flex; align-items: baseline; gap: .3rem;
   font-weight: 800; font-size: .85rem; letter-spacing: .02em;
