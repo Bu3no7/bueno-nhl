@@ -205,6 +205,9 @@ function slimPbp(pbp) {
         typeDescKey: k,
         details: {
           shootingPlayerId: det.shootingPlayerId != null ? det.shootingPlayerId : null,
+          // shot-on-goal keeps the goalie: the site's goalie weak-zone grid
+          // and shots-against lookups match on goalieInNetId
+          ...(k === 'shot-on-goal' ? { goalieInNetId: det.goalieInNetId != null ? det.goalieInNetId : null } : {}),
           xCoord: det.xCoord,
           yCoord: det.yCoord,
           eventOwnerTeamId: det.eventOwnerTeamId != null ? det.eventOwnerTeamId : null,
