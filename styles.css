@@ -938,9 +938,15 @@ tr.team-row:focus-visible { outline: 2px solid var(--teal); outline-offset: -2px
 .score-bug { position: relative; margin-top: 1rem; font-size: 1.1rem; font-weight: 700; background: rgba(0,0,0,.6); padding: .4rem 1rem; border-radius: 8px; animation: goalSlideUp .5s ease-out .4s both; }
 .gtype-clickable { cursor: pointer; }
 
-/* ---- Goal heat map (player card) ---- */
-.heat-chips { display: flex; gap: .45rem; flex-wrap: wrap; margin-top: .6rem; }
-.heat-chip { background: #101828; border: 1px solid #1e2a3f; border-radius: 999px; padding: .32rem .65rem; font-size: .78rem; }
-.heat-chip b { color: var(--teal); }
-.heat-chip.slot b { color: var(--gold); }
-.heat-ramp { height: 8px; border-radius: 4px; margin-top: .5rem; background: linear-gradient(90deg, rgba(40,64,220,0) 0%, #2840dc 15%, #00b4d8 35%, #38d977 55%, #ffd60a 75%, #fb8500 90%, #ef233c 100%); }
+/* ---- Goal heat map: zone blocks (player card) ---- */
+.zonemap { position: relative; width: 100%; max-width: 380px; margin: .5rem auto 0; }
+.zonemap svg { display: block; width: 100%; height: auto; }
+.zlabel { position: absolute; transform: translate(-50%, -50%); text-align: center; pointer-events: none; width: 36%; }
+.zlabel .zname { font-size: .62rem; font-weight: 700; letter-spacing: .15em; color: #aebadd; text-shadow: 0 1px 3px rgba(0,0,0,.8); }
+.zlabel .zbig { font-size: 1.7rem; font-weight: 800; line-height: 1.05; color: #eaffff; text-shadow: 0 0 12px rgba(58,219,227,.85), 0 0 3px rgba(58,219,227,.9); }
+.zlabel .zbig.hot { color: #fff4e0; text-shadow: 0 0 14px rgba(232,161,61,.95), 0 0 4px rgba(232,161,61,.9); }
+.zchips { display: flex; gap: .3rem; justify-content: center; margin-top: .2rem; }
+.zchip { background: rgba(7,11,18,.78); border: 1px solid #2a3450; border-radius: 999px; padding: .12rem .5rem; font-size: .68rem; font-weight: 600; color: #cfd8ea; }
+.zchip b { color: var(--teal); }
+.zchip.g b { color: var(--gold); }
+.outside-strip { margin-top: .55rem; text-align: center; font-size: .74rem; letter-spacing: .08em; color: var(--muted); background: #0d1524; border: 1px solid #1a2333; border-radius: 8px; padding: .45rem .5rem; }
