@@ -937,3 +937,9 @@ tr.team-row:focus-visible { outline: 2px solid var(--teal); outline-offset: -2px
 .scorer-num { font-size: 2.5rem; font-weight: 900; color: var(--teal); }
 .score-bug { position: relative; margin-top: 1rem; font-size: 1.1rem; font-weight: 700; background: rgba(0,0,0,.6); padding: .4rem 1rem; border-radius: 8px; animation: goalSlideUp .5s ease-out .4s both; }
 .gtype-clickable { cursor: pointer; }
+
+/* ---- Goal heat map (player card) ---- */
+.heat-chips { display: flex; gap: .45rem; flex-wrap: wrap; margin-top: .6rem; }
+.heat-chip { background: #101828; border: 1px solid #1e2a3f; border-radius: 999px; padding: .32rem .65rem; font-size: .78rem; }
+.heat-chip b { color: var(--teal); }
+.heat-chip.slot b { color: var(--gold); }
