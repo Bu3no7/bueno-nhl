@@ -1732,107 +1732,74 @@ function applyTeamFilter(v) {
 }
 /* ---------------- player card ---------------- */
 function drawRink(canvas, shots, teamColor) {
-  const W = 420, H = 400;
+  // Vertical rink, net at top, Bueno zone-block skin: deep-teal point,
+  // teal sides, gold slot wash, hot low slot — shared by the player
+  // shot/goal map and both goalie maps.
+  const W = 400, H = 430;
   canvas.width = W; canvas.height = H;
   const ctx = canvas.getContext('2d');
-  // map normalized coords: x in [0,100] -> px, y in [-42.5,42.5] -> py
-  // (identical mapping to before — all callers unaffected)
-  const X = (x) => 20 + (x / 100) * (W - 40);
-  const Y = (y) => 20 + ((y + 42.5) / 85) * (H - 40);
-  const pxFt = (W - 40) / 100; // px per foot (x axis)
-  // ---- dark ice surface ----
-  const bg = ctx.createRadialGradient(W / 2, H * 0.45, 40, W / 2, H / 2, 300);
-  bg.addColorStop(0, '#182747');
-  bg.addColorStop(0.6, '#101b31');
-  bg.addColorStop(1, '#0a1120');
-  ctx.fillStyle = bg;
-  ctx.fillRect(0, 0, W, H);
-  // subtle ice sheen: faint diagonal highlight
+  const X = (y) => 20 + ((y + 42.5) / 85) * (W - 40);   // across the ice
+  const Y = (x) => 16 + ((100 - x) / 103) * (H - 32);   // along the ice, net up
+  const pxX = (W - 40) / 85, pxY = (H - 32) / 103;
+  const bg = ctx.createRadialGradient(W / 2, H * 0.4, 40, W / 2, H / 2, 320);
+  bg.addColorStop(0, '#16233f'); bg.addColorStop(0.6, '#101b31'); bg.addColorStop(1, '#0a1120');
+  ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+  const rinkPath = () => {
+    ctx.beginPath();
+    ctx.moveTo(X(-42.5), Y(-3));
+    ctx.lineTo(X(-42.5), Y(70));
+    ctx.quadraticCurveTo(X(-42.5), Y(100), X(-13), Y(100));
+    ctx.lineTo(X(13), Y(100));
+    ctx.quadraticCurveTo(X(42.5), Y(100), X(42.5), Y(70));
+    ctx.lineTo(X(42.5), Y(-3));
+    ctx.closePath();
+  };
+  // polygon from rink coords [x, y]
+  const poly = (pts, fill) => {
+    ctx.beginPath();
+    pts.forEach(([rx, ry], i) => { const cx = X(ry), cy = Y(rx); if (i) ctx.lineTo(cx, cy); else ctx.moveTo(cx, cy); });
+    ctx.closePath(); ctx.fillStyle = fill; ctx.fill();
+  };
   ctx.save();
-  ctx.globalAlpha = 0.05;
-  ctx.fillStyle = '#ffffff';
-  ctx.beginPath();
-  ctx.moveTo(0, H); ctx.lineTo(W * 0.55, 0); ctx.lineTo(W * 0.8, 0); ctx.lineTo(W * 0.25, H);
-  ctx.closePath(); ctx.fill();
-  ctx.restore();
-  const rinkL = X(0), rinkR = X(100), rinkT = Y(-42.5), rinkB = Y(42.5);
-  // ---- home-plate danger zone (subtle filled amber, under the lines) ----
-  ctx.save();
-  const hpGrad = ctx.createRadialGradient(X(89), Y(0), 4, X(89), Y(0), 30 * pxFt);
-  hpGrad.addColorStop(0, 'rgba(232,161,61,0.28)');
-  hpGrad.addColorStop(0.7, 'rgba(232,161,61,0.10)');
-  hpGrad.addColorStop(1, 'rgba(232,161,61,0)');
-  ctx.fillStyle = hpGrad;
-  ctx.beginPath();
-  // home-plate pentagon in front of the net
-  ctx.moveTo(X(89), Y(-9)); ctx.lineTo(X(78), Y(-9)); ctx.lineTo(X(70), Y(0));
-  ctx.lineTo(X(78), Y(9)); ctx.lineTo(X(89), Y(9)); ctx.closePath();
-  ctx.fill();
-  ctx.restore();
-  // ---- rink outline: crisp white ----
-  ctx.strokeStyle = 'rgba(235,242,255,0.9)'; ctx.lineWidth = 2.5;
-  ctx.strokeRect(rinkL, rinkT, rinkR - rinkL, rinkB - rinkT);
-  // ---- blue line (x=25), broadcast blue, full weight ----
-  ctx.strokeStyle = '#3b82f6'; ctx.lineWidth = 5;
-  ctx.beginPath(); ctx.moveTo(X(25), rinkT); ctx.lineTo(X(25), rinkB); ctx.stroke();
-  // ---- goal line (x=89), red, full width ----
+  rinkPath(); ctx.clip();
+  // ---- zone block fills ----
+  ctx.fillStyle = 'rgba(24,68,84,0.55)';
+  ctx.fillRect(0, Y(47), W, H - Y(47)); // point
+  poly([[100, -42.5], [100, -10], [69, -22], [54, -22], [54, -11], [47, -11], [47, -42.5]], 'rgba(23,94,108,0.45)'); // left side
+  poly([[100, 42.5], [100, 10], [69, 22], [54, 22], [54, 11], [47, 11], [47, 42.5]], 'rgba(23,94,108,0.45)'); // right side
+  poly([[89, -9], [69, -22], [54, -22], [54, -11], [47, -11], [47, 11], [54, 11], [54, 22], [69, 22], [89, 9]], 'rgba(160,104,20,0.50)'); // slot
+  poly([[100, -10], [100, 10], [74, 10], [74, -10]], 'rgba(196,44,30,0.78)'); // low slot
+  // ---- markings ----
+  ctx.strokeStyle = 'rgba(232,161,61,0.5)'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(X(-22), Y(69)); ctx.lineTo(X(-10), Y(76)); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(X(22), Y(69)); ctx.lineTo(X(10), Y(76)); ctx.stroke();
+  for (const fy of [-22, 22]) {
+    ctx.strokeStyle = 'rgba(235,242,255,0.35)'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.ellipse(X(fy), Y(69), 15 * pxX, 15 * pxY, 0, 0, Math.PI * 2); ctx.stroke();
+    ctx.fillStyle = '#e5484d';
+    ctx.beginPath(); ctx.arc(X(fy), Y(69), 3.4, 0, Math.PI * 2); ctx.fill();
+  }
+  ctx.strokeStyle = '#3b82f6'; ctx.lineWidth = 4; ctx.globalAlpha = 0.85;
+  ctx.beginPath(); ctx.moveTo(X(-42.5), Y(25)); ctx.lineTo(X(42.5), Y(25)); ctx.stroke();
+  ctx.globalAlpha = 1;
+  ctx.strokeStyle = 'rgba(232,200,50,0.45)'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(X(-42.5), Y(47)); ctx.lineTo(X(42.5), Y(47)); ctx.stroke();
   ctx.strokeStyle = '#e5484d'; ctx.lineWidth = 3;
-  ctx.beginPath(); ctx.moveTo(X(89), rinkT); ctx.lineTo(X(89), rinkB); ctx.stroke();
-  // ---- goal crease: light-blue semicircle ----
+  ctx.beginPath(); ctx.moveTo(X(-42.5), Y(89)); ctx.lineTo(X(42.5), Y(89)); ctx.stroke();
   ctx.save();
   ctx.fillStyle = 'rgba(94,200,248,0.30)';
   ctx.strokeStyle = 'rgba(94,200,248,0.85)'; ctx.lineWidth = 1.5;
-  ctx.beginPath();
-  ctx.ellipse(X(89), Y(0), 6 * pxFt, 6 * pxFt * 1.12, 0, -Math.PI / 2, Math.PI / 2);
-  ctx.closePath(); ctx.fill(); ctx.stroke();
+  ctx.beginPath(); ctx.ellipse(X(0), Y(89), 6 * pxX, 6 * pxY, 0, 0, Math.PI); ctx.closePath(); ctx.fill(); ctx.stroke();
   ctx.restore();
-  // ---- faceoff circles + dots ----
-  for (const fy of [-22, 22]) {
-    ctx.strokeStyle = 'rgba(235,242,255,0.75)'; ctx.lineWidth = 1.8;
-    ctx.beginPath(); ctx.arc(X(69), Y(fy), 15, 0, Math.PI * 2); ctx.stroke();
-    ctx.fillStyle = 'rgba(235,242,255,0.9)';
-    ctx.beginPath(); ctx.arc(X(69), Y(fy), 3.2, 0, Math.PI * 2); ctx.fill();
-    // hash marks
-    ctx.strokeStyle = 'rgba(235,242,255,0.5)'; ctx.lineWidth = 1.5;
-    for (const s of [-1, 1]) {
-      ctx.beginPath(); ctx.moveTo(X(69) - 22, Y(fy) + s * 10); ctx.lineTo(X(69) - 14, Y(fy) + s * 10); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(X(69) + 22, Y(fy) + s * 10); ctx.lineTo(X(69) + 14, Y(fy) + s * 10); ctx.stroke();
-    }
-  }
-  // ---- net: posts + crossbar + mesh, top-down at the goal line ----
-  const netX = X(89), netHW = 3 * pxFt; // 6ft wide
-  ctx.save();
-  // mesh (behind the line, into the zone end)
-  ctx.fillStyle = 'rgba(200,215,235,0.10)';
-  ctx.strokeStyle = 'rgba(200,215,235,0.35)'; ctx.lineWidth = 0.8;
-  const netDepth = 2.2 * pxFt;
-  ctx.beginPath();
-  ctx.moveTo(netX, Y(0) - netHW); ctx.lineTo(netX + netDepth, Y(0) - netHW * 0.8);
-  ctx.lineTo(netX + netDepth, Y(0) + netHW * 0.8); ctx.lineTo(netX, Y(0) + netHW);
-  ctx.closePath(); ctx.fill(); ctx.stroke();
-  // mesh crosshatch
-  ctx.strokeStyle = 'rgba(200,215,235,0.18)';
-  for (let i = 1; i < 4; i++) {
-    const t = i / 4;
-    ctx.beginPath();
-    ctx.moveTo(netX + netDepth * t, Y(0) - netHW * (1 - t * 0.2));
-    ctx.lineTo(netX + netDepth * t, Y(0) + netHW * (1 - t * 0.2));
-    ctx.stroke();
-  }
-  // posts + crossbar in goal red
-  ctx.strokeStyle = '#e5484d'; ctx.lineWidth = 3.5; ctx.lineCap = 'round';
-  ctx.beginPath(); ctx.moveTo(netX, Y(0) - netHW); ctx.lineTo(netX, Y(0) + netHW); ctx.stroke();
-  ctx.fillStyle = '#e5484d';
-  ctx.beginPath(); ctx.arc(netX, Y(0) - netHW, 2.6, 0, Math.PI * 2); ctx.fill();
-  ctx.beginPath(); ctx.arc(netX, Y(0) + netHW, 2.6, 0, Math.PI * 2); ctx.fill();
-  ctx.restore();
-  // ---- shots: visual hierarchy — goals glow, others dim ----
+  ctx.fillStyle = '#0d1524'; ctx.strokeStyle = 'rgba(255,255,255,0.45)'; ctx.lineWidth = 1.5;
+  ctx.fillRect(X(-3), Y(93), X(3) - X(-3), Y(89) - Y(93));
+  ctx.strokeRect(X(-3), Y(93), X(3) - X(-3), Y(89) - Y(93));
+  // ---- shots: goals glow, attempts dim ----
   for (const s of shots) {
-    const px = X(Math.max(0, Math.min(100, s.x)));
-    const py = Y(Math.max(-42.5, Math.min(42.5, s.y)));
+    const px = X(Math.max(-42.5, Math.min(42.5, s.y)));
+    const py = Y(Math.max(-3, Math.min(100, s.x)));
     ctx.save();
     if (s.goal) {
-      // glowing goal marker: halo + gold core + white ring
       ctx.shadowColor = '#ffd54a'; ctx.shadowBlur = 14;
       ctx.beginPath(); ctx.arc(px, py, 7, 0, Math.PI * 2);
       ctx.fillStyle = '#ffd54a'; ctx.fill();
@@ -1853,6 +1820,9 @@ function drawRink(canvas, shots, teamColor) {
     ctx.fillStyle = '#8b98ab'; ctx.font = '14px sans-serif'; ctx.textAlign = 'center';
     ctx.fillText('No located shots in recent games', W / 2, H / 2);
   }
+  ctx.restore();
+  rinkPath();
+  ctx.strokeStyle = 'rgba(235,242,255,0.55)'; ctx.lineWidth = 3; ctx.stroke();
 }
 function openPlayer(pid, gameId) {
   const r = state.skaters.find((s) => String(s.pid) === String(pid) && String(s.gameId) === String(gameId));
@@ -1942,12 +1912,12 @@ function openPlayer(pid, gameId) {
       <button class="btn" id="parlayAddBtn">Add to parlay</button>
     </div>
     <details class="rink-details" open>
-      <summary class="sec-title" style="cursor:pointer"><span id="rinkTitle" style="color:var(--gold)">Shot map</span> <span class="muted small">recent games, attacking →</span></summary>
+      <summary class="sec-title" style="cursor:pointer"><span id="rinkTitle" style="color:var(--gold)">Shot map</span> <span class="muted small">recent games, attacking ↑</span></summary>
       <div style="margin:.4rem 0"><button class="pill on" id="rinkShots">Shots</button> <button class="pill" id="rinkGoals">Goals</button></div>
       <canvas class="rink" id="rinkCanvas"></canvas>
       <div class="legend"><span><span class="dot" style="background:#2f6fed"></span>attempt</span>
         <span><span class="dot" style="background:#d4a017"></span>goal</span>
-      <span><span class="dot" style="border:2px dashed #e8a13d;background:none"></span>high-danger zone</span></div>
+      <span><span class="dot" style="background:#a06414"></span>slot</span> <span><span class="dot" style="background:#c42c1e"></span>low slot</span></div>
     </details>
     ${heatMapSectionHtml(r)}`;
   $('playerModal').classList.remove('hidden');
@@ -1965,7 +1935,6 @@ function openPlayer(pid, gameId) {
   $('rinkShots').addEventListener('click', () => { rinkMode = 'shots'; drawRinkMode(); });
   $('rinkGoals').addEventListener('click', () => { rinkMode = 'goals'; drawRinkMode(); });
   drawRinkMode();
-  drawHeatMap($('heatCanvas'), r.shots || []);
   $('parlayAddBtn').addEventListener('click', () => addParlayLeg(r, $('parlayLegSelect').value));
 }
 function closePlayer() { $('playerModal').classList.add('hidden'); }
@@ -1982,20 +1951,17 @@ function inHomePlate(x, y) {
   }
   return inside;
 }
-function heatStats(shots) {
-  const n = shots.length;
-  const slot = shots.filter((s) => inHomePlate(s.x, s.y));
-  const goals = shots.filter((s) => s.goal);
-  const slotGoals = goals.filter((s) => inHomePlate(s.x, s.y));
-  const hd = shots.filter((s) => isHighDanger(s.x, s.y)).length;
-  const point = shots.filter((s) => s.x < 50).length;
-  return {
-    n, goals: goals.length,
-    slotPct: n ? slot.length / n : 0,
-    slotGoals: slotGoals.length,
-    hdPct: n ? hd / n : 0,
-    pointPct: n ? point / n : 0,
-  };
+function zoneOf(x, y) {
+  if (x >= 74 && Math.abs(y) <= 10) return 'lowSlot';
+  if (inHomePlate(x, y) || (Math.abs(y) <= 11 && x >= 47 && x < 54)) return 'slot';
+  if (x < 25) return 'outside';
+  if (x < 47) return 'point';
+  return y < 0 ? 'left' : 'right';
+}
+function zoneStats(shots) {
+  const z = { lowSlot: { att: 0, goals: 0 }, slot: { att: 0, goals: 0 }, left: { att: 0, goals: 0 }, right: { att: 0, goals: 0 }, point: { att: 0, goals: 0 }, outside: { att: 0, goals: 0 } };
+  for (const s of shots) { const k = zoneOf(s.x, s.y); z[k].att++; if (s.goal) z[k].goals++; }
+  return z;
 }
 function heatMapSectionHtml(r) {
   const shots = r.shots || [];
@@ -2005,95 +1971,56 @@ function heatMapSectionHtml(r) {
       <p class="muted small" style="margin:.5rem 0 0">Not enough shot data yet — the map fills in as games are played.</p>
     </details>`;
   }
-  const hs = heatStats(shots);
-  const take = hs.slotPct >= 0.40
-    ? 'Lives in the slot — most of his damage comes from the home-plate area in front.'
-    : hs.pointPct >= 0.35
+  const zs = zoneStats(shots);
+  const total = shots.length;
+  const pct = (k) => Math.round((zs[k].att / total) * 100);
+  const hot = ['lowSlot', 'slot', 'left', 'right', 'point'].reduce((a, b) => (zs[a].att >= zs[b].att ? a : b));
+  const zlabel = (k, name, left, top) => `<div class="zlabel" style="left:${left}%; top:${top}%"><div class="zname">${name}</div><div class="zbig${k === hot ? ' hot' : ''}">${pct(k)}%</div><div class="zchips"><span class="zchip"><b>${zs[k].att}</b> att</span><span class="zchip g"><b>${zs[k].goals}</b> G</span></div></div>`;
+  const slotShare = (zs.lowSlot.att + zs.slot.att) / total;
+  const take = slotShare >= 0.5
+    ? `Lives in the slot — ${Math.round(slotShare * 100)}% of his shots come from the home-plate area${zs.lowSlot.goals ? ', and the low slot is where the goals are' : ''}.`
+    : (zs.point.att / total >= 0.3
       ? 'Does his damage from distance — point shots and perimeter looks.'
-      : 'Scores from all over the zone — no single home base.';
+      : 'Scores from all over the zone — no single home base.');
   return `<details class="rink-details heat-details">
     <summary class="sec-title" style="cursor:pointer"><span style="color:var(--gold)">Goal heat map</span> <span class="muted small">where his goals come from</span></summary>
-    <canvas class="rink" id="heatCanvas" style="margin-top:.5rem"></canvas>
-    <div class="heat-ramp"></div>
-    <div class="legend"><span>Fewer shots</span><span><span style="color:#fff">★</span> goal</span><span><span class="dot" style="border:2px dashed #e8a13d;background:none"></span>slot / home plate</span><span>More shots</span></div>
-    <div class="heat-chips">
-      <span class="heat-chip slot">Slot: <b>${Math.round(hs.slotPct * 100)}%</b> of shots</span>
-      <span class="heat-chip slot">Goals from slot: <b>${hs.slotGoals} of ${hs.goals}</b></span>
-      <span class="heat-chip">High-danger: <b>${Math.round(hs.hdPct * 100)}%</b></span>
-      <span class="heat-chip">Point: <b>${Math.round(hs.pointPct * 100)}%</b></span>
+    <div class="zonemap">
+      <svg viewBox="0 0 380 430" aria-hidden="true">
+        <defs>
+          <clipPath id="zmClip"><path d="M14 426 L14 120 A176 108 0 0 1 366 120 L366 426 Z"/></clipPath>
+          <radialGradient id="zmIce" cx="50%" cy="38%" r="80%">
+            <stop offset="0%" stop-color="#16233f"/><stop offset="60%" stop-color="#101b31"/><stop offset="100%" stop-color="#0a1120"/>
+          </radialGradient>
+        </defs>
+        <g clip-path="url(#zmClip)">
+          <rect x="0" y="0" width="380" height="430" fill="url(#zmIce)"/>
+          <rect x="0" y="300" width="380" height="130" fill="rgba(24,68,84,.55)"/>
+          <polygon points="14,26 190,26 190,300 14,300" fill="rgba(23,94,108,.45)"/>
+          <polygon points="190,26 366,26 366,300 190,300" fill="rgba(23,94,108,.45)"/>
+          <polygon points="190,96 128,168 108,300 272,300 252,168" fill="rgba(160,104,20,.5)"/>
+          <rect x="140" y="30" width="100" height="118" fill="rgba(196,44,30,.78)"/>
+          <circle cx="105" cy="215" r="58" fill="none" stroke="rgba(235,242,255,.35)" stroke-width="2"/>
+          <circle cx="275" cy="215" r="58" fill="none" stroke="rgba(235,242,255,.35)" stroke-width="2"/>
+          <circle cx="105" cy="215" r="4" fill="#e5484d"/>
+          <circle cx="275" cy="215" r="4" fill="#e5484d"/>
+          <line x1="14" y1="86" x2="366" y2="86" stroke="#e5484d" stroke-width="2.5"/>
+          <line x1="14" y1="300" x2="366" y2="300" stroke="#3b82f6" stroke-width="3.5"/>
+          <path d="M158 86 A32 32 0 0 0 222 86 Z" fill="rgba(94,200,248,.35)"/>
+          <rect x="172" y="18" width="36" height="16" fill="#0d1524" stroke="rgba(255,255,255,.45)"/>
+          <line x1="128" y1="168" x2="105" y2="215" stroke="rgba(232,161,61,.65)" stroke-width="2"/>
+          <line x1="252" y1="168" x2="275" y2="215" stroke="rgba(232,161,61,.65)" stroke-width="2"/>
+        </g>
+        <path d="M14 426 L14 120 A176 108 0 0 1 366 120 L366 426" fill="none" stroke="rgba(235,242,255,.55)" stroke-width="3"/>
+      </svg>
+      ${zlabel('lowSlot', 'LOW SLOT', 50, 24)}
+      ${zlabel('slot', 'SLOT', 50, 56)}
+      ${zlabel('left', 'LEFT SIDE', 19, 40)}
+      ${zlabel('right', 'RIGHT SIDE', 81, 40)}
+      ${zlabel('point', 'POINT', 50, 85)}
     </div>
-    <p class="small muted" style="margin:.55rem 0 0">${take} <span class="muted">(${hs.n} attempts tracked)</span></p>
+    <div class="outside-strip">OUTSIDE THE ZONE: ${zs.outside.att} ATT · ${pct('outside')}% · ${zs.outside.goals} G</div>
+    <p class="small muted" style="margin:.55rem 0 0">${take} <span class="muted">(${total} attempts tracked)</span></p>
   </details>`;
-}
-function drawHeatMap(canvas, shots) {
-  if (!canvas) return;
-  const W = 420, H = 400;
-  canvas.width = W; canvas.height = H;
-  const ctx = canvas.getContext('2d');
-  const X = (x) => 20 + (x / 100) * (W - 40);
-  const Y = (y) => 20 + ((y + 42.5) / 85) * (H - 40);
-  const bg = ctx.createRadialGradient(W / 2, H * 0.45, 40, W / 2, H / 2, 300);
-  bg.addColorStop(0, '#182747'); bg.addColorStop(0.6, '#101b31'); bg.addColorStop(1, '#0a1120');
-  ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
-  // smooth heat layer: accumulate soft intensity blobs offscreen, then
-  // colorize the alpha through a heat palette (blue -> teal -> green ->
-  // yellow -> orange -> red hot); low density stays faded/transparent
-  const off = document.createElement('canvas');
-  off.width = W; off.height = H;
-  const octx = off.getContext('2d');
-  for (const s of shots) {
-    const r = 26, cx = X(s.x), cy = Y(s.y);
-    const g = octx.createRadialGradient(cx, cy, 0, cx, cy, r);
-    g.addColorStop(0, 'rgba(0,0,0,0.55)');
-    g.addColorStop(0.4, 'rgba(0,0,0,0.28)');
-    g.addColorStop(1, 'rgba(0,0,0,0)');
-    octx.fillStyle = g;
-    octx.beginPath(); octx.arc(cx, cy, r, 0, Math.PI * 2); octx.fill();
-  }
-  const img = octx.getImageData(0, 0, W, H), px = img.data;
-  const stops = [[0, [0, 0, 0, 0]], [0.10, [40, 64, 220, 90]], [0.30, [0, 180, 216, 140]], [0.50, [56, 217, 119, 175]], [0.68, [255, 214, 10, 205]], [0.85, [251, 133, 0, 230]], [1, [239, 35, 60, 245]]];
-  const lut = [];
-  for (let i = 0; i < 256; i++) {
-    const t = i / 255;
-    let c = stops[stops.length - 1][1];
-    for (let k = 1; k < stops.length; k++) {
-      if (t <= stops[k][0]) {
-        const [t0, c0] = stops[k - 1], [t1, c1] = stops[k], f = (t - t0) / (t1 - t0);
-        c = [0, 1, 2, 3].map((ch) => Math.round(c0[ch] + (c1[ch] - c0[ch]) * f));
-        break;
-      }
-    }
-    lut.push(c);
-  }
-  for (let i = 0; i < px.length; i += 4) {
-    const c = lut[px[i + 3]];
-    px[i] = c[0]; px[i + 1] = c[1]; px[i + 2] = c[2]; px[i + 3] = c[3];
-  }
-  octx.putImageData(img, 0, 0);
-  ctx.drawImage(off, 0, 0);
-  // rink lines over the heat
-  const rinkL = X(0), rinkR = X(100), rinkT = Y(-42.5), rinkB = Y(42.5);
-  ctx.strokeStyle = 'rgba(235,242,255,0.9)'; ctx.lineWidth = 2.5;
-  ctx.strokeRect(rinkL, rinkT, rinkR - rinkL, rinkB - rinkT);
-  ctx.strokeStyle = '#3b82f6'; ctx.lineWidth = 5;
-  ctx.beginPath(); ctx.moveTo(X(25), rinkT); ctx.lineTo(X(25), rinkB); ctx.stroke();
-  ctx.strokeStyle = '#e5484d'; ctx.lineWidth = 3;
-  ctx.beginPath(); ctx.moveTo(X(89), rinkT); ctx.lineTo(X(89), rinkB); ctx.stroke();
-  ctx.strokeStyle = 'rgba(255,90,90,.55)'; ctx.lineWidth = 2;
-  for (const fy of [-22, 22]) { ctx.beginPath(); ctx.arc(X(69), Y(fy), 15 * ((W - 40) / 100), 0, Math.PI * 2); ctx.stroke(); }
-  ctx.save();
-  ctx.fillStyle = 'rgba(94,200,248,0.30)';
-  ctx.beginPath(); ctx.ellipse(X(89), Y(0), 6 * ((W - 40) / 100), 6 * ((W - 40) / 100) * 1.12, 0, -Math.PI / 2, Math.PI / 2);
-  ctx.closePath(); ctx.fill(); ctx.restore();
-  // slot / home-plate outline (gold dashed)
-  ctx.strokeStyle = '#e8a13d'; ctx.lineWidth = 2; ctx.setLineDash([7, 5]);
-  ctx.beginPath();
-  HOME_PLATE.forEach(([hx, hy], i) => { if (i === 0) ctx.moveTo(X(hx), Y(hy)); else ctx.lineTo(X(hx), Y(hy)); });
-  ctx.closePath(); ctx.stroke();
-  ctx.setLineDash([]);
-  // goals as stars
-  ctx.fillStyle = '#fff'; ctx.font = '13px system-ui'; ctx.textAlign = 'center';
-  for (const s of shots) if (s.goal) ctx.fillText('★', X(s.x), Y(s.y) + 4);
 }
 /* ---------------- goalie card ---------------- */
 async function openGoalie(goalieId, teamAbbrev, gameId) {
