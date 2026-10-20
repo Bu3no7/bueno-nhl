@@ -77,6 +77,67 @@ function slimTeam(t) {
 
 // Same logic as the site's goalieStarter(): first goalieInNetId seen
 // defending for the team, in chronological play order.
+/* ---------------- Daily Faceoff line combinations ----------------
+   The NHL API has no line combos; DFO publishes real ones (from morning
+   skates / beat writers) as a Next.js page with the data in __NEXT_DATA__.
+   Best effort: any failure returns null and the site falls back to its
+   TOI estimates. Players are keyed by normalized name (DFO ids differ
+   from NHL ids); the site matches its skaters the same way. */
+const DFO_SLUGS = {
+  ANA: 'anaheim-ducks', BOS: 'boston-bruins', BUF: 'buffalo-sabres',
+  CGY: 'calgary-flames', CAR: 'carolina-hurricanes', CHI: 'chicago-blackhawks',
+  COL: 'colorado-avalanche', CBJ: 'columbus-blue-jackets', DAL: 'dallas-stars',
+  DET: 'detroit-red-wings', EDM: 'edmonton-oilers', FLA: 'florida-panthers',
+  LAK: 'los-angeles-kings', MIN: 'minnesota-wild', MTL: 'montreal-canadiens',
+  NSH: 'nashville-predators', NJD: 'new-jersey-devils', NYI: 'new-york-islanders',
+  NYR: 'new-york-rangers', OTT: 'ottawa-senators', PHI: 'philadelphia-flyers',
+  PIT: 'pittsburgh-penguins', SJS: 'san-jose-sharks', SEA: 'seattle-kraken',
+  STL: 'st-louis-blues', TBL: 'tampa-bay-lightning', TOR: 'toronto-maple-leafs',
+  UTA: 'utah-mammoth', VAN: 'vancouver-canucks', VGK: 'vegas-golden-knights',
+  WSH: 'washington-capitals', WPG: 'winnipeg-jets',
+};
+const normName = (n) => (n || '').normalize('NFD').replace(/[̀-ͯ]/g, '')
+  .toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+
+async function fetchDfoLines(abbr) {
+  const slug = DFO_SLUGS[abbr];
+  if (!slug) return null;
+  const ctrl = new AbortController();
+  const to = setTimeout(() => ctrl.abort(), 15000);
+  try {
+    const res = await fetch(`https://www.dailyfaceoff.com/teams/${slug}/line-combinations/`, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
+        'Accept': 'text/html',
+      },
+      signal: ctrl.signal,
+    });
+    if (!res.ok) return null;
+    const html = await res.text();
+    const m = html.match(/<script id="__NEXT_DATA__" type="application\/json">([\s\S]*?)<\/script>/);
+    if (!m) return null;
+    const combos = (JSON.parse(m[1]) || {}).props?.pageProps?.combinations;
+    if (!combos || !Array.isArray(combos.players)) return null;
+    const players = {};
+    for (const p of combos.players) {
+      const key = normName(p.name);
+      if (!key) continue;
+      const cur = players[key] || (players[key] = { line: null, pos: null, pp: null });
+      const g = p.groupIdentifier || '';
+      const fm = g.match(/^f([1-4])$/), dm = g.match(/^d([1-3])$/), pm = g.match(/^pp([12])$/);
+      if (fm) { cur.line = 'L' + fm[1]; cur.pos = (p.positionIdentifier || '').toUpperCase() || null; }
+      else if (dm) { cur.line = 'D' + dm[1]; cur.pos = (p.positionIdentifier || '').toUpperCase() || null; }
+      else if (pm) { cur.pp = 'PP' + pm[1]; }
+    }
+    for (const k of Object.keys(players)) {
+      if (!players[k].line && !players[k].pp) delete players[k];
+    }
+    if (!Object.keys(players).length) return null;
+    return { updatedAt: combos.updatedAt || null, players };
+  } catch (e) { return null; }
+  finally { clearTimeout(to); }
+}
+
 function starterFor(pbp, teamAbbrev) {
   if (!pbp) return { id: null, name: '' };
   const home = pbp.homeTeam || {}, away = pbp.awayTeam || {};
@@ -263,7 +324,7 @@ async function main() {
       state: g.gameState, startUTC: g.startTimeUTC,
     })),
     pbps: {}, rosters: {}, recentIds: {}, zonePbps: {},
-    players: {}, goalieSv: {}, standings: {},
+    players: {}, goalieSv: {}, standings: {}, lines: {},
   };
   if (!games.length) {
     write(out);
@@ -370,6 +431,13 @@ async function main() {
     const st = await counted(E.fetchJSON(`${API}/standings/${dateStr}`));
     out.standings = slimStandings(st);
   } catch (e) { out.standings = {}; }
+
+  // 8. Daily Faceoff line combinations for slate teams (best effort)
+  await E.limitedMap(teams, 3, async (t) => {
+    const L = await fetchDfoLines(t);
+    if (L) out.lines[t] = L;
+  });
+  console.log(`[data-builder] DFO lines for ${Object.keys(out.lines).length}/${teams.length} teams`);
 
   write(out);
   const bytes = fs.statSync(path.join(DATA_DIR, `${dateStr}.json`)).size;
