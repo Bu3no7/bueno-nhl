@@ -2372,6 +2372,7 @@ function applyBoxscoreToGame(g, bs) {
   // Goal details (plays/rosterSpots) stay as-is until the slow tier refreshes
   // the full pbp — scores and clocks never wait on it.
   const snap = scoreSnapshot(bs);
+  g.state = snap.state; // keep top-level state in sync for gameStatusText
   if (g.pbp && g.pbp.awayTeam) {
     g.pbp.awayTeam.score = snap.a;
     g.pbp.homeTeam.score = snap.h;
