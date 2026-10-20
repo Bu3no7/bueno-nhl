@@ -1948,7 +1948,8 @@ function openPlayer(pid, gameId) {
       <div class="legend"><span><span class="dot" style="background:#2f6fed"></span>attempt</span>
         <span><span class="dot" style="background:#d4a017"></span>goal</span>
       <span><span class="dot" style="border:2px dashed #e8a13d;background:none"></span>high-danger zone</span></div>
-    </details>`;
+    </details>
+    ${heatMapSectionHtml(r)}`;
   $('playerModal').classList.remove('hidden');
   ensurePlayerBio(r);
   // map follows the Markets dropdown on open; pills let you switch without closing
@@ -1964,9 +1965,115 @@ function openPlayer(pid, gameId) {
   $('rinkShots').addEventListener('click', () => { rinkMode = 'shots'; drawRinkMode(); });
   $('rinkGoals').addEventListener('click', () => { rinkMode = 'goals'; drawRinkMode(); });
   drawRinkMode();
+  drawHeatMap($('heatCanvas'), r.shots || []);
   $('parlayAddBtn').addEventListener('click', () => addParlayLeg(r, $('parlayLegSelect').value));
 }
 function closePlayer() { $('playerModal').classList.add('hidden'); }
+/* ---------------- goal heat map (player card) ----------------
+   Where a skater's goals come from: heat grid over his shot attempts
+   (tonight + recent games, normalized attacking coords), the slot /
+   home-plate area outlined, goals starred, and zone stats as chips. */
+const HOME_PLATE = [[89, -9], [69, -22], [54, -22], [54, 22], [69, 22], [89, 9]];
+function inHomePlate(x, y) {
+  let inside = false;
+  for (let i = 0, j = HOME_PLATE.length - 1; i < HOME_PLATE.length; j = i++) {
+    const [xi, yi] = HOME_PLATE[i], [xj, yj] = HOME_PLATE[j];
+    if (((yi > y) !== (yj > y)) && (x < ((xj - xi) * (y - yi)) / (yj - yi) + xi)) inside = !inside;
+  }
+  return inside;
+}
+function heatStats(shots) {
+  const n = shots.length;
+  const slot = shots.filter((s) => inHomePlate(s.x, s.y));
+  const goals = shots.filter((s) => s.goal);
+  const slotGoals = goals.filter((s) => inHomePlate(s.x, s.y));
+  const hd = shots.filter((s) => isHighDanger(s.x, s.y)).length;
+  const point = shots.filter((s) => s.x < 50).length;
+  return {
+    n, goals: goals.length,
+    slotPct: n ? slot.length / n : 0,
+    slotGoals: slotGoals.length,
+    hdPct: n ? hd / n : 0,
+    pointPct: n ? point / n : 0,
+  };
+}
+function heatMapSectionHtml(r) {
+  const shots = r.shots || [];
+  if (shots.length < 5) {
+    return `<details class="rink-details heat-details">
+      <summary class="sec-title" style="cursor:pointer"><span style="color:var(--gold)">Goal heat map</span> <span class="muted small">where his goals come from</span></summary>
+      <p class="muted small" style="margin:.5rem 0 0">Not enough shot data yet — the map fills in as games are played.</p>
+    </details>`;
+  }
+  const hs = heatStats(shots);
+  const take = hs.slotPct >= 0.40
+    ? 'Lives in the slot — most of his damage comes from the home-plate area in front.'
+    : hs.pointPct >= 0.35
+      ? 'Does his damage from distance — point shots and perimeter looks.'
+      : 'Scores from all over the zone — no single home base.';
+  return `<details class="rink-details heat-details">
+    <summary class="sec-title" style="cursor:pointer"><span style="color:var(--gold)">Goal heat map</span> <span class="muted small">where his goals come from</span></summary>
+    <canvas class="rink" id="heatCanvas" style="margin-top:.5rem"></canvas>
+    <div class="legend"><span>Brighter = more shots</span><span><span style="color:#fff">★</span> goal</span><span><span class="dot" style="border:2px dashed #e8a13d;background:none"></span>slot / home plate</span></div>
+    <div class="heat-chips">
+      <span class="heat-chip slot">Slot: <b>${Math.round(hs.slotPct * 100)}%</b> of shots</span>
+      <span class="heat-chip slot">Goals from slot: <b>${hs.slotGoals} of ${hs.goals}</b></span>
+      <span class="heat-chip">High-danger: <b>${Math.round(hs.hdPct * 100)}%</b></span>
+      <span class="heat-chip">Point: <b>${Math.round(hs.pointPct * 100)}%</b></span>
+    </div>
+    <p class="small muted" style="margin:.55rem 0 0">${take} <span class="muted">(${hs.n} attempts tracked)</span></p>
+  </details>`;
+}
+function drawHeatMap(canvas, shots) {
+  if (!canvas) return;
+  const W = 420, H = 400;
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+  const X = (x) => 20 + (x / 100) * (W - 40);
+  const Y = (y) => 20 + ((y + 42.5) / 85) * (H - 40);
+  const bg = ctx.createRadialGradient(W / 2, H * 0.45, 40, W / 2, H / 2, 300);
+  bg.addColorStop(0, '#182747'); bg.addColorStop(0.6, '#101b31'); bg.addColorStop(1, '#0a1120');
+  ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+  // heat grid over shot density
+  const cell = 21, cols = Math.ceil(W / cell), rows = Math.ceil(H / cell);
+  const grid = Array.from({ length: rows }, () => new Array(cols).fill(0));
+  for (const s of shots) {
+    const c = Math.floor(X(s.x) / cell), r = Math.floor(Y(s.y) / cell);
+    if (grid[r] && grid[r][c] != null) grid[r][c]++;
+  }
+  let max = 1;
+  grid.forEach((row) => row.forEach((v) => { max = Math.max(max, v); }));
+  for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
+    const v = grid[r][c] / max;
+    if (!v) continue;
+    const hue = 190 - v * 165;
+    ctx.fillStyle = `hsla(${hue}, 95%, ${45 + v * 12}%, ${0.25 + v * 0.65})`;
+    ctx.fillRect(c * cell, r * cell, cell, cell);
+  }
+  // rink lines over the heat
+  const rinkL = X(0), rinkR = X(100), rinkT = Y(-42.5), rinkB = Y(42.5);
+  ctx.strokeStyle = 'rgba(235,242,255,0.9)'; ctx.lineWidth = 2.5;
+  ctx.strokeRect(rinkL, rinkT, rinkR - rinkL, rinkB - rinkT);
+  ctx.strokeStyle = '#3b82f6'; ctx.lineWidth = 5;
+  ctx.beginPath(); ctx.moveTo(X(25), rinkT); ctx.lineTo(X(25), rinkB); ctx.stroke();
+  ctx.strokeStyle = '#e5484d'; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.moveTo(X(89), rinkT); ctx.lineTo(X(89), rinkB); ctx.stroke();
+  ctx.strokeStyle = 'rgba(255,90,90,.55)'; ctx.lineWidth = 2;
+  for (const fy of [-22, 22]) { ctx.beginPath(); ctx.arc(X(69), Y(fy), 15 * ((W - 40) / 100), 0, Math.PI * 2); ctx.stroke(); }
+  ctx.save();
+  ctx.fillStyle = 'rgba(94,200,248,0.30)';
+  ctx.beginPath(); ctx.ellipse(X(89), Y(0), 6 * ((W - 40) / 100), 6 * ((W - 40) / 100) * 1.12, 0, -Math.PI / 2, Math.PI / 2);
+  ctx.closePath(); ctx.fill(); ctx.restore();
+  // slot / home-plate outline (gold dashed)
+  ctx.strokeStyle = '#e8a13d'; ctx.lineWidth = 2; ctx.setLineDash([7, 5]);
+  ctx.beginPath();
+  HOME_PLATE.forEach(([hx, hy], i) => { if (i === 0) ctx.moveTo(X(hx), Y(hy)); else ctx.lineTo(X(hx), Y(hy)); });
+  ctx.closePath(); ctx.stroke();
+  ctx.setLineDash([]);
+  // goals as stars
+  ctx.fillStyle = '#fff'; ctx.font = '13px system-ui'; ctx.textAlign = 'center';
+  for (const s of shots) if (s.goal) ctx.fillText('★', X(s.x), Y(s.y) + 4);
+}
 /* ---------------- goalie card ---------------- */
 async function openGoalie(goalieId, teamAbbrev, gameId) {
   const g = state.games.find((gg) => String(gg.id) === String(gameId));
