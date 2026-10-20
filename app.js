@@ -2014,7 +2014,8 @@ function heatMapSectionHtml(r) {
   return `<details class="rink-details heat-details">
     <summary class="sec-title" style="cursor:pointer"><span style="color:var(--gold)">Goal heat map</span> <span class="muted small">where his goals come from</span></summary>
     <canvas class="rink" id="heatCanvas" style="margin-top:.5rem"></canvas>
-    <div class="legend"><span>Brighter = more shots</span><span><span style="color:#fff">★</span> goal</span><span><span class="dot" style="border:2px dashed #e8a13d;background:none"></span>slot / home plate</span></div>
+    <div class="heat-ramp"></div>
+    <div class="legend"><span>Fewer shots</span><span><span style="color:#fff">★</span> goal</span><span><span class="dot" style="border:2px dashed #e8a13d;background:none"></span>slot / home plate</span><span>More shots</span></div>
     <div class="heat-chips">
       <span class="heat-chip slot">Slot: <b>${Math.round(hs.slotPct * 100)}%</b> of shots</span>
       <span class="heat-chip slot">Goals from slot: <b>${hs.slotGoals} of ${hs.goals}</b></span>
@@ -2034,22 +2035,42 @@ function drawHeatMap(canvas, shots) {
   const bg = ctx.createRadialGradient(W / 2, H * 0.45, 40, W / 2, H / 2, 300);
   bg.addColorStop(0, '#182747'); bg.addColorStop(0.6, '#101b31'); bg.addColorStop(1, '#0a1120');
   ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
-  // heat grid over shot density
-  const cell = 21, cols = Math.ceil(W / cell), rows = Math.ceil(H / cell);
-  const grid = Array.from({ length: rows }, () => new Array(cols).fill(0));
+  // smooth heat layer: accumulate soft intensity blobs offscreen, then
+  // colorize the alpha through a heat palette (blue -> teal -> green ->
+  // yellow -> orange -> red hot); low density stays faded/transparent
+  const off = document.createElement('canvas');
+  off.width = W; off.height = H;
+  const octx = off.getContext('2d');
   for (const s of shots) {
-    const c = Math.floor(X(s.x) / cell), r = Math.floor(Y(s.y) / cell);
-    if (grid[r] && grid[r][c] != null) grid[r][c]++;
+    const r = 26, cx = X(s.x), cy = Y(s.y);
+    const g = octx.createRadialGradient(cx, cy, 0, cx, cy, r);
+    g.addColorStop(0, 'rgba(0,0,0,0.55)');
+    g.addColorStop(0.4, 'rgba(0,0,0,0.28)');
+    g.addColorStop(1, 'rgba(0,0,0,0)');
+    octx.fillStyle = g;
+    octx.beginPath(); octx.arc(cx, cy, r, 0, Math.PI * 2); octx.fill();
   }
-  let max = 1;
-  grid.forEach((row) => row.forEach((v) => { max = Math.max(max, v); }));
-  for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
-    const v = grid[r][c] / max;
-    if (!v) continue;
-    const hue = 190 - v * 165;
-    ctx.fillStyle = `hsla(${hue}, 95%, ${45 + v * 12}%, ${0.25 + v * 0.65})`;
-    ctx.fillRect(c * cell, r * cell, cell, cell);
+  const img = octx.getImageData(0, 0, W, H), px = img.data;
+  const stops = [[0, [0, 0, 0, 0]], [0.10, [40, 64, 220, 90]], [0.30, [0, 180, 216, 140]], [0.50, [56, 217, 119, 175]], [0.68, [255, 214, 10, 205]], [0.85, [251, 133, 0, 230]], [1, [239, 35, 60, 245]]];
+  const lut = [];
+  for (let i = 0; i < 256; i++) {
+    const t = i / 255;
+    let c = stops[stops.length - 1][1];
+    for (let k = 1; k < stops.length; k++) {
+      if (t <= stops[k][0]) {
+        const [t0, c0] = stops[k - 1], [t1, c1] = stops[k], f = (t - t0) / (t1 - t0);
+        c = [0, 1, 2, 3].map((ch) => Math.round(c0[ch] + (c1[ch] - c0[ch]) * f));
+        break;
+      }
+    }
+    lut.push(c);
   }
+  for (let i = 0; i < px.length; i += 4) {
+    const c = lut[px[i + 3]];
+    px[i] = c[0]; px[i + 1] = c[1]; px[i + 2] = c[2]; px[i + 3] = c[3];
+  }
+  octx.putImageData(img, 0, 0);
+  ctx.drawImage(off, 0, 0);
   // rink lines over the heat
   const rinkL = X(0), rinkR = X(100), rinkT = Y(-42.5), rinkB = Y(42.5);
   ctx.strokeStyle = 'rgba(235,242,255,0.9)'; ctx.lineWidth = 2.5;
