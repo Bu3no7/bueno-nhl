@@ -943,3 +943,4 @@ tr.team-row:focus-visible { outline: 2px solid var(--teal); outline-offset: -2px
 .heat-chip { background: #101828; border: 1px solid #1e2a3f; border-radius: 999px; padding: .32rem .65rem; font-size: .78rem; }
 .heat-chip b { color: var(--teal); }
 .heat-chip.slot b { color: var(--gold); }
+.heat-ramp { height: 8px; border-radius: 4px; margin-top: .5rem; background: linear-gradient(90deg, rgba(40,64,220,0) 0%, #2840dc 15%, #00b4d8 35%, #38d977 55%, #ffd60a 75%, #fb8500 90%, #ef233c 100%); }
