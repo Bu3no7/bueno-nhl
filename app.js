@@ -2447,6 +2447,26 @@ const mktFilter = $('mktTeamFilter');
 if (mktFilter) mktFilter.addEventListener('change', (e) => applyTeamFilter(e.target.value));
 const mktKindFilter = $('mktKindFilter');
 if (mktKindFilter) mktKindFilter.addEventListener('change', (e) => setMarketKind(e.target.value));
+/* Collapsible header: the chevron in the brand bar hides the util bar
+   (date, picker, Share/Refresh) and the lab tab rows to reclaim vertical
+   space. The choice persists per device. */
+const headerToggle = $('headerToggle');
+function applyHeaderCollapsed(collapsed) {
+  const hdr = $('siteHeader');
+  if (!hdr) return;
+  hdr.classList.toggle('header-collapsed', !!collapsed);
+  if (headerToggle) {
+    headerToggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+    headerToggle.setAttribute('aria-label', collapsed ? 'Expand header' : 'Collapse header');
+  }
+}
+try { applyHeaderCollapsed(window.localStorage.getItem('buenoHeaderCollapsed') === '1'); } catch (e) { /* storage unavailable */ }
+if (headerToggle) headerToggle.addEventListener('click', () => {
+  const hdr = $('siteHeader');
+  const collapsed = !(hdr && hdr.classList.contains('header-collapsed'));
+  applyHeaderCollapsed(collapsed);
+  try { window.localStorage.setItem('buenoHeaderCollapsed', collapsed ? '1' : '0'); } catch (e) { /* ignore */ }
+});
 const stakeInput = $('parlayStake');
 if (stakeInput) stakeInput.addEventListener('input', renderParlayTotals);
 // book parlay calculator + vig checker (parlay view, below the leg builder)
