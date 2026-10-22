@@ -5,28 +5,225 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bueno Sports - NBA</title>
 <link rel="stylesheet" href="styles.css">
+<style>
+:root { --teal: #FF7A1A; --teal-wash: rgba(255,122,26,.08); }
+.hero-num { color: #FF7A1A !important; text-shadow: 0 0 16px rgba(255,122,26,.35); }
+.bnav-btn.active, .tab.active { color: #FF7A1A !important; }
+.nba-pts { font-size: 1.8rem; font-weight: 800; color: #FF7A1A; min-width: 52px; }
+.nba-game-row { display: flex; align-items: center; gap: .5rem; padding: .45rem 0; border-bottom: 1px solid rgba(255,255,255,.06); }
+.nba-game-row:last-child { border-bottom: none; }
+.nba-game-row .tm { display: flex; align-items: center; gap: .4rem; flex: 1; min-width: 0; }
+.nba-game-row .sc { font-weight: 800; min-width: 2ch; text-align: right; }
+.nba-game-row .st { margin-left: auto; text-align: right; }
+.nba-face { width: 44px; height: 33px; object-fit: cover; object-position: top; border-radius: 6px; vertical-align: middle; }
+.live-dot { animation: pulse-dot 1.6s ease-in-out infinite; }
+</style>
 </head>
 <body>
-<div style="max-width:480px;margin:0 auto;padding:2rem 1rem;text-align:center">
-  <h2>Bueno Sports</h2>
-  <div class="sport-picker">
-    <select id="sportSelect" aria-label="Choose sport">
-      <option value="nhl">NHL</option>
-      <option value="mlb">MLB</option>
-      <option value="nfl">NFL</option>
-      <option value="nba" selected>NBA</option>
-      <option value="ufc">UFC</option>
-      <option value="soccer">Soccer</option>
-    </select>
+<div id="loadingBar" class="loading hidden"><span id="loadingText">Loading…</span></div>
+
+<section id="view-home" class="view active">
+  <div class="home-hero">
+    <h2>Bueno Sports</h2>
+    <div class="sport-picker">
+      <select id="sportSelect" aria-label="Choose sport">
+        <option value="nhl">NHL</option>
+        <option value="mlb">MLB</option>
+        <option value="nfl">NFL</option>
+        <option value="nba" selected>NBA</option>
+        <option value="ufc">UFC</option>
+        <option value="soccer">Soccer</option>
+      </select>
+    </div>
+    <p class="muted small">NBA scores, standings &amp; top performers · live data</p>
   </div>
-  <p class="muted" style="margin-top:2rem">NBA coming soon.</p>
-  <p><a href="index.html" style="color:var(--teal)">← Back to NHL</a></p>
-</div>
+  <div class="home-grid">
+    <div class="home-card" id="nbaGamesCard">
+      <h3>Tonight</h3>
+      <div id="nbaGamesBody"><p class="muted">Loading…</p></div>
+    </div>
+    <div class="home-card" id="nbaTopCard">
+      <h3>Top performers</h3>
+      <div id="nbaTopBody"><p class="muted">Loading…</p></div>
+    </div>
+    <div class="home-card" id="nbaStandingsCard">
+      <h3>Standings</h3>
+      <div id="nbaStandingsBody"><p class="muted">Loading…</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="view-lab" class="view">
+  <div class="tabs" role="tablist">
+    <button class="tab active" data-view="board" role="tab">Board</button>
+    <button class="tab" data-view="slate" role="tab">Slate</button>
+  </div>
+  <section id="nba-view-board" class="view active">
+    <div class="view-head"><div><p class="kicker">Tonight</p><h2>Player Board</h2></div></div>
+    <div class="table-wrap"><table id="nbaBoardTable">
+      <thead><tr><th>Player</th><th>Team</th><th class="num">MIN</th><th class="num">PTS</th><th class="num">REB</th><th class="num">AST</th></tr></thead>
+      <tbody id="nbaBoardBody"></tbody>
+    </table></div>
+  </section>
+  <section id="nba-view-slate" class="view">
+    <div class="view-head"><div><p class="kicker">Games</p><h2>Slate</h2></div></div>
+    <div id="nbaSlateBody"><p class="muted">Loading…</p></div>
+  </section>
+</section>
+
+<nav class="bottom-nav" aria-label="Main">
+  <button class="bnav-btn active" data-bnav="home"><span class="bnav-ico">⌂</span><span>Home</span></button>
+  <button class="bnav-btn" data-bnav="lab"><span class="bnav-ico">🧪</span><span>NBA Lab</span></button>
+</nav>
+
 <script>
 document.getElementById('sportSelect').addEventListener('change', (e) => {
   const v = e.target.value;
   window.location.href = v === 'nhl' ? 'index.html' : v + '.html';
 });
+// Bottom nav
+document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('[data-bnav]').forEach(x => x.classList.remove('active'));
+  b.classList.add('active');
+  document.getElementById('view-home').classList.toggle('active', b.dataset.bnav === 'home');
+  document.getElementById('view-lab').classList.toggle('active', b.dataset.bnav === 'lab');
+}));
+// Lab tabs
+document.querySelectorAll('#view-lab .tab').forEach(t => t.addEventListener('click', () => {
+  document.querySelectorAll('#view-lab .tab').forEach(x => x.classList.remove('active'));
+  t.classList.add('active');
+  ['board','slate'].forEach(v => {
+    document.getElementById('nba-view-'+v).classList.toggle('active', v === t.dataset.view);
+  });
+}));
+// Load NBA data (ESPN public API — keyless; logos + headshots from ESPN CDN)
+(async function() {
+  const $ = (id) => document.getElementById(id);
+  const gamesEl = $('nbaGamesBody'), topEl = $('nbaTopBody'),
+        standEl = $('nbaStandingsBody'), boardBody = $('nbaBoardBody'),
+        slateEl = $('nbaSlateBody');
+  const empty = (el, msg) => { if (el) el.innerHTML = '<p class="muted">' + msg + '</p>'; };
+  const API = 'https://site.api.espn.com/apis/site/v2/sports/basketball/nba';
+  const LOGO_SLUG = { GS:'gs', NO:'no', NY:'ny', SA:'sa', UTAH:'utah', SAC:'sac', WSH:'wsh' };
+  const logoUrl = (abbr) => 'https://a.espncdn.com/i/teamlogos/nba/500/' +
+    (LOGO_SLUG[String(abbr || '').toUpperCase()] || String(abbr || '').toLowerCase()) + '.png';
+  const logoImg = (abbr, px) => '<img src="' + logoUrl(abbr) + '" alt="' + abbr + '" width="' + px + '" height="' + px + '" style="vertical-align:-4px">';
+  const faceImg = (id) => '<img class="nba-face" src="https://a.espncdn.com/i/headshots/nba/players/full/' + id + '.png" alt="" loading="lazy" onerror="this.style.display=\'none\'">';
+  const getJSON = async (url) => { const r = await fetch(url); if (!r.ok) throw new Error(r.status); return r.json(); };
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+  // Browser-local date: tonight's slate in the visitor's timezone
+  const now = new Date(), p2 = (n) => String(n).padStart(2, '0');
+  const ymd = now.getFullYear() + p2(now.getMonth() + 1) + p2(now.getDate());
+
+  // ---- standings (independent of the slate) ----
+  (async () => {
+    try {
+      const d = await getJSON('https://site.api.espn.com/apis/v2/sports/basketball/nba/standings');
+      const html = (d.children || []).map((conf) => {
+        const rows = (conf.standings.entries || []).map((e) => {
+          const st = {};
+          for (const s of e.stats || []) st[s.name] = s.displayValue;
+          return '<div class="nba-game-row"><span class="tm">' + logoImg(e.team.abbreviation, 20) + ' ' + esc(e.team.abbreviation) + '</span>' +
+            '<span class="muted small">' + (st.wins || '0') + '-' + (st.losses || '0') + '</span></div>';
+        }).join('');
+        return '<p class="kicker" style="margin:10px 0 2px">' + esc(conf.name || '') + '</p>' + rows;
+      }).join('');
+      standEl.innerHTML = html || '<p class="muted">Standings unavailable.</p>';
+    } catch (e) { empty(standEl, 'Standings unavailable.'); }
+  })();
+
+  // ---- tonight's games + player board ----
+  try {
+    const sb = await getJSON(API + '/scoreboard?dates=' + ymd);
+    const events = sb.events || [];
+    if (!events.length) {
+      empty(gamesEl, 'No NBA games today.');
+      empty(topEl, 'No games today.');
+      empty(slateEl, 'No NBA games today.');
+      if (boardBody) boardBody.innerHTML = '';
+      return;
+    }
+    const games = events.map((ev) => {
+      const comp = (ev.competitions || [])[0] || {};
+      const cs = comp.competitors || [];
+      const by = (ha) => cs.find((c) => c.homeAway === ha) || {};
+      const home = by('home'), away = by('away');
+      const st = ev.status || {};
+      const type = (st.type || {});
+      return {
+        id: ev.id, state: type.state || 'pre',
+        detail: type.shortDetail || '',
+        start: ev.date,
+        venue: (comp.venue || {}).fullName || '',
+        home: { abbr: (home.team || {}).abbreviation, name: (home.team || {}).displayName, score: home.score },
+        away: { abbr: (away.team || {}).abbreviation, name: (away.team || {}).displayName, score: away.score },
+      };
+    });
+    const teamRow = (t, other) => {
+      const played = t.score !== undefined && t.score !== '' && other.score !== undefined && other.score !== '';
+      return '<span class="tm">' + logoImg(t.abbr, 22) + ' ' + esc(t.abbr) + '</span>' +
+        '<span class="sc">' + (played ? esc(t.score) : '') + '</span>';
+    };
+    const gameRows = games.map((g) =>
+      '<div class="nba-game-row">' + teamRow(g.away, g.home) + teamRow(g.home, g.away) +
+      '<span class="st muted small">' + (g.state === 'in' ? '<span class="live-dot">●</span> ' : '') + esc(g.detail) + '</span></div>'
+    ).join('');
+    gamesEl.innerHTML = gameRows;
+    slateEl.innerHTML = games.map((g) =>
+      '<div class="nba-game-row"><span class="tm">' + logoImg(g.away.abbr, 24) + ' ' + esc(g.away.name || g.away.abbr) + ' @ ' + esc(g.home.name || g.home.abbr) + ' ' + logoImg(g.home.abbr, 24) + '</span>' +
+      '<span class="st muted small">' + esc(g.detail) + (g.venue ? ' · ' + esc(g.venue) : '') + '</span></div>'
+    ).join('');
+
+    // player board: box scores for games that have started
+    const started = games.filter((g) => g.state !== 'pre');
+    if (!started.length) {
+      empty(topEl, 'Tip-off hasn\'t happened yet — performers land here once games start.');
+      if (boardBody) boardBody.innerHTML = '';
+      return;
+    }
+    const players = [];
+    await Promise.all(started.map(async (g) => {
+      try {
+        const sum = await getJSON(API + '/summary?event=' + g.id);
+        for (const tp of (sum.boxscore || {}).players || []) {
+          const teamAbbr = (tp.team || {}).abbreviation || '';
+          const statBlock = (tp.statistics || [])[0] || {};
+          const labels = statBlock.labels || [];
+          const ix = (k) => labels.indexOf(k);
+          for (const a of statBlock.athletes || []) {
+            const s = a.stats || [];
+            if (!s.length) continue;
+            const pts = parseInt(s[ix('PTS')], 10);
+            if (!Number.isFinite(pts)) continue;
+            players.push({
+              id: (a.athlete || {}).id,
+              name: (a.athlete || {}).displayName || '',
+              team: teamAbbr,
+              min: s[ix('MIN')] || '',
+              pts, reb: parseInt(s[ix('REB')], 10) || 0, ast: parseInt(s[ix('AST')], 10) || 0,
+              game: g.away.abbr + ' @ ' + g.home.abbr,
+            });
+          }
+        }
+      } catch (e) { /* skip game */ }
+    }));
+    players.sort((a, b) => b.pts - a.pts || b.reb - a.reb);
+    const tr = (r) =>
+      '<tr><td>' + faceImg(r.id) + ' ' + esc(r.name) + '</td>' +
+      '<td>' + logoImg(r.team, 20) + ' ' + esc(r.team) + '</td>' +
+      '<td class="num">' + esc(r.min) + '</td>' +
+      '<td class="num nba-pts">' + r.pts + '</td>' +
+      '<td class="num">' + r.reb + '</td><td class="num">' + r.ast + '</td></tr>';
+    boardBody.innerHTML = players.map(tr).join('');
+    topEl.innerHTML = '<div class="table-wrap"><table><tbody>' + players.slice(0, 5).map(tr).join('') + '</tbody></table></div>';
+    if (!players.length) empty(topEl, 'No box scores yet.');
+  } catch (e) {
+    empty(gamesEl, "Couldn't load tonight's games.");
+    empty(topEl, "Couldn't load.");
+    empty(slateEl, "Couldn't load.");
+  }
+})();
 </script>
 </body>
 </html>
