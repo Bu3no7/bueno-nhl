@@ -18,7 +18,7 @@
 <div class="promo-ticker" aria-label="Announcement"><div class="promo-track" id="promoTrack"></div></div>
 <script>
 (function () {
-  var msgs = ['🏀 Hoops are live', 'NBA Section is open with daily updates'];
+  var msgs = ['Hoops are live', 'NBA Section is open with daily updates'];
   var seq = msgs.map(function (m) { return '<span>' + m + '</span>'; }).join('<span aria-hidden="true">•</span>');
   var half = seq + '<span aria-hidden="true">•</span>' + seq + '<span aria-hidden="true">•</span>' + seq + '<span aria-hidden="true">•</span>' + seq + '<span aria-hidden="true">•</span>';
   document.getElementById('promoTrack').innerHTML = half + half;
@@ -42,37 +42,37 @@
     </div>
     <div class="sport-grid">
       <a class="sport-card" href="/nhl.html">
-        <span class="sport-card-ico">🏒</span>
+        <span class="sport-card-ico"><img class="sport-card-logo" src="https://assets.nhle.com/logos/nhl/svg/NHL_light.svg" alt="" onerror="this.parentNode.textContent='🏒'"></span>
         <span class="sport-card-name">NHL</span>
         <span class="sport-card-line" id="landNhlLine">Loading tonight's slate…</span>
         <span class="sport-card-cta">Enter Center Ice →</span>
       </a>
       <a class="sport-card" href="/nba.html">
-        <span class="sport-card-ico">🏀</span>
+        <span class="sport-card-ico"><img class="sport-card-logo" src="https://a.espncdn.com/i/teamlogos/leagues/500/nba.png" alt="" onerror="this.parentNode.textContent='🏀'"></span>
         <span class="sport-card-name">NBA</span>
         <span class="sport-card-line" id="landNbaLine">Live scores, board &amp; standings</span>
         <span class="sport-card-cta">Open NBA →</span>
       </a>
       <a class="sport-card" href="/mlb.html">
-        <span class="sport-card-ico">⚾</span>
+        <span class="sport-card-ico"><img class="sport-card-logo" src="https://a.espncdn.com/i/teamlogos/leagues/500/mlb.png" alt="" onerror="this.parentNode.textContent='⚾'"></span>
         <span class="sport-card-name">MLB</span>
         <span class="sport-card-line" id="landMlbLine">Home-run probabilities</span>
         <span class="sport-card-cta">Open MLB →</span>
       </a>
       <a class="sport-card" href="/nfl.html">
-        <span class="sport-card-ico">🏈</span>
+        <span class="sport-card-ico"><img class="sport-card-logo" src="https://a.espncdn.com/i/teamlogos/leagues/500/nfl.png" alt="" onerror="this.parentNode.textContent='🏈'"></span>
         <span class="sport-card-name">NFL</span>
         <span class="sport-card-line" id="landNflLine">Scores &amp; standings</span>
         <span class="sport-card-cta">Open NFL →</span>
       </a>
       <a class="sport-card" href="/ufc.html">
-        <span class="sport-card-ico">🥊</span>
+        <span class="sport-card-ico"><img class="sport-card-logo logo-invert" src="https://a.espncdn.com/i/teamlogos/leagues/500/ufc.png" alt="" onerror="this.parentNode.textContent='🥊'"></span>
         <span class="sport-card-name">UFC</span>
         <span class="sport-card-line">Coming soon</span>
         <span class="sport-card-cta">Peek →</span>
       </a>
       <a class="sport-card" href="/soccer.html">
-        <span class="sport-card-ico">⚽</span>
+        <span class="sport-card-ico"><img class="sport-card-logo" src="https://a.espncdn.com/i/teamlogos/leagues/500/mls.png" alt="" onerror="this.parentNode.textContent='⚽'"></span>
         <span class="sport-card-name">Soccer</span>
         <span class="sport-card-line">Coming soon</span>
         <span class="sport-card-cta">Peek →</span>
@@ -88,12 +88,12 @@
     <div class="home-card quicklinks-card">
       <h3>Quick links</h3>
       <div class="quicklinks">
-        <a class="qlink" href="/nhl.html">🏒 NHL</a>
-        <a class="qlink" href="/nba.html">🏀 NBA</a>
-        <a class="qlink" href="/mlb.html">⚾ MLB</a>
-        <a class="qlink" href="/nfl.html">🏈 NFL</a>
-        <a class="qlink" href="/ufc.html">🥊 UFC</a>
-        <a class="qlink" href="/soccer.html">⚽ Soccer</a>
+        <a class="qlink" href="/nhl.html"><img class="qlink-logo" src="https://assets.nhle.com/logos/nhl/svg/NHL_light.svg" alt="" onerror="this.remove()">NHL</a>
+        <a class="qlink" href="/nba.html"><img class="qlink-logo" src="https://a.espncdn.com/i/teamlogos/leagues/500/nba.png" alt="" onerror="this.remove()">NBA</a>
+        <a class="qlink" href="/mlb.html"><img class="qlink-logo" src="https://a.espncdn.com/i/teamlogos/leagues/500/mlb.png" alt="" onerror="this.remove()">MLB</a>
+        <a class="qlink" href="/nfl.html"><img class="qlink-logo" src="https://a.espncdn.com/i/teamlogos/leagues/500/nfl.png" alt="" onerror="this.remove()">NFL</a>
+        <a class="qlink" href="/ufc.html"><img class="qlink-logo logo-invert" src="https://a.espncdn.com/i/teamlogos/leagues/500/ufc.png" alt="" onerror="this.remove()">UFC</a>
+        <a class="qlink" href="/soccer.html"><img class="qlink-logo" src="https://a.espncdn.com/i/teamlogos/leagues/500/mls.png" alt="" onerror="this.remove()">Soccer</a>
       </div>
     </div>
     <div class="home-card contact-card" id="contactCard">
@@ -110,12 +110,10 @@
 
 <nav class="bottom-nav" aria-label="Main">
   <a class="bnav-btn active" href="index.html"><span class="bnav-ico">⌂</span><span>Home</span></a>
-  <a class="bnav-btn" href="nhl.html"><span class="bnav-ico">🏒</span><span>NHL</span></a>
-  <a class="bnav-btn" href="nba.html"><span class="bnav-ico">🏀</span><span>NBA</span></a>
-  <a class="bnav-btn" href="mlb.html"><span class="bnav-ico">⚾</span><span>MLB</span></a>
-  <a class="bnav-btn" href="nfl.html"><span class="bnav-ico">🏈</span><span>NFL</span></a>
+  <button class="bnav-btn" type="button" data-sports-menu><span class="bnav-ico">☰</span><span>Sports</span></button>
 </nav>
 
 <script src="landing.js"></script>
+<script src="sports-menu.js"></script>
 </body>
 </html>

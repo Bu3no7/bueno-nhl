@@ -1005,3 +1005,37 @@ tr.team-row:focus-visible { outline: 2px solid var(--teal); outline-offset: -2px
 .qlink:hover { border-color: var(--teal); color: var(--teal); }
 .contact-card { margin-top: .9rem; }
 .contact-line { font-size: 1rem; }
+
+/* ---------------- Official league logos + sports menu ---------------- */
+.sport-card-logo { height: 52px; width: auto; max-width: 92px; object-fit: contain; display: block; margin: 0 auto; }
+.qlink { display: inline-flex; align-items: center; gap: .45rem; }
+.qlink-logo { height: 20px; width: auto; max-width: 30px; object-fit: contain; }
+.logo-invert { filter: invert(1); }
+.sports-sheet { position: fixed; inset: 0; z-index: 600; }
+.sports-sheet[hidden] { display: none; }
+.sports-backdrop { position: absolute; inset: 0; background: rgba(2, 6, 12, .62); }
+.sports-panel {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  background: #0c1424; border-top: 1px solid var(--border);
+  border-radius: 18px 18px 0 0; padding: .6rem .9rem calc(.9rem + env(safe-area-inset-bottom));
+  max-width: 560px; margin: 0 auto;
+  animation: sports-up .18s ease-out;
+}
+@keyframes sports-up { from { transform: translateY(24px); opacity: .4; } to { transform: none; opacity: 1; } }
+.sports-head {
+  display: flex; align-items: center; justify-content: space-between;
+  font-weight: 800; font-size: 1rem; padding: .35rem .2rem .6rem;
+}
+.sports-close { background: none; border: none; color: var(--muted); font-size: 1.5rem; line-height: 1; cursor: pointer; padding: .1rem .4rem; }
+.sports-row {
+  display: flex; align-items: center; gap: .8rem;
+  padding: .6rem .5rem; border-radius: 12px;
+  color: var(--text); text-decoration: none;
+}
+.sports-row:active { background: #101a2c; }
+.sports-row.current { background: #101a2c; }
+.sports-ico { width: 44px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex: none; }
+.sports-ico img { max-height: 40px; max-width: 44px; object-fit: contain; }
+.sports-name { font-weight: 700; font-size: 1.02rem; flex: 1; }
+.sports-tag { color: var(--teal); font-size: .8rem; font-weight: 700; }
+.sports-arrow { color: var(--muted); font-size: 1.25rem; }
