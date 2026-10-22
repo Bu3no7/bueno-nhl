@@ -66,7 +66,74 @@
   <div id="errorBanner" class="error-banner hidden" role="alert"></div>
   <div id="loadingBar" class="loading hidden"><span id="loadingText">Loading…</span></div>
 
-  <section id="view-home" class="view active">
+  <section id="view-landing" class="view active">
+    <div class="home-hero">
+      <h2>Bueno Sports</h2>
+      <p class="muted small">Every sport. One model shop. Fair prices, graded nightly.</p>
+    </div>
+    <div class="sport-grid">
+      <button class="sport-card" id="landNhlCard" type="button">
+        <span class="sport-card-ico">🏒</span>
+        <span class="sport-card-name">NHL</span>
+        <span class="sport-card-line" id="landNhlLine">Loading tonight's slate…</span>
+        <span class="sport-card-cta">Enter Center Ice →</span>
+      </button>
+      <a class="sport-card" href="/nba.html">
+        <span class="sport-card-ico">🏀</span>
+        <span class="sport-card-name">NBA</span>
+        <span class="sport-card-line" id="landNbaLine">Live scores, board &amp; standings</span>
+        <span class="sport-card-cta">Open NBA →</span>
+      </a>
+      <a class="sport-card" href="/mlb.html">
+        <span class="sport-card-ico">⚾</span>
+        <span class="sport-card-name">MLB</span>
+        <span class="sport-card-line" id="landMlbLine">Home-run probabilities</span>
+        <span class="sport-card-cta">Open MLB →</span>
+      </a>
+      <a class="sport-card" href="/nfl.html">
+        <span class="sport-card-ico">🏈</span>
+        <span class="sport-card-name">NFL</span>
+        <span class="sport-card-line" id="landNflLine">Scores &amp; standings</span>
+        <span class="sport-card-cta">Open NFL →</span>
+      </a>
+      <a class="sport-card" href="/ufc.html">
+        <span class="sport-card-ico">🥊</span>
+        <span class="sport-card-name">UFC</span>
+        <span class="sport-card-line">Coming soon</span>
+        <span class="sport-card-cta">Peek →</span>
+      </a>
+      <a class="sport-card" href="/soccer.html">
+        <span class="sport-card-ico">⚽</span>
+        <span class="sport-card-name">Soccer</span>
+        <span class="sport-card-line">Coming soon</span>
+        <span class="sport-card-cta">Peek →</span>
+      </a>
+    </div>
+    <div class="home-card about-card" id="aboutCard">
+      <h3>About Bueno Sports</h3>
+      <p>Bueno Sports is a model shop, not a tip sheet. Every price on this site comes out of a statistical model we built and grade ourselves — anytime goals in the NHL, home runs in MLB, player props in the NBA — priced as fair, no-vig odds from live data.</p>
+      <p>The models run on free, public data (the NHL's own API, ESPN, the MLB Stats API) and weigh what actually moves a prop: form, ice time and line deployment, the matchup, the goalie or pitcher, and where a player does his damage on the ice. Two engines check each other — an exact analytical model and a correlated Monte Carlo simulation — so a number has to survive both before it makes the board.</p>
+      <p>The house rule is simple: <strong>backtest first, keep what wins.</strong> Every model is graded against real results, every night. Ideas that don't beat the version already live get dropped, however good they sound — and when the model is wrong, the miss stays on the record.</p>
+      <p class="muted small">Bueno Sports is a probabilities project, not betting advice. A fair price tells you what a prop is worth, not what will happen.</p>
+    </div>
+    <div class="home-card quicklinks-card">
+      <h3>Quick links</h3>
+      <div class="quicklinks">
+        <a class="qlink" href="/nba.html">🏀 NBA</a>
+        <a class="qlink" href="/mlb.html">⚾ MLB</a>
+        <a class="qlink" href="/nfl.html">🏈 NFL</a>
+        <a class="qlink" href="/ufc.html">🥊 UFC</a>
+        <a class="qlink" href="/soccer.html">⚽ Soccer</a>
+      </div>
+    </div>
+    <div class="home-card contact-card" id="contactCard">
+      <h3>Contact</h3>
+      <p>Questions, feedback, or a market you want us to price next? The Bueno Sports inbox is on its way.</p>
+      <p class="contact-line">📧 <span id="contactEmail" class="muted">Email coming soon</span></p>
+    </div>
+  </section>
+
+  <section id="view-home" class="view">
     <div class="home-hero">
       <img src="https://assets.nhle.com/logos/nhl/svg/NHL_light.svg" alt="NHL" class="home-nhl-logo">
       <h2>Bueno Sports</h2>
@@ -346,7 +413,8 @@
 </footer>
 
 <nav class="bottom-nav" aria-label="Main">
-  <button class="bnav-btn active" data-section="home" type="button"><span class="bnav-ico">⌂</span><span>Home</span></button>
+  <button class="bnav-btn active" data-section="landing" type="button"><span class="bnav-ico">⌂</span><span>Home</span></button>
+  <button class="bnav-btn" data-section="home" type="button"><span class="bnav-ico">🏒</span><span>Center Ice</span></button>
   <button class="bnav-btn" data-section="lab" type="button"><span class="bnav-ico">🧪</span><span>NHL Lab</span></button>
 </nav>
 
