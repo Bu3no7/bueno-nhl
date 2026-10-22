@@ -950,3 +950,17 @@ tr.team-row:focus-visible { outline: 2px solid var(--teal); outline-offset: -2px
 .zchip b { color: var(--teal); }
 .zchip.g b { color: var(--gold); }
 .outside-strip { margin-top: .55rem; text-align: center; font-size: .74rem; letter-spacing: .08em; color: var(--muted); background: #0d1524; border: 1px solid #1a2333; border-radius: 8px; padding: .45rem .5rem; }
+
+/* Market leaders board (Markets view) */
+.leaders-board { background: #0d1524; border: 1px solid #1a2333; border-radius: 12px; padding: .6rem .8rem .8rem; margin: .4rem 0 .9rem; }
+.leaders-board summary { cursor: pointer; font-weight: 700; font-size: .95rem; list-style: none; }
+.leaders-board summary::-webkit-details-marker { display: none; }
+.leaders-board summary::after { content: '▾'; float: right; color: var(--muted); }
+.leaders-board:not([open]) summary::after { content: '▸'; }
+.leaders-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: .7rem 1.2rem; margin-top: .6rem; }
+.leader-group h4 { margin: 0 0 .35rem; font-size: .78rem; letter-spacing: .06em; text-transform: uppercase; color: var(--teal); }
+.leader-row { display: flex; align-items: center; gap: .45rem; padding: .28rem 0; border-top: 1px solid rgba(255,255,255,.05); }
+.leader-rank { color: var(--muted); font-weight: 700; font-size: .8rem; width: 1em; text-align: center; }
+.leader-row .pname { flex: 1; min-width: 0; }
+.leader-row .pavatar { width: 34px; height: 34px; }
+.leader-val { white-space: nowrap; font-size: .88rem; }
