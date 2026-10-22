@@ -95,20 +95,73 @@ document.querySelectorAll('#view-lab .tab').forEach(t => t.addEventListener('cli
 }));
 // Load MLB data
 (async function() {
-  const picksEl = document.getElementById('mlbPicksBody');
+  const $ = (id) => document.getElementById(id);
+  const picksEl = $('mlbPicksBody'), boardBody = $('mlbBoardBody'),
+        longBody = $('mlbLongshotsBody'), slateBody = $('mlbSlateBody'),
+        standEl = $('mlbStandingsBody');
+  const empty = (el, msg) => { if (el) el.innerHTML = '<p class="muted">' + msg + '</p>'; };
+  // Team logos (ESPN CDN slug map)
+  const MLB_LOGO_SLUG = { ARI:'ari', ATL:'atl', BAL:'bal', BOS:'bos', CHC:'chc', CWS:'chw', CIN:'cin', CLE:'cle', COL:'col', DET:'det', HOU:'hou', KC:'kc', LAA:'laa', LAD:'lad', MIA:'mia', MIL:'mil', MIN:'min', NYY:'nyy', NYM:'nym', OAK:'ath', ATH:'ath', PHI:'phi', PIT:'pit', SD:'sd', SF:'sf', SEA:'sea', STL:'stl', TB:'tb', TEX:'tex', TOR:'tor', WSH:'wsh' };
+  const mlbLogo = (abbr) => { const s = MLB_LOGO_SLUG[String(abbr || '').toUpperCase()]; return s ? 'https://a.espncdn.com/i/teamlogos/mlb/500/' + s + '.png' : ''; };
+  const logoImg = (abbr, px) => mlbLogo(abbr)
+    ? '<img src="' + mlbLogo(abbr) + '" alt="' + abbr + '" width="' + px + '" height="' + px + '" style="vertical-align:-4px">'
+    : abbr;
   try {
-    const today = new Date().toISOString().slice(0,10);
+    // Local date, not UTC — a 6pm Phoenix game is "today" here, tomorrow in UTC
+    const now = new Date(), p2 = (n) => String(n).padStart(2, '0');
+    const today = now.getFullYear() + '-' + p2(now.getMonth() + 1) + '-' + p2(now.getDate());
     const games = await fetchMlbSchedule(today);
     if (!games.length) {
-      picksEl.innerHTML = '<p class="muted">No MLB games today.</p>';
-      document.getElementById('mlbStandingsBody').innerHTML = '<p class="muted">Offseason.</p>';
+      empty(picksEl, 'No MLB games today.');
+      empty(standEl, 'Offseason.');
+      if (boardBody) boardBody.innerHTML = '';
+      empty(longBody, 'No games today.');
+      empty(slateBody, 'No MLB games today.');
       return;
     }
-    picksEl.innerHTML = games.map(g =>
-      `<div class="mlb-game-head">${g.awayAbbr} @ ${g.homeAbbr}</div><p class="muted small">Probables: ${g.awayPitcher?.name||'TBD'} vs ${g.homePitcher?.name||'TBD'}</p>`
-    ).join('');
-    document.getElementById('mlbSlateBody').innerHTML = picksEl.innerHTML;
-  } catch(e) { picksEl.innerHTML = '<p class="muted">Couldn\'t load.</p>'; }
+    empty(standEl, 'Postseason — standings are final.');
+    const cache = new Map();
+    const getHitter = (id) => { const k = 'h' + id; if (!cache.has(k)) cache.set(k, fetchHitterStats(id)); return cache.get(k); };
+    const getPitcher = (id) => { const k = 'p' + id; if (!cache.has(k)) cache.set(k, fetchPitcherStats(id)); return cache.get(k); };
+    const rows = [], heads = [];
+    for (const g of games) {
+      const ab = g.away.abbr, hb = g.home.abbr;
+      const ap = g.away.probablePitcher, hp = g.home.probablePitcher;
+      heads.push(
+        '<div class="mlb-game-head">' + logoImg(ab, 22) + ' ' + ab + ' @ ' + hb + ' ' + logoImg(hb, 22) + '</div>' +
+        '<p class="muted small">Probables: ' + (ap ? ap.name : 'TBD') + ' vs ' + (hp ? hp.name : 'TBD') + '</p>'
+      );
+      for (const pair of [[g.away, g.home], [g.home, g.away]]) {
+        const team = pair[0], opp = pair[1];
+        if (!team.id) continue;
+        const roster = await fetchMlbRoster(team.id);
+        const bats = roster.filter((pl) => pl.pos !== 'P');
+        const oppPS = opp.probablePitcher ? await getPitcher(opp.probablePitcher.id) : null;
+        const priced = await Promise.all(bats.map(async (h) => {
+          const hs = await getHitter(h.id);
+          if (!hs || !(hs.pa > 0)) return null;
+          const r = priceHitter(hs, oppPS, 1.0, null); // neutral park, neutral lineup spot
+          return { name: h.name, team: team.abbr, pos: h.pos, pa: hs.pa, hr: hs.hr, p: r.p, fair: r.fair };
+        }));
+        for (const r of priced) if (r) rows.push(r);
+      }
+    }
+    rows.sort((a, b) => b.p - a.p);
+    const pct = (p) => (p * 100).toFixed(1) + '%';
+    const tr = (r) =>
+      '<tr><td>' + r.name + ' <span class="muted small">' + r.pos + ' · ' + r.hr + ' HR</span></td>' +
+      '<td>' + logoImg(r.team, 20) + ' ' + r.team + '</td>' +
+      '<td class="num mlb-hr-pct">' + pct(r.p) + '</td><td class="num">' + r.fair + '</td></tr>';
+    picksEl.innerHTML = heads.join('') +
+      '<p class="kicker" style="margin:12px 0 4px">Top HR picks</p>' +
+      '<div class="table-wrap"><table><tbody>' + rows.slice(0, 5).map(tr).join('') + '</tbody></table></div>';
+    boardBody.innerHTML = rows.map(tr).join('');
+    const longs = rows.filter((r) => /^\+\d+$/.test(r.fair) && parseInt(r.fair.slice(1), 10) >= 1000).slice(0, 5);
+    longBody.innerHTML = longs.length
+      ? '<div class="table-wrap"><table><tbody>' + longs.map(tr).join('') + '</tbody></table></div>'
+      : '<p class="muted">No +1000 or longer shots today.</p>';
+    slateBody.innerHTML = heads.join('');
+  } catch (e) { empty(picksEl, "Couldn't load."); }
 })();
 </script>
 </body>
