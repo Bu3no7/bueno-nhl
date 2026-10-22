@@ -6,8 +6,24 @@
 <title>Bueno Sports</title>
 <meta name="description" content="Bueno Sports: live NHL anytime-goal-scorer probabilities. Factor-based Poisson model, refreshed from official NHL data.">
 <link rel="stylesheet" href="styles.css">
+<style>
+/* Temporary promo ticker — remove this block + the .promo-ticker div to retire */
+.promo-ticker { overflow: hidden; background: linear-gradient(90deg, #b34d00, #FF7A1A, #b34d00); color: #fff; white-space: nowrap; }
+.promo-track { display: inline-block; padding: .38rem 0; font-weight: 700; font-size: .85rem; letter-spacing: .02em; animation: promo-scroll 22s linear infinite; will-change: transform; }
+.promo-track span { margin: 0 2.2rem; }
+@keyframes promo-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+</style>
 </head>
 <body>
+<div class="promo-ticker" aria-label="Announcement"><div class="promo-track" id="promoTrack"></div></div>
+<script>
+(function () {
+  var msgs = ['🏀 Hoops are live', 'NBA Section is open with daily updates'];
+  var seq = msgs.map(function (m) { return '<span>' + m + '</span>'; }).join('<span aria-hidden="true">•</span>');
+  var half = seq + '<span aria-hidden="true">•</span>' + seq + '<span aria-hidden="true">•</span>' + seq + '<span aria-hidden="true">•</span>' + seq + '<span aria-hidden="true">•</span>';
+  document.getElementById('promoTrack').innerHTML = half + half;
+})();
+</script>
 <header class="site-header">
   <div class="brand-bar">
     <div class="brand">
