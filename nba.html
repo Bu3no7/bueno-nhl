@@ -25,16 +25,6 @@
 <section id="view-home" class="view active">
   <div class="home-hero">
     <h2>Bueno Sports</h2>
-    <div class="sport-picker">
-      <select id="sportSelect" aria-label="Choose sport">
-        <option value="nhl">NHL</option>
-        <option value="mlb">MLB</option>
-        <option value="nfl">NFL</option>
-        <option value="nba" selected>NBA</option>
-        <option value="ufc">UFC</option>
-        <option value="soccer">Soccer</option>
-      </select>
-    </div>
     <p class="muted small">NBA scores, standings &amp; top performers · live data</p>
   </div>
   <div class="home-grid">
@@ -79,10 +69,6 @@
 </nav>
 
 <script>
-document.getElementById('sportSelect').addEventListener('change', (e) => {
-  const v = e.target.value;
-  window.location.href = v + '.html';
-});
 // Bottom nav
 document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click', () => {
   document.querySelectorAll('[data-bnav]').forEach(x => x.classList.remove('active'));
