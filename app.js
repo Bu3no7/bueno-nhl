@@ -1014,6 +1014,7 @@ function setMarketKind(kind) {
   } else {
     renderMarkets();
   }
+  renderLeaders();
 }
 /* Goals tab filters: player-name search + game dropdown. Both combine
    with each other and with the goal-type dropdown; they filter the
@@ -1564,6 +1565,51 @@ function renderMarkets() {
   }).join('');
   wrap.querySelectorAll('.pname').forEach((b) =>
     b.addEventListener('click', () => openPlayer(b.dataset.pid, b.dataset.gid)));
+}
+/* ---------------- market leaders board ----------------
+   Collapsible top-3 per market at the top of the Markets view: anytime
+   goal, brace, first goal, and the headline Poisson line for shots,
+   assists and points. Face cards + clickable names via pnameBtn. */
+function renderLeaders() {
+  const grid = $('leadersGrid');
+  if (!grid) return;
+  const sk = state.skaters || [];
+  if (!sk.length) {
+    grid.innerHTML = '<p class="muted small">Leaders load with the slate.</p>';
+    return;
+  }
+  const probVal = (pKey, fairKey) => (r) =>
+    `<strong>${pct1(r[pKey])}</strong> <span class="muted">${r[fairKey]}</span>`;
+  const groups = [
+    { title: 'Anytime goal', rows: sk.slice().sort((a, b) => b.p - a.p).slice(0, 3), val: probVal('p', 'fair') },
+    { title: 'Brace', rows: twoPlusProbs().slice(0, 3), val: probVal('tpP', 'tpFair') },
+    { title: 'First goal', rows: firstGoalProbs().slice(0, 3), val: probVal('fgP', 'fgFair') },
+  ];
+  for (const kind of ['shots', 'assists', 'points']) {
+    const line = MARKET_HEADLINE[kind];
+    const rows = sk.slice()
+      .sort((a, b) => marketOver(b, kind, line) - marketOver(a, kind, line))
+      .slice(0, 3);
+    groups.push({
+      title: `${MARKET_META[kind].label} o${line}`,
+      rows,
+      val: (r) => {
+        const m = (r.markets[kind] || []).find((x) => x.line === line);
+        return `<strong>${pct1(m ? m.over : 0)}</strong> <span class="muted">${m ? m.overFair : '–'}</span>`;
+      },
+    });
+  }
+  grid.innerHTML = groups.map((g) => `
+    <div class="leader-group">
+      <h4>${esc(g.title)}</h4>
+      ${g.rows.map((r, i) => `
+        <div class="leader-row">
+          <span class="leader-rank">${i + 1}</span>
+          ${pnameBtn(r)}
+          <span class="leader-val">${g.val(r)}</span>
+        </div>`).join('')}
+    </div>`).join('');
+  wirePnameClicks(grid);
 }
 /* ---------------- parlay builder ---------------- */
 function addParlayLeg(r, v) {
