@@ -1567,9 +1567,47 @@ function renderMarkets() {
     b.addEventListener('click', () => openPlayer(b.dataset.pid, b.dataset.gid)));
 }
 /* ---------------- market leaders board ----------------
-   Collapsible top-3 per market at the top of the Markets view: anytime
-   goal, brace, first goal, and the headline Poisson line for shots,
-   assists and points. Face cards + clickable names via pnameBtn. */
+   Collapsible leaders board at the top of the Markets view. Goals,
+   assists, points and shots show the league-wide CURRENT-SEASON top 3
+   (NHL leaders feed + NHL stats API); brace and first goal have no
+   official season leaderboard, so those two stay tonight's model top 3.
+   Rows matching tonight's slate get the full clickable player card via
+   pnameBtn; other season leaders render as static face cards. */
+const seasonLeadersState = { loaded: false, data: null };
+async function loadSeasonLeaders() {
+  if (seasonLeadersState.loaded) return seasonLeadersState.data;
+  const out = {};
+  try {
+    const d = await fetchJSON(`${API}/skater-stats-leaders/${SEASON}/2?categories=goals,assists,points&limit=3`);
+    for (const cat of ['goals', 'assists', 'points']) {
+      out[cat] = (d[cat] || []).map((r) => ({
+        pid: r.id,
+        name: `${(r.firstName || {}).default || ''} ${(r.lastName || {}).default || ''}`.trim(),
+        team: r.teamAbbrev, headshot: r.headshot, value: r.value,
+      }));
+    }
+  } catch (e) { /* season groups fall back to tonight's model rows */ }
+  try {
+    const sort = encodeURIComponent(JSON.stringify([{ property: 'shots', direction: 'DESC' }]));
+    const d2 = await fetchJSON(`/nhl-stats/skater/summary?limit=3&start=0&sort=${sort}&cayenneExp=seasonId%3D${SEASON}`);
+    out.shots = (d2.data || []).map((r) => ({
+      pid: r.playerId, name: r.skaterFullName,
+      team: String(r.teamAbbrevs || '').split(',').pop().trim(),
+      headshot: null, value: r.shots,
+    }));
+  } catch (e) { /* shots group falls back to tonight's model rows */ }
+  seasonLeadersState.loaded = true;
+  seasonLeadersState.data = out;
+  return out;
+}
+function leaderRowHtml(item, rank, valHtml) {
+  const match = (state.skaters || []).find((s) => String(s.pid) === String(item.pid));
+  if (match) {
+    return `<div class="leader-row"><span class="leader-rank">${rank}</span>${pnameBtn(match)}<span class="leader-val">${valHtml}</span></div>`;
+  }
+  const hs = item.headshot || headshotUrl(item.team, item.pid);
+  return `<div class="leader-row"><span class="leader-rank">${rank}</span><span class="pname-static"><img class="pavatar" src="${esc(hs)}" alt="" ${imgFallback}>${esc(item.name)} <span class="muted">${esc(item.team || '')}</span></span><span class="leader-val">${valHtml}</span></div>`;
+}
 function renderLeaders() {
   const grid = $('leadersGrid');
   if (!grid) return;
@@ -1578,36 +1616,50 @@ function renderLeaders() {
     grid.innerHTML = '<p class="muted small">Leaders load with the slate.</p>';
     return;
   }
+  if (!seasonLeadersState.loaded) {
+    loadSeasonLeaders().then(() => renderLeaders());
+  }
+  const season = seasonLeadersState.data || {};
   const probVal = (pKey, fairKey) => (r) =>
     `<strong>${pct1(r[pKey])}</strong> <span class="muted">${r[fairKey]}</span>`;
-  const groups = [
-    { title: 'Anytime goal', rows: sk.slice().sort((a, b) => b.p - a.p).slice(0, 3), val: probVal('p', 'fair') },
-    { title: 'Brace', rows: twoPlusProbs().slice(0, 3), val: probVal('tpP', 'tpFair') },
-    { title: 'First goal', rows: firstGoalProbs().slice(0, 3), val: probVal('fgP', 'fgFair') },
-  ];
-  for (const kind of ['shots', 'assists', 'points']) {
+  const seasonGroup = (title, cat, unit, fallbackRows, fallbackVal) => {
+    const rows = season[cat];
+    if (rows && rows.length) {
+      return { title: `${title} · season`, html: rows.map((it, i) =>
+        leaderRowHtml(it, i + 1, `<strong>${it.value}</strong> <span class="muted">${unit}</span>`)).join('') };
+    }
+    return { title: `${title} · season`, html: fallbackRows.map((r, i) =>
+      leaderRowHtml(r, i + 1, fallbackVal(r))).join('') };
+  };
+  const tonightGroup = (title, rows, val) => ({
+    title: `${title} · tonight`,
+    html: rows.map((r, i) => leaderRowHtml(r, i + 1, val(r))).join(''),
+  });
+  const atgRows = sk.slice().sort((a, b) => b.p - a.p).slice(0, 3);
+  const shotsLine = MARKET_HEADLINE.shots;
+  const shotsRows = sk.slice()
+    .sort((a, b) => marketOver(b, 'shots', shotsLine) - marketOver(a, 'shots', shotsLine))
+    .slice(0, 3);
+  const poissonVal = (kind) => (r) => {
     const line = MARKET_HEADLINE[kind];
-    const rows = sk.slice()
-      .sort((a, b) => marketOver(b, kind, line) - marketOver(a, kind, line))
-      .slice(0, 3);
-    groups.push({
-      title: `${MARKET_META[kind].label} o${line}`,
-      rows,
-      val: (r) => {
-        const m = (r.markets[kind] || []).find((x) => x.line === line);
-        return `<strong>${pct1(m ? m.over : 0)}</strong> <span class="muted">${m ? m.overFair : '–'}</span>`;
-      },
-    });
-  }
+    const m = (r.markets[kind] || []).find((x) => x.line === line);
+    return `<strong>${pct1(m ? m.over : 0)}</strong> <span class="muted">${m ? m.overFair : '–'}</span>`;
+  };
+  const shotsVal = poissonVal('shots');
+  const astRows = sk.slice().sort((a, b) => (b.apg || 0) - (a.apg || 0)).slice(0, 3);
+  const ptsRows = sk.slice().sort((a, b) => (b.ptspg || 0) - (a.ptspg || 0)).slice(0, 3);
+  const groups = [
+    seasonGroup('Goals', 'goals', 'G', atgRows, probVal('p', 'fair')),
+    tonightGroup('Brace', twoPlusProbs().slice(0, 3), probVal('tpP', 'tpFair')),
+    tonightGroup('First goal', firstGoalProbs().slice(0, 3), probVal('fgP', 'fgFair')),
+    seasonGroup('Shots', 'shots', 'SOG', shotsRows, shotsVal),
+    seasonGroup('Assists', 'assists', 'A', astRows, poissonVal('assists')),
+    seasonGroup('Points', 'points', 'P', ptsRows, poissonVal('points')),
+  ];
   grid.innerHTML = groups.map((g) => `
     <div class="leader-group">
       <h4>${esc(g.title)}</h4>
-      ${g.rows.map((r, i) => `
-        <div class="leader-row">
-          <span class="leader-rank">${i + 1}</span>
-          ${pnameBtn(r)}
-          <span class="leader-val">${g.val(r)}</span>
-        </div>`).join('')}
+      ${g.html}
     </div>`).join('');
   wirePnameClicks(grid);
 }
