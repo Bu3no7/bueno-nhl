@@ -68,6 +68,17 @@ a:hover { text-decoration: underline; }
 }
 .brand h1 { margin: 0; font-size: 1.2rem; font-weight: 800; letter-spacing: -.01em; }
 .tagline { margin: 0; font-size: .76rem; color: var(--muted); }
+.header-toggle {
+  margin-left: auto; background: none; border: 1px solid var(--border-soft);
+  border-radius: 8px; color: var(--muted); cursor: pointer;
+  width: 2rem; height: 2rem; font-size: 1rem; line-height: 1;
+  align-self: center; transition: transform .15s ease, color .12s ease;
+}
+.header-toggle:hover { color: var(--teal); }
+.site-header.header-collapsed .header-toggle { transform: rotate(-90deg); }
+.site-header.header-collapsed .util-bar,
+.site-header.header-collapsed .lab-nav { display: none; }
+.site-header.header-collapsed .brand-bar { padding-bottom: .55rem; }
 
 /* utility header: date + count left, refresh right */
 .util-bar {
