@@ -964,3 +964,5 @@ tr.team-row:focus-visible { outline: 2px solid var(--teal); outline-offset: -2px
 .leader-row .pname { flex: 1; min-width: 0; }
 .leader-row .pavatar { width: 34px; height: 34px; }
 .leader-val { white-space: nowrap; font-size: .88rem; }
+.leader-row .pname-static { display: flex; align-items: center; gap: .45rem; flex: 1; min-width: 0; font-weight: 600; font-size: .92rem; }
+.leader-row .pname-static .pavatar { width: 34px; height: 34px; border-radius: 50%; }
