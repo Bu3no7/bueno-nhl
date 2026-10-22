@@ -11,6 +11,13 @@
   status = 200
   force = true
 
+# NHL stats API (season leaderboards — shots etc.) through the same origin:
+[[redirects]]
+  from = "/nhl-stats/*"
+  to = "https://api.nhle.com/stats/rest/en/:splat"
+  status = 200
+  force = true
+
 # Keep internal docs off the live site:
 [[redirects]]
   from = "/MODEL.md"
