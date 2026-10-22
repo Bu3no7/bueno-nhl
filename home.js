@@ -36,9 +36,7 @@ function setSection(sec) {
   document.querySelectorAll('.bnav-btn').forEach((b) => b.classList.toggle('active', b.dataset.section === sec));
   const labNav = $('labNav');
   if (labNav) labNav.hidden = sec !== 'lab';
-  if (sec === 'landing') {
-    setView('landing');
-  } else if (sec === 'home') {
+  if (sec === 'home') {
     setView('home');
   } else {
     // NHL Lab: show the lab sub-view (default to markets)
@@ -347,65 +345,6 @@ function renderHome() {
   renderHomeStandings();
   renderPlayoffOdds();
 }
-/* ---- Landing (site-wide home): sport cards with live one-liners ---- */
-let landingFetched = false;
-async function renderLanding() {
-  const nhlLine = $('landNhlLine');
-  if (nhlLine) {
-    const games = state.games || [];
-    const skaters = (state.skaters || []).filter((s) => s.pos !== 'G' && s.p > 0);
-    if (games.length && skaters.length) {
-      const top = [...skaters].sort((a, b) => b.p - a.p)[0];
-      nhlLine.textContent = `${games.length} game${games.length === 1 ? '' : 's'} tonight · Top pick: ${top.name} ${Math.round(top.p * 100)}%`;
-    } else if (games.length) {
-      nhlLine.textContent = `${games.length} game${games.length === 1 ? '' : 's'} tonight`;
-    }
-  }
-  if (landingFetched) return;
-  landingFetched = true;
-  const setLine = (id, txt) => { const el = $(id); if (el && txt) el.textContent = txt; };
-  const today = new Date();
-  const ymd = (d) => `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
-  try { // NBA: games tonight
-    const r = await fetch(`https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=${ymd(today)}`);
-    const d = await r.json();
-    const n = (d.events || []).length;
-    if (n) setLine('landNbaLine', `${n} game${n === 1 ? '' : 's'} tonight · live board & standings`);
-  } catch (e) { /* keep default line */ }
-  try { // NFL: next game on the board
-    const r = await fetch('https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard');
-    const d = await r.json();
-    const ev = (d.events || [])[0];
-    if (ev) {
-      const t = new Date(ev.date);
-      const when = t.toLocaleDateString([], { weekday: 'short' }) + ' ' +
-        t.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
-      setLine('landNflLine', `${ev.shortName} · ${when}`);
-    }
-  } catch (e) { /* keep default line */ }
-  try { // MLB: today's game, else tomorrow's (World Series window)
-    const iso = (d) => d.toISOString().slice(0, 10);
-    let r = await fetch(`https://statsapi.mlb.com/api/v1/schedule?sportId=1&date=${iso(today)}`);
-    let d = await r.json();
-    let games = ((d.dates || [])[0] || {}).games || [];
-    let dayLabel = 'Today';
-    if (!games.length) {
-      const tm = new Date(today.getTime() + 86400000);
-      r = await fetch(`https://statsapi.mlb.com/api/v1/schedule?sportId=1&date=${iso(tm)}`);
-      d = await r.json();
-      games = ((d.dates || [])[0] || {}).games || [];
-      dayLabel = tm.toLocaleDateString([], { weekday: 'short' });
-    }
-    if (games.length) {
-      const g = games[0];
-      const t = new Date(g.gameDate);
-      const when = t.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
-      setLine('landMlbLine', `${g.teams.away.team.name} @ ${g.teams.home.team.name} · ${dayLabel} ${when}`);
-    }
-  } catch (e) { /* keep default line */ }
-}
-const landNhlCard = $('landNhlCard');
-if (landNhlCard) landNhlCard.addEventListener('click', () => setSection('home'));
 /* ---- Share: screenshot the current view ---- */
 function ensureHtml2Canvas(cb) {
   if (window.html2canvas) return cb();
@@ -449,6 +388,6 @@ if (_shareBtn) _shareBtn.addEventListener('click', shareCurrentView);
   if (!sel) return;
   sel.addEventListener('change', () => {
     const v = sel.value;
-    window.location.href = v === 'nhl' ? 'index.html' : v + '.html';
+    window.location.href = v + '.html';
   });
 })();

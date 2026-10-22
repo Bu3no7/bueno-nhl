@@ -68,7 +68,8 @@
 </section>
 
 <nav class="bottom-nav" aria-label="Main">
-  <button class="bnav-btn active" data-bnav="home"><span class="bnav-ico">⌂</span><span>Home</span></button>
+  <a class="bnav-btn" href="index.html"><span class="bnav-ico">⌂</span><span>Home</span></a>
+  <button class="bnav-btn active" data-bnav="home"><span class="bnav-ico">⚾</span><span>MLB</span></button>
   <button class="bnav-btn" data-bnav="lab"><span class="bnav-ico">🧪</span><span>MLB Lab</span></button>
 </nav>
 
@@ -76,7 +77,7 @@
 <script>
 document.getElementById('sportSelect').addEventListener('change', (e) => {
   const v = e.target.value;
-  window.location.href = v === 'nhl' ? 'index.html' : v + '.html';
+  window.location.href = v + '.html';
 });
 // Bottom nav
 document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click', () => {

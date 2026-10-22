@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bueno Sports</title>
-<meta name="description" content="Bueno Sports: live NHL anytime-goal-scorer probabilities. Factor-based Poisson model, refreshed from official NHL data.">
+<meta name="description" content="Bueno Sports: model-priced probabilities across sports — NHL anytime goals, MLB home runs, NBA player props. Fair no-vig odds from live data, graded nightly.">
 <link rel="stylesheet" href="styles.css">
 <style>
 /* Temporary promo ticker — remove this block + the .promo-ticker div to retire */
@@ -24,60 +24,29 @@
   document.getElementById('promoTrack').innerHTML = half + half;
 })();
 </script>
-<header class="site-header" id="siteHeader">
+<header class="site-header">
   <div class="brand-bar">
     <div class="brand">
       <span class="brand-puck" aria-hidden="true">&#9679;</span>
       <h1>Bueno Sports</h1>
     </div>
-    <p class="tagline">NHL anytime-goal probabilities &middot; live data</p>
-    <button id="headerToggle" class="header-toggle" type="button" aria-label="Collapse header" aria-expanded="true">▾</button>
+    <p class="tagline">Every sport &middot; one model shop</p>
   </div>
-  <div class="util-bar">
-    <div class="util-left">
-      <span id="utilDate" class="util-date">—</span>
-      <span id="utilGames" class="util-games"></span>
-    </div>
-    <div class="util-right">
-      <input type="date" id="datePicker" value="2026-10-14" min="2026-10-01" max="2027-06-30" aria-label="Slate date">
-      <button id="shareBtn" class="refresh-link" title="Share a screenshot of this view">Share</button>
-      <button id="refreshBtn" class="refresh-link" title="Reload all data">Refresh</button>
-    </div>
-  </div>
-  <nav class="nav-groups lab-nav" id="labNav" aria-label="Sections" hidden>
-    <div class="nav-group">
-      <div class="nav-grid">
-        <button class="tab active" data-view="markets" role="tab">Markets</button>
-        <button class="tab" data-view="longshots" role="tab">Longshots</button>
-        <button class="tab" data-view="parlay" role="tab">Parlay</button>
-      </div>
-    </div>
-    <div class="nav-group">
-      <div class="nav-grid">
-        <button class="tab" data-view="slate" role="tab">Slate</button>
-        <button class="tab" data-view="goals" role="tab">Live</button>
-        <button class="tab" data-view="board" role="tab">Board</button>
-      </div>
-    </div>
-  </nav>
 </header>
 
 <main>
-  <div id="errorBanner" class="error-banner hidden" role="alert"></div>
-  <div id="loadingBar" class="loading hidden"><span id="loadingText">Loading…</span></div>
-
   <section id="view-landing" class="view active">
     <div class="home-hero">
       <h2>Bueno Sports</h2>
       <p class="muted small">Every sport. One model shop. Fair prices, graded nightly.</p>
     </div>
     <div class="sport-grid">
-      <button class="sport-card" id="landNhlCard" type="button">
+      <a class="sport-card" href="/nhl.html">
         <span class="sport-card-ico">🏒</span>
         <span class="sport-card-name">NHL</span>
         <span class="sport-card-line" id="landNhlLine">Loading tonight's slate…</span>
         <span class="sport-card-cta">Enter Center Ice →</span>
-      </button>
+      </a>
       <a class="sport-card" href="/nba.html">
         <span class="sport-card-ico">🏀</span>
         <span class="sport-card-name">NBA</span>
@@ -119,6 +88,7 @@
     <div class="home-card quicklinks-card">
       <h3>Quick links</h3>
       <div class="quicklinks">
+        <a class="qlink" href="/nhl.html">🏒 NHL</a>
         <a class="qlink" href="/nba.html">🏀 NBA</a>
         <a class="qlink" href="/mlb.html">⚾ MLB</a>
         <a class="qlink" href="/nfl.html">🏈 NFL</a>
@@ -132,316 +102,20 @@
       <p class="contact-line">📧 <span id="contactEmail" class="muted">Email coming soon</span></p>
     </div>
   </section>
-
-  <section id="view-home" class="view">
-    <div class="home-hero">
-      <img src="https://assets.nhle.com/logos/nhl/svg/NHL_light.svg" alt="NHL" class="home-nhl-logo">
-      <h2>Bueno Sports</h2>
-      <div class="sport-picker">
-        <select id="sportSelect" aria-label="Choose sport">
-          <option value="nhl" selected>NHL</option>
-          <option value="mlb">MLB</option>
-          <option value="nfl">NFL</option>
-          <option value="nba">NBA</option>
-          <option value="ufc">UFC</option>
-          <option value="soccer">Soccer</option>
-        </select>
-      </div>
-      <p class="muted small">NHL anytime-goal probabilities &middot; live data</p>
-    </div>
-    <div class="home-grid">
-      <div class="home-card" id="homePicksCard">
-        <h3>Top picks <span class="muted small">tap for player card</span></h3>
-        <div id="homePicksBody"><p class="muted">Loading…</p></div>
-      </div>
-      <div class="home-card" id="homeResultsCard">
-        <h3>Yesterday's results <span class="muted small">tap for player card</span></h3>
-        <div id="homeResultsBody"><p class="muted">Results post after last night's games.</p></div>
-      </div>
-      <div class="home-card" id="homeStandingsCard">
-        <h3>Standings <span class="muted small">tap a team for lineup</span></h3>
-        <div id="homeStandingsBody"><p class="muted">Loading…</p></div>
-      </div>
-      <div class="home-card" id="homeOddsCard">
-        <h3>Playoff odds <span class="po-preview-tag">Preview</span></h3>
-        <div id="homeOddsBody"><p class="muted">Loading…</p></div>
-      </div>
-    </div>
-  </section>
-
-  <section id="view-standings" class="view">
-    <div class="view-head">
-      <div>
-        <p class="kicker">Season</p>
-        <h2>Standings</h2>
-        <p class="view-sub muted">Live from the official NHL API. Tap a team for its lineup.</p>
-      </div>
-      <button class="ghost-btn" id="standingsBack" type="button">&larr; Home</button>
-    </div>
-    <div id="standingsBody"><p class="muted">Loading standings…</p></div>
-  </section>
-
-  <section id="view-teamlineup" class="view">
-    <div class="view-head">
-      <div>
-        <p class="kicker">Lineup</p>
-        <h2 id="teamLineupTitle">Team</h2>
-        <p class="view-sub muted">Estimated from ice time.</p>
-      </div>
-      <button class="ghost-btn" id="teamLineupBack" type="button">&larr; Standings</button>
-    </div>
-    <div id="teamLineupBody"><p class="muted">Loading…</p></div>
-  </section>
-
-  <section id="view-playoffodds" class="view">
-    <div class="view-head">
-      <div>
-        <p class="kicker">Season</p>
-        <h2>Playoff Odds</h2>
-        <p class="view-sub muted">Season simulation — coming soon.</p>
-      </div>
-      <button class="ghost-btn" id="oddsBack" type="button">&larr; Home</button>
-    </div>
-    <div id="oddsBody"><p class="muted">Loading…</p></div>
-  </section>
-
-  <section id="view-slate" class="view">
-    <div class="view-head">
-      <div>
-        <p class="kicker">Schedule</p>
-        <h2 id="slateTitle">Tonight's slate</h2>
-      </div>
-      <span id="autoRefreshNote" class="muted small">Auto-refreshes every 30s while open</span>
-    </div>
-    <div id="gamesGrid" class="games-grid"></div>
-  </section>
-
-  <section id="view-goals" class="view">
-    <div class="view-head">
-      <div>
-        <p class="kicker">Live</p>
-        <h2>Goal feed</h2>
-        <p class="view-sub muted">Every goal, as it happens. Auto-refreshes every 30s while open.</p>
-      </div>
-    </div>
-    <div id="goalsFeed"></div>
-  </section>
-
-  <section id="view-board" class="view">
-    <div class="view-head">
-      <div>
-        <p class="kicker">Model</p>
-        <h2>Projection board</h2>
-        <p class="view-sub muted">Every dressed skater, priced by the factor model.</p>
-      </div>
-      <div class="board-controls">
-        <label class="small muted">Sort
-          <select id="sortSelect">
-            <option value="prob">Probability</option>
-            <option value="name">Name</option>
-            <option value="team">Team</option>
-            <option value="zone">Zone score</option>
-          </select>
-        </label>
-        <label class="small muted">Team
-          <select id="teamFilter"><option value="">All teams</option></select>
-        </label>
-      </div>
-    </div>
-    <details class="finder" id="boardFinder">
-      <summary class="finder-toggle">Find players <span class="muted small">filter by what matters</span></summary>
-      <div class="finder-body">
-        <div class="factor">
-          <div class="factor-top"><span class="factor-name">Shooting Talent</span><span class="factor-val" data-f="shoot">15</span></div>
-          <input type="range" min="0" max="30" value="15" data-f="shoot">
-        </div>
-        <div class="factor">
-          <div class="factor-top"><span class="factor-name">Shot Volume</span><span class="factor-val" data-f="vol">15</span></div>
-          <input type="range" min="0" max="30" value="15" data-f="vol">
-        </div>
-        <div class="factor">
-          <div class="factor-top"><span class="factor-name">Power Play Role</span><span class="factor-val" data-f="pp">15</span></div>
-          <input type="range" min="0" max="30" value="15" data-f="pp">
-        </div>
-        <div class="factor">
-          <div class="factor-top"><span class="factor-name">Zone Score</span><span class="factor-val" data-f="zone">15</span></div>
-          <input type="range" min="0" max="30" value="15" data-f="zone">
-        </div>
-        <div class="factor">
-          <div class="factor-top"><span class="factor-name">Ice Time</span><span class="factor-val" data-f="toi">15</span></div>
-          <input type="range" min="0" max="30" value="15" data-f="toi">
-        </div>
-        <div class="finder-actions">
-          <button id="finderApply" class="apply-btn">Find Matches</button>
-          <button id="finderReset" class="refresh-link">Reset</button>
-        </div>
-      </div>
-    </details>
-    <div class="table-wrap">
-      <table id="boardTable">
-        <thead><tr>
-          <th data-sort="name">Skater</th><th>Team</th><th>Pos</th>
-          <th data-sort="prob" class="num">Prob</th><th class="num">Fair</th>
-          <th class="num">G/GP</th><th class="num">SOG/GP</th>
-          <th class="num">TOI</th><th data-sort="zone" class="num">Zone</th>
-        </tr></thead>
-        <tbody id="boardBody"></tbody>
-      </table>
-    </div>
-    <p class="muted small">Probabilities are model anytime-goal estimates..</p>
-  </section>
-
-  <section id="view-longshots" class="view">
-    <div class="view-head">
-      <div>
-        <p class="kicker">Value</p>
-        <h2>Longshots</h2>
-        <p class="view-sub muted">Model fair odds +1000 or longer.</p>
-      </div>
-    </div>
-    <div id="longshotsList" class="longshots-list"></div>
-  </section>
-
-  <section id="view-markets" class="view">
-    <div class="view-head">
-      <div>
-        <p class="kicker">Model</p>
-        <h2>Markets</h2>
-        <p id="marketsSub" class="view-sub muted">Ranked by model probability &middot; fair no-vig odds.</p>
-      </div>
-      <label class="small muted">Market
-        <select id="mktKindFilter">
-          <option value="atg" selected>Anytime goal</option>
-          <option value="twoplus">Brace</option>
-          <option value="firstgoal">First goal</option>
-          <option value="shots">Shots on goal</option>
-          <option value="assists">Assists</option>
-          <option value="points">Points</option>
-        </select>
-      </label>
-      <label class="small muted" id="mktTeamFilterWrap">Team
-        <select id="mktTeamFilter"><option value="">All teams</option></select>
-      </label>
-    </div>
-    <details id="leadersBoard" class="leaders-board" open>
-      <summary>🏆 Leaders <span class="muted small">top 3 · season leaders for goals, shots, assists &amp; points · tonight's model for brace &amp; first goal · tap a name for the full card</span></summary>
-      <div id="leadersGrid" class="leaders-grid"></div>
-    </details>
-    <div class="goal-filters" id="mktGoalFilters">
-      <input type="text" id="goalSearchInput" placeholder="Search players…" autocomplete="off" aria-label="Search players">
-      <select id="goalGameSelect" aria-label="Filter by game">
-        <option value="all">All games</option>
-      </select>
-      <button id="goalFilterClear" class="ghost-btn" type="button" title="Clear filters" aria-label="Clear filters">✕</button>
-    </div>
-    <div id="goalprobsWrap">
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Skater</th><th>Team</th><th class="num">Prob</th><th class="num">Fair</th></tr></thead>
-          <tbody id="goalprobsBody"></tbody>
-        </table>
-      </div>
-      <p class="muted small">Model goal probabilities with no-vig fair American odds..</p>
-    </div>
-    <div id="marketsWrap" class="hidden"></div>
-    <p class="muted small hidden" id="marketsNote">Over probabilities from each skater's Poisson rate (shots, assists, points per game). Tap a name for beat/miss snapshots..</p>
-    <div id="icebreakerSection" class="hidden">
-      <h3 class="mkt-title">Ice Breaker spotlight</h3>
-      <div id="iceSpotWrap" class="ib-spot-grid"></div>
-      <p class="muted small"><strong>Score:</strong> each player's first-goal chance in his game, weighted by how much scoring his game is expected to have versus tonight's slate average — tonight's top pick is 100.</p>
-      <p class="muted small">Method: each skater's share of their game's scoring rate, with a +25% opening-line premium for estimated L1 skaters and a small home-ice tilt, renormalized per game. The starter premium and home tilt are research-backed baselines — not validated absolute rates. Lines are estimated from ice time, never official..</p>
-    </div>
-  </section>
-
-  <section id="view-parlay" class="view">
-    <div class="view-head">
-      <div>
-        <p class="kicker">Bet slip</p>
-        <h2>Parlay builder</h2>
-        <p class="view-sub muted">Stack legs from any player card.</p>
-      </div>
-      <label class="small muted">Stake $
-        <input type="number" id="parlayStake" value="10" min="0" step="1">
-      </label>
-    </div>
-    <div id="parlayLegs"></div>
-    <div id="parlayTotals" style="margin-top:.8rem"></div>
-
-    <div class="calc-sep"></div>
-    <h3 class="calc-head">Book parlay</h3>
-    <p class="muted small">Enter the book's odds yourself — no player cards needed.</p>
-    <div id="bookLegs"></div>
-    <div class="calc-row">
-      <button class="ghost-btn" id="bookAddLeg" type="button">+ Add leg</button>
-      <label class="small muted">Stake $
-        <input type="number" id="bookStake" value="10" min="0" step="1">
-      </label>
-    </div>
-    <div id="bookTotals" style="margin-top:.8rem"></div>
-
-    <div class="calc-sep"></div>
-    <h3 class="calc-head">Vig checker</h3>
-    <p class="muted small">Two-sided market — see the book's margin and the no-vig fair odds.</p>
-    <div class="calc-row">
-      <label class="small muted">Side A
-        <input type="text" id="vigA" value="-110" inputmode="numeric" placeholder="-110">
-      </label>
-      <label class="small muted">Side B
-        <input type="text" id="vigB" value="-110" inputmode="numeric" placeholder="-110">
-      </label>
-    </div>
-    <div id="vigOut" style="margin-top:.8rem"></div>
-  </section>
 </main>
 
-<div id="playerModal" class="modal hidden" role="dialog" aria-modal="true">
-  <div class="modal-card">
-    <button id="modalClose" class="modal-close" aria-label="Close">&times;</button>
-    <div id="modalBody"></div>
-  </div>
-</div>
-
-<div id="matchupModal" class="modal hidden" role="dialog" aria-modal="true">
-  <div class="modal-card">
-    <button id="matchupClose" class="modal-close" aria-label="Close">&times;</button>
-    <div id="matchupBody"></div>
-  </div>
-</div>
-
 <footer class="site-footer">
-  <p class="muted small">Data: official NHL API (api-web.nhle.com), fetched live in your browser. No accounts, no tracking, no cookies. Not betting advice.</p>
+  <p class="muted small">Data: official NHL API, ESPN and the MLB Stats API, fetched live in your browser. No accounts, no tracking, no cookies. Not betting advice.</p>
 </footer>
 
 <nav class="bottom-nav" aria-label="Main">
-  <button class="bnav-btn active" data-section="landing" type="button"><span class="bnav-ico">⌂</span><span>Home</span></button>
-  <button class="bnav-btn" data-section="home" type="button"><span class="bnav-ico">🏒</span><span>Center Ice</span></button>
-  <button class="bnav-btn" data-section="lab" type="button"><span class="bnav-ico">🧪</span><span>NHL Lab</span></button>
+  <a class="bnav-btn active" href="index.html"><span class="bnav-ico">⌂</span><span>Home</span></a>
+  <a class="bnav-btn" href="nhl.html"><span class="bnav-ico">🏒</span><span>NHL</span></a>
+  <a class="bnav-btn" href="nba.html"><span class="bnav-ico">🏀</span><span>NBA</span></a>
+  <a class="bnav-btn" href="mlb.html"><span class="bnav-ico">⚾</span><span>MLB</span></a>
+  <a class="bnav-btn" href="nfl.html"><span class="bnav-ico">🏈</span><span>NFL</span></a>
 </nav>
 
-<script src="engine.js"></script>
-<script src="season-sim.js"></script>
-<script src="goalies.js"></script>
-<script src="app.js"></script>
-<script src="home.js"></script>
-<script src="goal-anim.js"></script>
-<!-- Goal animation takeover -->
-<div class="goal-takeover" id="goalTakeover" aria-hidden="true">
-  <div class="rink-phase" id="rinkPhase"><canvas id="rinkAnim" width="420" height="200"></canvas></div>
-  <div class="goal-phase" id="goalPhase">
-    <div class="goal-bg"></div>
-    <div class="goal-text">GOAL!</div>
-    <div id="goalTypeBadge"></div>
-    <div class="scorer-card">
-      <div class="scorer-num" id="goalScorerNum"></div>
-      <img id="goalScorerHs" src="" alt="">
-      <div><div class="scorer-name" id="goalScorerName"></div><div class="scorer-meta" id="goalScorerMeta"></div></div>
-    </div>
-    <div class="score-bug" id="goalScoreBug">
-      <img id="goalAwayLogo" src="" alt="" style="width:28px;height:28px;vertical-align:middle;">
-      <span id="goalScoreText"></span>
-      <img id="goalHomeLogo" src="" alt="" style="width:28px;height:28px;vertical-align:middle;">
-    </div>
-  </div>
-</div>
+<script src="landing.js"></script>
 </body>
 </html>

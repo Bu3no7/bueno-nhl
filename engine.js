@@ -2,7 +2,7 @@
 BUENO ENGINE — shared pure functions (no DOM, no localStorage, no globals)
 ----------------------------------------------------------------------------
 Used by BOTH:
-  - the browser site (index.html loads this before app.js; everything here
+  - the browser site (nhl.html loads this before app.js; everything here
     becomes a global for app.js), and
   - sims-runner/run.js in Node (via require('../engine.js')).
 

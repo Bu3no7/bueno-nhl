@@ -60,7 +60,7 @@ const state = {
   games: [],          // {id, away, home, awayId, homeId, state, startUTC, pbp}
   skaters: [],        // computed model rows
   playerCache: new Map(),
-  view: 'landing',
+  view: 'home',
   section: 'home',    // bottom-nav section: 'home' | 'lab'
   marketKind: 'atg',  // Markets tab: one market at a time — 'atg' | 'twoplus' | 'firstgoal' | 'shots' | 'assists' | 'points'
   goalSearch: '',     // Markets tab player-name search filter
@@ -2180,7 +2180,6 @@ function renderAll() {
   setMarketKind(state.marketKind);
   renderParlay();
   renderHome();
-  if (typeof renderLanding === 'function') renderLanding();
 }
 /* ---------------- two-tier live refresh ----------------
    Fast tier (15s): lightweight boxscore per live game (~13KB vs ~118KB pbp).
@@ -2361,8 +2360,7 @@ const LAB_VIEWS = ['markets', 'longshots', 'parlay', 'slate', 'goals', 'board'];
 function setView(v) {
   state.view = v;
   // Keep the section in sync with the view
-  if (v === 'landing') state.section = 'landing';
-  else if (HOME_VIEWS.includes(v)) state.section = 'home';
+  if (HOME_VIEWS.includes(v)) state.section = 'home';
   else if (LAB_VIEWS.includes(v)) state.section = 'lab';
   document.querySelectorAll('.bnav-btn').forEach((b) => b.classList.toggle('active', b.dataset.section === state.section));
   const labNav = $('labNav');
@@ -2371,7 +2369,6 @@ function setView(v) {
   document.querySelectorAll('.view').forEach((s) => s.classList.toggle('active', s.id === 'view-' + v));
   const arn = $('autoRefreshNote');
   if (arn) arn.style.visibility = v === 'slate' ? 'visible' : 'hidden';
-  if (v === 'landing' && typeof renderLanding === 'function') renderLanding();
   if (v === 'home') renderHome();
   if (v === 'standings') renderStandings();
   if (v === 'teamlineup') renderTeamLineup();
@@ -2404,7 +2401,7 @@ function startAutoRefresh() {
 document.querySelectorAll('.tab').forEach((t) =>
   t.addEventListener('click', () => setView(t.dataset.view)));
 // Bottom nav: Home / NHL Lab section switching
-document.querySelectorAll('.bnav-btn').forEach((b) =>
+document.querySelectorAll('.bnav-btn[data-section]').forEach((b) =>
   b.addEventListener('click', () => setSection(b.dataset.section)));
 // Back buttons
 const standingsBack = $('standingsBack');
@@ -2430,8 +2427,8 @@ document.addEventListener('keydown', (e) => {
   const tr = e.target.closest && e.target.closest('.team-row[data-team]');
   if (tr && tr.dataset.team) { e.preventDefault(); openTeamLineup(tr.dataset.team); }
 });
-// Landing is the default section on boot
-state.section = 'landing';
+// Center Ice is the default section on boot (site home lives on index.html)
+state.section = 'home';
 $('sortSelect').addEventListener('change', (e) => { state.sortBy = e.target.value; renderBoard(); });
 // Markets goal filters: live search + game dropdown (persist across market switches)
 const goalSearchInput = $('goalSearchInput');

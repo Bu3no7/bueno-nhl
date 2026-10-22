@@ -878,6 +878,7 @@ body { padding-bottom: 68px; }
   min-height: 56px;
 }
 .bnav-btn .bnav-ico { font-size: 1.35rem; line-height: 1; }
+a.bnav-btn { text-decoration: none; }
 .bnav-btn.active { color: var(--teal); }
 .bnav-btn:active { opacity: .7; }
 .lab-nav[hidden] { display: none; }
