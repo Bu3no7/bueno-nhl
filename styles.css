@@ -977,3 +977,30 @@ tr.team-row:focus-visible { outline: 2px solid var(--teal); outline-offset: -2px
 .leader-val { white-space: nowrap; font-size: .88rem; }
 .leader-row .pname-static { display: flex; align-items: center; gap: .45rem; flex: 1; min-width: 0; font-weight: 600; font-size: .92rem; }
 .leader-row .pname-static .pavatar { width: 34px; height: 34px; border-radius: 50%; }
+
+/* Landing (site-wide home) */
+.sport-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: .9rem; margin-top: .8rem; }
+.sport-card {
+  display: flex; flex-direction: column; gap: .3rem; text-align: left;
+  background: #0d1524; border: 1px solid #1a2333; border-radius: 12px;
+  padding: 1rem; cursor: pointer; color: var(--text); font-family: inherit;
+  text-decoration: none; transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease;
+  width: 100%; box-sizing: border-box;
+}
+.sport-card:hover { transform: translateY(-2px); border-color: var(--teal); box-shadow: 0 6px 22px rgba(58,219,227,.12); }
+.sport-card-ico { font-size: 1.6rem; }
+.sport-card-name { font-size: 1.15rem; font-weight: 800; letter-spacing: -.01em; }
+.sport-card-line { color: var(--muted); font-size: .85rem; }
+.sport-card-cta { color: var(--teal); font-weight: 700; font-size: .85rem; margin-top: .25rem; }
+.about-card { margin-top: .9rem; }
+.about-card p { line-height: 1.55; }
+.quicklinks-card { margin-top: .9rem; }
+.quicklinks { display: flex; flex-wrap: wrap; gap: .5rem; }
+.qlink {
+  background: #101a2c; border: 1px solid #1f2c44; border-radius: 999px;
+  padding: .45rem .9rem; color: var(--text); text-decoration: none;
+  font-weight: 600; font-size: .9rem;
+}
+.qlink:hover { border-color: var(--teal); color: var(--teal); }
+.contact-card { margin-top: .9rem; }
+.contact-line { font-size: 1rem; }
