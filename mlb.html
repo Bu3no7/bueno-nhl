@@ -70,7 +70,7 @@
 <nav class="bottom-nav" aria-label="Main">
   <a class="bnav-btn" href="index.html"><span class="bnav-ico">⌂</span><span>Home</span></a>
   <button class="bnav-btn active" data-bnav="home"><span class="bnav-ico">⚾</span><span>MLB</span></button>
-  <button class="bnav-btn" data-bnav="lab"><span class="bnav-ico">🧪</span><span>MLB Lab</span></button>
+  <button class="bnav-btn" data-bnav="lab"><span class="bnav-ico">🧢</span><span>The Dugout</span></button>
   <button class="bnav-btn" type="button" data-sports-menu><span class="bnav-ico">☰</span><span>Sports</span></button>
 </nav>
 
@@ -87,7 +87,7 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
   document.getElementById('view-home').classList.toggle('active', b.dataset.bnav === 'home');
   document.getElementById('view-lab').classList.toggle('active', b.dataset.bnav === 'lab');
 }));
-// Lab tabs
+// Dugout tabs
 document.querySelectorAll('#view-lab .tab').forEach(t => t.addEventListener('click', () => {
   document.querySelectorAll('#view-lab .tab').forEach(x => x.classList.remove('active'));
   t.classList.add('active');
