@@ -25,8 +25,8 @@
       } catch (e) { /* keep default */ }
     }
     setLine('landNhlLine', n
-      ? `${n} game${n === 1 ? '' : 's'} tonight · top picks, live board & the Lab`
-      : 'Top picks, live board & the Lab');
+      ? `${n} game${n === 1 ? '' : 's'} tonight · top picks, live board & Top Shelf`
+      : 'Top picks, live board & Top Shelf');
   })();
 
   // NBA: games tonight (ESPN scoreboard, browser-local date)

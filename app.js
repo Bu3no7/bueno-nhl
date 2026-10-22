@@ -2171,7 +2171,7 @@ async function openGoalie(goalieId, teamAbbrev, gameId) {
   drawGoalieRinks();
 }
 /* ---------------- views & refresh ---------------- */
-/* Home + NHL Lab code lives in home.js */
+/* Home + Top Shelf code lives in home.js */
 function renderAll() {
   renderSlate();
   renderGoals();
@@ -2400,7 +2400,7 @@ function startAutoRefresh() {
 /* ---------------- boot ---------------- */
 document.querySelectorAll('.tab').forEach((t) =>
   t.addEventListener('click', () => setView(t.dataset.view)));
-// Bottom nav: Home / NHL Lab section switching
+// Bottom nav: Home / Center Ice / Top Shelf section switching
 document.querySelectorAll('.bnav-btn[data-section]').forEach((b) =>
   b.addEventListener('click', () => setSection(b.dataset.section)));
 // Back buttons

@@ -1,4 +1,4 @@
-/* ================= Home + NHL Lab ================= */
+/* ================= Home + Top Shelf ================= */
 let nhlStandingsCache = null;
 let nhlStandingsCacheTime = 0;
 async function fetchStandings() {
@@ -39,7 +39,7 @@ function setSection(sec) {
   if (sec === 'home') {
     setView('home');
   } else {
-    // NHL Lab: show the lab sub-view (default to markets)
+    // Top Shelf: show the lab sub-view (default to markets)
     const labViews = ['markets', 'longshots', 'parlay', 'slate', 'goals', 'board'];
     setView(labViews.includes(state.view) ? state.view : 'markets');
   }
