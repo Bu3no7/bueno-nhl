@@ -9,18 +9,21 @@
 <style>
 /* ---- NHL mobile fit: tables sized for a phone screen ---- */
 @media (max-width: 600px) {
-  .table-wrap th, .table-wrap td { padding: .42rem .3rem; font-size: .8rem; }
+  .table-wrap th, .table-wrap td { padding: .4rem .22rem; font-size: .78rem; }
   td .pname img.pavatar { width: 26px; height: 26px; }
-  .prob-bar { min-width: 44px; }
+  .prob-bar { min-width: 36px; }
   /* Board: secondary rate columns live on the player card instead */
   #boardTable th:nth-child(3), #boardTable td:nth-child(3),
   #boardTable th:nth-child(6), #boardTable td:nth-child(6),
   #boardTable th:nth-child(7), #boardTable td:nth-child(7) { display: none; }
 }
+@media (max-width: 540px) {
+  /* Zone is the widest luxury column — drop it before it forces a scroll */
+  #boardTable th:nth-child(9), #boardTable td:nth-child(9) { display: none; }
+}
 @media (max-width: 420px) {
   /* Small phones: essentials only — Skater / Team / Prob / Fair */
-  #boardTable th:nth-child(8), #boardTable td:nth-child(8),
-  #boardTable th:nth-child(9), #boardTable td:nth-child(9) { display: none; }
+  #boardTable th:nth-child(8), #boardTable td:nth-child(8) { display: none; }
 }
 </style>
 </head>
