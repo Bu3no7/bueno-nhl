@@ -25,14 +25,14 @@
   /* Small phones: essentials only — Skater / Team / Prob / Fair */
   #boardTable th:nth-child(8), #boardTable td:nth-child(8) { display: none; }
 }
-/* ---- Yesterday's results: collapsible card, closed by default ---- */
-#homeResultsCard { padding: 0; }
-#homeResultsCard summary { list-style: none; cursor: pointer; padding: 1rem 1.1rem; font-size: 1rem; font-weight: 700; }
-#homeResultsCard summary::-webkit-details-marker { display: none; }
-#homeResultsCard summary::before { content: '▸ '; color: var(--teal); }
-#homeResultsCard[open] summary::before { content: '▾ '; }
-#homeResultsCard[open] summary { padding-bottom: .4rem; }
-#homeResultsBody { padding: 0 1.1rem 1rem; }
+/* ---- Collapsible home cards (Yesterday's results, Standings): closed by default ---- */
+.card-collapse { padding: 0; }
+.card-collapse summary { list-style: none; cursor: pointer; padding: 1rem 1.1rem; font-size: 1rem; font-weight: 700; }
+.card-collapse summary::-webkit-details-marker { display: none; }
+.card-collapse summary::before { content: '▸ '; color: var(--teal); }
+.card-collapse[open] summary::before { content: '▾ '; }
+.card-collapse[open] summary { padding-bottom: .4rem; }
+.card-collapse > div { padding: 0 1.1rem 1rem; }
 </style>
 </head>
 <body>
@@ -89,14 +89,14 @@
         <h3>Top picks <span class="muted small">tap for player card</span></h3>
         <div id="homePicksBody"><p class="muted">Loading…</p></div>
       </div>
-      <details class="home-card" id="homeResultsCard">
+      <details class="home-card card-collapse" id="homeResultsCard">
         <summary class="yday-summary">Yesterday's results <span class="muted small">tap to expand · tap a scorer for goal animation</span></summary>
         <div id="homeResultsBody"><p class="muted">Results post after last night's games.</p></div>
       </details>
-      <div class="home-card" id="homeStandingsCard">
-        <h3>Standings <span class="muted small">tap a team for lineup</span></h3>
+      <details class="home-card card-collapse" id="homeStandingsCard">
+        <summary>Standings <span class="muted small">tap to expand · tap a team for lineup</span></summary>
         <div id="homeStandingsBody"><p class="muted">Loading…</p></div>
-      </div>
+      </details>
       <div class="home-card" id="homeOddsCard">
         <h3>Playoff odds <span class="po-preview-tag">Preview</span></h3>
         <div id="homeOddsBody"><p class="muted">Loading…</p></div>

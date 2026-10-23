@@ -60,6 +60,14 @@
 .fb-mkt-line { font-weight: 800; color: var(--text); }
 .fb-mkt-over { color: #FF7A1A; font-weight: 700; }
 .fb-mkt-pct { color: #2dd4bf; font-weight: 800; }
+/* ---- collapsible cards (Standings): closed by default ---- */
+.fb-collapse { padding: 0; }
+.fb-collapse summary { list-style: none; cursor: pointer; margin: 0; padding: .9rem .95rem; }
+.fb-collapse summary::-webkit-details-marker { display: none; }
+.fb-collapse summary::after { content: '▸'; margin-left: auto; color: #FF7A1A; font-size: .85rem; }
+.fb-collapse[open ] summary::after { content: '▾'; }
+.fb-collapse[open ] summary { padding-bottom: .4rem; }
+.fb-collapse > div { padding: 0 .95rem .9rem; }
 .fb-mkt-table tbody tr.fb-prow { cursor: pointer; }
 .fb-ladder-row td { text-align: left !important; padding: .3rem .35rem .65rem; }
 .fb-ladder { display: flex; flex-wrap: wrap; gap: .35rem; }
@@ -92,10 +100,10 @@
       <h3 class="fb-sec-title">Top performers <span class="sub">tonight</span></h3>
       <div id="nbaTopBody"><p class="muted">Loading…</p></div>
     </div>
-    <div class="home-card" id="nbaStandingsCard">
-      <h3 class="fb-sec-title">Standings</h3>
+    <details class="home-card fb-collapse" id="nbaStandingsCard">
+      <summary class="fb-sec-title">Standings</summary>
       <div id="nbaStandingsBody"><p class="muted">Loading…</p></div>
-    </div>
+    </details>
   </div>
 </section>
 
