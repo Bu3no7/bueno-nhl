@@ -58,6 +58,13 @@
 .fb-mkt-table td, .fb-mkt-table th { font-variant-numeric: tabular-nums; }
 .fb-mkt-line { font-weight: 800; color: var(--text); }
 .fb-mkt-over { color: #FF7A1A; font-weight: 700; }
+/* ---- Fast Break header: segmented nav + slim heads ---- */
+.fb-seg { display: flex; background: #101a2c; border: 1px solid var(--border); border-radius: 12px; padding: 4px; gap: 4px; position: sticky; top: 0; z-index: 6; }
+.fb-seg button { flex: 1; border: none; background: transparent; color: var(--muted); font-family: inherit; font-weight: 800; font-size: .9rem; padding: .55rem 0; border-radius: 9px; cursor: pointer; }
+.fb-seg button.active { background: #FF7A1A; color: #131313; }
+.fb-slim-head { display: flex; align-items: baseline; gap: .5rem; margin: .85rem 0 .55rem; }
+.fb-slim-head h2 { font-size: 1.05rem; font-weight: 800; margin: 0; }
+.fb-slim-head .right { margin-left: auto; color: var(--muted); font-size: .75rem; font-weight: 600; }
 </style>
 </head>
 <body>
@@ -85,20 +92,20 @@
 </section>
 
 <section id="view-lab" class="view">
-  <div class="tabs" role="tablist">
-    <button class="tab active" data-view="board" role="tab">Board</button>
-    <button class="tab" data-view="markets" role="tab">Markets</button>
-    <button class="tab" data-view="slate" role="tab">Slate</button>
+  <div class="fb-seg" role="tablist">
+    <button class="active" data-view="board" role="tab" type="button">Board</button>
+    <button data-view="markets" role="tab" type="button">Markets</button>
+    <button data-view="slate" role="tab" type="button">Slate</button>
   </div>
   <section id="nba-view-board" class="view active">
-    <div class="view-head"><div><p class="kicker">Tonight</p><h2>Player Board</h2></div></div>
+    <div class="fb-slim-head"><h2>Player Board</h2><span class="right">Tonight · <span class="fb-slim-date"></span></span></div>
     <div class="table-wrap"><table id="nbaBoardTable">
       <thead><tr><th>Player</th><th class="num">MIN</th><th class="num">PTS</th><th class="num">REB</th><th class="num">AST</th></tr></thead>
       <tbody id="nbaBoardBody"></tbody>
     </table></div>
   </section>
   <section id="nba-view-markets" class="view">
-    <div class="view-head"><div><p class="kicker">Bueno engine · fair odds</p><h2>Markets</h2></div></div>
+    <div class="fb-slim-head"><h2>Markets</h2><span class="right">Bueno engine · fair odds</span></div>
     <p class="muted small" style="margin:.2rem 0 .6rem">Model fair lines from the engine — minutes × rates core, graded against DK's props; v2 role, opponent and game-environment layers on top. Prices are projections, not book odds.</p>
     <div id="nbaGradeLine" class="muted small" style="margin-bottom:.4rem"></div>
     <div class="fb-mkt-pills" id="nbaMktPills">
@@ -113,7 +120,7 @@
     </table></div>
   </section>
   <section id="nba-view-slate" class="view">
-    <div class="view-head"><div><p class="kicker">Games</p><h2>Slate</h2></div></div>
+    <div class="fb-slim-head"><h2>Slate</h2><span class="right">Tonight · <span class="fb-slim-date"></span></span></div>
     <div id="nbaSlateBody"><p class="muted">Loading…</p></div>
   </section>
 </section>
@@ -134,9 +141,9 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
   document.getElementById('view-home').classList.toggle('active', b.dataset.bnav === 'home');
   document.getElementById('view-lab').classList.toggle('active', b.dataset.bnav === 'lab');
 }));
-// Fast Break tabs
-document.querySelectorAll('#view-lab .tab').forEach(t => t.addEventListener('click', () => {
-  document.querySelectorAll('#view-lab .tab').forEach(x => x.classList.remove('active'));
+// Fast Break segmented nav
+document.querySelectorAll('#view-lab .fb-seg button').forEach(t => t.addEventListener('click', () => {
+  document.querySelectorAll('#view-lab .fb-seg button').forEach(x => x.classList.remove('active'));
   t.classList.add('active');
   ['board', 'markets', 'slate'].forEach(v => {
     document.getElementById('nba-view-' + v).classList.toggle('active', v === t.dataset.view);
@@ -179,6 +186,9 @@ document.querySelectorAll('#view-lab .tab').forEach(t => t.addEventListener('cli
   const ymdDash = now.getFullYear() + '-' + p2(now.getMonth() + 1) + '-' + p2(now.getDate());
   const dateLabel = $('nbaDateLabel');
   if (dateLabel) dateLabel.textContent = now.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
+  document.querySelectorAll('.fb-slim-date').forEach((el) => {
+    el.textContent = now.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
+  });
 
   let tonightGames = [];   // {id, state, detail, home:{id,abbr,name,score,record}, away:{...}}
   let standingsByTeamId = {}; // id -> {pa} from completed-season standings
