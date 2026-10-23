@@ -2412,7 +2412,7 @@ const oddsBack = $('oddsBack');
 if (oddsBack) oddsBack.addEventListener('click', () => setView('home'));
 // Home: pick rows open the player card
 document.addEventListener('click', (e) => {
-  const pr = e.target.closest('.pick-row[data-pid]');
+  const pr = e.target.closest('.hero-pick[data-pid]');
   if (pr && pr.dataset.pid) openPlayer(pr.dataset.pid, pr.dataset.gid);
 });
 // Home + standings + odds: team rows open the team lineup view
@@ -2422,7 +2422,7 @@ document.addEventListener('click', (e) => {
 });
 document.addEventListener('keydown', (e) => {
   if (e.key !== 'Enter' && e.key !== ' ') return;
-  const pr = e.target.closest && e.target.closest('.pick-row[data-pid]');
+  const pr = e.target.closest && e.target.closest('.hero-pick[data-pid]');
   if (pr && pr.dataset.pid) { e.preventDefault(); openPlayer(pr.dataset.pid, pr.dataset.gid); return; }
   const tr = e.target.closest && e.target.closest('.team-row[data-team]');
   if (tr && tr.dataset.team) { e.preventDefault(); openTeamLineup(tr.dataset.team); }

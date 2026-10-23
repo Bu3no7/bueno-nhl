@@ -1039,3 +1039,18 @@ tr.team-row:focus-visible { outline: 2px solid var(--teal); outline-offset: -2px
 .sports-name { font-weight: 700; font-size: 1.02rem; flex: 1; }
 .sports-tag { color: var(--teal); font-size: .8rem; font-weight: 700; }
 .sports-arrow { color: var(--muted); font-size: 1.25rem; }
+
+/* ---- Top picks as face cards (NBA-style presentation, hero % kept) ---- */
+.pick-cards { display: flex; gap: .6rem; overflow-x: auto; padding-bottom: .3rem; scrollbar-width: none; }
+.pick-cards::-webkit-scrollbar { display: none; }
+.pick-card { flex: none; width: 150px; background: var(--panel2); border: 1px solid var(--border); border-radius: 14px; padding: .85rem .7rem .75rem; text-align: center; cursor: pointer; }
+.pick-card:hover { border-color: var(--teal); }
+.pick-card:focus-visible { outline: 2px solid var(--teal); outline-offset: 1px; }
+.pick-card-num { font-size: 1.9rem; font-weight: 800; color: var(--teal); line-height: 1; text-shadow: 0 0 16px rgba(58,219,227,.35); font-variant-numeric: tabular-nums; margin-top: .5rem; }
+.pick-card-num small { font-size: .95rem; font-weight: 600; }
+.pick-card-head { width: 84px; height: 84px; border-radius: 50%; object-fit: cover; background: var(--panel); }
+.pick-card-name { font-weight: 700; font-size: 1rem; margin-top: .5rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pick-card-team { display: flex; align-items: center; justify-content: center; gap: .35rem; color: var(--muted); font-size: .8rem; margin-top: .2rem; }
+.pick-card-team img { width: 18px; height: 18px; }
+.pick-card-meta { color: var(--muted); font-size: .72rem; margin-top: .15rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pick-card .pick-fair { margin-top: .2rem; font-size: .82rem; font-weight: 700; }

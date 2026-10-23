@@ -54,18 +54,19 @@ function renderHomePicks() {
     return;
   }
   const top = [...skaters].sort((a, b) => b.p - a.p).slice(0, 5);
-  el.innerHTML = top.map((r) => {
+  el.innerHTML = `<div class="pick-cards">` + top.map((r) => {
     const g = state.games.find((gg) => String(gg.id) === String(r.gameId));
     const matchup = g ? `${g.away} @ ${g.home}` : esc(r.team);
     const pct = Math.round(r.p * 100);
-    return `<div class="pick-row hero-pick" data-pid="${r.pid}" data-gid="${r.gameId}" role="button" tabindex="0">
-      <div class="hero-num">${pct}<small>%</small></div>
-      <img class="pick-head" src="${esc(r.headshot || '')}" alt="" ${imgFallback}>
-      <div><div class="pick-name">${esc(r.name)}</div>
-      <div class="pick-meta">${esc(r.team)} · ${esc(matchup)} · ${r.goals}G</div>
-      <div class="pick-fair">${r.fair} fair</div></div>
+    return `<div class="pick-card hero-pick" data-pid="${r.pid}" data-gid="${r.gameId}" role="button" tabindex="0">
+      <img class="pick-card-head" src="${esc(r.headshot || '')}" alt="" ${imgFallback}>
+      <div class="pick-card-name">${esc(r.name)}</div>
+      <div class="pick-card-team"><img src="${teamLogoUrl(r.team)}" alt="">${esc(r.team)}</div>
+      <div class="pick-card-meta">${esc(matchup)} · ${r.goals}G</div>
+      <div class="pick-card-num">${pct}<small>%</small></div>
+      <div class="pick-fair">${r.fair} fair</div>
     </div>`;
-  }).join('');
+  }).join('') + `</div>`;
 }
 /* ---- Home: yesterday's results ---- */
 async function renderHomeResults() {
