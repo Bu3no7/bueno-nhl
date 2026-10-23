@@ -6,6 +6,23 @@
 <title>Bueno Sports · NHL</title>
 <meta name="description" content="Bueno Sports: live NHL anytime-goal-scorer probabilities. Factor-based Poisson model, refreshed from official NHL data.">
 <link rel="stylesheet" href="styles.css">
+<style>
+/* ---- NHL mobile fit: tables sized for a phone screen ---- */
+@media (max-width: 600px) {
+  .table-wrap th, .table-wrap td { padding: .42rem .3rem; font-size: .8rem; }
+  td .pname img.pavatar { width: 26px; height: 26px; }
+  .prob-bar { min-width: 44px; }
+  /* Board: secondary rate columns live on the player card instead */
+  #boardTable th:nth-child(3), #boardTable td:nth-child(3),
+  #boardTable th:nth-child(6), #boardTable td:nth-child(6),
+  #boardTable th:nth-child(7), #boardTable td:nth-child(7) { display: none; }
+}
+@media (max-width: 420px) {
+  /* Small phones: essentials only — Skater / Team / Prob / Fair */
+  #boardTable th:nth-child(8), #boardTable td:nth-child(8),
+  #boardTable th:nth-child(9), #boardTable td:nth-child(9) { display: none; }
+}
+</style>
 </head>
 <body>
 <header class="site-header" id="siteHeader">
