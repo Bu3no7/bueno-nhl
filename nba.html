@@ -283,15 +283,16 @@ document.querySelectorAll('#view-lab .fb-seg button').forEach(t => t.addEventLis
       '<span class="muted small" style="text-align:right">' + esc(g.detail) + (g.venue ? ' · ' + esc(g.venue) : '') + '</span></div>'
     ).join('');
 
-    // player board + top performers: box scores for games that have started
+    // player board + top performers: box scores for games that have started.
+    // NOTE: no early return here — the Markets wiring below must still run
+    // on days when no game has tipped yet.
     const started = tonightGames.filter((g) => g.state !== 'pre');
     if (!started.length) {
       empty(topEl, 'Tip-off hasn\'t happened yet — performers land here once games start.');
       if (boardBody) boardBody.innerHTML = '';
-      return;
     }
     const players = [];
-    await Promise.all(started.map(async (g) => {
+    if (started.length) await Promise.all(started.map(async (g) => {
       try {
         const sum = await getJSON(API + '/summary?event=' + g.id);
         for (const tp of (sum.boxscore || {}).players || []) {
@@ -315,6 +316,7 @@ document.querySelectorAll('#view-lab .fb-seg button').forEach(t => t.addEventLis
         }
       } catch (e) { /* skip game */ }
     }));
+    if (started.length) {
     players.sort((a, b) => b.pts - a.pts || b.reb - a.reb);
     const tr = (r, i) =>
       '<tr><td><span class="fb-bplayer"><img class="hs" src="' + headshot(r.id) + '" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">' +
@@ -329,7 +331,8 @@ document.querySelectorAll('#view-lab .fb-seg button').forEach(t => t.addEventLis
       '<div class="pteam"><img src="' + logoUrl(r.team) + '" alt="">' + esc(r.team) + '</div>' +
       '<div class="pstat">' + r.pts + ' PTS <small>· ' + r.reb + ' REB · ' + r.ast + ' AST</small></div></div>'
     ).join('') + '</div>';
-    if (!players.length) empty(topEl, 'No box scores yet.');
+    if (!players.length && started.length) empty(topEl, 'No box scores yet.');
+    }
   } catch (e) {
     empty(gamesEl, "Couldn't load tonight's games.");
     empty(topEl, "Couldn't load.");
