@@ -289,7 +289,7 @@ document.querySelectorAll('#view-lab .fb-seg button').forEach(t => t.addEventLis
     const started = tonightGames.filter((g) => g.state !== 'pre');
     if (!started.length) {
       empty(topEl, 'Tip-off hasn\'t happened yet — performers land here once games start.');
-      if (boardBody) boardBody.innerHTML = '';
+      if (boardBody) boardBody.innerHTML = '<tr><td colspan="5" class="muted">Tip-off hasn\'t happened yet — the board fills in once games start.</td></tr>';
     }
     const players = [];
     if (started.length) await Promise.all(started.map(async (g) => {
