@@ -58,6 +58,13 @@
 .fb-mkt-table td, .fb-mkt-table th { font-variant-numeric: tabular-nums; }
 .fb-mkt-line { font-weight: 800; color: var(--text); }
 .fb-mkt-over { color: #FF7A1A; font-weight: 700; }
+.fb-mkt-pct { color: #2dd4bf; font-weight: 800; }
+.fb-mkt-table tbody tr.fb-prow { cursor: pointer; }
+.fb-ladder-row td { text-align: left !important; padding: .3rem .35rem .65rem; }
+.fb-ladder { display: flex; flex-wrap: wrap; gap: .35rem; }
+.fb-chip { background: #101a2c; border: 1px solid var(--border); border-radius: 999px; padding: .28rem .65rem; font-size: .78rem; font-weight: 600; color: var(--muted); }
+.fb-chip b { color: var(--text); }
+.fb-chip .p { color: #2dd4bf; font-weight: 800; }
 /* ---- Fast Break header: segmented nav + slim heads ---- */
 .fb-seg { display: flex; background: #101a2c; border: 1px solid var(--border); border-radius: 12px; padding: 4px; gap: 4px; position: sticky; top: 0; z-index: 6; }
 .fb-seg button { flex: 1; border: none; background: transparent; color: var(--muted); font-family: inherit; font-weight: 800; font-size: .9rem; padding: .55rem 0; border-radius: 9px; cursor: pointer; }
@@ -115,9 +122,10 @@
       <button class="fb-mkt-pill" data-mkt="threes" type="button">Threes</button>
     </div>
     <div class="table-wrap"><table class="fb-mkt-table">
-      <thead><tr><th>Player</th><th class="num">MIN</th><th class="num">Proj</th><th class="num">Fair line</th><th class="num">Over</th><th class="num">Under</th></tr></thead>
-      <tbody id="nbaMktBody"><tr><td colspan="6" class="muted">Pricing tonight's slate…</td></tr></tbody>
+      <thead><tr><th>Player</th><th class="num">MIN</th><th class="num">Proj</th><th class="num">Fair line</th><th class="num">Over</th><th class="num">Hit %</th><th class="num">Under</th></tr></thead>
+      <tbody id="nbaMktBody"><tr><td colspan="7" class="muted">Pricing tonight's slate…</td></tr></tbody>
     </table></div>
+    <p class="muted small" style="margin-top:.4rem">Tap a player for milestone odds — the likelihood they clear each number. Hit % is the model's chance of going over the fair line.</p>
   </section>
   <section id="nba-view-slate" class="view">
     <div class="fb-slim-head"><h2>Slate</h2><span class="right">Tonight · <span class="fb-slim-date"></span></span></div>
@@ -236,7 +244,7 @@ document.querySelectorAll('#view-lab .fb-seg button').forEach(t => t.addEventLis
       empty(topEl, 'No games today.');
       empty(slateEl, 'No NBA games today.');
       if (boardBody) boardBody.innerHTML = '';
-      if (mktBody) mktBody.innerHTML = '<tr><td colspan="6" class="muted">No games today to price.</td></tr>';
+      if (mktBody) mktBody.innerHTML = '<tr><td colspan="7" class="muted">No games today to price.</td></tr>';
       return;
     }
     tonightGames = events.map((ev) => {
@@ -441,10 +449,14 @@ document.querySelectorAll('#view-lab .fb-seg button').forEach(t => t.addEventLis
       if (!season || !season.minutes) return null;
       const priced = nbaPricePlayer(season, { recentGames: job.recentGames, oppDefRtg: job.oppDefRtg, paceAdj: job.paceAdj });
       const mk = {};
+      const LADDERS = { points: [10, 15, 20, 25, 30, 35, 40], rebounds: [4, 6, 8, 10, 12, 15], assists: [3, 5, 7, 10, 12], threes: [1, 2, 3, 4, 5, 6] };
       for (const key of ['points', 'rebounds', 'assists', 'threes']) {
         const md = priced.markets[key];
         const pOver = nbaProbOver(md.dist, md.medianLine);
-        mk[key] = { mean: md.mean, line: md.medianLine, over: nbaFairOdds(pOver), under: nbaFairOdds(1 - pOver), pOver };
+        const ladder = (LADDERS[key] || [])
+          .map((t) => ({ t, p: nbaProbOver(md.dist, t - 0.5) }))
+          .filter((x) => x.p >= 0.02 && x.p <= 0.98);
+        mk[key] = { mean: md.mean, line: md.medianLine, over: nbaFairOdds(pOver), under: nbaFairOdds(1 - pOver), pOver, ladder };
       }
       return { id: job.pid, name: job.name, team: job.team, min: Math.round(priced.minutes), markets: mk };
     });
@@ -515,24 +527,35 @@ document.querySelectorAll('#view-lab .fb-seg button').forEach(t => t.addEventLis
   function renderMarkets() {
     if (!mktBody) return;
     if (!mktRows) {
-      mktBody.innerHTML = '<tr><td colspan="6" class="muted">Pricing tonight\'s slate…</td></tr>';
+      mktBody.innerHTML = '<tr><td colspan="7" class="muted">Pricing tonight\'s slate…</td></tr>';
       return;
     }
     if (!mktRows.length) {
-      mktBody.innerHTML = '<tr><td colspan="6" class="muted">No prices yet — check back closer to tip-off.</td></tr>';
+      mktBody.innerHTML = '<tr><td colspan="7" class="muted">No prices yet — check back closer to tip-off.</td></tr>';
       return;
     }
     const rows = [...mktRows].sort((a, b) => b.markets[mktCurrent].mean - a.markets[mktCurrent].mean).slice(0, 30);
+    const suffix = { points: 'PTS', rebounds: 'REB', assists: 'AST', threes: '3PM' }[mktCurrent];
     mktBody.innerHTML = rows.map((r) => {
       const m = r.markets[mktCurrent];
-      return '<tr><td><span class="fb-bplayer"><img class="hs" src="' + headshot(r.id) + '" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">' +
+      const chips = (m.ladder || []).map((x) =>
+        '<span class="fb-chip"><b>' + x.t + '+</b> ' + suffix + ' · <span class="p">' + Math.round(x.p * 100) + '%</span> · ' + nbaFairOdds(x.p) + '</span>'
+      ).join('');
+      return '<tr class="fb-prow" data-pid="' + r.id + '"><td><span class="fb-bplayer"><img class="hs" src="' + headshot(r.id) + '" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">' +
         '<span class="bn">' + esc(r.name) + '</span><img class="tl" src="' + logoUrl(r.team) + '" alt=""></span></td>' +
         '<td class="num">' + r.min + '</td>' +
         '<td class="num">' + m.mean + '</td>' +
         '<td class="num fb-mkt-line">' + m.line + '</td>' +
         '<td class="num fb-mkt-over">' + m.over + '</td>' +
-        '<td class="num">' + m.under + '</td></tr>';
+        '<td class="num fb-mkt-pct">' + Math.round(m.pOver * 100) + '%</td>' +
+        '<td class="num">' + m.under + '</td></tr>' +
+        '<tr class="fb-ladder-row" data-ladder="' + r.id + '" style="display:none"><td colspan="7"><div class="fb-ladder">' +
+        (chips || '<span class="muted small">No milestone range for this projection.</span>') + '</div></td></tr>';
     }).join('');
+    mktBody.querySelectorAll('tr.fb-prow').forEach((tr) => tr.addEventListener('click', () => {
+      const lad = mktBody.querySelector('tr[data-ladder="' + tr.dataset.pid + '"]');
+      if (lad) lad.style.display = lad.style.display === 'none' ? '' : 'none';
+    }));
   }
   document.querySelectorAll('#nbaMktPills .fb-mkt-pill').forEach((b) =>
     b.addEventListener('click', () => {
