@@ -1,6 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-<rect width="512" height="512" rx="110" fill="#0a101d"/>
-<circle cx="256" cy="256" r="225" fill="none" stroke="#FF7A1A" stroke-width="10"/>
-<text x="256" y="350" font-family="Arial, Helvetica, sans-serif" font-size="310" font-weight="bold" fill="#FF7A1A" text-anchor="middle">B</text>
-<circle cx="368" cy="378" r="28" fill="#2dd4bf"/>
+<rect width="512" height="512" fill="#0a101d"/>
+<polyline points="60,420 150,352 215,372 300,248 385,182 452,108" fill="none" stroke="#1E9E54" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="452" cy="108" r="26" fill="#4ADE80"/>
 </svg>
