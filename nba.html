@@ -241,10 +241,10 @@ details.pc-sec[open ] summary .chev { transform: rotate(90deg); }
     <p class="muted small" style="margin-top:.4rem">NBA scores, standings &amp; top performers · live data</p>
   </div>
   <div class="home-grid">
-    <div class="home-card" id="nbaGamesCard">
-      <h3 class="fb-sec-title">Tonight <span class="sub" id="nbaDateLabel"></span></h3>
+    <details class="home-card fb-collapse" id="nbaGamesCard">
+      <summary class="fb-sec-title">Tonight <span class="sub" id="nbaDateLabel"></span> <span class="sub" id="nbaTonightHint"></span></summary>
       <div id="nbaGamesBody"><p class="muted">Loading…</p></div>
-    </div>
+    </details>
     <div class="home-card" id="nbaTopCard">
       <h3 class="fb-sec-title">Top performers <span class="sub">tonight</span></h3>
       <div id="nbaTopBody"><p class="muted">Loading…</p></div>
@@ -459,6 +459,15 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
   }
 
   function renderTonight() {
+    const hintEl = $('nbaTonightHint');
+    if (hintEl) {
+      if (!tonightGames.length) hintEl.textContent = '';
+      else {
+        const live = tonightGames.filter((g) => g.state === 'in').length;
+        const fin = tonightGames.filter((g) => g.state === 'post').length;
+        hintEl.textContent = '· ' + tonightGames.length + ' games' + (live ? ' · ' + live + ' live' : '') + (fin ? ' · ' + fin + ' final' : '');
+      }
+    }
     if (!tonightGames.length) { empty(gamesEl, 'No NBA games today.'); return; }
     const gteam = (t, right) =>
       '<div class="fb-gteam' + (right ? ' right' : '') + '">' +
