@@ -186,6 +186,70 @@ details.sl-fold[open ] summary .chev { transform: rotate(90deg); }
 .lu-line { margin-left: auto; color: var(--muted); font-size: .76rem; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .lu-line b { color: var(--text); font-size: .86rem; }
 .gm-note { color: var(--muted); font-size: .78rem; line-height: 1.5; margin-top: .9rem; }
+/* ---- game sheet v2: collapsible live sections ---- */
+.gs-hint { margin-left: auto; text-transform: none; letter-spacing: 0; font-weight: 600; font-size: .74rem; color: var(--muted); }
+.gs-sec summary .chev { margin-left: .5rem; }
+.gf-wp-split { display: flex; align-items: center; gap: .55rem; margin: .2rem 0 .45rem; }
+.gf-wp-split img { width: 22px; height: 22px; }
+.gf-wp-pct { font-size: 1.15rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+.gf-wp-pct.a { color: #2dd4bf; }
+.gf-wp-pct.h { color: #FF7A1A; margin-left: auto; }
+.gf-wp-bar { flex: 1; display: flex; height: 8px; border-radius: 99px; overflow: hidden; background: var(--card2); }
+.gf-wp-bar .ba { background: #2dd4bf; }
+.gf-wp-bar .bh { background: #FF7A1A; }
+.gf-qrow { display: flex; justify-content: space-between; color: var(--muted); font-size: .68rem; font-weight: 700; margin-top: .2rem; }
+.gf-swing { border-top: 1px solid rgba(31,44,68,.6); margin-top: .6rem; padding-top: .55rem; }
+.gf-swing-l { color: var(--muted); font-size: .76rem; font-weight: 600; }
+.gf-swing-t { font-weight: 700; font-size: .9rem; margin: .2rem 0 .35rem; line-height: 1.4; }
+.gf-meta { color: var(--muted); font-size: .74rem; font-weight: 600; margin-right: .45rem; }
+.gf-chip { display: inline-block; border-radius: 999px; padding: .14rem .55rem; font-size: .7rem; font-weight: 800; background: rgba(255,122,26,.13); color: #ffb27a; border: 1px solid rgba(255,122,26,.4); }
+.gf-chip.teal { background: rgba(45,212,191,.12); color: #7ef0dd; border-color: rgba(45,212,191,.4); }
+.gf-court { background: #0a101d; border-radius: 12px; padding: .3rem .15rem .05rem; }
+.gf-this { font-size: .86rem; line-height: 1.5; margin-top: .55rem; }
+.gf-this b { color: #FF7A1A; }
+.gf-legend { color: var(--muted); font-size: .72rem; margin-top: .35rem; display: flex; justify-content: space-between; gap: .6rem; flex-wrap: wrap; }
+.gf-fgs { display: flex; flex-direction: column; gap: .35rem; margin-top: .55rem; }
+.gf-fg { background: var(--card2); border: 1px solid var(--border); border-radius: 999px; padding: .34rem .75rem; font-size: .8rem; font-weight: 700; }
+.gf-fg .tm { font-weight: 800; margin-right: .4rem; }
+.gf-fg .tm.a { color: #2dd4bf; }
+.gf-fg .tm.h { color: #FF7A1A; }
+.gf-kp-row { display: flex; gap: .55rem; overflow-x: auto; padding-bottom: .3rem; scrollbar-width: none; }
+.gf-kp-row::-webkit-scrollbar { display: none; }
+.gf-kp { flex: 0 0 188px; background: var(--card2); border: 1px solid var(--border); border-radius: 14px; padding: .65rem .75rem; cursor: pointer; }
+.gf-kp-top { display: flex; justify-content: space-between; color: var(--muted); font-size: .72rem; font-weight: 700; }
+.gf-kp-team { color: var(--text); font-weight: 800; }
+.gf-kp-type { font-size: .98rem; font-weight: 800; margin: .35rem 0 .4rem; }
+.gf-kp-player { display: flex; align-items: center; gap: .45rem; font-weight: 600; font-size: .84rem; min-height: 28px; }
+.gf-kp-player img { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; object-position: top; background: var(--card); }
+.gf-kp-bot { display: flex; align-items: center; justify-content: space-between; margin-top: .5rem; }
+.gf-kp-score { color: var(--muted); font-size: .72rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.gf-sc { padding: .6rem 0; cursor: pointer; }
+.gf-sc + .gf-sc { border-top: 1px solid rgba(31,44,68,.5); }
+.gf-sc-top { display: flex; justify-content: space-between; color: var(--muted); font-size: .7rem; font-weight: 700; margin-bottom: .35rem; }
+.gf-sc-main { display: flex; gap: .6rem; align-items: flex-start; }
+.gf-sc-main img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; object-position: top; background: var(--card2); flex: none; }
+.gf-sc-txt { flex: 1; min-width: 0; }
+.gf-sc-name { font-weight: 800; font-size: .9rem; }
+.gf-sc-team { color: #FF7A1A; font-size: .74rem; font-weight: 800; margin-left: .3rem; }
+.gf-sc-play { font-size: .82rem; line-height: 1.45; margin-top: .12rem; opacity: .92; }
+.gf-sc-sub { display: flex; align-items: center; gap: .5rem; color: var(--muted); font-size: .72rem; font-weight: 700; margin-top: .3rem; font-variant-numeric: tabular-nums; }
+.gf-sc-pts { font-size: 1.15rem; font-weight: 800; color: #2dd4bf; }
+table.gf-score { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+table.gf-score th { color: var(--muted); font-size: .74rem; font-weight: 700; padding: .25rem .15rem; text-align: right; }
+table.gf-score th:first-child { text-align: left; }
+table.gf-score td { padding: .45rem .15rem; text-align: right; font-size: .9rem; border-top: 1px solid rgba(31,44,68,.55); }
+table.gf-score td.tm { text-align: left; font-weight: 800; }
+table.gf-score td.tot { font-weight: 800; }
+.gf-ts-row { display: flex; align-items: center; gap: .6rem; padding: .3rem 0; }
+.gf-ts-v { width: 58px; font-weight: 700; font-size: .88rem; font-variant-numeric: tabular-nums; }
+.gf-ts-v.a { color: #2dd4bf; }
+.gf-ts-v.h { color: #FF7A1A; text-align: right; }
+.gf-ts-v.b { font-weight: 800; }
+.gf-ts-mid { flex: 1; }
+.gf-ts-label { text-align: center; color: var(--muted); font-size: .76rem; font-weight: 600; margin-bottom: .24rem; }
+.gf-ts-bar { display: flex; height: 5px; border-radius: 99px; overflow: hidden; background: rgba(31,44,68,.5); gap: 2px; }
+.gf-ts-bar .ba { background: #2dd4bf; border-radius: 99px; }
+.gf-ts-bar .bh { background: #FF7A1A; border-radius: 99px; }
 .pc-head { display: flex; gap: .9rem; align-items: center; padding-right: 1.6rem; }
 .pc-head img.hs { width: 86px; height: 86px; border-radius: 50%; object-fit: cover; object-position: top; background: var(--card2); flex: none; }
 .pc-head h3 { font-size: 1.3rem; font-weight: 800; line-height: 1.15; margin: 0; }
@@ -421,6 +485,7 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
   let lgPace = 100;
   let livePlayers = [];    // box-score rows for started games
   let liveByPid = {};      // pid -> live row
+  let liveFeedByGame = {}; // gid -> {plays, wp, statsA, statsH, linesA, linesH} from the same summary fetch
   let gamesLoaded = false;
   let gamesReadyResolve = null;
   const gamesReady = new Promise((r) => { gamesReadyResolve = r; });
@@ -530,6 +595,14 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
         // Verified coverage: trust this summary only if it actually
         // contains BOTH teams' box-score blocks for this game.
         if (!blockIds.includes(String(g.home.id)) || !blockIds.includes(String(g.away.id))) return;
+        if (Array.isArray(sum.plays) && sum.plays.length) {
+          const wpMap = {};
+          for (const w of sum.winprobability || []) wpMap[w.playId] = w.homeWinPercentage;
+          const statsOf = (tid) => { const tt = (((sum.boxscore || {}).teams) || []).find((x) => String((x.team || {}).id) === String(tid)); const o = {}; if (tt) for (const s of tt.statistics || []) o[s.name] = s.displayValue; return o; };
+          const comps = (((sum.header || {}).competitions || [])[0] || {}).competitors || [];
+          const linesOf = (ha) => { const c = comps.find((x) => x.homeAway === ha); return c ? (c.linescores || []).map((l) => l.displayValue) : []; };
+          liveFeedByGame[g.id] = { plays: sum.plays, wp: wpMap, statsA: statsOf(g.away.id), statsH: statsOf(g.home.id), linesA: linesOf('away'), linesH: linesOf('home') };
+        }
         for (const tp of blocks) {
           const teamAbbr = (tp.team || {}).abbreviation || '';
           const statBlock = (tp.statistics || [])[0] || {};
@@ -1234,6 +1307,117 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
     if (!lu) return null;
     return { confirmed: false, date: lu.date, starters: lu.starters, bench: lu.bench };
   }
+  const gmSecs = { lineups: true };
+  function gmSecHtml(key, title, hint, body) {
+    return '<details class="pc-sec gs-sec" data-sec="' + key + '"' + (gmSecs[key] ? ' open' : '') + '><summary>' + title +
+      (hint ? '<span class="gs-hint">' + esc(hint) + '</span>' : '') + '<span class="chev">›</span></summary><div class="pc-sec-body">' + body + '</div></details>';
+  }
+  function gmFeedSections(g) {
+    const feed = liveFeedByGame[g.id];
+    if (!feed || !feed.plays || !feed.plays.length) return '';
+    const plays = feed.plays, wpMap = feed.wp || {};
+    const homeId = String(g.home.id);
+    let lastWp = null; const series = []; const swingOf = {};
+    for (const p of plays) {
+      const w = wpMap[p.id] != null ? wpMap[p.id] : lastWp;
+      if (w != null) { if (lastWp != null) swingOf[p.id] = w - lastWp; series.push({ wp: w, period: (p.period || {}).number || 1 }); lastWp = w; }
+    }
+    const scorerOf = (p) => { const f = (p.participants || []).find((x) => x && x.athlete && x.athlete.id); return f ? String(f.athlete.id) : null; };
+    const nameOf = (p) => { const m = /^(.+?) (makes|misses)/.exec(p.text || ''); return m ? m[1] : ''; };
+    const teamOf = (p) => String((p.team || {}).id) === homeId ? g.home.abbr : g.away.abbr;
+    const chipOf = (d) => '<span class="gf-chip' + (d > 0 ? '' : ' teal') + '">' + esc(d > 0 ? g.home.abbr : g.away.abbr) + ' +' + Math.round(Math.abs(d) * 100) + '%</span>';
+    let out = '';
+    if (series.length > 4 && lastWp != null) {
+      const homePct = Math.round(lastWp * 100), awayPct = 100 - homePct;
+      const W = 340, H = 110, PAD = 6;
+      const px = (i) => (i / (series.length - 1)) * W;
+      const py = (w) => H - PAD - w * (H - 2 * PAD);
+      let line = ''; series.forEach((s, k) => { line += (k ? 'L' : 'M') + px(k).toFixed(1) + ' ' + py(s.wp).toFixed(1) + ' '; });
+      const area = line + 'L' + W + ' ' + H + ' L0 ' + H + ' Z';
+      const qb = [1, 2, 3].map((q) => { const k = series.findIndex((s) => s.period > q); return k > 0 ? px(k) : null; }).filter((x) => x != null);
+      let bigHtml = '';
+      const scoredPlays = plays.filter((p) => p.scoringPlay && swingOf[p.id] != null);
+      if (scoredPlays.length) {
+        const bp = scoredPlays.reduce((a, b) => Math.abs(swingOf[b.id]) > Math.abs(swingOf[a.id]) ? b : a);
+        bigHtml = '<div class="gf-swing"><div class="gf-swing-l">Biggest swing</div><div class="gf-swing-t">' + esc(bp.text || '') + '</div><span class="gf-meta">Q' + ((bp.period || {}).number || '') + ' ' + esc(((bp.clock || {}).displayValue) || '') + '</span>' + chipOf(swingOf[bp.id]) + '</div>';
+      }
+      out += gmSecHtml('wp', 'Win probability', g.home.abbr + ' ' + homePct + '%',
+        '<div class="gf-wp-split"><img src="' + logoUrl(g.away.abbr) + '" alt=""><span class="gf-wp-pct a">' + awayPct + '%</span>' +
+        '<div class="gf-wp-bar"><span class="ba" style="width:' + awayPct + '%"></span><span class="bh" style="width:' + homePct + '%"></span></div>' +
+        '<span class="gf-wp-pct h">' + homePct + '%</span><img src="' + logoUrl(g.home.abbr) + '" alt=""></div>' +
+        '<svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" preserveAspectRatio="none" style="display:block">' +
+        '<defs><linearGradient id="gfwpf" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FF7A1A" stop-opacity=".35"/><stop offset="100%" stop-color="#FF7A1A" stop-opacity="0"/></linearGradient></defs>' +
+        '<path d="' + area + '" fill="url(#gfwpf)"/><line x1="0" y1="' + py(0.5) + '" x2="' + W + '" y2="' + py(0.5) + '" stroke="#8fa1b8" stroke-width="1" stroke-dasharray="4 4" opacity=".5"/>' +
+        qb.map((x) => '<line x1="' + x + '" y1="0" x2="' + x + '" y2="' + H + '" stroke="#1f2c44" stroke-width="1"/>').join('') +
+        '<path d="' + line + '" fill="none" stroke="#FF7A1A" stroke-width="2"/>' +
+        '<circle cx="' + px(series.length - 1) + '" cy="' + py(lastWp) + '" r="3.6" fill="#fff" stroke="#FF7A1A" stroke-width="2"/></svg>' +
+        '<div class="gf-qrow"><span>Q1</span><span>Q2</span><span>Q3</span><span>Q4</span></div>' + bigHtml);
+    }
+    const shots = plays.filter((p) => p.shootingPlay && p.pointsAttempted >= 2 && p.coordinate && Math.abs(p.coordinate.x) < 1000 && Math.abs(p.coordinate.y) < 1000);
+    if (shots.length) {
+      const sx = (x) => x * 6, sy = (y) => 282 - (y + 5) * 6;
+      const n10 = Math.max(0, shots.length - 10);
+      let dots = '';
+      shots.forEach((p, i) => {
+        const home = String((p.team || {}).id) === homeId; const c = home ? '#FF7A1A' : '#2dd4bf';
+        const X = sx(p.coordinate.x), Y = sy(p.coordinate.y); const last = i === shots.length - 1; const recent = i >= n10;
+        const op = recent ? 0.3 + 0.7 * ((i - n10 + 1) / Math.max(1, shots.length - n10)) : 0.28;
+        if (p.scoreValue > 0) dots += '<circle cx="' + X + '" cy="' + Y + '" r="' + (last ? 4.4 : 3.1) + '" fill="' + c + '" fill-opacity="' + op.toFixed(2) + '"/>';
+        else { const r = 3.1; dots += '<path d="M' + (X - r) + ' ' + (Y - r) + ' L' + (X + r) + ' ' + (Y + r) + ' M' + (X + r) + ' ' + (Y - r) + ' L' + (X - r) + ' ' + (Y + r) + '" stroke="' + c + '" stroke-width="1.4" stroke-opacity="' + op.toFixed(2) + '"/>'; }
+        if (last) dots += '<circle cx="' + X + '" cy="' + Y + '" r="8" fill="none" stroke="#fff" stroke-width="1.6"/>';
+        if (recent) dots += '<text x="' + (X + 6.5) + '" y="' + (Y - 5.5) + '" fill="#8fa1b8" font-size="8.5" font-weight="700">' + (i - n10 + 1) + '</text>';
+      });
+      const lastShot = shots[shots.length - 1];
+      const fgChip = (abbr, st, cls) => '<span class="gf-fg"><span class="tm ' + cls + '">' + esc(abbr) + '</span>' + esc(st['fieldGoalsMade-fieldGoalsAttempted'] || '–') + ' FG · ' + esc(st['threePointFieldGoalsMade-threePointFieldGoalsAttempted'] || '–') + ' 3PT</span>';
+      out += gmSecHtml('shots', 'Shot chart', shots.length + ' attempts',
+        '<div class="gf-court"><svg viewBox="0 0 300 282" width="100%" style="display:block">' +
+        '<rect x="3" y="3" width="294" height="276" rx="6" fill="none" stroke="#2a3a58" stroke-width="2"/>' +
+        '<rect x="102" y="168" width="96" height="114" fill="rgba(255,122,26,.07)" stroke="#2a3a58" stroke-width="2"/>' +
+        '<circle cx="150" cy="168" r="36" fill="none" stroke="#2a3a58" stroke-width="2"/>' +
+        '<path d="M21 282 L21 198 A142.5 142.5 0 0 1 279 198 L279 282" fill="none" stroke="#2a3a58" stroke-width="2"/>' +
+        '<circle cx="150" cy="250.5" r="13.5" fill="none" stroke="#FF7A1A" stroke-width="2"/>' + dots + '</svg></div>' +
+        '<p class="gf-this"><b>This shot:</b> ' + esc(lastShot.text || '') + '</p>' +
+        '<div class="gf-legend"><span>' + esc(g.away.abbr) + ' teal · ' + esc(g.home.abbr) + ' orange</span><span>● made · × missed · last 10 numbered</span></div>' +
+        '<div class="gf-fgs">' + fgChip(g.away.abbr, feed.statsA, 'a') + fgChip(g.home.abbr, feed.statsH, 'h') + '</div>');
+    }
+    const keyPlays = plays.filter((p) => p.scoringPlay && p.scoreValue > 0 && swingOf[p.id] != null)
+      .sort((a, b) => Math.abs(swingOf[b.id]) - Math.abs(swingOf[a.id])).slice(0, 6)
+      .sort((a, b) => plays.indexOf(b) - plays.indexOf(a));
+    if (keyPlays.length) {
+      const typeOf = (p) => { const t = (p.text || '').toLowerCase(); if (p.scoreValue === 3 || /three point/.test(t)) return '3-POINTER'; if (/tip/.test(t)) return 'TIP-IN'; if (/dunk/.test(t)) return 'DUNK'; if (/layup/.test(t)) return 'LAYUP'; if (/free throw/.test(t)) return 'FREE THROW'; if (/hook/.test(t)) return 'HOOK SHOT'; if (/fadeaway/.test(t)) return 'FADEAWAY'; return 'JUMPER'; };
+      out += gmSecHtml('key', 'Key plays', keyPlays.length + ' biggest swings',
+        '<div class="gf-kp-row">' + keyPlays.map((p) => { const pid = scorerOf(p);
+          return '<div class="gf-kp"' + (pid ? ' data-pid="' + pid + '"' : '') + '><div class="gf-kp-top"><span>Q' + ((p.period || {}).number || '') + ' ' + esc(((p.clock || {}).displayValue) || '') + '</span><span class="gf-kp-team">' + esc(teamOf(p)) + '</span></div>' +
+          '<div class="gf-kp-type">' + typeOf(p) + '</div>' +
+          '<div class="gf-kp-player">' + (pid ? '<img src="' + headshot(pid) + '" alt="" onerror="this.style.display=\'none\'">' : '') + '<span>' + esc(nameOf(p)) + '</span></div>' +
+          '<div class="gf-kp-bot"><span class="gf-kp-score">' + esc(g.away.abbr) + ' ' + p.awayScore + '–' + p.homeScore + ' ' + esc(g.home.abbr) + '</span>' + chipOf(swingOf[p.id]) + '</div></div>'; }).join('') + '</div>');
+    }
+    const scored = plays.filter((p) => p.scoringPlay && p.scoreValue > 0);
+    if (scored.length) {
+      const rows = scored.slice(-22).reverse().map((p) => { const pid = scorerOf(p); const d = swingOf[p.id];
+        if (pid && nameOf(p)) knownPlayers[pid] = { name: nameOf(p), team: teamOf(p) };
+        return '<div class="gf-sc"' + (pid ? ' data-pid="' + pid + '"' : '') + '><div class="gf-sc-top"><span>' + esc(g.away.abbr) + ' @ ' + esc(g.home.abbr) + '</span><span>Q' + ((p.period || {}).number || '') + ' ' + esc(((p.clock || {}).displayValue) || '') + '</span></div>' +
+        '<div class="gf-sc-main">' + (pid ? '<img src="' + headshot(pid) + '" alt="" onerror="this.style.display=\'none\'">' : '') +
+        '<div class="gf-sc-txt"><div class="gf-sc-name">' + esc(nameOf(p)) + '<span class="gf-sc-team">' + esc(teamOf(p)) + '</span></div>' +
+        '<div class="gf-sc-play">' + esc(p.text || '') + '</div>' +
+        '<div class="gf-sc-sub"><span>' + esc(g.away.abbr) + ' ' + p.awayScore + '–' + p.homeScore + ' ' + esc(g.home.abbr) + '</span>' + (d != null && Math.abs(d) >= 0.05 ? chipOf(d) : '') + '</div></div>' +
+        '<span class="gf-sc-pts">+' + p.scoreValue + '</span></div></div>'; }).join('');
+      out += gmSecHtml('feed', 'Scorers feed', 'newest first', rows);
+    }
+    if (feed.linesA.length && feed.linesH.length) {
+      const q = Math.max(feed.linesA.length, feed.linesH.length);
+      const head = Array.from({ length: q }, (_, i) => '<th>Q' + (i + 1) + '</th>').join('') + '<th>T</th>';
+      const rowOf = (abbr, lines, tot) => '<tr><td class="tm">' + esc(abbr) + '</td>' + lines.map((v) => '<td>' + esc(v) + '</td>').join('') + '<td class="tot">' + esc(tot == null ? '' : tot) + '</td></tr>';
+      out += gmSecHtml('scoring', 'Scoring', '', '<table class="gf-score"><tr><th></th>' + head + '</tr>' + rowOf(g.away.abbr, feed.linesA, g.away.score) + rowOf(g.home.abbr, feed.linesH, g.home.score) + '</table>');
+    }
+    const cfg = [['FG', 'fieldGoalsMade-fieldGoalsAttempted', 'made'], ['Field Goal %', 'fieldGoalPct', 'pct'], ['3PT', 'threePointFieldGoalsMade-threePointFieldGoalsAttempted', 'made'], ['Three Point %', 'threePointFieldGoalPct', 'pct'], ['FT', 'freeThrowsMade-freeThrowsAttempted', 'made'], ['Free Throw %', 'freeThrowPct', 'pct'], ['Rebounds', 'totalRebounds', 'num'], ['Offensive Rebounds', 'offensiveRebounds', 'num'], ['Defensive Rebounds', 'defensiveRebounds', 'num'], ['Assists', 'assists', 'num'], ['Steals', 'steals', 'num'], ['Blocks', 'blocks', 'num'], ['Turnovers', 'totalTurnovers', 'num']];
+    const bv = (disp, kind) => kind === 'made' ? parseFloat(String(disp).split('-')[0]) || 0 : parseFloat(disp) || 0;
+    const tsRows = cfg.map(([label, key, kind]) => { const a = feed.statsA[key], hh = feed.statsH[key]; if (a == null || hh == null) return '';
+      const av = bv(a, kind), hv = bv(hh, kind), tot = av + hv || 1;
+      return '<div class="gf-ts-row"><span class="gf-ts-v a">' + esc(a) + '</span><div class="gf-ts-mid"><div class="gf-ts-label">' + label + '</div><div class="gf-ts-bar"><span class="ba" style="width:' + (av / tot * 100) + '%"></span><span class="bh" style="width:' + (hv / tot * 100) + '%"></span></div></div><span class="gf-ts-v h">' + esc(hh) + '</span></div>'; }).join('');
+    if (tsRows) out += gmSecHtml('stats', 'Team stats', '', '<div class="gf-ts-row"><span class="gf-ts-v a b">' + esc(g.away.abbr) + '</span><div class="gf-ts-mid"></div><span class="gf-ts-v h b">' + esc(g.home.abbr) + '</span></div>' + tsRows);
+    return out;
+  }
   function renderGame() {
     if (!gmSheet || !gameOpenId) return;
     const g = tonightGames.find((x) => String(x.id) === String(gameOpenId));
@@ -1247,6 +1431,7 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
         : g.state === 'in' ? 'Live · ' + esc(g.detail || '') + ' · ' + esc(g.away.score || '0') + ' – ' + esc(g.home.score || '0')
         : 'Tips ' + new Date(g.start).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })) +
       (proj ? ' · Model: ' + esc(proj.fav === 'home' ? g.home.abbr : g.away.abbr) + ' ' + (proj.spread === 0 ? 'PK' : '−' + proj.spread) + ' · total ' + proj.total : '') + '</div></div>';
+    h += '<details class="pc-sec gs-sec" data-sec="lineups"' + (gmSecs.lineups ? ' open' : '') + '><summary>Lineups<span class="gs-hint">' + (started ? 'confirmed at tip' : 'projected') + '</span><span class="chev">›</span></summary><div class="pc-sec-body">';
     for (const side of ['away', 'home']) {
       const t = g[side];
       const lu = gmRowsFor(g, t);
@@ -1263,12 +1448,16 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
         (lu.starters.length ? lu.starters.map(rowHtml).join('') : '<p class="muted small">No starters listed yet.</p>');
       if (lu.bench.length) h += '<div class="gm-sec">Rotation</div>' + lu.bench.map(rowHtml).join('');
     }
+    h += '</div></details>';
+    if (started) h += gmFeedSections(g);
     if (!started) h += '<p class="gm-note">Projected lineups come from each team\'s most recent game. Confirmed starters replace them here at tip-off — and once the game is live, every row carries the player\'s real line.</p>';
     gmSheet.innerHTML = h;
     gmSheet.scrollTop = keepScroll;
     const cb = $('gmCloseBtn');
     if (cb) cb.addEventListener('click', closeGame);
     gmSheet.querySelectorAll('.lu-row').forEach((el) => el.addEventListener('click', () => openPlayerCard(el.dataset.pid)));
+    gmSheet.querySelectorAll('details.gs-sec').forEach((d) => d.addEventListener('toggle', () => { gmSecs[d.dataset.sec] = d.open; }));
+    gmSheet.querySelectorAll('.gf-kp[data-pid], .gf-sc[data-pid]').forEach((el) => el.addEventListener('click', () => openPlayerCard(el.dataset.pid)));
   }
   function openGame(gid) {
     gameOpenId = String(gid);
@@ -1276,6 +1465,7 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
     if (gmOverlay) gmOverlay.classList.add('open');
     if (gmSheet) gmSheet.scrollTop = 0;
     const g = tonightGames.find((x) => String(x.id) === String(gameOpenId));
+    if (g && g.state !== 'pre') fetchLivePlayers().then(() => { if (gameOpenId) renderGame(); });
     if (g && g.state === 'pre' && !gmLoading && (!lineupByTeamId[g.home.id] || !lineupByTeamId[g.away.id])) {
       gmLoading = true;
       Promise.all([g.away, g.home].map(async (t) => {
