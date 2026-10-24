@@ -15,36 +15,11 @@
 <meta name="description" content="Bueno Sports: model-priced probabilities across sports — NHL anytime goals, MLB home runs, NBA player props. Fair no-vig odds from live data, graded nightly.">
 <link rel="stylesheet" href="styles.css">
 <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&display=swap" rel="stylesheet">
-<style>
-/* Temporary promo ticker — remove this block + the .promo-ticker div to retire */
-.promo-ticker { overflow: hidden; background: linear-gradient(90deg, #b34d00, #FF7A1A, #b34d00); color: #fff; white-space: nowrap; }
-.promo-track { display: inline-block; padding: .38rem 0; font-weight: 700; font-size: .85rem; letter-spacing: .02em; animation: promo-scroll 22s linear infinite; will-change: transform; }
-.promo-track span { margin: 0 2.2rem; }
-@keyframes promo-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-/* Bueno Sports site logo: green Ascent + gold Alex Brush script with animated shine */
-.brand-logo { display: flex; align-items: center; gap: .55rem; text-decoration: none; }
-.brand-logo svg { width: 46px; height: 46px; flex: none; filter: drop-shadow(0 0 6px rgba(74,222,128,.7)); }
-.brand-logo .word { font-family: 'Alex Brush', cursive; font-size: 2.1rem; line-height: 1.1; margin: 0;
-  background: linear-gradient(105deg, #D4AF37 20%, #D4AF37 38%, #FFF8D6 48%, #FFFFFF 50%, #FFF8D6 52%, #D4AF37 62%, #D4AF37 80%);
-  background-size: 220% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent;
-  animation: bueno-shine 4s linear infinite, bueno-glow 2.6s ease-in-out infinite alternate; }
-@keyframes bueno-shine { 0% { background-position: 220% 0; } 100% { background-position: -220% 0; } }
-@keyframes bueno-glow { from { filter: drop-shadow(0 0 2px rgba(212,175,55,.35)); } to { filter: drop-shadow(0 0 8px rgba(212,175,55,.7)); } }
-</style>
 </head>
 <body>
-<div class="promo-ticker" aria-label="Announcement"><div class="promo-track" id="promoTrack"></div></div>
-<script>
-(function () {
-  var msgs = ['Hoops are live', 'NBA Section is open with daily updates'];
-  var seq = msgs.map(function (m) { return '<span>' + m + '</span>'; }).join('<span aria-hidden="true">•</span>');
-  var half = seq + '<span aria-hidden="true">•</span>' + seq + '<span aria-hidden="true">•</span>' + seq + '<span aria-hidden="true">•</span>' + seq + '<span aria-hidden="true">•</span>';
-  document.getElementById('promoTrack').innerHTML = half + half;
-})();
-</script>
 <header class="site-header">
   <div class="brand-bar">
-    <a class="brand-logo" href="index.html" aria-label="Bueno Sports home">
+    <a class="bueno-logo" href="index.html" aria-label="Bueno Sports home">
       <svg viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><polyline points="20,200 70,168 110,178 150,118 190,88 220,52" fill="none" stroke="#1E9E54" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/><circle cx="220" cy="52" r="13" fill="#4ADE80"/></svg>
       <h1 class="word">Bueno•Sports</h1>
     </a>

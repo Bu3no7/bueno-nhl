@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Alex+Brush&display=swap');
 /* Bueno Sports — dark + teal design language (matches the private Bueno NHL model). */
 
 :root {
@@ -1054,3 +1055,16 @@ tr.team-row:focus-visible { outline: 2px solid var(--teal); outline-offset: -2px
 .pick-card-team img { width: 18px; height: 18px; }
 .pick-card-meta { color: var(--muted); font-size: .72rem; margin-top: .15rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .pick-card .pick-fair { margin-top: .2rem; font-size: .82rem; font-weight: 700; }
+
+/* ---- Bueno Sports site logo (green Ascent + gold Alex Brush script, animated shine) ---- */
+.bueno-logo { display: flex; align-items: center; gap: .55rem; text-decoration: none; }
+.bueno-logo.center { justify-content: center; }
+.bueno-logo svg { width: 46px; height: 46px; flex: none; filter: drop-shadow(0 0 6px rgba(74,222,128,.7)); }
+.bueno-logo.sm svg { width: 36px; height: 36px; }
+.bueno-logo .word { font-family: 'Alex Brush', cursive; font-size: 2.1rem; line-height: 1.1; margin: 0;
+  background: linear-gradient(105deg, #D4AF37 20%, #D4AF37 38%, #FFF8D6 48%, #FFFFFF 50%, #FFF8D6 52%, #D4AF37 62%, #D4AF37 80%);
+  background-size: 220% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent;
+  animation: bueno-shine 4s linear infinite, bueno-glow 2.6s ease-in-out infinite alternate; }
+.bueno-logo.sm .word { font-size: 1.7rem; }
+@keyframes bueno-shine { 0% { background-position: 220% 0; } 100% { background-position: -220% 0; } }
+@keyframes bueno-glow { from { filter: drop-shadow(0 0 2px rgba(212,175,55,.35)); } to { filter: drop-shadow(0 0 8px rgba(212,175,55,.7)); } }
