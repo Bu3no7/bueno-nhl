@@ -451,6 +451,17 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
   const logoUrl = (abbr) => 'https://a.espncdn.com/i/teamlogos/nba/500/' +
     (LOGO_SLUG[String(abbr || '').toUpperCase()] || String(abbr || '').toLowerCase()) + '.png';
   const headshot = (id) => 'https://a.espncdn.com/i/headshots/nba/players/full/' + id + '.png';
+  function teamColorRgb(team) {
+    const parse = (h) => { if (!h) return null; const s = String(h).replace('#', ''); if (!/^[0-9a-fA-F]{6}$/.test(s)) return null; return [parseInt(s.slice(0, 2), 16), parseInt(s.slice(2, 4), 16), parseInt(s.slice(4, 6), 16)]; };
+    const lum = (c) => (0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]) / 255;
+    let rgb = parse(team && team.color);
+    const alt = parse(team && team.alternateColor);
+    if (!rgb || lum(rgb) < 0.22) rgb = (alt && lum(alt) >= 0.22) ? alt : rgb;
+    if (!rgb) return null;
+    if (lum(rgb) < 0.32) rgb = rgb.map((v) => Math.round(v + (255 - v) * 0.45));
+    return rgb;
+  }
+  const rgbCss = (rgb, a) => rgb ? 'rgba(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ',' + (a == null ? 1 : a) + ')' : null;
   const getJSON = async (url) => { const r = await fetch(url); if (!r.ok) throw new Error(r.status); return r.json(); };
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const round1 = (x) => Math.round(x * 10) / 10;
@@ -550,8 +561,8 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
         id: ev.id, state: type.state || 'pre',
         detail: type.shortDetail || '', start: ev.date,
         venue: (comp.venue || {}).fullName || '',
-        home: { id: (home.team || {}).id, abbr: (home.team || {}).abbreviation, name: (home.team || {}).displayName, score: home.score, record: rec(home) },
-        away: { id: (away.team || {}).id, abbr: (away.team || {}).abbreviation, name: (away.team || {}).displayName, score: away.score, record: rec(away) },
+        home: { id: (home.team || {}).id, abbr: (home.team || {}).abbreviation, name: (home.team || {}).displayName, score: home.score, record: rec(home), rgb: teamColorRgb(home.team) },
+        away: { id: (away.team || {}).id, abbr: (away.team || {}).abbreviation, name: (away.team || {}).displayName, score: away.score, record: rec(away), rgb: teamColorRgb(away.team) },
       };
     });
     return tonightGames.length > 0;
@@ -1325,7 +1336,12 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
     const scorerOf = (p) => { const f = (p.participants || []).find((x) => x && x.athlete && x.athlete.id); return f ? String(f.athlete.id) : null; };
     const nameOf = (p) => { const m = /^(.+?) (makes|misses)/.exec(p.text || ''); return m ? m[1] : ''; };
     const teamOf = (p) => String((p.team || {}).id) === homeId ? g.home.abbr : g.away.abbr;
-    const chipOf = (d) => '<span class="gf-chip' + (d > 0 ? '' : ' teal') + '">' + esc(d > 0 ? g.home.abbr : g.away.abbr) + ' +' + Math.round(Math.abs(d) * 100) + '%</span>';
+    const AC = g.away.rgb, HC = g.home.rgb;
+    const aCol = rgbCss(AC) || '#2dd4bf', hCol = rgbCss(HC) || '#FF7A1A';
+    const aGlow = rgbCss(AC, .55) || 'rgba(45,212,191,.55)', hGlow = rgbCss(HC, .55) || 'rgba(255,122,26,.55)';
+    const colOf = (p) => String((p.team || {}).id) === homeId ? hCol : aCol;
+    const chipOf = (d) => { const home = d > 0; const rgb = home ? HC : AC; const col = home ? hCol : aCol;
+      return '<span class="gf-chip" style="color:' + col + ';border-color:' + (rgbCss(rgb, .55) || (home ? 'rgba(255,122,26,.4)' : 'rgba(45,212,191,.4)')) + ';background:' + (rgbCss(rgb, .13) || (home ? 'rgba(255,122,26,.13)' : 'rgba(45,212,191,.12)')) + ';box-shadow:0 0 10px ' + (rgbCss(rgb, .28) || 'transparent') + '">' + esc(home ? g.home.abbr : g.away.abbr) + ' +' + Math.round(Math.abs(d) * 100) + '%</span>'; };
     let out = '';
     if (series.length > 4 && lastWp != null) {
       const homePct = Math.round(lastWp * 100), awayPct = 100 - homePct;
@@ -1335,6 +1351,16 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
       let line = ''; series.forEach((s, k) => { line += (k ? 'L' : 'M') + px(k).toFixed(1) + ' ' + py(s.wp).toFixed(1) + ' '; });
       const area = line + 'L' + W + ' ' + H + ' L0 ' + H + ' Z';
       const qb = [1, 2, 3].map((q) => { const k = series.findIndex((s) => s.period > q); return k > 0 ? px(k) : null; }).filter((x) => x != null);
+      let runs = '', runD = '', runCol = null, runGlow = null;
+      const flushRun = () => { if (runD) runs += '<path d="' + runD + '" fill="none" stroke="' + runCol + '" stroke-width="2" style="filter:drop-shadow(0 0 3px ' + runGlow + ')"/>'; };
+      series.forEach((s, k) => {
+        const homeSide = s.wp >= 0.5; const col = homeSide ? hCol : aCol; const glow = homeSide ? hGlow : aGlow;
+        const pt = px(k).toFixed(1) + ' ' + py(s.wp).toFixed(1);
+        if (runCol === null) { runCol = col; runGlow = glow; runD = 'M' + pt + ' '; }
+        else if (col !== runCol) { runD += 'L' + pt + ' '; flushRun(); runCol = col; runGlow = glow; runD = 'M' + pt + ' '; }
+        else runD += 'L' + pt + ' ';
+      });
+      flushRun();
       let bigHtml = '';
       const scoredPlays = plays.filter((p) => p.scoringPlay && swingOf[p.id] != null);
       if (scoredPlays.length) {
@@ -1342,15 +1368,15 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
         bigHtml = '<div class="gf-swing"><div class="gf-swing-l">Biggest swing</div><div class="gf-swing-t">' + esc(bp.text || '') + '</div><span class="gf-meta">Q' + ((bp.period || {}).number || '') + ' ' + esc(((bp.clock || {}).displayValue) || '') + '</span>' + chipOf(swingOf[bp.id]) + '</div>';
       }
       out += gmSecHtml('wp', 'Win probability', g.home.abbr + ' ' + homePct + '%',
-        '<div class="gf-wp-split"><img src="' + logoUrl(g.away.abbr) + '" alt=""><span class="gf-wp-pct a">' + awayPct + '%</span>' +
-        '<div class="gf-wp-bar"><span class="ba" style="width:' + awayPct + '%"></span><span class="bh" style="width:' + homePct + '%"></span></div>' +
-        '<span class="gf-wp-pct h">' + homePct + '%</span><img src="' + logoUrl(g.home.abbr) + '" alt=""></div>' +
+        '<div class="gf-wp-split"><img src="' + logoUrl(g.away.abbr) + '" alt=""><span class="gf-wp-pct a" style="color:' + aCol + ';text-shadow:0 0 16px ' + aGlow + '">' + awayPct + '%</span>' +
+        '<div class="gf-wp-bar"><span class="ba" style="width:' + awayPct + '%;background:' + aCol + ';box-shadow:0 0 12px ' + aGlow + '"></span><span class="bh" style="width:' + homePct + '%;background:' + hCol + ';box-shadow:0 0 12px ' + hGlow + '"></span></div>' +
+        '<span class="gf-wp-pct h" style="color:' + hCol + ';text-shadow:0 0 16px ' + hGlow + '">' + homePct + '%</span><img src="' + logoUrl(g.home.abbr) + '" alt=""></div>' +
         '<svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" preserveAspectRatio="none" style="display:block">' +
-        '<defs><linearGradient id="gfwpf" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FF7A1A" stop-opacity=".35"/><stop offset="100%" stop-color="#FF7A1A" stop-opacity="0"/></linearGradient></defs>' +
+        '<defs><linearGradient id="gfwpf" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" style="stop-color:' + hCol + '" stop-opacity=".32"/><stop offset="100%" style="stop-color:' + hCol + '" stop-opacity="0"/></linearGradient></defs>' +
         '<path d="' + area + '" fill="url(#gfwpf)"/><line x1="0" y1="' + py(0.5) + '" x2="' + W + '" y2="' + py(0.5) + '" stroke="#8fa1b8" stroke-width="1" stroke-dasharray="4 4" opacity=".5"/>' +
         qb.map((x) => '<line x1="' + x + '" y1="0" x2="' + x + '" y2="' + H + '" stroke="#1f2c44" stroke-width="1"/>').join('') +
-        '<path d="' + line + '" fill="none" stroke="#FF7A1A" stroke-width="2"/>' +
-        '<circle cx="' + px(series.length - 1) + '" cy="' + py(lastWp) + '" r="3.6" fill="#fff" stroke="#FF7A1A" stroke-width="2"/></svg>' +
+        runs +
+        '<circle cx="' + px(series.length - 1) + '" cy="' + py(lastWp) + '" r="3.6" fill="#fff" stroke="' + (lastWp >= 0.5 ? hCol : aCol) + '" stroke-width="2"/></svg>' +
         '<div class="gf-qrow"><span>Q1</span><span>Q2</span><span>Q3</span><span>Q4</span></div>' + bigHtml);
     }
     const shots = plays.filter((p) => p.shootingPlay && p.pointsAttempted >= 2 && p.coordinate && Math.abs(p.coordinate.x) < 1000 && Math.abs(p.coordinate.y) < 1000);
@@ -1359,7 +1385,7 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
       const n10 = Math.max(0, shots.length - 10);
       let dots = '';
       shots.forEach((p, i) => {
-        const home = String((p.team || {}).id) === homeId; const c = home ? '#FF7A1A' : '#2dd4bf';
+        const home = String((p.team || {}).id) === homeId; const c = home ? hCol : aCol;
         const X = sx(p.coordinate.x), Y = sy(p.coordinate.y); const last = i === shots.length - 1; const recent = i >= n10;
         const op = recent ? 0.3 + 0.7 * ((i - n10 + 1) / Math.max(1, shots.length - n10)) : 0.28;
         if (p.scoreValue > 0) dots += '<circle cx="' + X + '" cy="' + Y + '" r="' + (last ? 4.4 : 3.1) + '" fill="' + c + '" fill-opacity="' + op.toFixed(2) + '"/>';
@@ -1368,7 +1394,7 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
         if (recent) dots += '<text x="' + (X + 6.5) + '" y="' + (Y - 5.5) + '" fill="#8fa1b8" font-size="8.5" font-weight="700">' + (i - n10 + 1) + '</text>';
       });
       const lastShot = shots[shots.length - 1];
-      const fgChip = (abbr, st, cls) => '<span class="gf-fg"><span class="tm ' + cls + '">' + esc(abbr) + '</span>' + esc(st['fieldGoalsMade-fieldGoalsAttempted'] || '–') + ' FG · ' + esc(st['threePointFieldGoalsMade-threePointFieldGoalsAttempted'] || '–') + ' 3PT</span>';
+      const fgChip = (abbr, st, col) => '<span class="gf-fg"><span class="tm" style="color:' + col + '">' + esc(abbr) + '</span>' + esc(st['fieldGoalsMade-fieldGoalsAttempted'] || '–') + ' FG · ' + esc(st['threePointFieldGoalsMade-threePointFieldGoalsAttempted'] || '–') + ' 3PT</span>';
       out += gmSecHtml('shots', 'Shot chart', shots.length + ' attempts',
         '<div class="gf-court"><svg viewBox="0 0 300 282" width="100%" style="display:block">' +
         '<rect x="3" y="3" width="294" height="276" rx="6" fill="none" stroke="#2a3a58" stroke-width="2"/>' +
@@ -1377,8 +1403,8 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
         '<path d="M21 282 L21 198 A142.5 142.5 0 0 1 279 198 L279 282" fill="none" stroke="#2a3a58" stroke-width="2"/>' +
         '<circle cx="150" cy="250.5" r="13.5" fill="none" stroke="#FF7A1A" stroke-width="2"/>' + dots + '</svg></div>' +
         '<p class="gf-this"><b>This shot:</b> ' + esc(lastShot.text || '') + '</p>' +
-        '<div class="gf-legend"><span>' + esc(g.away.abbr) + ' teal · ' + esc(g.home.abbr) + ' orange</span><span>● made · × missed · last 10 numbered</span></div>' +
-        '<div class="gf-fgs">' + fgChip(g.away.abbr, feed.statsA, 'a') + fgChip(g.home.abbr, feed.statsH, 'h') + '</div>');
+        '<div class="gf-legend"><span>' + '<span style="color:' + aCol + '">' + esc(g.away.abbr) + '</span> · <span style="color:' + hCol + '">' + esc(g.home.abbr) + '</span>' + '</span><span>● made · × missed · last 10 numbered</span></div>' +
+        '<div class="gf-fgs">' + fgChip(g.away.abbr, feed.statsA, aCol) + fgChip(g.home.abbr, feed.statsH, hCol) + '</div>');
     }
     const keyPlays = plays.filter((p) => p.scoringPlay && p.scoreValue > 0 && swingOf[p.id] != null)
       .sort((a, b) => Math.abs(swingOf[b.id]) - Math.abs(swingOf[a.id])).slice(0, 6)
@@ -1387,7 +1413,7 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
       const typeOf = (p) => { const t = (p.text || '').toLowerCase(); if (p.scoreValue === 3 || /three point/.test(t)) return '3-POINTER'; if (/tip/.test(t)) return 'TIP-IN'; if (/dunk/.test(t)) return 'DUNK'; if (/layup/.test(t)) return 'LAYUP'; if (/free throw/.test(t)) return 'FREE THROW'; if (/hook/.test(t)) return 'HOOK SHOT'; if (/fadeaway/.test(t)) return 'FADEAWAY'; return 'JUMPER'; };
       out += gmSecHtml('key', 'Key plays', keyPlays.length + ' biggest swings',
         '<div class="gf-kp-row">' + keyPlays.map((p) => { const pid = scorerOf(p);
-          return '<div class="gf-kp"' + (pid ? ' data-pid="' + pid + '"' : '') + '><div class="gf-kp-top"><span>Q' + ((p.period || {}).number || '') + ' ' + esc(((p.clock || {}).displayValue) || '') + '</span><span class="gf-kp-team">' + esc(teamOf(p)) + '</span></div>' +
+          return '<div class="gf-kp"' + (pid ? ' data-pid="' + pid + '"' : '') + '><div class="gf-kp-top"><span>Q' + ((p.period || {}).number || '') + ' ' + esc(((p.clock || {}).displayValue) || '') + '</span><span class="gf-kp-team" style="color:' + colOf(p) + '">' + esc(teamOf(p)) + '</span></div>' +
           '<div class="gf-kp-type">' + typeOf(p) + '</div>' +
           '<div class="gf-kp-player">' + (pid ? '<img src="' + headshot(pid) + '" alt="" onerror="this.style.display=\'none\'">' : '') + '<span>' + esc(nameOf(p)) + '</span></div>' +
           '<div class="gf-kp-bot"><span class="gf-kp-score">' + esc(g.away.abbr) + ' ' + p.awayScore + '–' + p.homeScore + ' ' + esc(g.home.abbr) + '</span>' + chipOf(swingOf[p.id]) + '</div></div>'; }).join('') + '</div>');
@@ -1398,7 +1424,7 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
         if (pid && nameOf(p)) knownPlayers[pid] = { name: nameOf(p), team: teamOf(p) };
         return '<div class="gf-sc"' + (pid ? ' data-pid="' + pid + '"' : '') + '><div class="gf-sc-top"><span>' + esc(g.away.abbr) + ' @ ' + esc(g.home.abbr) + '</span><span>Q' + ((p.period || {}).number || '') + ' ' + esc(((p.clock || {}).displayValue) || '') + '</span></div>' +
         '<div class="gf-sc-main">' + (pid ? '<img src="' + headshot(pid) + '" alt="" onerror="this.style.display=\'none\'">' : '') +
-        '<div class="gf-sc-txt"><div class="gf-sc-name">' + esc(nameOf(p)) + '<span class="gf-sc-team">' + esc(teamOf(p)) + '</span></div>' +
+        '<div class="gf-sc-txt"><div class="gf-sc-name">' + esc(nameOf(p)) + '<span class="gf-sc-team" style="color:' + colOf(p) + '">' + esc(teamOf(p)) + '</span></div>' +
         '<div class="gf-sc-play">' + esc(p.text || '') + '</div>' +
         '<div class="gf-sc-sub"><span>' + esc(g.away.abbr) + ' ' + p.awayScore + '–' + p.homeScore + ' ' + esc(g.home.abbr) + '</span>' + (d != null && Math.abs(d) >= 0.05 ? chipOf(d) : '') + '</div></div>' +
         '<span class="gf-sc-pts">+' + p.scoreValue + '</span></div></div>'; }).join('');
@@ -1414,7 +1440,7 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
     const bv = (disp, kind) => kind === 'made' ? parseFloat(String(disp).split('-')[0]) || 0 : parseFloat(disp) || 0;
     const tsRows = cfg.map(([label, key, kind]) => { const a = feed.statsA[key], hh = feed.statsH[key]; if (a == null || hh == null) return '';
       const av = bv(a, kind), hv = bv(hh, kind), tot = av + hv || 1;
-      return '<div class="gf-ts-row"><span class="gf-ts-v a">' + esc(a) + '</span><div class="gf-ts-mid"><div class="gf-ts-label">' + label + '</div><div class="gf-ts-bar"><span class="ba" style="width:' + (av / tot * 100) + '%"></span><span class="bh" style="width:' + (hv / tot * 100) + '%"></span></div></div><span class="gf-ts-v h">' + esc(hh) + '</span></div>'; }).join('');
+      return '<div class="gf-ts-row"><span class="gf-ts-v a">' + esc(a) + '</span><div class="gf-ts-mid"><div class="gf-ts-label">' + label + '</div><div class="gf-ts-bar"><span class="ba" style="width:' + (av / tot * 100) + '%;background:' + aCol + '"></span><span class="bh" style="width:' + (hv / tot * 100) + '%;background:' + hCol + '"></span></div></div><span class="gf-ts-v h">' + esc(hh) + '</span></div>'; }).join('');
     if (tsRows) out += gmSecHtml('stats', 'Team stats', '', '<div class="gf-ts-row"><span class="gf-ts-v a b">' + esc(g.away.abbr) + '</span><div class="gf-ts-mid"></div><span class="gf-ts-v h b">' + esc(g.home.abbr) + '</span></div>' + tsRows);
     return out;
   }
