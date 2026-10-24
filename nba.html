@@ -135,6 +135,11 @@ details.sl-fold[open ] summary .chev { transform: rotate(90deg); }
 .fb-filterbar input[type="search"]:focus { outline: 2px solid #FF7A1A; outline-offset: 1px; }
 .fb-filterbar input[type="search"]::placeholder { color: var(--muted); font-weight: 600; }
 .pt-board { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: .6rem .9rem; }
+.pt-group { display: flex; align-items: center; gap: .5rem; padding: .75rem 0 .3rem; }
+.pt-group:first-child { padding-top: .15rem; }
+.pt-group img { width: 22px; height: 22px; }
+.pt-group-abbr { font-weight: 800; font-size: .95rem; }
+.pt-group-score { margin-left: auto; color: var(--muted); font-size: .78rem; font-weight: 700; }
 .pt-row { display: flex; align-items: center; gap: .6rem; padding: .55rem 0; flex-wrap: wrap; cursor: pointer; }
 .pt-row + .pt-row { border-top: 1px solid rgba(31,44,68,.45); }
 .pt-row:hover { background: rgba(255,122,26,.05); }
@@ -324,7 +329,7 @@ details.pc-sec[open ] summary .chev { transform: rotate(90deg); }
 
   <section id="nba-view-paint" class="view">
     <div class="fb-slim-head"><h2>In the Paint</h2><span class="right">Live tracker · <span class="fb-slim-date"></span></span></div>
-    <div class="fb-filterbar"><input type="search" id="nbaPaintSearch" placeholder="Search a player…" aria-label="Search a player" autocomplete="off"><select id="nbaPaintTeam" aria-label="Filter by team"></select></div>
+    <div class="fb-filterbar"><input type="search" id="nbaPaintSearch" placeholder="Search a player…" aria-label="Search a player" autocomplete="off"><select id="nbaPaintGame" aria-label="Filter by game"></select></div>
     <div class="pt-board" id="nbaPaintBody"><p class="pt-empty">Loading…</p></div>
     <p class="pt-empty" id="nbaPaintNone" style="display:none"></p>
   </section>
@@ -373,7 +378,7 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
   const gamesEl = $('nbaGamesBody'), topEl = $('nbaTopBody'),
         standEl = $('nbaStandingsBody'), slateEl = $('nbaSlateBody'),
         mktBody = $('nbaMktBody'), gradeEl = $('nbaGradeLine'),
-        paintEl = $('nbaPaintBody'), paintTeamEl = $('nbaPaintTeam');
+        paintEl = $('nbaPaintBody'), paintGameEl = $('nbaPaintGame');
   const empty = (el, msg) => { if (el) el.innerHTML = '<p class="muted">' + msg + '</p>'; };
   const API = 'https://site.api.espn.com/apis/site/v2/sports/basketball/nba';
   const CORE = 'https://sports.core.api.espn.com/v2/sports/basketball/leagues/nba';
@@ -677,14 +682,13 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
   function renderPaint() {
     if (!paintEl) return;
     const started = tonightGames.some((g) => g.state !== 'pre');
-    // team dropdown: teams with players on the board tonight
-    const counts = {};
-    for (const p of livePlayers) counts[p.team] = (counts[p.team] || 0) + 1;
-    const teams = Object.keys(counts).sort();
-    const prevSel = paintTeamEl.value;
-    paintTeamEl.innerHTML = '<option value="">All teams · live &amp; final</option>' +
-      teams.map((t) => '<option value="' + esc(t) + '">' + esc(t) + ' (' + counts[t] + ' players)</option>').join('');
-    paintTeamEl.value = teams.includes(prevSel) ? prevSel : '';
+    // game dropdown: games with players on the board tonight
+    const boardGameIds = new Set(livePlayers.map((p) => String(p.gameId)));
+    const prevSel = paintGameEl.value;
+    paintGameEl.innerHTML = '<option value="">All games · live &amp; final</option>' +
+      tonightGames.filter((g) => boardGameIds.has(String(g.id))).map((g) =>
+        '<option value="' + g.id + '">' + esc(g.away.abbr + ' @ ' + g.home.abbr + ' · ' + (g.state === 'post' ? 'Final' : (g.detail || 'Live'))) + '</option>').join('');
+    paintGameEl.value = boardGameIds.has(prevSel) ? prevSel : '';
     if (!started) {
       paintEl.innerHTML = '<p class="pt-empty">In the Paint fills in once games tip — every player, live, with pace vs his fair line.</p>';
       return;
@@ -693,29 +697,54 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
       paintEl.innerHTML = '<p class="pt-empty">Games have tipped — box scores are on their way…</p>';
       return;
     }
-    paintEl.innerHTML = livePlayers.map((p) =>
+    const rowHtml = (p) =>
       '<div class="pt-row" data-pid="' + p.id + '" data-team="' + esc(p.team) + '">' +
       '<img class="hs" src="' + headshot(p.id) + '" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">' +
       '<div class="pt-info"><div class="pt-name">' + esc(p.name) + '<span class="pt-team">' + esc(p.team) + '</span></div>' +
       '<div class="pt-game">' + esc(p.match) + ' · ' + (p.state === 'post' ? 'Final' : esc(p.detail)) + '</div></div>' +
       '<div class="pt-line"><span><b>' + esc(p.min) + '</b> MIN</span><span><b' + (p.pts > 20 ? ' class="hot"' : '') + '>' + p.pts + '</b> PTS</span><span><b' + (p.reb >= 10 ? ' class="hot"' : '') + '>' + p.reb + '</b> REB</span><span><b>' + p.ast + '</b> AST</span><span><b' + (p.tpm >= 2 ? ' class="hot"' : '') + '>' + p.tpm + '</b> 3PM</span></div>' +
-      '<div class="pt-chiprow">' + paintChip(p) + '</div></div>'
-    ).join('');
+      '<div class="pt-chiprow">' + paintChip(p) + '</div></div>';
+    const selGame = paintGameEl.value;
+    if (selGame) {
+      // one game: players split into Away / Home sections
+      const g = tonightGames.find((x) => String(x.id) === selGame);
+      const inGame = livePlayers.filter((p) => String(p.gameId) === selGame);
+      let h = '';
+      if (g) {
+        for (const side of ['away', 'home']) {
+          const t = g[side];
+          const ps = inGame.filter((p) => p.team === t.abbr);
+          if (!ps.length) continue;
+          h += '<div class="pt-group"><img src="' + logoUrl(t.abbr) + '" alt=""><span class="pt-group-abbr">' + esc(t.abbr) + '</span><span class="pt-group-score">' + (side === 'away' ? 'Away' : 'Home') + (g.state !== 'pre' && t.score ? ' · ' + esc(t.score) : '') + '</span></div>';
+          h += ps.map(rowHtml).join('');
+        }
+      }
+      paintEl.innerHTML = h || inGame.map(rowHtml).join('');
+    } else {
+      paintEl.innerHTML = livePlayers.map(rowHtml).join('');
+    }
     paintEl.querySelectorAll('.pt-row').forEach((el) => el.addEventListener('click', () => openPlayerCard(el.dataset.pid)));
     applyPaintFilter();
   }
   const paintSearchEl = $('nbaPaintSearch'), paintNoneEl = $('nbaPaintNone');
   function applyPaintFilter() {
-    const sel = paintTeamEl.value;
     const q = paintSearchEl ? paintSearchEl.value.trim().toLowerCase() : '';
     let visible = 0, total = 0;
     paintEl.querySelectorAll('.pt-row').forEach((el) => {
       total++;
       const p = liveByPid[el.dataset.pid];
-      const nameOk = !q || (p && p.name.toLowerCase().includes(q));
-      const show = (!sel || el.dataset.team === sel) && nameOk;
+      const show = !q || (p && p.name.toLowerCase().includes(q));
       el.style.display = show ? '' : 'none';
       if (show) visible++;
+    });
+    // group headers (game view) show only when a player under them is visible
+    paintEl.querySelectorAll('.pt-group').forEach((hd) => {
+      let any = false, n = hd.nextElementSibling;
+      while (n && !n.classList.contains('pt-group')) {
+        if (n.classList.contains('pt-row') && n.style.display !== 'none') { any = true; break; }
+        n = n.nextElementSibling;
+      }
+      hd.style.display = any ? '' : 'none';
     });
     if (paintNoneEl) {
       if (total && !visible) {
@@ -726,7 +755,7 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
       } else paintNoneEl.style.display = 'none';
     }
   }
-  if (paintTeamEl) paintTeamEl.addEventListener('change', applyPaintFilter);
+  if (paintGameEl) paintGameEl.addEventListener('change', renderPaint);
   if (paintSearchEl) paintSearchEl.addEventListener('input', applyPaintFilter);
 
   // ---- refresh + poll ----
