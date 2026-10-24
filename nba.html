@@ -75,7 +75,7 @@
 .fb-head .fb-title::before { content: ''; width: 4px; height: 18px; border-radius: 2px; background: #FF7A1A; flex: none; }
 .fb-burger { margin-left: auto; display: flex; align-items: center; gap: .5rem; background: #0b1322; border: 1px solid var(--border); color: var(--text); border-radius: 11px; padding: .55rem .8rem; font-size: .9rem; font-weight: 700; cursor: pointer; font-family: inherit; }
 .fb-burger-ico { color: #FF7A1A; font-size: 1rem; }
-.fb-sheet-wrap { position: fixed; inset: 0; background: rgba(2,5,10,.6); display: none; z-index: 40; }
+.fb-sheet-wrap { position: fixed; inset: 0; background: rgba(2,5,10,.6); display: none; z-index: 600; }
 .fb-sheet-wrap.open { display: block; }
 .fb-sheet { position: absolute; left: 0; right: 0; bottom: 0; max-width: 560px; margin: 0 auto; background: #0d1728; border: 1px solid var(--border); border-bottom: none; border-radius: 18px 18px 0 0; padding: 1rem 1rem calc(1.4rem + env(safe-area-inset-bottom)); }
 .fb-sheet-title { color: var(--muted); font-size: .72rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; margin-bottom: .6rem; }
@@ -150,9 +150,9 @@ details.sl-fold[open ] summary .chev { transform: rotate(90deg); }
 .pt-chip.dim { background: var(--card2); color: var(--muted); border: 1px solid var(--border); }
 .pt-empty { color: var(--muted); font-size: .88rem; text-align: center; padding: 1rem .4rem; line-height: 1.55; }
 /* ---- Player card overlay ---- */
-.pc-overlay { position: fixed; inset: 0; background: rgba(2,5,10,.65); display: none; z-index: 50; }
+.pc-overlay { position: fixed; inset: 0; background: rgba(2,5,10,.65); display: none; z-index: 610; }
 .pc-overlay.open { display: block; }
-.pc-sheet { position: absolute; left: 0; right: 0; bottom: 0; top: 5%; max-width: 560px; margin: 0 auto; background: var(--card); border: 1px solid var(--border); border-bottom: none; border-radius: 18px 18px 0 0; padding: 1rem 1.05rem 2rem; overflow-y: auto; }
+.pc-sheet { position: absolute; left: 0; right: 0; bottom: 0; top: 5%; max-width: 560px; margin: 0 auto; background: var(--card); border: 1px solid var(--border); border-bottom: none; border-radius: 18px 18px 0 0; padding: 1rem 1.05rem 2rem; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
 .pc-close { position: absolute; top: .7rem; right: .8rem; background: var(--card2); border: 1px solid var(--border); color: var(--text); border-radius: 50%; width: 30px; height: 30px; cursor: pointer; z-index: 2; }
 .pc-head { display: flex; gap: .9rem; align-items: center; padding-right: 1.6rem; }
 .pc-head img.hs { width: 86px; height: 86px; border-radius: 50%; object-fit: cover; object-position: top; background: var(--card2); flex: none; }
