@@ -128,9 +128,12 @@ details.sl-fold[open ] summary .chev { transform: rotate(90deg); }
 .sl-look-meta { color: var(--muted); font-size: .72rem; font-weight: 600; }
 .sl-look-p { margin-left: auto; font-weight: 800; font-size: 1.05rem; color: #2dd4bf; font-variant-numeric: tabular-nums; }
 /* ---- In the Paint ---- */
-.fb-filterbar { margin: 0 0 .7rem; }
+.fb-filterbar { margin: 0 0 .7rem; display: flex; flex-direction: column; gap: .5rem; }
 .fb-filterbar select { width: 100%; appearance: none; -webkit-appearance: none; background: #0b1322 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23FF7A1A' stroke-width='2' fill='none'/%3E%3C/svg%3E") no-repeat right .8rem center; border: 1px solid var(--border); border-radius: 11px; color: var(--text); font-size: .92rem; font-weight: 700; padding: .62rem .8rem; font-family: inherit; }
 .fb-filterbar select:focus { outline: 2px solid #FF7A1A; outline-offset: 1px; }
+.fb-filterbar input[type="search"] { width: 100%; background: #0b1322; border: 1px solid var(--border); border-radius: 11px; color: var(--text); font-size: .92rem; font-weight: 600; padding: .62rem .8rem; font-family: inherit; }
+.fb-filterbar input[type="search"]:focus { outline: 2px solid #FF7A1A; outline-offset: 1px; }
+.fb-filterbar input[type="search"]::placeholder { color: var(--muted); font-weight: 600; }
 .pt-board { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: .6rem .9rem; }
 .pt-row { display: flex; align-items: center; gap: .6rem; padding: .55rem 0; flex-wrap: wrap; cursor: pointer; }
 .pt-row + .pt-row { border-top: 1px solid rgba(31,44,68,.45); }
@@ -321,8 +324,9 @@ details.pc-sec[open ] summary .chev { transform: rotate(90deg); }
 
   <section id="nba-view-paint" class="view">
     <div class="fb-slim-head"><h2>In the Paint</h2><span class="right">Live tracker · <span class="fb-slim-date"></span></span></div>
-    <div class="fb-filterbar"><select id="nbaPaintTeam" aria-label="Filter by team"></select></div>
+    <div class="fb-filterbar"><input type="search" id="nbaPaintSearch" placeholder="Search a player…" aria-label="Search a player" autocomplete="off"><select id="nbaPaintTeam" aria-label="Filter by team"></select></div>
     <div class="pt-board" id="nbaPaintBody"><p class="pt-empty">Loading…</p></div>
+    <p class="pt-empty" id="nbaPaintNone" style="display:none"></p>
   </section>
 
   <section id="nba-view-parlay" class="view">
@@ -700,13 +704,30 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
     paintEl.querySelectorAll('.pt-row').forEach((el) => el.addEventListener('click', () => openPlayerCard(el.dataset.pid)));
     applyPaintFilter();
   }
+  const paintSearchEl = $('nbaPaintSearch'), paintNoneEl = $('nbaPaintNone');
   function applyPaintFilter() {
     const sel = paintTeamEl.value;
+    const q = paintSearchEl ? paintSearchEl.value.trim().toLowerCase() : '';
+    let visible = 0, total = 0;
     paintEl.querySelectorAll('.pt-row').forEach((el) => {
-      el.style.display = (!sel || el.dataset.team === sel) ? '' : 'none';
+      total++;
+      const p = liveByPid[el.dataset.pid];
+      const nameOk = !q || (p && p.name.toLowerCase().includes(q));
+      const show = (!sel || el.dataset.team === sel) && nameOk;
+      el.style.display = show ? '' : 'none';
+      if (show) visible++;
     });
+    if (paintNoneEl) {
+      if (total && !visible) {
+        paintNoneEl.textContent = q
+          ? 'No player matching "' + (paintSearchEl ? paintSearchEl.value.trim() : '') + '" on the board — he lands here once his game tips and he logs a minute.'
+          : 'No players match that filter.';
+        paintNoneEl.style.display = '';
+      } else paintNoneEl.style.display = 'none';
+    }
   }
   if (paintTeamEl) paintTeamEl.addEventListener('change', applyPaintFilter);
+  if (paintSearchEl) paintSearchEl.addEventListener('input', applyPaintFilter);
 
   // ---- refresh + poll ----
   let pollTimer = null;
