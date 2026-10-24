@@ -6,7 +6,7 @@
 <title>Bueno Sports - NBA</title>
 <link rel="stylesheet" href="styles.css">
 <style>
-:root { --teal: #FF7A1A; --teal-wash: rgba(255,122,26,.08); }
+:root { --teal: #FF7A1A; --teal-wash: rgba(255,122,26,.08); --card: #0e1626; --card2: #101a2c; }
 .bnav-btn.active, .tab.active { color: #FF7A1A !important; }
 .live-dot { animation: pulse-dot 1.6s ease-in-out infinite; color: #ff5252; font-weight: 800; }
 /* ---- neat skin (from the approved draft) ---- */
@@ -28,7 +28,7 @@
 .fb-gstat { color: var(--muted); font-size: .72rem; }
 .fb-perf-row { display: flex; gap: .6rem; overflow-x: auto; padding-bottom: .3rem; scrollbar-width: none; }
 .fb-perf-row::-webkit-scrollbar { display: none; }
-.fb-perf { flex: none; width: 118px; background: var(--card2, #101a2c); border: 1px solid var(--border); border-radius: 14px; padding: .7rem .6rem .6rem; text-align: center; }
+.fb-perf { flex: none; width: 118px; background: var(--card2, #101a2c); border: 1px solid var(--border); border-radius: 14px; padding: .7rem .6rem .6rem; text-align: center; cursor: pointer; }
 .fb-perf img.hs { width: 58px; height: 58px; border-radius: 50%; object-fit: cover; object-position: top; background: #0e1626; }
 .fb-perf .pname { font-weight: 700; font-size: .8rem; margin-top: .4rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .fb-perf .pteam { display: flex; align-items: center; justify-content: center; gap: .3rem; color: var(--muted); font-size: .7rem; margin-top: .1rem; }
@@ -69,18 +69,167 @@
 .fb-collapse[open ] summary { padding-bottom: .4rem; }
 .fb-collapse > div { padding: 0 .95rem .9rem; }
 .fb-mkt-table tbody tr.fb-prow { cursor: pointer; }
-.fb-ladder-row td { text-align: left !important; padding: .3rem .35rem .65rem; }
-.fb-ladder { display: flex; flex-wrap: wrap; gap: .35rem; }
-.fb-chip { background: #101a2c; border: 1px solid var(--border); border-radius: 999px; padding: .28rem .65rem; font-size: .78rem; font-weight: 600; color: var(--muted); }
-.fb-chip b { color: var(--text); }
-.fb-chip .p { color: #2dd4bf; font-weight: 800; }
-/* ---- Fast Break header: segmented nav + slim heads ---- */
-.fb-seg { display: flex; background: #101a2c; border: 1px solid var(--border); border-radius: 12px; padding: 4px; gap: 4px; position: sticky; top: 0; z-index: 6; }
-.fb-seg button { flex: 1; border: none; background: transparent; color: var(--muted); font-family: inherit; font-weight: 800; font-size: .9rem; padding: .55rem 0; border-radius: 9px; cursor: pointer; }
-.fb-seg button.active { background: #FF7A1A; color: #131313; }
+/* ---- Fast Break header: hamburger + bottom sheet (replaces the pill bar) ---- */
+.fb-head { display: flex; align-items: center; gap: .55rem; margin: 0 0 .2rem; }
+.fb-head .fb-title { font-size: 1.05rem; font-weight: 800; display: flex; align-items: center; gap: .55rem; }
+.fb-head .fb-title::before { content: ''; width: 4px; height: 18px; border-radius: 2px; background: #FF7A1A; flex: none; }
+.fb-burger { margin-left: auto; display: flex; align-items: center; gap: .5rem; background: #0b1322; border: 1px solid var(--border); color: var(--text); border-radius: 11px; padding: .55rem .8rem; font-size: .9rem; font-weight: 700; cursor: pointer; font-family: inherit; }
+.fb-burger-ico { color: #FF7A1A; font-size: 1rem; }
+.fb-sheet-wrap { position: fixed; inset: 0; background: rgba(2,5,10,.6); display: none; z-index: 40; }
+.fb-sheet-wrap.open { display: block; }
+.fb-sheet { position: absolute; left: 0; right: 0; bottom: 0; max-width: 560px; margin: 0 auto; background: #0d1728; border: 1px solid var(--border); border-bottom: none; border-radius: 18px 18px 0 0; padding: 1rem 1rem calc(1.4rem + env(safe-area-inset-bottom)); }
+.fb-sheet-title { color: var(--muted); font-size: .72rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; margin-bottom: .6rem; }
+.fb-sheet-item { display: flex; align-items: center; gap: .5rem; width: 100%; text-align: left; background: var(--card2); border: 1px solid var(--border); color: var(--text); border-radius: 12px; padding: .75rem .85rem; font-size: .98rem; font-weight: 800; margin-bottom: .45rem; cursor: pointer; font-family: inherit; }
+.fb-sheet-item .fb-sheet-sub { color: var(--muted); font-size: .72rem; font-weight: 600; }
+.fb-sheet-item.on { border-color: rgba(255,122,26,.55); }
+.fb-sheet-check { margin-left: auto; color: #FF7A1A; font-weight: 800; visibility: hidden; }
+.fb-sheet-item.on .fb-sheet-check { visibility: visible; }
+.fb-sheet-cancel { width: 100%; background: none; border: none; color: var(--muted); font-size: .9rem; font-weight: 700; padding: .55rem 0 .1rem; cursor: pointer; font-family: inherit; }
 .fb-slim-head { display: flex; align-items: baseline; gap: .5rem; margin: .85rem 0 .55rem; }
 .fb-slim-head h2 { font-size: 1.05rem; font-weight: 800; margin: 0; }
 .fb-slim-head .right { margin-left: auto; color: var(--muted); font-size: .75rem; font-weight: 600; }
+/* ---- Slate cards ---- */
+.sl-wrap { display: flex; flex-direction: column; gap: .8rem; }
+.sl-gcard { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: .95rem 1.05rem .8rem; }
+.sl-teams { display: flex; align-items: center; gap: .6rem; }
+.sl-trow { display: flex; align-items: center; gap: .5rem; flex: 1; min-width: 0; }
+.sl-trow.right { flex-direction: row-reverse; text-align: right; }
+.sl-trow img { width: 34px; height: 34px; object-fit: contain; flex: none; }
+.sl-trow .abbr { font-weight: 800; font-size: 1.02rem; }
+.sl-rec { display: block; color: var(--muted); font-size: .68rem; font-weight: 600; }
+.sl-score { margin-left: auto; font-weight: 800; font-size: 1.25rem; font-variant-numeric: tabular-nums; color: var(--muted); }
+.sl-trow.right .sl-score { margin-left: 0; margin-right: auto; }
+.sl-score.win { color: var(--text); }
+.sl-tip { text-align: center; font-weight: 800; font-size: .86rem; color: #FF7A1A; flex: none; line-height: 1.25; }
+.sl-tip span { display: block; color: var(--muted); font-size: .62rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+.sl-tip.live { color: #ff6b6b; font-size: .8rem; }
+.sl-tip.live span { color: #ff6b6b; }
+.sl-tip.final { color: var(--muted); letter-spacing: .1em; font-size: .78rem; }
+.sl-trio { display: flex; gap: .5rem; margin-top: .8rem; }
+.sl-tcell { flex: 1; background: var(--card2); border: 1px solid var(--border); border-radius: 11px; text-align: center; padding: .55rem .2rem; min-width: 0; }
+.sl-tcell.mid { border-color: rgba(255,122,26,.45); }
+.sl-tv { font-weight: 800; font-size: 1.02rem; font-variant-numeric: tabular-nums; }
+.sl-tv .pct { color: #2dd4bf; font-size: .85rem; }
+.sl-tk { color: var(--muted); font-size: .62rem; letter-spacing: .08em; text-transform: uppercase; margin-top: .15rem; }
+.sl-proj { text-align: center; color: var(--muted); font-size: .8rem; margin-top: .6rem; font-variant-numeric: tabular-nums; }
+.sl-tags { display: flex; gap: .35rem; flex-wrap: wrap; margin-top: .55rem; }
+.sl-tag { background: rgba(255,122,26,.13); color: #ffb27a; border: 1px solid rgba(255,122,26,.35); border-radius: 999px; padding: .18rem .6rem; font-size: .7rem; font-weight: 700; }
+.sl-tag.dim { background: var(--card2); color: var(--muted); border-color: var(--border); }
+.sl-check { margin-top: .55rem; background: rgba(45,212,191,.07); border: 1px solid rgba(45,212,191,.25); border-radius: 10px; padding: .45rem .6rem; font-size: .76rem; color: var(--muted); }
+details.sl-fold { margin-top: .55rem; border-top: 1px solid rgba(31,44,68,.6); }
+details.sl-fold summary { list-style: none; cursor: pointer; padding: .6rem 0 .15rem; font-size: .78rem; font-weight: 700; color: var(--muted); display: flex; }
+details.sl-fold summary::-webkit-details-marker { display: none; }
+details.sl-fold summary .chev { margin-left: auto; color: #FF7A1A; }
+details.sl-fold[open ] summary .chev { transform: rotate(90deg); }
+.sl-fold-body { padding: .3rem 0 .25rem; display: flex; flex-direction: column; gap: .4rem; }
+.sl-look { display: flex; align-items: center; gap: .65rem; background: var(--card2); border: 1px solid var(--border); border-radius: 12px; padding: .45rem .65rem; cursor: pointer; }
+.sl-look img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; object-position: top; background: var(--card); flex: none; }
+.sl-look-name { font-weight: 700; font-size: .9rem; }
+.sl-look-meta { color: var(--muted); font-size: .72rem; font-weight: 600; }
+.sl-look-p { margin-left: auto; font-weight: 800; font-size: 1.05rem; color: #2dd4bf; font-variant-numeric: tabular-nums; }
+/* ---- In the Paint ---- */
+.fb-filterbar { margin: 0 0 .7rem; }
+.fb-filterbar select { width: 100%; appearance: none; -webkit-appearance: none; background: #0b1322 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23FF7A1A' stroke-width='2' fill='none'/%3E%3C/svg%3E") no-repeat right .8rem center; border: 1px solid var(--border); border-radius: 11px; color: var(--text); font-size: .92rem; font-weight: 700; padding: .62rem .8rem; font-family: inherit; }
+.fb-filterbar select:focus { outline: 2px solid #FF7A1A; outline-offset: 1px; }
+.pt-board { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: .6rem .9rem; }
+.pt-row { display: flex; align-items: center; gap: .6rem; padding: .55rem 0; flex-wrap: wrap; cursor: pointer; }
+.pt-row + .pt-row { border-top: 1px solid rgba(31,44,68,.45); }
+.pt-row:hover { background: rgba(255,122,26,.05); }
+.pt-row img.hs { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; object-position: top; background: var(--card2); flex: none; }
+.pt-info { min-width: 118px; }
+.pt-name { font-weight: 700; font-size: .92rem; }
+.pt-team { color: #FF7A1A; font-weight: 800; font-size: .78rem; margin-left: .25rem; }
+.pt-game { color: var(--muted); font-size: .7rem; font-weight: 600; margin-top: .1rem; }
+.pt-line { margin-left: auto; display: flex; gap: .55rem; font-size: .78rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.pt-line b { color: var(--text); font-size: .88rem; }
+.pt-chiprow { width: 100%; }
+.pt-chip { display: inline-block; border-radius: 999px; padding: .14rem .55rem; font-size: .68rem; font-weight: 800; }
+.pt-chip.good { background: rgba(46,204,143,.15); color: #7ce8b8; border: 1px solid rgba(46,204,143,.4); }
+.pt-chip.bad { background: rgba(224,82,82,.13); color: #ff9c9c; border: 1px solid rgba(224,82,82,.35); }
+.pt-chip.pace { background: rgba(255,122,26,.14); color: #ffb27a; border: 1px solid rgba(255,122,26,.4); }
+.pt-chip.dim { background: var(--card2); color: var(--muted); border: 1px solid var(--border); }
+.pt-empty { color: var(--muted); font-size: .88rem; text-align: center; padding: 1rem .4rem; line-height: 1.55; }
+/* ---- Player card overlay ---- */
+.pc-overlay { position: fixed; inset: 0; background: rgba(2,5,10,.65); display: none; z-index: 50; }
+.pc-overlay.open { display: block; }
+.pc-sheet { position: absolute; left: 0; right: 0; bottom: 0; top: 5%; max-width: 560px; margin: 0 auto; background: var(--card); border: 1px solid var(--border); border-bottom: none; border-radius: 18px 18px 0 0; padding: 1rem 1.05rem 2rem; overflow-y: auto; }
+.pc-close { position: absolute; top: .7rem; right: .8rem; background: var(--card2); border: 1px solid var(--border); color: var(--text); border-radius: 50%; width: 30px; height: 30px; cursor: pointer; z-index: 2; }
+.pc-head { display: flex; gap: .9rem; align-items: center; padding-right: 1.6rem; }
+.pc-head img.hs { width: 86px; height: 86px; border-radius: 50%; object-fit: cover; object-position: top; background: var(--card2); flex: none; }
+.pc-head h3 { font-size: 1.3rem; font-weight: 800; line-height: 1.15; margin: 0; }
+.pc-team { display: flex; align-items: center; gap: .4rem; color: var(--muted); font-size: .85rem; margin-top: .25rem; }
+.pc-team img { width: 20px; height: 20px; object-fit: contain; }
+.pc-match { color: var(--muted); font-size: .8rem; margin-top: .15rem; }
+.pc-min-chip { margin-left: auto; text-align: center; background: var(--card2); border: 1px solid var(--border); border-radius: 12px; padding: .45rem .6rem; flex: none; }
+.pc-min-chip .n { font-size: 1.25rem; font-weight: 800; color: #FF7A1A; }
+.pc-min-chip .l { font-size: .62rem; letter-spacing: .1em; color: var(--muted); text-transform: uppercase; }
+.pc-live-strip { display: flex; justify-content: space-between; gap: .5rem; flex-wrap: wrap; background: rgba(255,122,26,.1); border: 1px solid rgba(255,122,26,.35); border-radius: 10px; padding: .5rem .65rem; margin-top: .8rem; font-size: .76rem; }
+.pc-live-strip .ls { color: #ffb27a; font-weight: 800; letter-spacing: .05em; }
+.pc-live-strip b { font-variant-numeric: tabular-nums; }
+details.pc-sec { border-top: 1px solid rgba(31,44,68,.6); margin-top: .85rem; }
+details.pc-sec summary { list-style: none; cursor: pointer; padding: .6rem 0 .2rem; font-size: .74rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: .5rem; }
+details.pc-sec summary::-webkit-details-marker { display: none; }
+details.pc-sec summary::before { content: ''; width: 4px; height: 14px; border-radius: 2px; background: #FF7A1A; flex: none; }
+details.pc-sec summary .chev { margin-left: auto; color: #FF7A1A; letter-spacing: 0; }
+details.pc-sec[open ] summary .chev { transform: rotate(90deg); }
+.pc-sec-body { padding: .3rem 0 .4rem; }
+.pc-price-row { display: flex; align-items: center; gap: .55rem; padding: .42rem 0; font-variant-numeric: tabular-nums; }
+.pc-price-row + .pc-price-row { border-top: 1px solid rgba(31,44,68,.45); }
+.pc-price-row.combo { background: rgba(255,122,26,.06); border-radius: 10px; padding: .5rem .5rem; margin-top: .3rem; border-top: none; }
+.pc-pr-label { font-weight: 700; font-size: .87rem; width: 82px; flex: none; }
+.pc-pr-line { font-size: 1.12rem; font-weight: 800; }
+.pc-pr-hit { color: #2dd4bf; font-weight: 800; font-size: .84rem; }
+.pc-pr-odds { margin-left: auto; color: var(--muted); font-size: .8rem; font-weight: 600; text-align: right; }
+.pc-ladder { display: flex; flex-wrap: wrap; gap: .35rem; margin: .3rem 0 .55rem; }
+.pc-chip2 { background: var(--card2); border: 1px solid var(--border); border-radius: 999px; padding: .26rem .6rem; font-size: .76rem; font-weight: 600; color: var(--muted); }
+.pc-chip2 b { color: var(--text); }
+.pc-chip2 .p { color: #2dd4bf; font-weight: 800; }
+.pc-ladder-label { font-size: .77rem; font-weight: 700; color: var(--muted); margin-top: .35rem; }
+.pc-factor { display: flex; align-items: center; gap: .6rem; padding: .38rem 0; font-size: .88rem; }
+.pc-factor + .pc-factor { border-top: 1px solid rgba(31,44,68,.45); }
+.pc-factor .fname { font-weight: 600; flex: none; }
+.pc-factor .fdesc { color: var(--muted); font-size: .8rem; }
+.pc-factor .fmult { margin-left: auto; font-weight: 800; font-variant-numeric: tabular-nums; flex: none; }
+.pc-up { color: #5fd68a; }
+.pc-down { color: #ff7a7a; }
+.pc-table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; background: transparent; }
+.pc-table th { text-align: right; color: var(--muted); font-size: .68rem; letter-spacing: .08em; padding: .35rem .3rem; border-bottom: 1px solid var(--border); background: transparent; }
+.pc-table th:first-child, .pc-table td:first-child { text-align: left; }
+.pc-table td { padding: .45rem .3rem; font-size: .86rem; text-align: right; }
+.pc-table tbody tr + tr td { border-top: 1px solid rgba(31,44,68,.45); }
+.pc-season-strip { display: flex; gap: .5rem; text-align: center; flex-wrap: wrap; }
+.pc-season-strip div { flex: 1; min-width: 62px; background: var(--card2); border: 1px solid var(--border); border-radius: 10px; padding: .5rem .2rem; }
+.pc-season-strip .v { font-weight: 800; font-size: .98rem; }
+.pc-season-strip .k { color: var(--muted); font-size: .64rem; letter-spacing: .08em; text-transform: uppercase; margin-top: .1rem; }
+.pc-nocard { color: var(--muted); font-size: .85rem; line-height: 1.55; margin-top: .9rem; }
+.fm-grid, .fm-row { display: grid; gap: .32rem; }
+.fm-row { margin-top: .32rem; }
+.fm-head { font-size: .68rem; font-weight: 700; color: var(--muted); text-align: center; line-height: 1.3; align-self: end; padding-bottom: .15rem; }
+.fm-head span { font-weight: 500; font-size: .62rem; }
+.fm-label { font-size: .78rem; font-weight: 700; display: flex; flex-direction: column; justify-content: center; }
+.fm-label span { color: var(--muted); font-weight: 600; font-size: .7rem; }
+.fm-cell { position: relative; height: 32px; background: var(--card2); border-radius: 7px; overflow: hidden; }
+.fm-cell .zero { position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: rgba(143,161,184,.4); }
+.fm-cell .bar { position: absolute; top: 7px; height: 9px; border-radius: 3px; }
+.fm-cell .cv { position: absolute; right: 5px; bottom: 2px; font-size: .68rem; font-weight: 800; }
+.fm-legend { color: var(--muted); font-size: .76rem; margin-top: .55rem; line-height: 1.5; }
+.pc-legbtn { display: flex; align-items: center; gap: .45rem; width: 100%; background: var(--card2); border: 1px solid var(--border); color: var(--text); border-radius: 10px; padding: .5rem .65rem; margin-bottom: .35rem; font-size: .85rem; font-weight: 600; cursor: pointer; text-align: left; font-family: inherit; }
+.pc-legbtn b { color: #2dd4bf; }
+.pc-legbtn .pc-legst { margin-left: auto; color: #FF7A1A; font-weight: 800; font-size: .76rem; }
+.pc-legbtn.inp { border-color: rgba(255,122,26,.55); }
+.pc-parlaypeek { color: var(--muted); font-size: .78rem; line-height: 1.5; margin-top: .45rem; }
+/* ---- Parlay builder ---- */
+.pb-leg { display: flex; align-items: center; gap: .55rem; background: var(--card2); border: 1px solid var(--border); border-radius: 11px; padding: .55rem .7rem; margin-bottom: .4rem; font-size: .88rem; font-weight: 700; }
+.pb-leg b { margin-left: auto; color: #2dd4bf; font-variant-numeric: tabular-nums; }
+.pb-legx { background: none; border: none; color: var(--muted); cursor: pointer; font-size: .9rem; font-family: inherit; }
+.pb-addlabel { font-size: .7rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin: .8rem 0 .4rem; }
+.pb-addlist { display: flex; flex-wrap: wrap; gap: .35rem; }
+.pb-addchip { background: var(--card2); border: 1px solid var(--border); color: var(--text); border-radius: 999px; padding: .3rem .6rem; font-size: .76rem; font-weight: 600; cursor: pointer; font-family: inherit; }
+.pb-addchip:hover { border-color: rgba(255,122,26,.55); }
+.pb-calc { border-top: 1px solid rgba(31,44,68,.6); margin-top: 1rem; padding-top: .7rem; }
+.pb-calc-row { display: flex; align-items: center; justify-content: space-between; gap: .6rem; padding: .35rem 0; font-size: .88rem; color: var(--muted); font-variant-numeric: tabular-nums; flex-wrap: wrap; }
+.pb-calc-row b { color: var(--text); }
+.pb-calc-row input { width: 76px; background: var(--card2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); padding: .3rem .45rem; font-size: .88rem; font-family: inherit; }
 </style>
 </head>
 <body>
@@ -108,18 +257,26 @@
 </section>
 
 <section id="view-lab" class="view">
-  <div class="fb-seg" role="tablist">
-    <button class="active" data-view="board" role="tab" type="button">Board</button>
-    <button data-view="markets" role="tab" type="button">Markets</button>
-    <button data-view="slate" role="tab" type="button">Slate</button>
+  <div class="fb-head">
+    <span class="fb-title">The Fast Break</span>
+    <button class="fb-burger" id="fbBurger" type="button" aria-label="Choose view"><span class="fb-burger-ico">☰</span><span id="fbBurgerView">Slate</span></button>
   </div>
-  <section id="nba-view-board" class="view active">
-    <div class="fb-slim-head"><h2>Player Board</h2><span class="right">Tonight · <span class="fb-slim-date"></span></span></div>
-    <div class="table-wrap"><table id="nbaBoardTable">
-      <thead><tr><th>Player</th><th class="num">MIN</th><th class="num">PTS</th><th class="num">REB</th><th class="num">AST</th></tr></thead>
-      <tbody id="nbaBoardBody"></tbody>
-    </table></div>
+  <div class="fb-sheet-wrap" id="fbSheetWrap">
+    <div class="fb-sheet">
+      <div class="fb-sheet-title">The Fast Break — choose a view</div>
+      <button class="fb-sheet-item on" data-fbview="slate" type="button">Slate<span class="fb-sheet-sub">model cards · live scores</span><span class="fb-sheet-check">✓</span></button>
+      <button class="fb-sheet-item" data-fbview="markets" type="button">Markets<span class="fb-sheet-sub">fair lines · P+R+A · ladders</span><span class="fb-sheet-check">✓</span></button>
+      <button class="fb-sheet-item" data-fbview="paint" type="button">In the Paint<span class="fb-sheet-sub">live player tracker</span><span class="fb-sheet-check">✓</span></button>
+      <button class="fb-sheet-item" data-fbview="parlay" type="button">Parlay builder<span class="fb-sheet-sub">combine legs · price the ticket</span><span class="fb-sheet-check">✓</span></button>
+      <button class="fb-sheet-cancel" id="fbSheetCancel" type="button">Cancel</button>
+    </div>
+  </div>
+
+  <section id="nba-view-slate" class="view active">
+    <div class="fb-slim-head"><h2>Slate</h2><span class="right">Tonight · <span class="fb-slim-date"></span></span></div>
+    <div id="nbaSlateBody"><p class="muted">Loading…</p></div>
   </section>
+
   <section id="nba-view-markets" class="view">
     <div class="fb-slim-head"><h2>Markets</h2><span class="right">Bueno engine · fair odds</span></div>
     <p class="muted small" style="margin:.2rem 0 .6rem">Model fair lines from the engine — minutes × rates core, graded against DK's props; v2 role, opponent and game-environment layers on top. Prices are projections, not book odds.</p>
@@ -129,18 +286,37 @@
       <button class="fb-mkt-pill" data-mkt="rebounds" type="button">Rebounds</button>
       <button class="fb-mkt-pill" data-mkt="assists" type="button">Assists</button>
       <button class="fb-mkt-pill" data-mkt="threes" type="button">Threes</button>
+      <button class="fb-mkt-pill" data-mkt="pra" type="button">P+R+A</button>
     </div>
     <div class="table-wrap"><table class="fb-mkt-table">
       <thead><tr><th>Player</th><th class="num">MIN</th><th class="num">Proj</th><th class="num">Fair line</th><th class="num">Over</th><th class="num">Hit %</th><th class="num">Under</th></tr></thead>
       <tbody id="nbaMktBody"><tr><td colspan="7" class="muted">Pricing tonight's slate…</td></tr></tbody>
     </table></div>
-    <p class="muted small" style="margin-top:.4rem">Tap a player for milestone odds — the likelihood they clear each number. Hit % is the model's chance of going over the fair line.</p>
+    <p class="muted small" style="margin-top:.4rem">Tap a player for his full card — fair lines, milestone ladders, form vs tonight's lines, and parlay legs. Hit % is the model's chance of going over the fair line.</p>
   </section>
-  <section id="nba-view-slate" class="view">
-    <div class="fb-slim-head"><h2>Slate</h2><span class="right">Tonight · <span class="fb-slim-date"></span></span></div>
-    <div id="nbaSlateBody"><p class="muted">Loading…</p></div>
+
+  <section id="nba-view-paint" class="view">
+    <div class="fb-slim-head"><h2>In the Paint</h2><span class="right">Live tracker · <span class="fb-slim-date"></span></span></div>
+    <div class="fb-filterbar"><select id="nbaPaintTeam" aria-label="Filter by team"></select></div>
+    <div class="pt-board" id="nbaPaintBody"><p class="pt-empty">Loading…</p></div>
+  </section>
+
+  <section id="nba-view-parlay" class="view">
+    <div class="fb-slim-head"><h2>Parlay builder</h2><span class="right">Bueno model prices</span></div>
+    <p class="muted small" style="margin:.2rem 0 .6rem">Legs price off the model. Combined = every leg hits (legs are treated as independent — cross-game legs are cleanest).</p>
+    <div id="pbLegList"></div>
+    <div class="pb-addlabel">Add a leg — tonight's top milestone looks</div>
+    <div id="pbAddList" class="pb-addlist"></div>
+    <div class="pb-calc">
+      <div class="pb-calc-row"><span>Combined probability</span><b id="pbCombP">—</b></div>
+      <div class="pb-calc-row"><span>Fair odds</span><b id="pbFair">—</b></div>
+      <div class="pb-calc-row"><label>Stake $ <input id="pbStake" type="number" value="10" min="1"></label><span>Payout <b id="pbPayout">—</b> · profit <b id="pbProfit">—</b></span></div>
+      <div class="pb-calc-row"><label>Book offers <input id="pbBook" type="text" placeholder="+450"></label><b id="pbVerdict"></b></div>
+    </div>
   </section>
 </section>
+
+<div class="pc-overlay" id="nbaCardOverlay"><div class="pc-sheet" id="nbaCardSheet"></div></div>
 
 <nav class="bottom-nav" aria-label="Main">
   <a class="bnav-btn" href="index.html"><span class="bnav-ico">⌂</span><span>Home</span></a>
@@ -151,21 +327,14 @@
 
 <script src="nba-engine.js"></script>
 <script>
-// Bottom nav
+// Bottom nav (home <-> lab). The Fast Break's own views are switched
+// from the hamburger sheet inside the main script below.
 document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click', () => {
   document.querySelectorAll('[data-bnav]').forEach(x => x.classList.remove('active'));
   b.classList.add('active');
   document.getElementById('view-home').classList.toggle('active', b.dataset.bnav === 'home');
   document.getElementById('view-lab').classList.toggle('active', b.dataset.bnav === 'lab');
-}));
-// Fast Break segmented nav
-document.querySelectorAll('#view-lab .fb-seg button').forEach(t => t.addEventListener('click', () => {
-  document.querySelectorAll('#view-lab .fb-seg button').forEach(x => x.classList.remove('active'));
-  t.classList.add('active');
-  ['board', 'markets', 'slate'].forEach(v => {
-    document.getElementById('nba-view-' + v).classList.toggle('active', v === t.dataset.view);
-  });
-  if (t.dataset.view === 'markets') loadMarkets();
+  if (b.dataset.bnav === 'lab' && window.fbOnLabOpen) window.fbOnLabOpen();
 }));
 </script>
 <script>
@@ -173,9 +342,9 @@ document.querySelectorAll('#view-lab .fb-seg button').forEach(t => t.addEventLis
 (async function() {
   const $ = (id) => document.getElementById(id);
   const gamesEl = $('nbaGamesBody'), topEl = $('nbaTopBody'),
-        standEl = $('nbaStandingsBody'), boardBody = $('nbaBoardBody'),
-        slateEl = $('nbaSlateBody'), mktBody = $('nbaMktBody'),
-        gradeEl = $('nbaGradeLine');
+        standEl = $('nbaStandingsBody'), slateEl = $('nbaSlateBody'),
+        mktBody = $('nbaMktBody'), gradeEl = $('nbaGradeLine'),
+        paintEl = $('nbaPaintBody'), paintTeamEl = $('nbaPaintTeam');
   const empty = (el, msg) => { if (el) el.innerHTML = '<p class="muted">' + msg + '</p>'; };
   const API = 'https://site.api.espn.com/apis/site/v2/sports/basketball/nba';
   const CORE = 'https://sports.core.api.espn.com/v2/sports/basketball/leagues/nba';
@@ -183,10 +352,10 @@ document.querySelectorAll('#view-lab .fb-seg button').forEach(t => t.addEventLis
   const LOGO_SLUG = { GS:'gs', NO:'no', NY:'ny', SA:'sa', UTAH:'utah', SAC:'sac', WSH:'wsh' };
   const logoUrl = (abbr) => 'https://a.espncdn.com/i/teamlogos/nba/500/' +
     (LOGO_SLUG[String(abbr || '').toUpperCase()] || String(abbr || '').toLowerCase()) + '.png';
-  const logoImg = (abbr, px) => '<img src="' + logoUrl(abbr) + '" alt="' + abbr + '" width="' + px + '" height="' + px + '" style="vertical-align:-4px" loading="lazy">';
   const headshot = (id) => 'https://a.espncdn.com/i/headshots/nba/players/full/' + id + '.png';
   const getJSON = async (url) => { const r = await fetch(url); if (!r.ok) throw new Error(r.status); return r.json(); };
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const round1 = (x) => Math.round(x * 10) / 10;
   async function pool(items, n, fn) {
     const out = new Array(items.length); let i = 0;
     await Promise.all(Array.from({ length: n }, async () => {
@@ -207,8 +376,29 @@ document.querySelectorAll('#view-lab .fb-seg button').forEach(t => t.addEventLis
     el.textContent = now.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
   });
 
-  let tonightGames = [];   // {id, state, detail, home:{id,abbr,name,score,record}, away:{...}}
+  const MKT_KEYS = ['points', 'rebounds', 'assists', 'threes', 'pra'];
+  const MKT_LABEL = { points: 'Points', rebounds: 'Rebounds', assists: 'Assists', threes: 'Threes', pra: 'P + R + A' };
+  const MKT_UNIT = { points: 'PTS', rebounds: 'REB', assists: 'AST', threes: '3PM', pra: 'PRA' };
+  const LADDERS = { points: [10, 15, 20, 25, 30, 35, 40], rebounds: [4, 6, 8, 10, 12, 15], assists: [3, 5, 7, 10, 12], threes: [1, 2, 3, 4, 5, 6], pra: [25, 30, 35, 40, 45, 50, 55, 60] };
+
+  let tonightGames = [];   // {id, state, detail, start, venue, home:{id,abbr,name,score,record}, away:{...}}
   let standingsByTeamId = {}; // id -> {pa} from completed-season standings
+  let teamRatings = null;  // teamId -> {pace, offRtg, defRtg}
+  let lgPace = 100;
+  let livePlayers = [];    // box-score rows for started games
+  let liveByPid = {};      // pid -> live row
+  let gamesLoaded = false;
+  let gamesReadyResolve = null;
+  const gamesReady = new Promise((r) => { gamesReadyResolve = r; });
+  let standingsResolve = null;
+  const standingsDone = new Promise((r) => { standingsResolve = r; });
+
+  const teamNameByAbbr = () => {
+    const m = {};
+    for (const g of tonightGames) { m[g.home.abbr] = g.home.name; m[g.away.abbr] = g.away.name; }
+    return m;
+  };
+  const gameById = (id) => tonightGames.find((g) => String(g.id) === String(id)) || null;
 
   // ---- standings (current season card + completed-season points-against for defRtg) ----
   (async () => {
@@ -242,20 +432,13 @@ document.querySelectorAll('#view-lab .fb-seg button').forEach(t => t.addEventLis
         }
       }
     } catch (e) { /* defRtg falls back to league average */ }
+    if (standingsResolve) standingsResolve();
   })();
 
-  // ---- tonight's games + player board ----
-  try {
+  // ---- tonight's games (scoreboard) ----
+  async function fetchScoreboard() {
     const sb = await getJSON(API + '/scoreboard?dates=' + ymd);
     const events = sb.events || [];
-    if (!events.length) {
-      empty(gamesEl, 'No NBA games today.');
-      empty(topEl, 'No games today.');
-      empty(slateEl, 'No NBA games today.');
-      if (boardBody) boardBody.innerHTML = '';
-      if (mktBody) mktBody.innerHTML = '<tr><td colspan="7" class="muted">No games today to price.</td></tr>';
-      return;
-    }
     tonightGames = events.map((ev) => {
       const comp = (ev.competitions || [])[0] || {};
       const cs = comp.competitors || [];
@@ -272,6 +455,11 @@ document.querySelectorAll('#view-lab .fb-seg button').forEach(t => t.addEventLis
         away: { id: (away.team || {}).id, abbr: (away.team || {}).abbreviation, name: (away.team || {}).displayName, score: away.score, record: rec(away) },
       };
     });
+    return tonightGames.length > 0;
+  }
+
+  function renderTonight() {
+    if (!tonightGames.length) { empty(gamesEl, 'No NBA games today.'); return; }
     const gteam = (t, right) =>
       '<div class="fb-gteam' + (right ? ' right' : '') + '">' +
       (right ? '' : '<img src="' + logoUrl(t.abbr) + '" alt="">') +
@@ -285,25 +473,21 @@ document.querySelectorAll('#view-lab .fb-seg button').forEach(t => t.addEventLis
         : '<div class="fb-gmid"><div class="fb-gtime">' + new Date(g.start).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) + '</div><div class="fb-gstat">tip-off</div></div>';
       return '<div class="home-card fb-game" style="margin:0">' + gteam(g.away, false) + mid + gteam(g.home, true) + '</div>';
     }).join('');
-    slateEl.innerHTML = tonightGames.map((g) =>
-      '<div class="home-card" style="display:flex;align-items:center;gap:.5rem">' +
-      '<span style="display:flex;align-items:center;gap:.4rem;flex:1;min-width:0">' + logoImg(g.away.abbr, 24) + ' ' + esc(g.away.name || g.away.abbr) + ' @ ' + esc(g.home.name || g.home.abbr) + ' ' + logoImg(g.home.abbr, 24) + '</span>' +
-      '<span class="muted small" style="text-align:right">' + esc(g.detail) + (g.venue ? ' · ' + esc(g.venue) : '') + '</span></div>'
-    ).join('');
+  }
 
-    // player board + top performers: box scores for games that have started.
-    // NOTE: no early return here — the Markets wiring below must still run
-    // on days when no game has tipped yet.
+  // ---- box scores for started games (team blocks verified before use) ----
+  async function fetchLivePlayers() {
     const started = tonightGames.filter((g) => g.state !== 'pre');
-    if (!started.length) {
-      empty(topEl, 'Tip-off hasn\'t happened yet — performers land here once games start.');
-      if (boardBody) boardBody.innerHTML = '<tr><td colspan="5" class="muted">Tip-off hasn\'t happened yet — the board fills in once games start.</td></tr>';
-    }
     const players = [];
-    if (started.length) await Promise.all(started.map(async (g) => {
+    await Promise.all(started.map(async (g) => {
       try {
         const sum = await getJSON(API + '/summary?event=' + g.id);
-        for (const tp of (sum.boxscore || {}).players || []) {
+        const blocks = (sum.boxscore || {}).players || [];
+        const blockIds = blocks.map((tp) => String((tp.team || {}).id));
+        // Verified coverage: trust this summary only if it actually
+        // contains BOTH teams' box-score blocks for this game.
+        if (!blockIds.includes(String(g.home.id)) || !blockIds.includes(String(g.away.id))) return;
+        for (const tp of blocks) {
           const teamAbbr = (tp.team || {}).abbreviation || '';
           const statBlock = (tp.statistics || [])[0] || {};
           const labels = statBlock.labels || [];
@@ -313,44 +497,221 @@ document.querySelectorAll('#view-lab .fb-seg button').forEach(t => t.addEventLis
             if (!s.length) continue;
             const pts = parseInt(s[ix('PTS')], 10);
             if (!Number.isFinite(pts)) continue;
+            const tpt = String(s[ix('3PT')] || '0-0').split('-')[0];
             players.push({
               id: (a.athlete || {}).id,
               name: (a.athlete || {}).displayName || '',
               team: teamAbbr,
+              gameId: g.id, state: g.state, detail: g.detail,
+              match: g.away.abbr + ' @ ' + g.home.abbr,
               min: s[ix('MIN')] || '',
-              pts, reb: parseInt(s[ix('REB')], 10) || 0, ast: parseInt(s[ix('AST')], 10) || 0,
+              minNum: parseFloat(s[ix('MIN')]) || 0,
+              pts, reb: parseInt(s[ix('REB')], 10) || 0,
+              ast: parseInt(s[ix('AST')], 10) || 0,
+              tpm: parseInt(tpt, 10) || 0,
             });
           }
         }
       } catch (e) { /* skip game */ }
     }));
-    if (started.length) {
     players.sort((a, b) => b.pts - a.pts || b.reb - a.reb);
-    const tr = (r, i) =>
-      '<tr><td><span class="fb-bplayer"><img class="hs" src="' + headshot(r.id) + '" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">' +
-      '<span class="bn">' + esc(r.name) + '</span><img class="tl" src="' + logoUrl(r.team) + '" alt=""></span></td>' +
-      '<td class="num">' + esc(r.min) + '</td>' +
-      '<td class="num' + (i === 0 ? ' fb-hot' : '') + '">' + r.pts + '</td>' +
-      '<td class="num">' + r.reb + '</td><td class="num">' + r.ast + '</td></tr>';
-    boardBody.innerHTML = players.map(tr).join('');
-    topEl.innerHTML = '<div class="fb-perf-row">' + players.slice(0, 8).map((r) =>
-      '<div class="fb-perf"><img class="hs" src="' + headshot(r.id) + '" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">' +
+    livePlayers = players;
+    liveByPid = {};
+    for (const p of players) liveByPid[p.id] = p;
+  }
+
+  function renderTop() {
+    if (!tonightGames.length) { empty(topEl, 'No games today.'); return; }
+    const started = tonightGames.some((g) => g.state !== 'pre');
+    if (!started) { empty(topEl, 'Tip-off hasn\'t happened yet — performers land here once games start.'); return; }
+    if (!livePlayers.length) { empty(topEl, 'No box scores yet.'); return; }
+    topEl.innerHTML = '<div class="fb-perf-row">' + livePlayers.slice(0, 8).map((r) =>
+      '<div class="fb-perf" data-pid="' + r.id + '" role="button" tabindex="0"><img class="hs" src="' + headshot(r.id) + '" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">' +
       '<div class="pname">' + esc(r.name) + '</div>' +
       '<div class="pteam"><img src="' + logoUrl(r.team) + '" alt="">' + esc(r.team) + '</div>' +
       '<div class="pstat">' + r.pts + ' PTS <small>· ' + r.reb + ' REB · ' + r.ast + ' AST</small></div></div>'
     ).join('') + '</div>';
-    if (!players.length && started.length) empty(topEl, 'No box scores yet.');
+    topEl.querySelectorAll('.fb-perf').forEach((el) => el.addEventListener('click', () => openPlayerCard(el.dataset.pid)));
+  }
+
+  // ---- Slate (model cards + live tracker + Top looks) ----
+  function gameProjFor(g) {
+    if (!teamRatings) return null;
+    const hr = teamRatings[g.home.id], ar = teamRatings[g.away.id];
+    if (!hr || !ar) return null;
+    return nbaGameProjection(hr, ar, { pace: lgPace, rtg: 115.6 });
+  }
+  function topLooksFor(gameId) {
+    if (!mktRows) return null;
+    const rows = mktRows.filter((r) => String(r.gameId) === String(gameId));
+    const pick = (mkt, t) => {
+      let best = null;
+      for (const r of rows) {
+        const p = (r.markets[mkt].rungs || {})[t];
+        if (p != null && (best === null || p > best.p)) best = { id: r.id, name: r.name, team: r.team, mkt, t, p };
+      }
+      return best;
+    };
+    return [pick('points', 20), pick('rebounds', 8), pick('assists', 7)].filter(Boolean);
+  }
+  function renderSlate() {
+    if (!slateEl) return;
+    if (!tonightGames.length) { empty(slateEl, 'No NBA games today.'); return; }
+    slateEl.innerHTML = '<div class="sl-wrap">' + tonightGames.map((g) => {
+      const proj = gameProjFor(g);
+      const aS = parseInt(g.away.score, 10), hS = parseInt(g.home.score, 10);
+      const played = g.state !== 'pre';
+      const scoreHtml = (t, s) => played
+        ? '<span class="sl-score' + (g.state === 'post' && Number.isFinite(s) && Number.isFinite(t === g.away ? hS : aS) && s > (t === g.away ? hS : aS) ? ' win' : '') + '">' + (Number.isFinite(s) ? s : 0) + '</span>'
+        : '';
+      const trow = (t, s, right) =>
+        '<div class="sl-trow' + (right ? ' right' : '') + '"><img src="' + logoUrl(t.abbr) + '" alt="">' +
+        '<span><span class="abbr">' + esc(t.abbr) + '</span>' +
+        (!played && t.record ? '<span class="sl-rec">' + esc(t.record) + '</span>' : '') + '</span>' +
+        scoreHtml(t, s) + '</div>';
+      let mid;
+      if (g.state === 'in') mid = '<div class="sl-tip live">' + esc(g.detail || 'Live') + '<span>live</span></div>';
+      else if (g.state === 'post') mid = '<div class="sl-tip final">FINAL</div>';
+      else mid = '<div class="sl-tip">' + new Date(g.start).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) + '<span>tip-off</span></div>';
+      let body = '';
+      if (proj) {
+        const favHome = proj.fav === 'home';
+        const favAbbr = favHome ? g.home.abbr : g.away.abbr;
+        const favML = favHome ? proj.homeML : proj.awayML;
+        const favPct = Math.round((favHome ? proj.homeWinP : proj.awayWinP) * 100);
+        const spreadTxt = proj.spread === 0 ? 'PK' : favAbbr + ' −' + proj.spread;
+        body += '<div class="sl-trio">' +
+          '<div class="sl-tcell"><div class="sl-tv">' + favML + ' <span class="pct">' + favPct + '%</span></div><div class="sl-tk">' + esc(favAbbr) + ' moneyline</div></div>' +
+          '<div class="sl-tcell mid"><div class="sl-tv">' + spreadTxt + '</div><div class="sl-tk">Model spread</div></div>' +
+          '<div class="sl-tcell"><div class="sl-tv">' + proj.total + '</div><div class="sl-tk">Model total</div></div></div>' +
+          '<div class="sl-proj">Proj score: ' + esc(g.away.abbr) + ' ' + Math.round(proj.expAway) + ' — ' + Math.round(proj.expHome) + ' ' + esc(g.home.abbr) + ' · pace ' + proj.pace + '</div>' +
+          '<div class="sl-tags">' + (proj.tags.length
+            ? proj.tags.map((t) => '<span class="sl-tag">' + esc(t) + '</span>').join('')
+            : '<span class="sl-tag dim">Standard script</span>') + '</div>';
+        if (g.state === 'post' && Number.isFinite(aS) && Number.isFinite(hS)) {
+          const favWon = favHome ? hS > aS : aS > hS;
+          const favMargin = favHome ? hS - aS : aS - hS;
+          let check = 'Model check — favorite ' + (favWon ? 'won' : 'lost');
+          if (favWon) check += favMargin > proj.spread ? ' · covered' : (favMargin === proj.spread ? ' · pushed the spread' : ' · won, no cover');
+          const actualTotal = aS + hS, diff = actualTotal - proj.total;
+          check += ' · total ' + actualTotal + ' vs ' + proj.total + ' (' +
+            (diff > 0 ? 'over ' + diff : diff < 0 ? 'under ' + (-diff) : 'dead on') + ')';
+          body += '<div class="sl-check">' + esc(check) + '</div>';
+        }
+      } else {
+        body += '<div class="sl-proj">Model projection loads with team ratings…</div>';
+      }
+      const looks = topLooksFor(g.id);
+      let looksHtml;
+      if (looks === null) looksHtml = '<p class="muted small">Pricing tonight\'s slate…</p>';
+      else if (!looks.length) looksHtml = '<p class="muted small">No priced players in this game.</p>';
+      else looksHtml = looks.map((l) =>
+        '<div class="sl-look" data-pid="' + l.id + '" role="button"><img src="' + headshot(l.id) + '" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">' +
+        '<div><div class="sl-look-name">' + esc(l.name) + '</div><div class="sl-look-meta">' + esc(l.team) + ' · ' + l.t + '+ ' + MKT_UNIT[l.mkt] + '</div></div>' +
+        '<div class="sl-look-p">' + Math.round(l.p * 100) + '%</div></div>'
+      ).join('');
+      body += '<details class="sl-fold"><summary>Top looks<span class="chev">▸</span></summary><div class="sl-fold-body">' + looksHtml + '</div></details>';
+      return '<div class="sl-gcard"><div class="sl-teams">' + trow(g.away, aS, false) + mid + trow(g.home, hS, true) + '</div>' + body + '</div>';
+    }).join('') + '</div>';
+    slateEl.querySelectorAll('.sl-look').forEach((el) => el.addEventListener('click', () => openPlayerCard(el.dataset.pid)));
+  }
+
+  // ---- In the Paint (live player tracker) ----
+  let pricedById = {};
+  function paintChip(p) {
+    const row = pricedById[p.id];
+    if (!row) return '<span class="pt-chip dim">no model line</span>';
+    const L = row.markets.points.line, projMin = row.min;
+    if (p.state === 'post') {
+      return p.pts > L
+        ? '<span class="pt-chip good">✓ cleared ' + L + '</span>'
+        : '<span class="pt-chip bad">✗ under ' + L + '</span>';
     }
-  } catch (e) {
-    empty(gamesEl, "Couldn't load tonight's games.");
-    empty(topEl, "Couldn't load.");
-    empty(slateEl, "Couldn't load.");
+    if (p.pts > L) return '<span class="pt-chip good">✓ over ' + L + ' already</span>';
+    if (p.minNum >= 8 && projMin > 0) {
+      const pace = p.pts * (projMin / p.minNum);
+      return pace >= L
+        ? '<span class="pt-chip pace">on pace · proj ' + Math.round(pace) + '</span>'
+        : '<span class="pt-chip dim">pace ' + Math.round(pace) + ' · line ' + L + '</span>';
+    }
+    return '<span class="pt-chip dim">line ' + L + '</span>';
+  }
+  function renderPaint() {
+    if (!paintEl) return;
+    const started = tonightGames.some((g) => g.state !== 'pre');
+    // team dropdown: teams with players on the board tonight
+    const counts = {};
+    for (const p of livePlayers) counts[p.team] = (counts[p.team] || 0) + 1;
+    const teams = Object.keys(counts).sort();
+    const prevSel = paintTeamEl.value;
+    paintTeamEl.innerHTML = '<option value="">All teams · live &amp; final</option>' +
+      teams.map((t) => '<option value="' + esc(t) + '">' + esc(t) + ' (' + counts[t] + ' players)</option>').join('');
+    paintTeamEl.value = teams.includes(prevSel) ? prevSel : '';
+    if (!started) {
+      paintEl.innerHTML = '<p class="pt-empty">In the Paint fills in once games tip — every player, live, with pace vs his fair line.</p>';
+      return;
+    }
+    if (!livePlayers.length) {
+      paintEl.innerHTML = '<p class="pt-empty">Games have tipped — box scores are on their way…</p>';
+      return;
+    }
+    paintEl.innerHTML = livePlayers.map((p) =>
+      '<div class="pt-row" data-pid="' + p.id + '" data-team="' + esc(p.team) + '">' +
+      '<img class="hs" src="' + headshot(p.id) + '" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">' +
+      '<div class="pt-info"><div class="pt-name">' + esc(p.name) + '<span class="pt-team">' + esc(p.team) + '</span></div>' +
+      '<div class="pt-game">' + esc(p.match) + ' · ' + (p.state === 'post' ? 'Final' : esc(p.detail)) + '</div></div>' +
+      '<div class="pt-line"><span><b>' + esc(p.min) + '</b> MIN</span><span><b>' + p.pts + '</b> PTS</span><span><b>' + p.reb + '</b> REB</span><span><b>' + p.ast + '</b> AST</span><span><b>' + p.tpm + '</b> 3PM</span></div>' +
+      '<div class="pt-chiprow">' + paintChip(p) + '</div></div>'
+    ).join('');
+    paintEl.querySelectorAll('.pt-row').forEach((el) => el.addEventListener('click', () => openPlayerCard(el.dataset.pid)));
+    applyPaintFilter();
+  }
+  function applyPaintFilter() {
+    const sel = paintTeamEl.value;
+    paintEl.querySelectorAll('.pt-row').forEach((el) => {
+      el.style.display = (!sel || el.dataset.team === sel) ? '' : 'none';
+    });
+  }
+  if (paintTeamEl) paintTeamEl.addEventListener('change', applyPaintFilter);
+
+  // ---- refresh + poll ----
+  let pollTimer = null;
+  async function refreshLive() {
+    let hasGames = false;
+    try { hasGames = await fetchScoreboard(); } catch (e) { /* keep last state */ }
+    if (!gamesLoaded) {
+      gamesLoaded = true;
+      if (gamesReadyResolve) gamesReadyResolve();
+      if (!hasGames && !tonightGames.length) {
+        empty(gamesEl, 'No NBA games today.');
+        empty(topEl, 'No games today.');
+        if (mktBody) mktBody.innerHTML = '<tr><td colspan="7" class="muted">No games today to price.</td></tr>';
+      }
+    }
+    renderTonight();
+    renderSlate();
+    await fetchLivePlayers();
+    renderTop();
+    renderPaint();
+    if (cardPid) renderCard(cardPid, true);
+  }
+  function schedulePoll() {
+    if (pollTimer) clearTimeout(pollTimer);
+    if (!tonightGames.length) return;
+    const anyIn = tonightGames.some((g) => g.state === 'in');
+    const anyPre = tonightGames.some((g) => g.state === 'pre');
+    if (!anyIn && !anyPre) return;
+    pollTimer = setTimeout(async () => { await refreshLive(); schedulePoll(); }, anyIn ? 60000 : 120000);
   }
 
   /* ================= Markets (Bueno engine v2) ================= */
   let mktRows = null;      // priced rows for tonight
   let mktLoading = false;
   let mktCurrent = 'points';
+  const dayCache = (() => {
+    const c = lsGet('bueno-nba-mkt-v1') || {};
+    return c.day === ymdDash ? c : { day: ymdDash, players: {}, teams: {} };
+  })();
 
   function parseSeasonStats(j) {
     const cats = (((j || {}).splits || {}).categories) || [];
@@ -359,6 +720,7 @@ document.querySelectorAll('#view-lab .fb-seg button').forEach(t => t.addEventLis
     const gp = m.gamesPlayed || 0;
     if (!gp) return null;
     return {
+      gamesPlayed: gp,
       minutes: m.minutes != null ? m.minutes : (m.avgMinutes || 0) * gp,
       points: m.points || 0,
       assists: m.assists || 0,
@@ -366,6 +728,7 @@ document.querySelectorAll('#view-lab .fb-seg button').forEach(t => t.addEventLis
       threeAtt: m.threePointFieldGoalsAttempted || 0,
       threeMade: m.threePointFieldGoalsMade || 0,
       threePct: m.threePointFieldGoalPct != null ? m.threePointFieldGoalPct / 100 : null,
+      fgPct: m.fieldGoalPct != null ? m.fieldGoalPct : null,
       avgMinutes: m.avgMinutes || 0,
     };
   }
@@ -380,40 +743,11 @@ document.querySelectorAll('#view-lab .fb-seg button').forEach(t => t.addEventLis
       defRtg: pa ? (pa / pace) * 100 : 115.6,
     };
   }
-  // last-3 completed games' minutes per athlete for a team
-  async function recentMinutesByTeam(teamId) {
-    const sched = await getJSON(API + '/teams/' + teamId + '/schedule');
-    const past = (sched.events || []).filter((e) => {
-      const t = (((e.competitions || [])[0] || {}).status || {}).type || {};
-      return t.completed;
-    }).sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 3);
-    const byPlayer = {}; // pid -> [min, ...] most recent first
-    const names = {};
-    for (const ev of past) {
-      const sum = await getJSON(API + '/summary?event=' + ev.id);
-      for (const tp of (sum.boxscore || {}).players || []) {
-        if (String((tp.team || {}).id) !== String(teamId)) continue;
-        const statBlock = (tp.statistics || [])[0] || {};
-        const labels = statBlock.labels || [];
-        const ixMin = labels.indexOf('MIN');
-        for (const a of statBlock.athletes || []) {
-          const pid = (a.athlete || {}).id;
-          if (!pid) continue;
-          const min = parseFloat((a.stats || [])[ixMin]) || 0;
-          (byPlayer[pid] = byPlayer[pid] || []).push(min);
-          names[pid] = (a.athlete || {}).displayName || '';
-        }
-      }
-    }
-    return { byPlayer, names };
-  }
-
-  async function priceTonight() {
-    if (!tonightGames.length) return [];
-    const cache = lsGet('bueno-nba-mkt-v1') || {};
-    const dayCache = cache.day === ymdDash ? cache : { day: ymdDash, players: {}, teams: {} };
+  async function loadRatings() {
+    if (teamRatings) return teamRatings;
+    if (!tonightGames.length) await gamesReady;
+    await standingsDone;
     const teamIds = [...new Set(tonightGames.flatMap((g) => [g.home.id, g.away.id]).filter(Boolean))];
-    // team ratings (cached per day)
     const ratings = {};
     await pool(teamIds, 4, async (tid) => {
       if (dayCache.teams[tid]) { ratings[tid] = dayCache.teams[tid]; return; }
@@ -423,11 +757,67 @@ document.querySelectorAll('#view-lab .fb-seg button').forEach(t => t.addEventLis
         dayCache.teams[tid] = ratings[tid];
       } catch (e) { ratings[tid] = { pace: 100, offRtg: 115.6, defRtg: 115.6 }; }
     });
-    const lgPace = teamIds.reduce((a, t) => a + (ratings[t] ? ratings[t].pace : 100), 0) / Math.max(1, teamIds.length);
-    // recent minutes + rotation per team
+    teamRatings = ratings;
+    lgPace = teamIds.length
+      ? teamIds.reduce((a, t) => a + (ratings[t] ? ratings[t].pace : 100), 0) / teamIds.length
+      : 100;
+    lsSet('bueno-nba-mkt-v1', dayCache);
+    return ratings;
+  }
+  // last-4 completed games per athlete for a team: full stat lines
+  // (minutes feed the engine; the lines feed the player card).
+  // Team block is verified against the summary before its lines are used.
+  async function recentGamesByTeam(teamId) {
+    const sched = await getJSON(API + '/teams/' + teamId + '/schedule');
+    const past = (sched.events || []).filter((e) => {
+      const t = (((e.competitions || [])[0] || {}).status || {}).type || {};
+      return t.completed;
+    }).sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 4);
+    const byPlayer = {}; // pid -> [gameLine, ...] most recent first
+    const names = {};
+    for (const ev of past) {
+      const comp = (ev.competitions || [])[0] || {};
+      const oppC = (comp.competitors || []).find((c) => String((c.team || {}).id) !== String(teamId)) || {};
+      const oppAbbr = (oppC.team || {}).abbreviation || '';
+      const homeAway = ((comp.competitors || []).find((c) => String((c.team || {}).id) === String(teamId)) || {}).homeAway === 'home' ? 'vs' : '@';
+      const d = new Date(ev.date);
+      const dateStr = p2(d.getMonth() + 1) + '-' + p2(d.getDate());
+      const sum = await getJSON(API + '/summary?event=' + ev.id);
+      const blocks = (sum.boxscore || {}).players || [];
+      const block = blocks.find((tp) => String((tp.team || {}).id) === String(teamId));
+      if (!block) continue; // summary doesn't carry this team's block — don't trust it
+      const statBlock = (block.statistics || [])[0] || {};
+      const labels = statBlock.labels || [];
+      const ix = (k) => labels.indexOf(k);
+      for (const a of statBlock.athletes || []) {
+        const pid = (a.athlete || {}).id;
+        if (!pid) continue;
+        const s = a.stats || [];
+        if (!s.length) continue;
+        const tpt = String(s[ix('3PT')] || '0-0').split('-')[0];
+        (byPlayer[pid] = byPlayer[pid] || []).push({
+          date: dateStr, opp: oppAbbr, homeAway,
+          min: parseFloat(s[ix('MIN')]) || 0,
+          pts: parseInt(s[ix('PTS')], 10) || 0,
+          reb: parseInt(s[ix('REB')], 10) || 0,
+          ast: parseInt(s[ix('AST')], 10) || 0,
+          tpm: parseInt(tpt, 10) || 0,
+        });
+        names[pid] = (a.athlete || {}).displayName || '';
+      }
+    }
+    return { byPlayer, names };
+  }
+
+  async function priceTonight() {
+    if (!tonightGames.length) await gamesReady;
+    if (!tonightGames.length) return [];
+    const ratings = await loadRatings();
+    // recent game lines per team
+    const teamIds = [...new Set(tonightGames.flatMap((g) => [g.home.id, g.away.id]).filter(Boolean))];
     const teamRecent = {};
     await pool(teamIds, 4, async (tid) => {
-      try { teamRecent[tid] = await recentMinutesByTeam(tid); }
+      try { teamRecent[tid] = await recentGamesByTeam(tid); }
       catch (e) { teamRecent[tid] = { byPlayer: {}, names: {} }; }
     });
     // build player jobs
@@ -441,10 +831,17 @@ document.querySelectorAll('#view-lab .fb-seg button').forEach(t => t.addEventLis
           { pace: ratings[opp.id].pace, offRtg: ratings[opp.id].offRtg, defRtg: ratings[opp.id].defRtg },
           { pace: lgPace, rtg: 115.6 });
         const paceAdj = side === 'away' ? env.a : env.b;
-        for (const [pid, mins] of Object.entries(rec.byPlayer)) {
-          const avg = mins.reduce((a, b) => a + b, 0) / mins.length;
+        for (const [pid, lines] of Object.entries(rec.byPlayer)) {
+          const mins = lines.map((l) => l.min);
+          const mins3 = mins.slice(0, 3);
+          const avg = mins3.reduce((a, b) => a + b, 0) / Math.max(1, mins3.length);
           if (!(avg >= 10 || mins[0] >= 16)) continue;
-          jobs.push({ pid, name: rec.names[pid] || '', team: t.abbr, teamId: t.id, oppDefRtg: ratings[opp.id].defRtg, paceAdj, recentGames: mins, gameId: g.id });
+          jobs.push({
+            pid, name: rec.names[pid] || '', team: t.abbr, teamName: t.name, teamId: t.id,
+            oppAbbr: opp.abbr, oppName: opp.name, home: side === 'home',
+            oppDefRtg: ratings[opp.id].defRtg, paceAdj,
+            recentGames: mins, recentLines: lines, gameId: g.id,
+          });
         }
       }
     }
@@ -460,17 +857,45 @@ document.querySelectorAll('#view-lab .fb-seg button').forEach(t => t.addEventLis
       }
       if (!season || !season.minutes) return null;
       const priced = nbaPricePlayer(season, { recentGames: job.recentGames, oppDefRtg: job.oppDefRtg, paceAdj: job.paceAdj });
+      const praMd = nbaPraMarket(priced.markets);
+      const raw = {
+        points: priced.markets.points, rebounds: priced.markets.rebounds,
+        assists: priced.markets.assists, threes: priced.markets.threes,
+        pra: { mean: praMd.mean, medianLine: nbaMedianLine(praMd.dist), dist: praMd.dist },
+      };
       const mk = {};
-      const LADDERS = { points: [10, 15, 20, 25, 30, 35, 40], rebounds: [4, 6, 8, 10, 12, 15], assists: [3, 5, 7, 10, 12], threes: [1, 2, 3, 4, 5, 6] };
-      for (const key of ['points', 'rebounds', 'assists', 'threes']) {
-        const md = priced.markets[key];
+      for (const key of MKT_KEYS) {
+        const md = raw[key];
         const pOver = nbaProbOver(md.dist, md.medianLine);
-        const ladder = (LADDERS[key] || [])
-          .map((t) => ({ t, p: nbaProbOver(md.dist, t - 0.5) }))
-          .filter((x) => x.p >= 0.02 && x.p <= 0.98);
-        mk[key] = { mean: md.mean, line: md.medianLine, over: nbaFairOdds(pOver), under: nbaFairOdds(1 - pOver), pOver, ladder };
+        const rungs = {};
+        for (const t of LADDERS[key]) rungs[t] = nbaProbOver(md.dist, t - 0.5);
+        const ladder = Object.keys(rungs)
+          .map((t) => ({ t: Number(t), p: rungs[t] }))
+          .filter((x) => x.p >= 0.02 && x.p <= 0.98)
+          .sort((a, b) => a.t - b.t);
+        mk[key] = { mean: md.mean, line: md.medianLine, over: nbaFairOdds(pOver), under: nbaFairOdds(1 - pOver), pOver, ladder, rungs };
       }
-      return { id: job.pid, name: job.name, team: job.team, min: Math.round(priced.minutes), markets: mk };
+      const gp = season.gamesPlayed || 0;
+      const seasonAvgs = gp ? {
+        ppg: round1(season.points / gp), rpg: round1(season.rebounds / gp),
+        apg: round1(season.assists / gp), mpg: round1(season.avgMinutes || 0),
+        fgPct: season.fgPct, threePct: season.threePct,
+      } : null;
+      const recMins = job.recentGames.slice(0, 3);
+      const factors = {
+        seasonMpg: round1(season.avgMinutes || 0),
+        recentAvg: recMins.length ? round1(recMins.reduce((a, b) => a + b, 0) / recMins.length) : null,
+        recentN: recMins.length,
+        oppDefRtg: round1(job.oppDefRtg),
+        oppFactor: nbaOppFactor(job.oppDefRtg, 'points'),
+        paceAdj: job.paceAdj,
+      };
+      return {
+        id: job.pid, name: job.name, team: job.team, teamName: job.teamName, teamId: job.teamId,
+        gameId: job.gameId, oppAbbr: job.oppAbbr, oppName: job.oppName, home: job.home,
+        min: Math.round(priced.minutes), markets: mk,
+        seasonAvgs, recentLines: job.recentLines, factors,
+      };
     });
     lsSet('bueno-nba-mkt-v1', dayCache);
     const clean = rows.filter(Boolean);
@@ -480,11 +905,12 @@ document.querySelectorAll('#view-lab .fb-seg button').forEach(t => t.addEventLis
 
   function savePrices(rows) {
     const store = lsGet('bueno-nba-prices-v1') || {};
-    store[ymdDash] = rows.map((r) => ({
-      id: r.id, name: r.name,
-      lines: { points: r.markets.points.line, rebounds: r.markets.rebounds.line, assists: r.markets.assists.line, threes: r.markets.threes.line },
-      pOver: { points: r.markets.points.pOver, rebounds: r.markets.rebounds.pOver, assists: r.markets.assists.pOver, threes: r.markets.threes.pOver },
-    }));
+    const grab = (r, field) => {
+      const o = {};
+      for (const key of MKT_KEYS) o[key] = r.markets[key][field];
+      return o;
+    };
+    store[ymdDash] = rows.map((r) => ({ id: r.id, name: r.name, lines: grab(r, 'line'), pOver: grab(r, 'pOver') }));
     const keys = Object.keys(store).sort();
     while (keys.length > 3) delete store[keys.shift()];
     lsSet('bueno-nba-prices-v1', store);
@@ -498,7 +924,7 @@ document.querySelectorAll('#view-lab .fb-seg button').forEach(t => t.addEventLis
     const date = dates[dates.length - 1];
     try {
       const sb = await getJSON(API + '/scoreboard?dates=' + date.replace(/-/g, ''));
-      const actual = {}; // pid -> {points, rebounds, assists, threes}
+      const actual = {}; // pid -> {points, rebounds, assists, threes, pra}
       await Promise.all((sb.events || []).map(async (ev) => {
         const sum = await getJSON(API + '/summary?event=' + ev.id);
         for (const tp of (sum.boxscore || {}).players || []) {
@@ -509,11 +935,13 @@ document.querySelectorAll('#view-lab .fb-seg button').forEach(t => t.addEventLis
             const s = a.stats || [];
             if (!s.length) continue;
             const tpt = String(s[ix('3PT')] || '0-0').split('-')[0];
+            const pts = parseInt(s[ix('PTS')], 10) || 0;
+            const reb = parseInt(s[ix('REB')], 10) || 0;
+            const ast = parseInt(s[ix('AST')], 10) || 0;
             actual[(a.athlete || {}).id] = {
-              points: parseInt(s[ix('PTS')], 10) || 0,
-              rebounds: parseInt(s[ix('REB')], 10) || 0,
-              assists: parseInt(s[ix('AST')], 10) || 0,
+              points: pts, rebounds: reb, assists: ast,
               threes: parseInt(tpt, 10) || 0,
+              pra: pts + reb + ast,
             };
           }
         }
@@ -522,8 +950,8 @@ document.querySelectorAll('#view-lab .fb-seg button').forEach(t => t.addEventLis
       for (const row of store[date]) {
         const a = actual[row.id];
         if (!a) continue;
-        for (const key of ['points', 'rebounds', 'assists', 'threes']) {
-          if (a[key] === row.lines[key] - 0.5) continue; // exact push on the .5 line impossible; kept for safety
+        for (const key of MKT_KEYS) {
+          if (row.lines[key] == null || row.pOver[key] == null) continue; // older slates predate P+R+A
           n++;
           expSum += row.pOver[key];
           if (a[key] > row.lines[key]) hits++;
@@ -547,12 +975,8 @@ document.querySelectorAll('#view-lab .fb-seg button').forEach(t => t.addEventLis
       return;
     }
     const rows = [...mktRows].sort((a, b) => b.markets[mktCurrent].mean - a.markets[mktCurrent].mean).slice(0, 30);
-    const suffix = { points: 'PTS', rebounds: 'REB', assists: 'AST', threes: '3PM' }[mktCurrent];
     mktBody.innerHTML = rows.map((r) => {
       const m = r.markets[mktCurrent];
-      const chips = (m.ladder || []).map((x) =>
-        '<span class="fb-chip"><b>' + x.t + '+</b> ' + suffix + ' · <span class="p">' + Math.round(x.p * 100) + '%</span> · ' + nbaFairOdds(x.p) + '</span>'
-      ).join('');
       return '<tr class="fb-prow" data-pid="' + r.id + '"><td><span class="fb-bplayer"><img class="hs" src="' + headshot(r.id) + '" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">' +
         '<span class="bn">' + esc(r.name) + '</span><img class="tl" src="' + logoUrl(r.team) + '" alt=""></span></td>' +
         '<td class="num">' + r.min + '</td>' +
@@ -560,14 +984,9 @@ document.querySelectorAll('#view-lab .fb-seg button').forEach(t => t.addEventLis
         '<td class="num fb-mkt-line">' + m.line + '</td>' +
         '<td class="num fb-mkt-over">' + m.over + '</td>' +
         '<td class="num fb-mkt-pct">' + Math.round(m.pOver * 100) + '%</td>' +
-        '<td class="num">' + m.under + '</td></tr>' +
-        '<tr class="fb-ladder-row" data-ladder="' + r.id + '" style="display:none"><td colspan="7"><div class="fb-ladder">' +
-        (chips || '<span class="muted small">No milestone range for this projection.</span>') + '</div></td></tr>';
+        '<td class="num">' + m.under + '</td></tr>';
     }).join('');
-    mktBody.querySelectorAll('tr.fb-prow').forEach((tr) => tr.addEventListener('click', () => {
-      const lad = mktBody.querySelector('tr[data-ladder="' + tr.dataset.pid + '"]');
-      if (lad) lad.style.display = lad.style.display === 'none' ? '' : 'none';
-    }));
+    mktBody.querySelectorAll('tr.fb-prow').forEach((tr) => tr.addEventListener('click', () => openPlayerCard(tr.dataset.pid)));
   }
   document.querySelectorAll('#nbaMktPills .fb-mkt-pill').forEach((b) =>
     b.addEventListener('click', () => {
@@ -584,9 +1003,304 @@ document.querySelectorAll('#view-lab .fb-seg button').forEach(t => t.addEventLis
     try { mktRows = await priceTonight(); }
     catch (e) { mktRows = []; }
     mktLoading = false;
+    pricedById = {};
+    for (const r of mktRows) pricedById[r.id] = r;
     renderMarkets();
+    renderSlate();
+    renderPaint();
+    renderParlay();
+    if (cardPid) renderCard(cardPid, true);
   };
+
+  /* ================= Parlay builder ================= */
+  let parlayLegs = (() => {
+    const s = lsGet('bueno-nba-parlay-v1');
+    return (s && s.day === ymdDash && Array.isArray(s.legs)) ? s.legs : [];
+  })();
+  const saveParlay = () => lsSet('bueno-nba-parlay-v1', { day: ymdDash, legs: parlayLegs });
+  const legInParlay = (label) => parlayLegs.some((l) => l.label === label);
+  const combinedP = () => parlayLegs.reduce((a, l) => a * l.p, 1); // probabilities stay 0–1
+  function addLeg(label, p) {
+    if (legInParlay(label)) return; // same leg twice is a no-op
+    parlayLegs.push({ label, p });
+    saveParlay();
+    syncParlayUI();
+  }
+  function removeLegAt(i) {
+    parlayLegs.splice(i, 1);
+    saveParlay();
+    syncParlayUI();
+  }
+  function parlayCandidates() {
+    if (!mktRows) return null;
+    const WANT = { points: [20, 25, 30], rebounds: [8, 10], assists: [5, 7], threes: [3, 4], pra: [40, 50] };
+    const out = [];
+    for (const r of mktRows) {
+      for (const mk of Object.keys(WANT)) {
+        for (const t of WANT[mk]) {
+          const p = (r.markets[mk].rungs || {})[t];
+          if (p != null && p >= 0.35 && p <= 0.92) out.push({ label: r.name + ' ' + t + '+ ' + MKT_UNIT[mk], p });
+        }
+      }
+    }
+    out.sort((a, b) => b.p - a.p);
+    return out.slice(0, 12);
+  }
+  function renderParlay() {
+    const legList = $('pbLegList'), addList = $('pbAddList');
+    if (!legList || !addList) return;
+    legList.innerHTML = parlayLegs.length
+      ? parlayLegs.map((l, i) =>
+          '<div class="pb-leg"><span>' + esc(l.label) + '</span><b>' + Math.round(l.p * 100) + '%</b>' +
+          '<button class="pb-legx" data-i="' + i + '" type="button" aria-label="Remove leg">✕</button></div>').join('')
+      : '<p class="muted small">No legs yet — add one below, or open any player card and use Add to parlay.</p>';
+    legList.querySelectorAll('.pb-legx').forEach((b) => b.addEventListener('click', () => removeLegAt(+b.dataset.i)));
+    const cands = parlayCandidates();
+    if (cands === null) {
+      addList.innerHTML = '<span class="muted small">Prices load with the slate — legs you add from player cards land here.</span>';
+    } else {
+      const avail = cands.filter((c) => !legInParlay(c.label));
+      addList.innerHTML = avail.length
+        ? avail.map((c) => '<button class="pb-addchip" type="button" data-label="' + esc(c.label) + '" data-p="' + c.p + '">' + esc(c.label) + ' · ' + Math.round(c.p * 100) + '%</button>').join('')
+        : '<span class="muted small">All of tonight\'s top looks are already in.</span>';
+      addList.querySelectorAll('.pb-addchip').forEach((b) => b.addEventListener('click', () => addLeg(b.dataset.label, parseFloat(b.dataset.p))));
+    }
+    const p = combinedP();
+    $('pbCombP').textContent = parlayLegs.length ? Math.round(p * 100) + '%' : '—';
+    $('pbFair').textContent = parlayLegs.length ? nbaFairOdds(p) : '—';
+    const stake = parseFloat(($('pbStake') || {}).value) || 0;
+    if (parlayLegs.length && p > 0) {
+      const pay = stake / p;
+      $('pbPayout').textContent = '$' + pay.toFixed(2);
+      $('pbProfit').textContent = '$' + (pay - stake).toFixed(2);
+    } else { $('pbPayout').textContent = '—'; $('pbProfit').textContent = '—'; }
+    const bp = parseAmerican(($('pbBook') || {}).value);
+    const verdict = $('pbVerdict');
+    if (bp && parlayLegs.length) {
+      const ev = (p / bp - 1) * 100;
+      verdict.textContent = ev >= 0 ? 'Edge +' + ev.toFixed(0) + '% vs the model' : 'Book is shorter than fair (' + ev.toFixed(0) + '%)';
+      verdict.style.color = ev >= 0 ? '#7ce8b8' : '#ff9c9c';
+    } else verdict.textContent = '';
+  }
+  function parseAmerican(s) {
+    const n = parseInt(String(s == null ? '' : s).replace(/[^0-9+-]/g, ''), 10);
+    if (isNaN(n) || n === 0) return null;
+    return n > 0 ? 100 / (n + 100) : (-n) / ((-n) + 100);
+  }
+  function syncParlayUI() {
+    renderParlay();
+    // refresh any open player card's Add-to-parlay states + tally
+    document.querySelectorAll('[data-legbtn]').forEach((b) => {
+      const inP = legInParlay(b.dataset.label);
+      b.classList.toggle('inp', inP);
+      const st = b.querySelector('.pc-legst');
+      if (st) st.textContent = inP ? '✓ in parlay' : '+ add';
+    });
+    document.querySelectorAll('[data-peek]').forEach((el) => {
+      if (!parlayLegs.length) { el.textContent = ''; return; }
+      const p = combinedP();
+      el.textContent = 'Parlay so far: ' + parlayLegs.length + ' leg' + (parlayLegs.length > 1 ? 's' : '') +
+        ' · ' + Math.round(p * 100) + '% · fair ' + nbaFairOdds(p) + ' — open ☰ Parlay builder to price the ticket';
+    });
+  }
+  const stakeEl = $('pbStake'), bookEl = $('pbBook');
+  if (stakeEl) stakeEl.addEventListener('input', renderParlay);
+  if (bookEl) bookEl.addEventListener('input', renderParlay);
+
+  /* ================= Player card ================= */
+  let cardPid = null;
+  const cardOverlay = $('nbaCardOverlay'), cardSheet = $('nbaCardSheet');
+  function openPlayerCard(pid) {
+    cardPid = String(pid);
+    renderCard(cardPid, false);
+    if (cardOverlay) cardOverlay.classList.add('open');
+    if (cardSheet) cardSheet.scrollTop = 0;
+  }
+  window.openPlayerCard = openPlayerCard;
+  function closeCard() {
+    cardPid = null;
+    if (cardOverlay) cardOverlay.classList.remove('open');
+  }
+  if (cardOverlay) cardOverlay.addEventListener('click', (e) => { if (e.target === cardOverlay) closeCard(); });
+
+  function formGridHtml(row) {
+    const games = (row.recentLines || []).slice(0, 4).reverse(); // oldest -> newest
+    if (!games.length) return '<p class="muted small">No recent games on file yet.</p>';
+    const cols = '64px repeat(' + games.length + ', 1fr)';
+    const actual = (g, key) => key === 'pra' ? g.pts + g.reb + g.ast
+      : key === 'points' ? g.pts : key === 'rebounds' ? g.reb : key === 'assists' ? g.ast : g.tpm;
+    let h = '<div class="fm-grid" style="grid-template-columns:' + cols + '"><div></div>' +
+      games.map((g) => '<div class="fm-head">' + esc(g.opp) + '<br><span>' + esc(g.date) + '</span></div>').join('') + '</div>';
+    for (const key of MKT_KEYS) {
+      const line = row.markets[key].line;
+      h += '<div class="fm-row" style="grid-template-columns:' + cols + '">' +
+        '<div class="fm-label">' + MKT_LABEL[key] + '<span>' + line + '</span></div>' +
+        games.map((g) => {
+          const a = actual(g, key);
+          const w = line > 0 ? Math.min(50, Math.abs(a - line) / line * 50) : 0;
+          const over = a > line;
+          const bar = a === line ? ''
+            : '<span class="bar" style="' + (over ? 'left:50%' : 'right:50%') + ';width:' + w + '%;background:' + (over ? '#2ecc8f' : '#e05252') + '"></span>';
+          return '<div class="fm-cell"><span class="zero"></span>' + bar +
+            '<span class="cv" style="color:' + (over ? '#7ce8b8' : a < line ? '#ff9c9c' : 'var(--muted)') + '">' + a + '</span></div>';
+        }).join('') + '</div>';
+    }
+    h += '<p class="fm-legend">Bar = how far he finished from tonight\'s line (center line = the line itself). Long green = smashed it · long red = never close · the small number is his actual. Columns oldest → newest.</p>';
+    return h;
+  }
+
+  function renderCard(pid, preserve) {
+    if (!cardSheet) return;
+    const openSecs = {};
+    if (preserve) cardSheet.querySelectorAll('details.pc-sec').forEach((d) => { openSecs[d.dataset.sec] = d.open; });
+    const row = pricedById[pid] || null;
+    const live = liveByPid[pid] || null;
+    const names = teamNameByAbbr();
+    const name = (row && row.name) || (live && live.name) || 'Player';
+    const teamAbbr = (row && row.team) || (live && live.team) || '';
+    const teamName = (row && row.teamName) || names[teamAbbr] || teamAbbr;
+    let match = '';
+    if (row) match = (row.home ? 'vs ' : '@ ') + (row.oppName || row.oppAbbr) + ' · tonight';
+    else if (live) match = live.match + ' · tonight';
+    const sec = (key, title, bodyHtml, open) =>
+      '<details class="pc-sec" data-sec="' + key + '"' + ((preserve ? openSecs[key] : open) ? ' open' : '') + '>' +
+      '<summary>' + title + '<span class="chev">▸</span></summary><div class="pc-sec-body">' + bodyHtml + '</div></details>';
+    let h = '<button class="pc-close" id="pcCloseBtn" type="button" aria-label="Close">✕</button>';
+    h += '<div class="pc-head"><img class="hs" src="' + headshot(pid) + '" alt="" onerror="this.style.visibility=\'hidden\'">' +
+      '<div><h3>' + esc(name) + '</h3>' +
+      '<div class="pc-team"><img src="' + logoUrl(teamAbbr) + '" alt="">' + esc(teamName) + '</div>' +
+      (match ? '<div class="pc-match">' + esc(match) + '</div>' : '') + '</div>' +
+      (row ? '<div class="pc-min-chip"><div class="n">' + row.min + '</div><div class="l">Proj min</div></div>' : '') +
+      '</div>';
+    if (live) {
+      h += '<div class="pc-live-strip"><span class="ls">' + (live.state === 'post' ? 'FINAL' : 'LIVE · ' + esc(live.detail)) + '</span>' +
+        '<b>' + esc(live.min) + ' MIN · ' + live.pts + ' PTS · ' + live.reb + ' REB · ' + live.ast + ' AST · ' + live.tpm + ' 3PM</b></div>';
+    }
+    if (!row) {
+      h += '<p class="pc-nocard">No model price for ' + esc(name) + ' tonight — no completed-season stats on file (rookie, or missed last season).' +
+        (live ? ' His live line still tracks here and in In the Paint.' : '') + '</p>';
+      cardSheet.innerHTML = h;
+      const cb = $('pcCloseBtn');
+      if (cb) cb.addEventListener('click', closeCard);
+      return;
+    }
+    // Tonight's fair lines (open by default)
+    const linesHtml = MKT_KEYS.map((key) => {
+      const m = row.markets[key];
+      return '<div class="pc-price-row' + (key === 'pra' ? ' combo' : '') + '">' +
+        '<span class="pc-pr-label">' + MKT_LABEL[key] + '</span>' +
+        '<span class="pc-pr-line">' + m.line + '</span>' +
+        '<span class="pc-pr-hit">' + Math.round(m.pOver * 100) + '% hit</span>' +
+        '<span class="pc-pr-odds">O ' + m.over + ' · U ' + m.under + '</span></div>';
+    }).join('');
+    h += sec('lines', "Tonight's fair lines", linesHtml, true);
+    // Milestones
+    const ladHtml = MKT_KEYS.map((key) => {
+      const lad = row.markets[key].ladder || [];
+      if (!lad.length) return '';
+      return '<div class="pc-ladder-label">' + MKT_LABEL[key] + '</div><div class="pc-ladder">' +
+        lad.map((x) => '<span class="pc-chip2"><b>' + x.t + '+</b> ' + MKT_UNIT[key] + ' · <span class="p">' + Math.round(x.p * 100) + '%</span></span>').join('') + '</div>';
+    }).join('');
+    h += sec('miles', 'Milestones', ladHtml || '<p class="muted small">No milestone range for this projection.</p>', false);
+    // Why this price
+    const f = row.factors || {};
+    let roleMult = '<span class="fmult">—</span>', roleCls = '';
+    if (f.recentAvg != null && f.seasonMpg) {
+      if (f.recentAvg >= f.seasonMpg * 1.1) { roleMult = '<span class="fmult pc-up">▲ role up</span>'; }
+      else if (f.recentAvg <= f.seasonMpg * 0.9) { roleMult = '<span class="fmult pc-down">▼ role dip</span>'; }
+      else roleMult = '<span class="fmult">— steady</span>';
+    }
+    const whyHtml =
+      '<div class="pc-factor"><span class="fname">Minutes / role</span><span class="fdesc">season base ' + f.seasonMpg + ' mpg' +
+        (f.recentAvg != null ? ' · last-' + f.recentN + ' avg ' + f.recentAvg : '') + ' → projected ' + row.min + '</span>' + roleMult + '</div>' +
+      '<div class="pc-factor"><span class="fname">Opponent</span><span class="fdesc">' + esc(row.oppName || row.oppAbbr) + ' allow ' + f.oppDefRtg + '/100 — points priced</span>' +
+        '<span class="fmult ' + (f.oppFactor > 1 ? 'pc-up' : f.oppFactor < 1 ? 'pc-down' : '') + '">×' + (f.oppFactor || 1).toFixed(2) + '</span></div>' +
+      '<div class="pc-factor"><span class="fname">Game environment</span><span class="fdesc">pace + efficiency vs league average</span>' +
+        '<span class="fmult ' + (f.paceAdj > 1 ? 'pc-up' : f.paceAdj < 1 ? 'pc-down' : '') + '">×' + (f.paceAdj || 1).toFixed(2) + '</span></div>';
+    h += sec('why', 'Why this price', whyHtml, false);
+    // Form vs tonight's lines (margin bars)
+    h += sec('form', "Form vs tonight's lines", formGridHtml(row), false);
+    // Last games
+    const lg = row.recentLines || [];
+    const lastHtml = lg.length
+      ? '<table class="pc-table"><thead><tr><th>Game</th><th>MIN</th><th>PTS</th><th>REB</th><th>AST</th><th>3PM</th></tr></thead><tbody>' +
+        lg.map((g) => '<tr><td>' + esc(g.date) + ' ' + esc(g.homeAway) + ' ' + esc(g.opp) + '</td><td>' + g.min + '</td><td>' + g.pts + '</td><td>' + g.reb + '</td><td>' + g.ast + '</td><td>' + g.tpm + '</td></tr>').join('') +
+        '</tbody></table>'
+      : '<p class="muted small">No recent games on file yet.</p>';
+    h += sec('last', 'Last games', lastHtml, false);
+    // Season averages
+    if (row.seasonAvgs) {
+      const sa = row.seasonAvgs;
+      const cell = (v, k) => '<div><div class="v">' + v + '</div><div class="k">' + k + '</div></div>';
+      h += sec('season', 'Season averages',
+        '<div class="pc-season-strip">' +
+        cell(sa.ppg, 'PPG') + cell(sa.rpg, 'RPG') + cell(sa.apg, 'APG') +
+        cell(sa.fgPct != null ? Math.round(sa.fgPct) + '%' : '—', 'FG') +
+        cell(sa.threePct != null ? Math.round(sa.threePct * 100) + '%' : '—', '3P') +
+        cell(sa.mpg, 'MPG') + '</div>' +
+        '<p class="muted small" style="margin-top:.45rem">Completed-season (2025-26) averages — the base rates behind tonight\'s price.</p>', false);
+    }
+    // Add to parlay
+    const legBtns = MKT_KEYS.map((key) => {
+      const rungs = row.markets[key].rungs || {};
+      const ts = Object.keys(rungs).map(Number).filter((t) => rungs[t] >= 0.05 && rungs[t] <= 0.97).sort((a, b) => a - b);
+      if (!ts.length) return '';
+      return '<div class="pc-ladder-label">' + MKT_LABEL[key] + '</div>' + ts.map((t) => {
+        const label = row.name + ' ' + t + '+ ' + MKT_UNIT[key];
+        const inP = legInParlay(label);
+        return '<button class="pc-legbtn' + (inP ? ' inp' : '') + '" type="button" data-legbtn data-label="' + esc(label) + '" data-p="' + rungs[t] + '">' +
+          '<span>' + t + '+ ' + MKT_UNIT[key] + '</span><b>' + Math.round(rungs[t] * 100) + '%</b>' +
+          '<span class="pc-legst">' + (inP ? '✓ in parlay' : '+ add') + '</span></button>';
+      }).join('');
+    }).join('');
+    h += sec('parlay', 'Add to parlay',
+      (legBtns || '<p class="muted small">No priced legs for this player tonight.</p>') + '<div class="pc-parlaypeek" data-peek></div>', false);
+    cardSheet.innerHTML = h;
+    const cb = $('pcCloseBtn');
+    if (cb) cb.addEventListener('click', closeCard);
+    cardSheet.querySelectorAll('[data-legbtn]').forEach((b) =>
+      b.addEventListener('click', () => addLeg(b.dataset.label, parseFloat(b.dataset.p))));
+    syncParlayUI();
+  }
+
+  /* ================= Fast Break views (hamburger sheet) ================= */
+  const FB_VIEW_NAMES = { slate: 'Slate', markets: 'Markets', paint: 'In the Paint', parlay: 'Parlay builder' };
+  let fbView = 'slate';
+  function setFbView(v) {
+    fbView = v;
+    ['slate', 'markets', 'paint', 'parlay'].forEach((x) => {
+      const el = $('nba-view-' + x);
+      if (el) el.classList.toggle('active', x === v);
+    });
+    const bv = $('fbBurgerView');
+    if (bv) bv.textContent = FB_VIEW_NAMES[v];
+    document.querySelectorAll('.fb-sheet-item').forEach((it) => it.classList.toggle('on', it.dataset.fbview === v));
+    if (v === 'markets') window.loadMarkets();
+    if (v === 'slate') { loadRatings().then(() => renderSlate()); window.loadMarkets(); }
+    if (v === 'paint') renderPaint();
+    if (v === 'parlay') { renderParlay(); window.loadMarkets(); }
+  }
+  const sheetWrap = $('fbSheetWrap');
+  const burger = $('fbBurger');
+  if (burger && sheetWrap) burger.addEventListener('click', () => sheetWrap.classList.add('open'));
+  if (sheetWrap) {
+    sheetWrap.addEventListener('click', (e) => { if (e.target === sheetWrap) sheetWrap.classList.remove('open'); });
+    const cancel = $('fbSheetCancel');
+    if (cancel) cancel.addEventListener('click', () => sheetWrap.classList.remove('open'));
+    sheetWrap.querySelectorAll('.fb-sheet-item').forEach((it) =>
+      it.addEventListener('click', () => { sheetWrap.classList.remove('open'); setFbView(it.dataset.fbview); }));
+  }
+  window.fbOnLabOpen = function() { setFbView(fbView); };
+
+  // ---- kickoff ----
+  renderPaint();
+  renderParlay();
+  await refreshLive();
+  schedulePoll();
   gradeStored();
+  // Warm the ratings in the background so Slate model cards are ready
+  // when The Fast Break opens (same fetches the pricing run reuses).
+  loadRatings().then(() => renderSlate()).catch(() => {});
 })();
 </script>
 <script src="sports-menu.js"></script>

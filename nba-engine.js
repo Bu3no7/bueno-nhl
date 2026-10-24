@@ -93,6 +93,56 @@ function nbaProjectMinutes(rates, recentMin, opts) {
   return Math.max(4, Math.min(40, m));
 }
 
+/* Combined P+R+A market: sum of the points/rebounds/assists distributions.
+   Independence given minutes (the standard combo assumption): means add,
+   variances add — points contributes sd^2, each negative-binomial market
+   contributes mean + mean^2/k — and the total is approximated Normal,
+   which the central limit makes reasonable at PRA scale (~40+). */
+function nbaPraMarket(markets) {
+  const pts = markets.points, reb = markets.rebounds, ast = markets.assists;
+  const mean = pts.mean + reb.mean + ast.mean;
+  const nbVar = (d) => d.mean + (d.mean * d.mean) / d.k;
+  const variance = (pts.dist.sd * pts.dist.sd) + nbVar(reb.dist) + nbVar(ast.dist);
+  return { mean: Math.round(mean * 10) / 10, dist: { kind: 'normal', mean, sd: Math.sqrt(variance) } };
+}
+
+/* ---------- Game model (win %, spread, total) ----------
+   Built from the same ratings the player engine uses (offRtg / defRtg
+   per 100 possessions + pace, completed-season ESPN core stats).
+   Expected points for X = gamePace/100 x (offRtg_X + defRtg_opp - lgAvg)
+   — the environment math from nbaEnvFactors, made explicit — with a
+   home-court bump to the home team's expectation. Margin is treated as
+   Normal(sd 12.5) for the win probability; the fair spread is the
+   expected margin rounded to the nearest half point. */
+const NBA_HOME_EDGE = 2.4;   // points of home court
+const NBA_MARGIN_SD = 12.5;  // sd of the final margin distribution
+function nbaGameProjection(home, away, lg) {
+  lg = lg || { pace: 100, rtg: 115.6 };
+  const pace = (home.pace + away.pace) / 2;
+  const expHome = pace / 100 * (home.offRtg + away.defRtg - lg.rtg) + NBA_HOME_EDGE;
+  const expAway = pace / 100 * (away.offRtg + home.defRtg - lg.rtg);
+  const margin = expHome - expAway; // home minus away
+  const homeWinP = nbaNormCdf(margin / NBA_MARGIN_SD);
+  const favIsHome = margin >= 0;
+  const spread = Math.round(Math.abs(margin) * 2) / 2;
+  const tags = [];
+  if (pace >= 102) tags.push('Pace-up');
+  if (pace <= 97.5) tags.push('Slow pace');
+  const total = expHome + expAway;
+  if (total >= 234) tags.push('Shootout');
+  if (total <= 218) tags.push('Grind');
+  if (Math.abs(margin) >= 11) tags.push('Blowout risk');
+  if (home.defRtg <= 110 && away.defRtg <= 110) tags.push('Defensive battle');
+  return {
+    expHome: Math.round(expHome * 10) / 10, expAway: Math.round(expAway * 10) / 10,
+    pace: Math.round(pace * 10) / 10, total: Math.round(total),
+    margin: Math.round(margin * 10) / 10,
+    homeWinP: Math.round(homeWinP * 100) / 100, awayWinP: Math.round((1 - homeWinP) * 100) / 100,
+    homeML: nbaFairOdds(homeWinP), awayML: nbaFairOdds(1 - homeWinP),
+    fav: favIsHome ? 'home' : 'away', spread, tags,
+  };
+}
+
 /* Opponent adjustment: multiplicative factor for one market from the
    opponent's defensive rating (points ALLOWED per 100) vs league average.
    A stingy defense (allows less than average) -> factor < 1 for scoring
@@ -240,6 +290,6 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     NBA_PRIORS, nbaRates, nbaProjectMinutes, nbaPricePlayer,
     nbaProbOver, nbaMedianLine, nbaFairOdds, nbaNormCdf, nbaNbCdf, nbaBinomCdf,
-    nbaOppFactor, nbaEnvFactors,
+    nbaOppFactor, nbaEnvFactors, nbaPraMarket, nbaGameProjection,
   };
 }
