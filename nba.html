@@ -142,6 +142,7 @@ details.sl-fold[open ] summary .chev { transform: rotate(90deg); }
 .pt-game { color: var(--muted); font-size: .7rem; font-weight: 600; margin-top: .1rem; }
 .pt-line { margin-left: auto; display: flex; gap: .55rem; font-size: .78rem; color: var(--muted); font-variant-numeric: tabular-nums; }
 .pt-line b { color: var(--text); font-size: .88rem; }
+.pt-line b.hot { color: #FF7A1A; text-shadow: 0 0 14px rgba(255,122,26,.55); }
 .pt-chiprow { width: 100%; }
 .pt-chip { display: inline-block; border-radius: 999px; padding: .14rem .55rem; font-size: .68rem; font-weight: 800; }
 .pt-chip.good { background: rgba(46,204,143,.15); color: #7ce8b8; border: 1px solid rgba(46,204,143,.4); }
@@ -669,7 +670,7 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
       '<img class="hs" src="' + headshot(p.id) + '" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">' +
       '<div class="pt-info"><div class="pt-name">' + esc(p.name) + '<span class="pt-team">' + esc(p.team) + '</span></div>' +
       '<div class="pt-game">' + esc(p.match) + ' · ' + (p.state === 'post' ? 'Final' : esc(p.detail)) + '</div></div>' +
-      '<div class="pt-line"><span><b>' + esc(p.min) + '</b> MIN</span><span><b>' + p.pts + '</b> PTS</span><span><b>' + p.reb + '</b> REB</span><span><b>' + p.ast + '</b> AST</span><span><b>' + p.tpm + '</b> 3PM</span></div>' +
+      '<div class="pt-line"><span><b>' + esc(p.min) + '</b> MIN</span><span><b' + (p.pts > 20 ? ' class="hot"' : '') + '>' + p.pts + '</b> PTS</span><span><b' + (p.reb >= 10 ? ' class="hot"' : '') + '>' + p.reb + '</b> REB</span><span><b>' + p.ast + '</b> AST</span><span><b' + (p.tpm >= 2 ? ' class="hot"' : '') + '>' + p.tpm + '</b> 3PM</span></div>' +
       '<div class="pt-chiprow">' + paintChip(p) + '</div></div>'
     ).join('');
     paintEl.querySelectorAll('.pt-row').forEach((el) => el.addEventListener('click', () => openPlayerCard(el.dataset.pid)));
