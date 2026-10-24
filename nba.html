@@ -624,16 +624,7 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
           '<div class="sl-tags">' + (proj.tags.length
             ? proj.tags.map((t) => '<span class="sl-tag">' + esc(t) + '</span>').join('')
             : '<span class="sl-tag dim">Standard script</span>') + '</div>';
-        if (g.state === 'post' && Number.isFinite(aS) && Number.isFinite(hS)) {
-          const favWon = favHome ? hS > aS : aS > hS;
-          const favMargin = favHome ? hS - aS : aS - hS;
-          let check = 'Model check — favorite ' + (favWon ? 'won' : 'lost');
-          if (favWon) check += favMargin > proj.spread ? ' · covered' : (favMargin === proj.spread ? ' · pushed the spread' : ' · won, no cover');
-          const actualTotal = aS + hS, diff = actualTotal - proj.total;
-          check += ' · total ' + actualTotal + ' vs ' + proj.total + ' (' +
-            (diff > 0 ? 'over ' + diff : diff < 0 ? 'under ' + (-diff) : 'dead on') + ')';
-          body += '<div class="sl-check">' + esc(check) + '</div>';
-        }
+        // No public model-check strip: game grading stays local (nba-model harness).
       } else {
         body += '<div class="sl-proj">Model projection loads with team ratings…</div>';
       }
