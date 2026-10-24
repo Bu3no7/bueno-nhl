@@ -155,6 +155,29 @@ details.sl-fold[open ] summary .chev { transform: rotate(90deg); }
 .pc-overlay.open { display: block; }
 .pc-sheet { position: absolute; left: 0; right: 0; bottom: 0; top: 5%; max-width: 560px; margin: 0 auto; background: var(--card); border: 1px solid var(--border); border-bottom: none; border-radius: 18px 18px 0 0; padding: 1rem 1.05rem 2rem; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
 .pc-close { position: absolute; top: .7rem; right: .8rem; background: var(--card2); border: 1px solid var(--border); color: var(--text); border-radius: 50%; width: 30px; height: 30px; cursor: pointer; z-index: 2; }
+/* ---- game sheet (slate card tap): lineups ---- */
+.sl-gcard { cursor: pointer; }
+.sl-tap { text-align: center; color: var(--muted); font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; margin-top: .55rem; }
+.gm-overlay { position: fixed; inset: 0; background: rgba(2,5,10,.65); display: none; z-index: 605; }
+.gm-overlay.open { display: block; }
+.gm-sheet { position: absolute; left: 0; right: 0; bottom: 0; top: 4%; max-width: 560px; margin: 0 auto; background: var(--card); border: 1px solid var(--border); border-bottom: none; border-radius: 18px 18px 0 0; padding: 1rem 1.05rem 2rem; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+.gm-head h3 { font-size: 1.12rem; font-weight: 800; padding-right: 2.2rem; }
+.gm-sub { color: var(--muted); font-size: .8rem; font-weight: 600; margin-top: .15rem; }
+.gm-team { display: flex; align-items: center; gap: .5rem; margin: 1.1rem 0 .35rem; }
+.gm-team img { width: 26px; height: 26px; }
+.gm-team .abbr { font-weight: 800; font-size: 1rem; }
+.gm-team .rec { color: var(--muted); font-size: .78rem; font-weight: 600; }
+.gm-sec { font-size: .7rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin: .55rem 0 .3rem; }
+.gm-sec .conf { color: #7ce8b8; }
+.gm-sec .proj { color: #ffb27a; }
+.lu-row { display: flex; align-items: center; gap: .6rem; padding: .42rem 0; cursor: pointer; }
+.lu-row + .lu-row { border-top: 1px solid rgba(31,44,68,.45); }
+.lu-row img.hs { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; object-position: top; background: var(--card2); flex: none; }
+.lu-name { font-weight: 700; font-size: .9rem; }
+.lu-pos { display: inline-block; color: var(--orange); font-size: .68rem; font-weight: 800; border: 1px solid rgba(255,122,26,.45); border-radius: 6px; padding: .05rem .32rem; margin-left: .35rem; vertical-align: 2px; }
+.lu-line { margin-left: auto; color: var(--muted); font-size: .76rem; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.lu-line b { color: var(--text); font-size: .86rem; }
+.gm-note { color: var(--muted); font-size: .78rem; line-height: 1.5; margin-top: .9rem; }
 .pc-head { display: flex; gap: .9rem; align-items: center; padding-right: 1.6rem; }
 .pc-head img.hs { width: 86px; height: 86px; border-radius: 50%; object-fit: cover; object-position: top; background: var(--card2); flex: none; }
 .pc-head h3 { font-size: 1.3rem; font-weight: 800; line-height: 1.15; margin: 0; }
@@ -318,6 +341,7 @@ details.pc-sec[open ] summary .chev { transform: rotate(90deg); }
 </section>
 
 <div class="pc-overlay" id="nbaCardOverlay"><div class="pc-sheet" id="nbaCardSheet"></div></div>
+<div class="gm-overlay" id="nbaGameOverlay"><div class="gm-sheet" id="nbaGameSheet"></div></div>
 
 <nav class="bottom-nav" aria-label="Main">
   <a class="bnav-btn" href="index.html"><span class="bnav-ico">⌂</span><span>Home</span></a>
@@ -511,6 +535,8 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
             players.push({
               id: (a.athlete || {}).id,
               name: (a.athlete || {}).displayName || '',
+              starter: !!a.starter,
+              pos: ((a.athlete || {}).position || {}).abbreviation || '',
               team: teamAbbr,
               gameId: g.id, state: g.state, detail: g.detail,
               match: g.away.abbr + ' @ ' + g.home.abbr,
@@ -621,13 +647,20 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
         '<div class="sl-look-p">' + Math.round(l.p * 100) + '%</div></div>'
       ).join('');
       body += '<details class="sl-fold"><summary>Top looks<span class="chev">▸</span></summary><div class="sl-fold-body">' + looksHtml + '</div></details>';
-      return '<div class="sl-gcard"><div class="sl-teams">' + trow(g.away, aS, false) + mid + trow(g.home, hS, true) + '</div>' + body + '</div>';
+      body += '<div class="sl-tap">Tap card for lineups</div>';
+      return '<div class="sl-gcard" data-gid="' + g.id + '"><div class="sl-teams">' + trow(g.away, aS, false) + mid + trow(g.home, hS, true) + '</div>' + body + '</div>';
     }).join('') + '</div>';
     slateEl.querySelectorAll('.sl-look').forEach((el) => el.addEventListener('click', () => openPlayerCard(el.dataset.pid)));
+    slateEl.querySelectorAll('.sl-gcard').forEach((el) => el.addEventListener('click', (e) => {
+      if (e.target.closest('.sl-look') || e.target.closest('.sl-fold')) return;
+      openGame(el.dataset.gid);
+    }));
   }
 
   // ---- In the Paint (live player tracker) ----
   let pricedById = {};
+  let lineupByTeamId = {}; // teamId -> most recent game's {date, starters, bench}
+  const knownPlayers = {}; // pid -> {name, team} from recent-game fetches (card fallback)
   function paintChip(p) {
     const row = pricedById[p.id];
     if (!row) return '<span class="pt-chip dim">no model line</span>';
@@ -703,6 +736,7 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
     await fetchLivePlayers();
     renderTop();
     renderPaint();
+    if (gameOpenId) renderGame();
     if (cardPid) renderCard(cardPid, true);
   }
   function schedulePoll() {
@@ -785,6 +819,7 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
     }).sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 4);
     const byPlayer = {}; // pid -> [gameLine, ...] most recent first
     const names = {};
+    let lineup = null; // most recent game's starters + rotation
     for (const ev of past) {
       const comp = (ev.competitions || [])[0] || {};
       const oppC = (comp.competitors || []).find((c) => String((c.team || {}).id) !== String(teamId)) || {};
@@ -799,6 +834,23 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
       const statBlock = (block.statistics || [])[0] || {};
       const labels = statBlock.labels || [];
       const ix = (k) => labels.indexOf(k);
+      if (!lineup) {
+        const rows = (statBlock.athletes || []).map((a) => {
+          const s = a.stats || [];
+          return {
+            pid: (a.athlete || {}).id,
+            name: (a.athlete || {}).displayName || '',
+            pos: ((a.athlete || {}).position || {}).abbreviation || '',
+            starter: !!a.starter,
+            min: s.length ? (parseFloat(s[ix('MIN')]) || 0) : 0,
+          };
+        }).filter((r) => r.pid);
+        lineup = {
+          date: dateStr,
+          starters: rows.filter((r) => r.starter),
+          bench: rows.filter((r) => !r.starter && r.min > 0).sort((a, b) => b.min - a.min),
+        };
+      }
       for (const a of statBlock.athletes || []) {
         const pid = (a.athlete || {}).id;
         if (!pid) continue;
@@ -816,7 +868,7 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
         names[pid] = (a.athlete || {}).displayName || '';
       }
     }
-    return { byPlayer, names };
+    return { byPlayer, names, lineup };
   }
 
   async function priceTonight() {
@@ -829,6 +881,12 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
     await pool(teamIds, 4, async (tid) => {
       try { teamRecent[tid] = await recentGamesByTeam(tid); }
       catch (e) { teamRecent[tid] = { byPlayer: {}, names: {} }; }
+      const rec = teamRecent[tid];
+      if (rec && rec.lineup) lineupByTeamId[tid] = rec.lineup;
+      if (rec && rec.names) {
+        const tObj = tonightGames.flatMap((g) => [g.home, g.away]).find((t) => String(t.id) === String(tid));
+        for (const pid of Object.keys(rec.names)) knownPlayers[pid] = { name: rec.names[pid], team: tObj ? tObj.abbr : '' };
+      }
     });
     // build player jobs
     const jobs = [];
@@ -1019,6 +1077,7 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
     renderSlate();
     renderPaint();
     renderParlay();
+    if (gameOpenId) renderGame();
     if (cardPid) renderCard(cardPid, true);
   };
 
@@ -1117,6 +1176,83 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
   if (stakeEl) stakeEl.addEventListener('input', renderParlay);
   if (bookEl) bookEl.addEventListener('input', renderParlay);
 
+  /* ================= Game sheet (lineups) ================= */
+  let gameOpenId = null, gmLoading = false;
+  const gmOverlay = $('nbaGameOverlay'), gmSheet = $('nbaGameSheet');
+  function gmRowsFor(game, t) {
+    if (game.state !== 'pre') {
+      const ps = livePlayers.filter((p) => String(p.gameId) === String(game.id) && p.team === t.abbr)
+        .map((p) => ({ pid: p.id, name: p.name, pos: p.pos, min: p.min, minNum: p.minNum, pts: p.pts, reb: p.reb, ast: p.ast, starter: p.starter }));
+      return {
+        confirmed: true,
+        starters: ps.filter((p) => p.starter).sort((a, b) => b.minNum - a.minNum),
+        bench: ps.filter((p) => !p.starter && p.minNum > 0).sort((a, b) => b.minNum - a.minNum),
+      };
+    }
+    const lu = lineupByTeamId[t.id];
+    if (!lu) return null;
+    return { confirmed: false, date: lu.date, starters: lu.starters, bench: lu.bench };
+  }
+  function renderGame() {
+    if (!gmSheet || !gameOpenId) return;
+    const g = tonightGames.find((x) => String(x.id) === String(gameOpenId));
+    if (!g) return;
+    const keepScroll = gmOverlay && gmOverlay.classList.contains('open') ? gmSheet.scrollTop : 0;
+    const started = g.state !== 'pre';
+    const proj = gameProjFor(g);
+    let h = '<button class="pc-close" id="gmCloseBtn" type="button" aria-label="Close">✕</button>';
+    h += '<div class="gm-head"><h3>' + esc(g.away.abbr) + ' @ ' + esc(g.home.abbr) + '</h3>' +
+      '<div class="gm-sub">' + (g.state === 'post' ? 'Final · ' + esc(g.away.score || '0') + ' – ' + esc(g.home.score || '0')
+        : g.state === 'in' ? 'Live · ' + esc(g.detail || '') + ' · ' + esc(g.away.score || '0') + ' – ' + esc(g.home.score || '0')
+        : 'Tips ' + new Date(g.start).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })) +
+      (proj ? ' · Model: ' + esc(proj.fav === 'home' ? g.home.abbr : g.away.abbr) + ' ' + (proj.spread === 0 ? 'PK' : '−' + proj.spread) + ' · total ' + proj.total : '') + '</div></div>';
+    for (const side of ['away', 'home']) {
+      const t = g[side];
+      const lu = gmRowsFor(g, t);
+      h += '<div class="gm-team"><img src="' + logoUrl(t.abbr) + '" alt=""><span class="abbr">' + esc(t.abbr) + '</span>' + (t.record ? '<span class="rec">' + esc(t.record) + '</span>' : '') + '</div>';
+      if (!lu) { h += '<p class="muted small">Loading lineups…</p>'; continue; }
+      const rowHtml = (r) => {
+        const line = started
+          ? '<span class="lu-line"><b>' + esc(r.min) + '</b> MIN · <b>' + r.pts + '</b> PTS · <b>' + r.reb + '</b> REB · <b>' + r.ast + '</b> AST</span>'
+          : '<span class="lu-line">last game <b>' + Math.round(r.min || 0) + '</b> MIN</span>';
+        return '<div class="lu-row" data-pid="' + r.pid + '"><img class="hs" src="' + headshot(r.pid) + '" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">' +
+          '<span class="lu-name">' + esc(r.name) + (r.pos ? '<span class="lu-pos">' + esc(r.pos) + '</span>' : '') + '</span>' + line + '</div>';
+      };
+      h += '<div class="gm-sec">' + (started ? 'Starters · <span class="conf">confirmed</span>' : 'Projected starters · <span class="proj">from last game ' + esc(lu.date || '') + '</span>') + '</div>' +
+        (lu.starters.length ? lu.starters.map(rowHtml).join('') : '<p class="muted small">No starters listed yet.</p>');
+      if (lu.bench.length) h += '<div class="gm-sec">Rotation</div>' + lu.bench.map(rowHtml).join('');
+    }
+    if (!started) h += '<p class="gm-note">Projected lineups come from each team\'s most recent game. Confirmed starters replace them here at tip-off — and once the game is live, every row carries the player\'s real line.</p>';
+    gmSheet.innerHTML = h;
+    gmSheet.scrollTop = keepScroll;
+    const cb = $('gmCloseBtn');
+    if (cb) cb.addEventListener('click', closeGame);
+    gmSheet.querySelectorAll('.lu-row').forEach((el) => el.addEventListener('click', () => openPlayerCard(el.dataset.pid)));
+  }
+  function openGame(gid) {
+    gameOpenId = String(gid);
+    renderGame();
+    if (gmOverlay) gmOverlay.classList.add('open');
+    if (gmSheet) gmSheet.scrollTop = 0;
+    const g = tonightGames.find((x) => String(x.id) === String(gameOpenId));
+    if (g && g.state === 'pre' && !gmLoading && (!lineupByTeamId[g.home.id] || !lineupByTeamId[g.away.id])) {
+      gmLoading = true;
+      Promise.all([g.away, g.home].map(async (t) => {
+        if (lineupByTeamId[t.id]) return;
+        try {
+          const rec = await recentGamesByTeam(t.id);
+          if (rec.lineup) lineupByTeamId[t.id] = rec.lineup;
+          for (const pid of Object.keys(rec.names || {})) knownPlayers[pid] = { name: rec.names[pid], team: t.abbr };
+        } catch (e) { /* leave unloaded; section shows loading */ }
+      })).then(() => { gmLoading = false; if (gameOpenId) renderGame(); });
+    }
+  }
+  function closeGame() {
+    gameOpenId = null;
+    if (gmOverlay) gmOverlay.classList.remove('open');
+  }
+  if (gmOverlay) gmOverlay.addEventListener('click', (e) => { if (e.target === gmOverlay) closeGame(); });
+
   /* ================= Player card ================= */
   let cardPid = null;
   const cardOverlay = $('nbaCardOverlay'), cardSheet = $('nbaCardSheet');
@@ -1166,8 +1302,8 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
     const row = pricedById[pid] || null;
     const live = liveByPid[pid] || null;
     const names = teamNameByAbbr();
-    const name = (row && row.name) || (live && live.name) || 'Player';
-    const teamAbbr = (row && row.team) || (live && live.team) || '';
+    const name = (row && row.name) || (live && live.name) || (knownPlayers[pid] && knownPlayers[pid].name) || 'Player';
+    const teamAbbr = (row && row.team) || (live && live.team) || (knownPlayers[pid] && knownPlayers[pid].team) || '';
     const teamName = (row && row.teamName) || names[teamAbbr] || teamAbbr;
     let match = '';
     if (row) match = (row.home ? 'vs ' : '@ ') + (row.oppName || row.oppAbbr) + ' · tonight';
