@@ -121,8 +121,35 @@ function skaterGoalsVsGoalie(skaterPid, goalieId) {
   }
   return n;
 }
+function vsGoalieEdgeHtml(r, g) {
+  // Standalone edge line for the top of the player card (round-2 reorder):
+  // only when the skater's top shot zone is genuinely one of this goalie's
+  // weakest zones with a real sample. Otherwise '' — never a fake edge.
+  if (!g) return '';
+  const pg = panelGoalie(g, r.oppAbbr);
+  if (!pg.id) return '';
+  const zCount = {};
+  for (const s of (r.shots || [])) {
+    const z = netZone(s.x, s.y);
+    if (z) zCount[z] = (zCount[z] || 0) + 1;
+  }
+  const zTotal = Object.values(zCount).reduce((a, b) => a + b, 0);
+  const topZones = Object.entries(zCount).sort((a, b) => b[1] - a[1]).slice(0, 2);
+  const gz = goalieZoneStats(pg.id);
+  const weakZones = NET_ZONES.filter((z) => gz[z].sv != null)
+    .sort((a, b) => gz[a].sv - gz[b].sv).slice(0, 2);
+  if (zTotal < 8 || !topZones.length || !weakZones.length) return '';
+  const [z, n] = topZones[0];
+  const totalGoals = NET_ZONES.reduce((a, zz) => a + gz[zz].goals, 0);
+  if (!weakZones.includes(z) || gz[z].shots < 3 || totalGoals < 1) return '';
+  const pct = Math.round(n / zTotal * 100);
+  const beaten = Math.round(gz[z].goals / totalGoals * 100);
+  return `<div class="pc-edge">⚡ <b>Edge:</b> Shoots <strong>${pct}%</strong> to <strong>${z.toLowerCase()}</strong> — <strong>${beaten}%</strong> of ${esc(pg.name.split(' ').slice(-1)[0])}'s conceded goals come from there.</div>`;
+}
 function vsGoalieHtml(r, g) {
-  // "vs [Goalie]" head-to-head section for a skater's player card
+  // "vs [Goalie]" head-to-head section for a skater's player card.
+  // The edge line is NOT rendered here anymore — it lives at the top of
+  // the card via vsGoalieEdgeHtml (round-2 reorder).
   if (!g) return '';
   const pg = panelGoalie(g, r.oppAbbr);
   if (!pg.id) return '';
@@ -152,6 +179,12 @@ function vsGoalieHtml(r, g) {
       overlap = `<div class="muted">Favors <strong>${z.toLowerCase()}</strong> (${pct}% of shots) — not ${esc(pg.name.split(' ').slice(-1)[0])}'s weak spot.</div>`;
     }
   }
+  // Edge line (player-card polish): only when the skater's top shot zone is
+  // genuinely one of this goalie's weakest zones with a real sample — the
+  // draft's "slot" maps to the site's zone names (e.g. center-low = low slot).
+  // Otherwise the line is omitted entirely (the overlap text below covers it).
+  // NOTE: the standalone edge line for the top of the card lives in
+  // vsGoalieEdgeHtml above; it is intentionally NOT duplicated here.
   return `<h4 style="margin:.8rem 0 .2rem">vs ${esc(pg.name)} <span class="muted small">head-to-head · model</span></h4>
     <div class="small" style="display:flex;flex-direction:column;gap:.25rem">
       <div><strong>${h2h}</strong> career-tracked goal${h2h === 1 ? '' : 's'} with ${esc(pg.name.split(' ').slice(-1)[0])} in net <span class="muted">(recent games)</span>.</div>

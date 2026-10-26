@@ -211,6 +211,9 @@ function isHighDanger(x, y) {
    consistent with the site's no-tracking stance. */
 const LS_PLAYER_PREFIX = 'bueno-pl-v1-';
 const LS_SWEEP_KEY = 'bueno-pl-v1-sweep';
+// Remembered Markets pick: localStorage only, same local-only pattern as
+// the parlay — nothing leaves the browser.
+const LS_MARKET_KEY = 'bueno-nhl-market-v1';
 function lsToday() {
   const n = new Date();
   return `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, '0')}-${String(n.getDate()).padStart(2, '0')}`;
@@ -995,6 +998,7 @@ const MARKET_SUBS = {
 function setMarketKind(kind) {
   if (!MARKET_SUBS[kind]) kind = 'atg';
   state.marketKind = kind;
+  try { localStorage.setItem(LS_MARKET_KEY, kind); } catch (e) { /* storage unavailable */ }
   const sel = $('mktKindFilter');
   if (sel) sel.value = kind;
   const isGoal = GOAL_KINDS.includes(kind);
@@ -1019,6 +1023,28 @@ function setMarketKind(kind) {
 /* Goals tab filters: player-name search + game dropdown. Both combine
    with each other and with the goal-type dropdown; they filter the
    already-loaded rows, no new requests. */
+/* Remembered market: restore the last Markets pick once per load (called
+   from renderAll before the first setMarketKind). Missing or invalid
+   stored values fall back to Anytime via setMarketKind's validation. */
+let marketKindRestored = false;
+function restoreMarketKind() {
+  if (marketKindRestored) return;
+  marketKindRestored = true;
+  try {
+    const v = localStorage.getItem(LS_MARKET_KEY);
+    if (v && MARKET_SUBS[v]) state.marketKind = v;
+  } catch (e) { /* storage unavailable — Anytime default stands */ }
+}
+/* Bottom-nav live badge: "N live" on Top Shelf while games are live,
+   counted with the same isWatchable check the live ticks use. Clears
+   when nothing is live; refreshed on slate load and every live tick. */
+function syncLiveBadge() {
+  const badge = $('bnavLiveBadge');
+  if (!badge) return;
+  const n = (state.games || []).filter(isWatchable).length;
+  if (n > 0) { badge.textContent = `${n} live`; badge.hidden = false; }
+  else badge.hidden = true;
+}
 function populateGoalGameFilter() {
   const sel = $('goalGameSelect');
   if (!sel) return;
@@ -1312,6 +1338,31 @@ function playerBioHtml(r, compact) {
   if (!items.length) return '';
   return `<div class="pc-bio${compact ? ' compact' : ''}">${items.join('<span class="pc-bio-sep">·</span>')}</div>`;
 }
+/* Round-2 card polish: bio folded into a collapsed Details row (closed by
+   default) so it no longer pushes the hockey sections down. */
+function pcDetailsHtml(r) {
+  const b = r.bio;
+  if (!b) return `<details class="pc-details" data-bio-loading="${esc(String(r.pid))}"><summary><span>▸ Details</span></summary><p class="muted small">Loading bio…</p></details>`;
+  const items = [];
+  if (b.height) items.push(esc(b.height));
+  if (b.weight) items.push(esc(b.weight));
+  if (b.shoots) items.push(`Shoots ${esc(b.shoots)}`);
+  if (b.birthplace) items.push(esc(b.birthplace));
+  if (b.dob) items.push(`Born ${esc(b.dob)}`);
+  if (!items.length) return '';
+  return `<details class="pc-details"><summary><span>▸ Details</span></summary><p>${items.join(' · ')}</p></details>`;
+}
+/* Round-2 card polish: freshest game from last5[0]. Opponent is included
+   only if the entry carries one (field name varies by payload); otherwise
+   the line shows goals/shots alone. '' when there is no last-5 sample. */
+function pcLastGameHtml(l5) {
+  const lg = (l5 || [])[0];
+  if (!lg) return '';
+  const oppRaw = lg.opponent ?? lg.opp ?? lg.oppAbbr ?? lg.opponentAbbr
+    ?? (lg.opponentTeam && (lg.opponentTeam.abbrev || lg.opponentTeam.abbr)) ?? null;
+  const oppTxt = oppRaw ? ` vs ${esc(String(oppRaw))}` : '';
+  return `<div class="pc-lastgame">Last game: <b>${lg.goals ?? 0}G, ${lg.shots ?? 0} SOG</b>${oppTxt}</div>`;
+}
 /* Lazy-load bio for players who don't have it yet (e.g. live game skaters) */
 async function ensurePlayerBio(r) {
   if (r.bio || r._bioLoading) return;
@@ -1327,38 +1378,293 @@ async function ensurePlayerBio(r) {
       shoots: d.shootsCatches,
     };
     const el = document.querySelector(`[data-bio-loading="${r.pid}"]`);
-    if (el) el.outerHTML = playerBioHtml(r, true);
+    if (el) el.outerHTML = pcDetailsHtml(r);
+    const jn = document.querySelector(`[data-jnum-loading="${r.pid}"]`);
+    if (jn && r.bio.number != null) {
+      jn.textContent = `#${r.bio.number}`;
+      jn.hidden = false;
+      jn.removeAttribute('data-jnum-loading');
+    }
   } catch (e) { /* bio stays empty */ }
   r._bioLoading = false;
 }
+/* ---------------- player-card polish (approved draft v2) ----------------
+   Tonight strip, team-color header glow, form margin bars, and glowing
+   linemate headshots. All values come from data the card already has —
+   nothing is invented; a section is omitted when its data isn't there. */
+function lightenHex(hex, amt) {
+  // mix a #rrggbb color toward white by amt (0..1); falls back to input
+  const m = /^#([0-9a-fA-F]{6})$/.exec(hex || '');
+  if (!m) return hex || '#888';
+  const n = parseInt(m[1], 16);
+  const mix = (c) => Math.round(c + (255 - c) * amt);
+  return '#' + [mix((n >> 16) & 255), mix((n >> 8) & 255), mix(n & 255)]
+    .map((v) => v.toString(16).padStart(2, '0')).join('');
+}
+function pcTonightHtml(r, g) {
+  // Line + PP unit + opposing goalie, all from existing card data.
+  // Fields that aren't available are omitted, never faked.
+  if (!g) return '';
+  const bits = [];
+  if (r.line) bits.push(`<b>Line:</b> ${esc(r.line)}${r.lineEst === false ? '' : ' <span class="muted small">est.</span>'}`);
+  if (r.ppUnit) bits.push(`<b>PP:</b> ${esc(r.ppUnit)}`);
+  const pg = panelGoalie(g, r.oppAbbr);
+  if (pg.id) bits.push(`<b>Opposing goalie:</b> ${esc(pg.name)}${pg.tag ? ` <span class="muted small">${esc(pg.tag)}</span>` : ''} · ${(r.oppSv * 100).toFixed(1)}% SV`);
+  else if (r.oppSv) bits.push(`<b>Opposing goalie:</b> ${esc(r.oppAbbr)} · ${(r.oppSv * 100).toFixed(1)}% SV`);
+  if (!bits.length) return '';
+  const caseBits = [];
+  if (r.line === 'L1') caseBits.push('top line');
+  if (r.ppUnit === 'PP1') caseBits.push('top power play');
+  if (pg.id) caseBits.push(`against ${esc(pg.name.split(' ').slice(-1)[0])}`);
+  const caseLine = caseBits.length
+    ? `<div class="pc-tonight-case">${caseBits.join(', ').replace(/, ([^,]*)$/, ' and $1')}.</div>` : '';
+  return `<div class="pc-tonight"><h4>Tonight</h4><div class="pc-tonight-rows">${bits.join('<br>')}</div>${caseLine}</div>`;
+}
+function pcFormBarsHtml(r, l5g, l5s) {
+  // Last-5 goals and shots vs 5-game season pace. White mark = season pace;
+  // bar past the mark = hot. Falls back to null (caller keeps old text line)
+  // when there is no last-5 or season sample.
+  const l5 = (r.last5 || []).slice(0, 5);
+  if (!l5.length || !(r.gp > 0)) return null;
+  const row = (label, actual, pace) => {
+    if (!(pace > 0)) return '';
+    const scale = Math.max(actual, pace) * 1.05;
+    const fill = Math.min(100, (actual / scale) * 100);
+    const mark = Math.min(100, (pace / scale) * 100);
+    const hot = actual > pace;
+    return `<div class="pc-frow"><label><span>${label} · last 5: <b>${actual}</b></span><span class="muted">season pace: ${pace.toFixed(1)}</span></label>`
+      + `<div class="pc-fbar"><i class="${hot ? 'hot' : 'cold'}" style="width:${fill.toFixed(1)}%"></i><span class="pc-fmark" style="left:${mark.toFixed(1)}%"></span></div>`
+      + `<p class="muted small">${hot ? 'Running hot — bar past the white season-pace mark.' : 'Below season pace.'}</p></div>`;
+  };
+  const goalsRow = row('Goals', l5g, 5 * (r.goals / r.gp));
+  const shotsRow = row('Shots', l5s, 5 * (r.sogpg || 0));
+  if (!goalsRow && !shotsRow) return null;
+  return `<div class="pc-form"><h4>Form — last 5 vs season pace</h4>${goalsRow}${shotsRow}</div>`;
+}
 function linematesHtml(r) {
   const mates = state.skaters.filter((s) => s.team === r.team && String(s.gameId) === String(r.gameId) && String(s.pid) !== String(r.pid));
-  let title = '', cells = '';
+  let title = '', list = [];
   if (['C', 'L', 'R'].includes(r.pos) && r.line) {
     const line = mates.filter((s) => s.line === r.line);
     if (!line.length) return '';
     title = `Line ${r.line} — linemates`;
     const POSORD = { LW: 0, C: 1, RW: 2 };
-    cells = [r, ...line]
-      .sort((a, b) => ((POSORD[a.linePos] ?? 9) - (POSORD[b.linePos] ?? 9)) || (b.toiMin - a.toiMin))
-      .map((s) => lineupCellHtml(s, String(s.pid) === String(r.pid))).join('');
+    list = line.sort((a, b) => ((POSORD[a.linePos] ?? 9) - (POSORD[b.linePos] ?? 9)) || (b.toiMin - a.toiMin));
   } else if (r.pos === 'D' && r.line && /^D[123]$/.test(r.line)) {
-    const pair = [r, ...mates.filter((s) => s.pos === 'D' && s.line === r.line)];
-    if (pair.length < 2) return '';
+    const pair = mates.filter((s) => s.pos === 'D' && s.line === r.line);
+    if (!pair.length) return '';
     title = `Pair ${r.line} — partner`;
-    cells = pair.map((s) => lineupCellHtml(s, String(s.pid) === String(r.pid))).join('');
+    list = pair;
   } else if (r.pos === 'D') {
     const defs = [r, ...mates.filter((s) => s.pos === 'D')].sort((a, b) => b.toiMin - a.toiMin);
     const idx = defs.findIndex((s) => String(s.pid) === String(r.pid));
-    const pair = defs.slice(Math.floor(idx / 2) * 2, Math.floor(idx / 2) * 2 + 2);
-    if (pair.length < 2) return '';
+    const pair = defs.slice(Math.floor(idx / 2) * 2, Math.floor(idx / 2) * 2 + 2).filter((s) => String(s.pid) !== String(r.pid));
+    if (!pair.length) return '';
     title = `Pair D${Math.floor(idx / 2) + 1} — partner`;
-    cells = pair.map((s) => lineupCellHtml(s, String(s.pid) === String(r.pid))).join('');
+    list = pair;
   } else {
     return '';
   }
   const estTag = r.lineEst === false ? '' : ' <span class="muted small">est.</span>';
-  return `<h4 style="margin:.5rem 0 .15rem">${esc(title)}${estTag}</h4><div class="lu-row"><div class="lu-players">${cells}</div></div>`;
+  const tc = TEAM_COLORS[r.team] || '#888';
+  const cells = list.map((s) => {
+    const last = s.name.split(' ').slice(-1)[0];
+    const initials = s.name.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase();
+    return `<button class="pc-mate" data-pid="${s.pid}" data-gid="${s.gameId}" title="Open ${esc(s.name)} card">
+      <img src="${esc(s.headshot)}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <span class="pc-mate-fb">${esc(initials)}</span>
+      <b>${esc(last)}</b><small>${esc(s.linePos || s.pos)}</small>
+    </button>`;
+  }).join('');
+  return `<h4 style="margin:.5rem 0 .15rem">${esc(title)}${estTag}</h4><div class="pc-mates" style="--pc-tc:${tc}">${cells}</div>`;
+}
+/* ---------------- NHL game sheet (slate-card expansion) ----------------
+   Tapping a slate card opens the matchup modal; the modal body is the
+   game sheet. Everything here rides data already fetched for the slate —
+   no new API calls. Section open-state persists across re-renders within
+   the session (same pattern as the NBA game sheet). */
+const sheetSecs = {}; // section key -> open bool, session only
+const SHEET_SEC_DEFAULTS = { scorers: true, goalies: true, preview: true, lineups: true, teamstats: true };
+function sheetSecOpen(key) { return key in sheetSecs ? sheetSecs[key] : !!SHEET_SEC_DEFAULTS[key]; }
+function sheetDetailsOpen() {
+  // capture current open-state before a re-render wipes the DOM
+  document.querySelectorAll('#matchupBody details.gs-sec').forEach((d) => { sheetSecs[d.dataset.sec] = d.open; });
+}
+function sheetBindToggles() {
+  document.querySelectorAll('#matchupBody details.gs-sec').forEach((d) => {
+    d.addEventListener('toggle', () => { sheetSecs[d.dataset.sec] = d.open; });
+  });
+}
+function renderMatchupBody(g, lamA, lamB, wp, st) {
+  sheetDetailsOpen();
+  $('matchupBody').innerHTML = matchupHtml(g, lamA, lamB, wp, st);
+  drawGoalieRinks();
+  sheetBindToggles();
+}
+// Sheet scorers feed: newest-first goals from this game's pbp. Each row
+// replays the existing goal animation (goal-anim.js) — no new animation code.
+// The gl objects are augmented with the game's team abbreviations, which
+// playGoalAnimation needs for its team logos.
+const sheetGoalsByGame = {}; // gameId -> [gl...] for animation replay
+function sheetScorersHtml(g) {
+  const goals = extractGoals(g.pbp, g).map((gl) => ({
+    ...gl, gameAway: g.away, gameHome: g.home, awayAbbr: g.away, homeAbbr: g.home,
+  }));
+  sheetGoalsByGame[g.id] = goals;
+  if (!goals.length) return `<p class="muted small">No goals yet.</p>`;
+  return `<div class="gs-feed">${goals.map((gl, i) => {
+    const perLabel = gl.periodType === 'OT' ? 'OT' : gl.periodType === 'SO' ? 'SO' : `P${gl.period}`;
+    const assists = gl.assists.length ? ` · ${gl.assists.map(esc).join(', ')}` : '';
+    return `<button class="gs-feed-row" data-sheet-goal="${g.id}:${i}" title="Replay goal animation">
+      <img class="gs-tlogo" src="${teamLogoUrl(gl.team)}" alt="" ${imgFallback}>
+      <span class="gtype gtype-${gl.type.toLowerCase()}">${GOAL_TYPE_LABEL[gl.type] || gl.type}</span>
+      <span class="gs-scorer"><strong>${esc(gl.scorer)}</strong><span class="muted small">${assists}</span></span>
+      <span class="gs-meta">${perLabel} ${esc(gl.time)}<span class="gs-score">${gl.awayScore}–${gl.homeScore}</span><span class="gs-tap">Tap for animation ▸</span></span>
+    </button>`;
+  }).join('')}</div>`;
+}
+// Sheet goalie matchup cards: compact entry points to the existing full
+// goalie card. They reuse the .goalie-open document handler (same as the
+// goalie heads in the detail panels), so no new goalie wiring is needed.
+function sheetGoalieCardsHtml(g) {
+  return `<div class="gs-goalies">${[g.away, g.home].map((t) => {
+    const pg = panelGoalie(g, t);
+    if (!pg.id) return `<div class="gs-gcard"><strong>${esc(pg.name)}</strong><span class="muted small">${esc(t)} · TBD</span></div>`;
+    const sv = goalieSvCache[pg.id];
+    const svTxt = sv ? ` · Save % ${(sv * 100).toFixed(1)}%` : '';
+    return `<button class="gs-gcard goalie-open" data-goalie="${pg.id}" data-team="${esc(t)}" data-game="${g.id}" title="Open ${esc(pg.name)} card">
+      <img class="gs-hs" src="${esc(headshotUrl(t, pg.id))}" alt="" ${imgFallback}>
+      <span class="gs-ginfo"><strong>${esc(pg.name)}</strong><span class="muted small">${esc(t)} · ${esc(pg.tag || '')}${svTxt}</span></span>
+      <span class="gs-tap">Goalie card ▸</span>
+    </button>`;
+  }).join('')}</div>`;
+}
+// Sheet team-stat bars in team colors. Data already on hand: live SOG from
+// the pbp, season goals for/against per game from standings (same fetch the
+// preview tape uses). Hits / faceoffs are NOT in any fetched payload, so
+// they are deliberately not shown rather than fabricated.
+function sheetTeamStatsHtml(g, st) {
+  const pbp = g.pbp;
+  const sogA = pbp && pbp.awayTeam && typeof pbp.awayTeam.sog === 'number' ? pbp.awayTeam.sog : null;
+  const sogH = pbp && pbp.homeTeam && typeof pbp.homeTeam.sog === 'number' ? pbp.homeTeam.sog : null;
+  const sa = st ? st[g.away] : null, sh = st ? st[g.home] : null;
+  const perGame = (s, f) => (s && s.gamesPlayed > 0) ? f(s) : null;
+  const gfA = perGame(sa, (s) => s.goalFor / s.gamesPlayed);
+  const gfH = perGame(sh, (s) => s.goalFor / s.gamesPlayed);
+  const gaA = perGame(sa, (s) => s.goalAgainst / s.gamesPlayed);
+  const gaH = perGame(sh, (s) => s.goalAgainst / s.gamesPlayed);
+  const cA = TEAM_COLORS[g.away] || '#888', cH = TEAM_COLORS[g.home] || '#888';
+  const bar = (label, a, h, fmt) => {
+    if (a == null || h == null || (a + h) <= 0) return '';
+    const pa = (a / (a + h)) * 100;
+    return `<div class="gs-stat"><label><span>${label} · ${esc(g.away)} ${fmt(a)}</span><span>${fmt(h)} ${esc(g.home)}</span></label>`
+      + `<div class="gs-bar"><i style="width:${pa.toFixed(1)}%;background:${cA};box-shadow:0 0 10px ${cA}"></i>`
+      + `<i style="flex:1;background:${cH};box-shadow:0 0 10px ${cH}"></i></div></div>`;
+  };
+  const rows = [
+    bar('Shots on goal', sogA, sogH, (v) => v),
+    bar('Goals for / game', gfA, gfH, (v) => v.toFixed(2)),
+    bar('Goals against / game', gaA, gaH, (v) => v.toFixed(2)),
+  ].join('');
+  return rows || `<p class="muted small">Team stats unavailable.</p>`;
+}
+/* ---------------- Live win % bar (game sheet) ----------------
+   Pregame, the bar shows the existing Poisson model number, labeled
+   "Model". Once live, the bar is driven by a LIVE calculation from
+   score + clock (draft: ~/workspace/nhl-live-wp-draft.md), recomputed
+   on every live tick while the sheet is open. The live number is a
+   calculation from what has already happened, NOT a projection, and the
+   sheet must never label it one.
+   Flow terms (shot attempts, takeaways, zone faceoffs) are implemented
+   below but DISABLED behind LIVE_WP_FLOW_ENABLED until the backtest
+   beats score+clock alone — the bar moves on score + clock only until
+   then, and the sublabel says so ("from score & clock so far").
+   WP history points are recorded per recompute (session only) as data
+   for the future WP graph; no graph is rendered yet. */
+const LIVE_WP_FLOW_ENABLED = false; // BACKTEST GATE — do not flip without the backtest (see draft).
+// PLACEHOLDER weights from the draft — replace with fitted coefficients after backtest.
+const LIVE_WP_SCORE_A = 0.55, LIVE_WP_SCORE_B = 1.10;
+const LIVE_WP_FLOW_C = 0.80, LIVE_WP_FLOW_D = 0.30, LIVE_WP_FLOW_E = 0.40;
+const liveWpHistory = {}; // gameId -> [{t, period, clock, home}] — session only
+let sheetOpenGameId = null; // game id of the currently open sheet, if any
+let sheetStandings = null; // last standings map used by the open sheet (fallback for tick refreshes)
+function liveWpLogit(p) { const c = Math.min(0.99, Math.max(0.01, p)); return Math.log(c / (1 - c)); }
+function liveWpSigmoid(x) { return 1 / (1 + Math.exp(-x)); }
+// Minutes elapsed from period + clock. OT is 5 min, SO counts as 65.
+// During intermission the API clock counts the break, not the period, so
+// elapsed is taken as the end of the last completed period.
+function liveWpElapsed(g) {
+  const pbp = g.pbp || {};
+  const pd = pbp.periodDescriptor || {};
+  const n = pd.number || 0;
+  const clockStr = (pbp.clock && pbp.clock.timeRemaining) || '';
+  if (!n) return { elapsed: 0, period: 0, clock: clockStr };
+  if (pbp.clock && pbp.clock.inIntermission) return { elapsed: (n - 1) * 20, period: n, clock: clockStr };
+  let rem = 0;
+  const m = /^(\d+):(\d+)$/.exec(clockStr);
+  if (m) rem = (+m[1]) * 60 + (+m[2]);
+  let elapsed;
+  if (n <= 3) elapsed = (n - 1) * 20 + Math.max(0, 20 - rem / 60);
+  else if (n === 4) elapsed = 60 + Math.max(0, 5 - rem / 60);
+  else elapsed = 65;
+  return { elapsed, period: n, clock: clockStr };
+}
+// Flow term from pbp plays. Gated off (see LIVE_WP_FLOW_ENABLED); when
+// enabled, team attribution uses details.eventOwnerTeamId vs the pbp
+// team ids, and zoneCode is read relative to the event owner team.
+// Returns 0 whenever the data needed is missing — never fabricates.
+function liveWpFlowTerm(g, goalDiff) {
+  if (!LIVE_WP_FLOW_ENABLED) return 0;
+  const pbp = g.pbp || {};
+  const plays = pbp.plays || [];
+  const idA = pbp.awayTeam && pbp.awayTeam.id, idH = pbp.homeTeam && pbp.homeTeam.id;
+  if (!idA || !idH || !plays.length) return 0;
+  let cfA = 0, cfH = 0, tkA = 0, tkH = 0, ozA = 0, ozH = 0;
+  for (const p of plays) {
+    const det = p.details || {};
+    const tid = det.eventOwnerTeamId;
+    if (tid !== idA && tid !== idH) continue;
+    const isA = tid === idA;
+    if (p.typeDescKey === 'shot-on-goal' || p.typeDescKey === 'missed-shot' || p.typeDescKey === 'blocked-shot') {
+      if (isA) cfA++; else cfH++;
+    } else if (p.typeDescKey === 'takeaway') {
+      if (isA) tkA++; else tkH++;
+    } else if (p.typeDescKey === 'faceoff' && det.zoneCode === 'O') {
+      if (isA) ozA++; else ozH++;
+    }
+  }
+  const corsiEdge = (cfA + cfH) > 0 ? (cfH - cfA) / (cfH + cfA) : 0;
+  const takeawayEdge = Math.tanh((tkH - tkA) / 5);
+  const ozEdge = (ozA + ozH) > 0 ? (ozH - ozA) / (ozH + ozA) : 0;
+  const damp = Math.max(0, 1 - Math.abs(goalDiff) / 4);
+  return damp * (LIVE_WP_FLOW_C * corsiEdge + LIVE_WP_FLOW_D * takeawayEdge + LIVE_WP_FLOW_E * ozEdge);
+}
+// Returns {a, b, mode} with a = away win %, b = home win % (same
+// convention as matchupWinProb). mode: 'model' (pregame), 'live', 'final'.
+function liveWinProb(g, pregameWp) {
+  const mode = (g.state === 'LIVE' || g.state === 'CRIT') ? 'live'
+    : (g.state === 'OFF' || g.state === 'FINAL') ? 'final' : 'model';
+  if (mode === 'model') return { a: pregameWp.a, b: pregameWp.b, mode };
+  const pbp = g.pbp || {};
+  const sA = pbp.awayTeam && typeof pbp.awayTeam.score === 'number' ? pbp.awayTeam.score : null;
+  const sH = pbp.homeTeam && typeof pbp.homeTeam.score === 'number' ? pbp.homeTeam.score : null;
+  if (sA == null || sH == null) return { a: pregameWp.a, b: pregameWp.b, mode: 'model' };
+  if (mode === 'final') {
+    // A decided game is not a probability anymore.
+    const home = sH > sA ? 1 : sH < sA ? 0 : 0.5;
+    return { a: 1 - home, b: home, mode };
+  }
+  const goalDiff = sH - sA; // home perspective
+  const el = liveWpElapsed(g);
+  const frac = Math.min(1, Math.max(0, el.elapsed / 60));
+  const logit = liveWpLogit(pregameWp.b) + goalDiff * (LIVE_WP_SCORE_A + LIVE_WP_SCORE_B * frac) + liveWpFlowTerm(g, goalDiff);
+  // Empty net: flow is already disabled, so score + clock dominate by construction.
+  const home = Math.min(0.99, Math.max(0.01, liveWpSigmoid(logit)));
+  const pt = { t: new Date().toISOString(), period: el.period, clock: el.clock, home: Math.round(home * 100) };
+  const hist = liveWpHistory[g.id] || (liveWpHistory[g.id] = []);
+  const last = hist[hist.length - 1];
+  if (!last || last.period !== pt.period || last.clock !== pt.clock || last.home !== pt.home) hist.push(pt);
+  return { a: 1 - home, b: home, mode };
 }
 function matchupHtml(g, lamA, lamB, wp, st) {
   const A = g.away, H = g.home;
@@ -1382,8 +1688,11 @@ function matchupHtml(g, lamA, lamB, wp, st) {
     ? `<div class="matchup-live"><span>${esc(A)} ${pbp.awayTeam.score}</span><span class="muted">–</span><span>${pbp.homeTeam.score} ${esc(H)}</span></div>
        <div class="matchup-status muted small">${gameStatusText(g)}</div>`
     : '';
-  const pctA = Math.round(wp.a * 100), pctH = Math.round(wp.b * 100);
+  const live = liveWinProb(g, wp);
+  const pctA = Math.round(live.a * 100), pctH = Math.round(live.b * 100);
+  const cA = TEAM_COLORS[A] || '#888', cH = TEAM_COLORS[H] || '#888';
   return `
+  <div class="gs-head" style="background:linear-gradient(120deg, ${cA}2e, transparent 55%, ${cH}24)">
   <div class="matchup-top">
     <div class="matchup-team">
       <img src="${teamLogoUrl(A)}" alt="${esc(A)}" ${imgFallback}>
@@ -1398,11 +1707,17 @@ function matchupHtml(g, lamA, lamB, wp, st) {
     </div>
   </div>
   ${liveHtml}
-  <div class="split-bar" aria-label="Win probability">
-    <div class="split-a" style="width:${(wp.a * 100).toFixed(1)}%"></div><div class="split-b" style="width:${(wp.b * 100).toFixed(1)}%"></div>
   </div>
-  <div class="split-labels"><span><strong>${pctA}%</strong> ${esc(A)}</span><span>${esc(H)} <strong>${pctH}%</strong></span></div>
+  <div class="gs-wp-head"><span>Win probability</span><span class="gs-wp-tag">${live.mode === 'live' ? 'Live win %' : live.mode === 'final' ? 'Final' : 'Model'}</span></div>
+  <div class="split-bar" aria-label="Win probability">
+    <div class="split-a" style="width:${(live.a * 100).toFixed(1)}%;background:${cA};box-shadow:0 0 12px ${cA}"></div><div class="split-b" style="width:${(live.b * 100).toFixed(1)}%;background:${cH};box-shadow:0 0 12px ${cH}"></div>
+  </div>
+  <div class="split-labels"><span><strong style="color:${cA};text-shadow:0 0 10px ${cA}">${pctA}%</strong> ${esc(A)}</span><span>${esc(H)} <strong style="color:${cH};text-shadow:0 0 10px ${cH}">${pctH}%</strong></span></div>
+  ${live.mode === 'live' ? `<div class="gs-wp-sub">from score &amp; clock so far</div>` : ''}
   <div class="matchup-proj">Projected <strong>${esc(A)} ${lamA.toFixed(1)} – ${lamB.toFixed(1)} ${esc(H)}</strong></div>
+  <details class="gs-sec" data-sec="scorers"${sheetSecOpen('scorers') ? ' open' : ''}><summary>Scorers feed</summary><div class="gs-sec-body">${sheetScorersHtml(g)}</div></details>
+  <details class="gs-sec" data-sec="goalies"${sheetSecOpen('goalies') ? ' open' : ''}><summary>Goalie matchup</summary><div class="gs-sec-body">${sheetGoalieCardsHtml(g)}</div></details>
+  <details class="gs-sec" data-sec="preview"${sheetSecOpen('preview') ? ' open' : ''}><summary>Game preview</summary><div class="gs-sec-body">
   <h4 class="tape-title">Game preview</h4>
   <div class="tape">
     ${tapeRow(fmt2(gfA), 'Goals for / game', fmt2(gfH), cmpRow(gfA, gfH))}
@@ -1411,28 +1726,45 @@ function matchupHtml(g, lamA, lamB, wp, st) {
     ${tapeRow(streak(sa), 'Streak', streak(sh), null)}
     ${tapeRow(l10rec(sa), 'Last 10', l10rec(sh), cmpRow(l10A, l10H))}
   </div>
-  ${goalieSectionHtml(g, st)}
-  ${matchupLineupHtml(g.id)}
-  <p class="muted small matchup-note">Win % from each team's Poisson scoring rate (regulation ties split evenly). Team stats via NHL standings, cached per date. Goalie maps chart non-shootout goals with this goalie in net, from tonight's and recent games.</p>`;
+  </div></details>
+  <details class="gs-sec" data-sec="lineups"${sheetSecOpen('lineups') ? ' open' : ''}><summary>Lineup</summary><div class="gs-sec-body">${matchupLineupHtml(g.id)}</div></details>
+  <details class="gs-sec" data-sec="teamstats"${sheetSecOpen('teamstats') ? ' open' : ''}><summary>Team stats</summary><div class="gs-sec-body">${sheetTeamStatsHtml(g, st)}</div></details>
+  <p class="muted small matchup-note">${live.mode === 'live' ? 'Live win % from score &amp; clock so far — a live calculation, not a projection.' : live.mode === 'final' ? 'Final result.' : 'Win % from each team\'s Poisson scoring rate (regulation ties split evenly).'} Team stats via NHL standings, cached per date. Goalie maps live in the full goalie card — tap a goalie above.</p>`;
 }
 async function openMatchup(gameId) {
   const g = state.games.find((gg) => String(gg.id) === String(gameId));
   if (!g) return;
+  sheetOpenGameId = g.id;
   const lamA = simUnits(state.skaters, g.id, g.away).total;
   const lamB = simUnits(state.skaters, g.id, g.home).total;
   const wp = matchupWinProb(lamA, lamB);
   // show win prob + projection immediately; fill in standings when they arrive
-  $('matchupBody').innerHTML = matchupHtml(g, lamA, lamB, wp, null);
-  drawGoalieRinks();
+  renderMatchupBody(g, lamA, lamB, wp, null);
   $('matchupModal').classList.remove('hidden');
   const st = await getStandings();
   await ensureGoalieProj(g);
   if (!$('matchupModal').classList.contains('hidden')) {
-    $('matchupBody').innerHTML = matchupHtml(g, lamA, lamB, wp, st);
-    drawGoalieRinks();
+    sheetStandings = st;
+    renderMatchupBody(g, lamA, lamB, wp, st);
   }
 }
-function closeMatchup() { $('matchupModal').classList.add('hidden'); }
+function closeMatchup() { sheetOpenGameId = null; $('matchupModal').classList.add('hidden'); }
+// Re-render the open sheet on live ticks so the win % bar moves with the
+// game. Called from rerenderLiveViews (both tick paths funnel through it).
+// Standings are cached per date, so this adds no new fetches after open.
+async function refreshOpenSheet() {
+  try {
+    if (!sheetOpenGameId || $('matchupModal').classList.contains('hidden')) return;
+    const g = state.games.find((gg) => String(gg.id) === String(sheetOpenGameId));
+    if (!g) return;
+    const lamA = simUnits(state.skaters, g.id, g.away).total;
+    const lamB = simUnits(state.skaters, g.id, g.home).total;
+    const wp = matchupWinProb(lamA, lamB);
+    let st = sheetStandings;
+    try { st = await getStandings(); sheetStandings = st; } catch (e) { /* keep last standings */ }
+    if (!$('matchupModal').classList.contains('hidden')) renderMatchupBody(g, lamA, lamB, wp, st);
+  } catch (e) { /* never break live views on a sheet refresh */ }
+}
 function sortedSkaters() {
   let rows = state.skaters.slice();
   if (state.teamFilter) rows = rows.filter((r) => r.team === state.teamFilter);
@@ -1668,13 +2000,13 @@ function addParlayLeg(r, v) {
   let leg;
   if (v === 'atg') {
     if (!(r.p > 0.0005)) return;
-    leg = { key: `${r.pid}:atg`, name: r.name, team: r.team, label: 'Anytime goal', prob: r.p, fair: r.fair };
+    leg = { key: `${r.pid}:atg`, name: r.name, team: r.team, gameId: r.gameId, label: 'Anytime goal', prob: r.p, fair: r.fair };
   } else {
     const [kind, lineStr] = String(v).split('|');
     const line = parseFloat(lineStr);
     const m = (r.markets[kind] || []).find((x) => x.line === line);
     if (!m || !(m.over > 0.0005) || m.overFair === '–') return;
-    leg = { key: `${r.pid}:${kind}:${line}`, name: r.name, team: r.team, label: `${MARKET_META[kind].label} o${line}`, prob: m.over, fair: m.overFair };
+    leg = { key: `${r.pid}:${kind}:${line}`, name: r.name, team: r.team, gameId: r.gameId, label: `${MARKET_META[kind].label} o${line}`, prob: m.over, fair: m.overFair };
   }
   if (!state.parlay.some((l) => l.key === leg.key)) state.parlay.push(leg);
   closePlayer();
@@ -1698,6 +2030,7 @@ function renderParlay() {
     }));
   }
   renderParlayTotals();
+  renderSendToBook();
 }
 function renderParlayTotals() {
   const box = $('parlayTotals');
@@ -1719,6 +2052,150 @@ function renderParlayTotals() {
       <div><div class="t-label">Model hit rate</div><div class="t-val">${pct1(joint)}</div></div>
     </div>
     <p class="muted small">Same-game legs are correlated — books may restrict or shade these, and the joint model rate assumes independence. Fair (no-vig) odds. Not betting advice.</p>`;
+}
+/* ---------------- Send to book (Gambly / Pikkit) ----------------
+   v1 is a TEXT handoff only: the site formats the ticket, copies it,
+   and opens the bot's page in a new tab. No API key, no backend, no
+   odds fetching, no placement — the user confirms at the book's price.
+   Link targets are the bots' own documented pages; no other bot URLs
+   are used here. */
+const STB_GAMBLY_URL = 'https://gambly.com/gambly-bot';
+const STB_PIKKIT_URL = 'https://pikkit.com/autofill';
+const STB_CHECKLIST = [
+  'Book price wins over model fair — check every leg at the book before confirming.',
+  'If a line moved or a market isn’t offered, that leg may fail to match — rebuild just that leg in the book.',
+  'You set the stake and place the bet. Nothing here places it for you.',
+];
+function stbDateStr() {
+  return new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+}
+function stbNhlLegGame(l) {
+  let gid = l.gameId;
+  if (gid == null && l.key) {
+    const pid = String(l.key).split(':')[0];
+    const s = (state.skaters || []).find((x) => String(x.pid) === pid);
+    if (s) gid = s.gameId;
+  }
+  if (gid == null) return null;
+  return (state.games || []).find((g) => String(g.id) === String(gid)) || null;
+}
+function stbNhlLegWording(l) {
+  const parts = String(l.key || '').split(':');
+  const kind = parts[1], line = parts[2];
+  if (kind === 'atg') return 'Anytime Goalscorer';
+  if (kind === 'shots') return `Over ${line} Shots on Goal`;
+  if (kind === 'assists') return `Over ${line} Assists`;
+  if (kind === 'points') return `Over ${line} Points`;
+  // Defensive only — the card picker cannot currently add these leg types.
+  if (/brace/i.test(l.label || '')) return '2+ Goals';
+  if (/first/i.test(l.label || '')) return 'First Goalscorer';
+  return l.label || '';
+}
+function stbNhlTicket() {
+  const legs = state.parlay || [];
+  if (!legs.length) return null;
+  // One leg is a straight bet, not a parlay: label it honestly and show
+  // its own fair (no correlation question for a single leg).
+  if (legs.length === 1) {
+    const l = legs[0], game = stbNhlLegGame(l);
+    const matchup = game ? `${game.away} @ ${game.home}` : l.team;
+    const dec = americanToDecimal(l.fair);
+    return [
+      `Straight bet — Bueno Sports — ${stbDateStr()}`,
+      `1. ${l.name} (${matchup}) — ${stbNhlLegWording(l)}`,
+      dec && dec > 1
+        ? `Model fair — reference only, NOT the book price: ${decimalToAmerican(dec)}`
+        : 'Model fair unavailable — check the edge at the book’s price.',
+      'Book price wins over model fair — check every leg at the book before confirming.',
+    ].join('\n');
+  }
+  const resolved = legs.map((l) => ({ leg: l, game: stbNhlLegGame(l) }));
+  const sgpGame = resolved.every((r) => r.game) && resolved.every((r) => String(r.game.id) === String(resolved[0].game.id))
+    ? resolved[0].game : null;
+  const header = sgpGame
+    ? `Same-Game Parlay — ${sgpGame.away} @ ${sgpGame.home} — Bueno Sports — ${stbDateStr()}`
+    : `Parlay — Bueno Sports — ${stbDateStr()}`;
+  const lines = resolved.map((r, i) => {
+    const matchup = r.game ? `${r.game.away} @ ${r.game.home}` : r.leg.team;
+    return `${i + 1}. ${r.leg.name} (${matchup}) — ${stbNhlLegWording(r.leg)}`;
+  });
+  let footer;
+  if (sgpGame) {
+    footer = 'Combined fair withheld — legs in one game correlate. Check the edge at the book’s price.';
+  } else {
+    const decs = legs.map((l) => americanToDecimal(l.fair)).filter((d) => d && d > 1);
+    footer = decs.length === legs.length
+      ? `Model fair — reference only, NOT the book price: ${decimalToAmerican(decs.reduce((a, b) => a * b, 1))}`
+      : 'Model fair unavailable — check the edge at the book’s price.';
+  }
+  return [header, ...lines, footer, 'Book price wins over model fair — check every leg at the book before confirming.'].join('\n');
+}
+async function stbCopyText(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch (e) { /* fall through to the textarea fallback */ }
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    const ok = document.execCommand('copy');
+    ta.remove();
+    return !!ok;
+  } catch (e2) { return false; }
+}
+function stbSendOpen(ticket, url, statusEl, fallbackEl, doneMsg) {
+  stbCopyText(ticket).then((ok) => {
+    if (ok) {
+      statusEl.textContent = doneMsg;
+      window.open(url, '_blank', 'noopener');
+    } else {
+      statusEl.textContent = 'Copy didn’t work in this browser — copy the ticket below manually.';
+      fallbackEl.value = ticket;
+      fallbackEl.classList.remove('hidden');
+      fallbackEl.select();
+    }
+  });
+}
+function renderSendToBook() {
+  const wrap = $('sendToBookWrap');
+  if (!wrap) return;
+  if (!state.parlay.length) { wrap.innerHTML = ''; return; }
+  wrap.innerHTML = `
+    <button class="btn" id="stbOpenBtn" type="button">Send to book</button>
+    <div id="stbChooser" class="stb-chooser hidden">
+      <ul class="stb-check">${STB_CHECKLIST.map((c) => `<li>${esc(c)}</li>`).join('')}</ul>
+      <div class="stb-row">
+        <button class="btn" id="stbGambly" type="button">Via Gambly</button>
+        <button class="btn" id="stbPikkit" type="button">Via Pikkit</button>
+        <button class="ghost-btn" id="stbCopy" type="button">Copy ticket text</button>
+      </div>
+      <p class="muted small" id="stbStatus"></p>
+      <textarea id="stbFallback" class="stb-fallback hidden" rows="8" readonly aria-label="Ticket text"></textarea>
+    </div>`;
+  $('stbOpenBtn').addEventListener('click', () => $('stbChooser').classList.toggle('hidden'));
+  const statusEl = $('stbStatus'), fallbackEl = $('stbFallback');
+  $('stbGambly').addEventListener('click', () => {
+    const t = stbNhlTicket();
+    if (t) stbSendOpen(t, STB_GAMBLY_URL, statusEl, fallbackEl, 'Ticket copied — paste it into Gambly Chat, then follow its deeplink to your book.');
+  });
+  $('stbPikkit').addEventListener('click', () => {
+    const t = stbNhlTicket();
+    if (t) stbSendOpen(t, STB_PIKKIT_URL, statusEl, fallbackEl, 'Ticket copied — paste it into Pikkit QuickPick, then Autofill to your book.');
+  });
+  $('stbCopy').addEventListener('click', () => {
+    const t = stbNhlTicket();
+    if (!t) return;
+    stbCopyText(t).then((ok) => {
+      if (ok) statusEl.textContent = 'Ticket copied.';
+      else {
+        statusEl.textContent = 'Copy didn’t work in this browser — copy the ticket below manually.';
+        fallbackEl.value = t; fallbackEl.classList.remove('hidden'); fallbackEl.select();
+      }
+    });
+  });
 }
 /* ---------------- book parlay calculator (manual odds) ---------------- */
 const bookLegs = []; // { id, odds }
@@ -1972,43 +2449,47 @@ function openPlayer(pid, gameId) {
   const statusPill = r.lineup === 'confirmed'
     ? '<span class="status-pill ok">In lineup</span>'
     : '<span class="status-pill proj">Projected</span>';
+  const tc = TEAM_COLORS[r.team] || '#888';
+  const formBars = pcFormBarsHtml(r, l5g, l5s);
+  const formHtml = formBars || `<p class="small muted">Season: ${r.goals}G ${r.assists}A ${r.points}P / ${r.gp}GP · Last 5: ${l5g}G, ${l5s} SOG</p>`;
+  // Small-sample zone note used to live on the removed trailing season
+  // sentence; keep it with the form block so the info isn't lost.
+  const zoneNote = r.zone.lowSample ? `<p class="small muted"><em>zone share uses league-average (small sample)</em></p>` : '';
+  // Jersey number chip: from bio (sweaterNumber) when already loaded; when
+  // the bio arrives later, ensurePlayerBio fills the placeholder in.
+  const jnumChip = r.bio && r.bio.number != null
+    ? `<span class="pc-jnum">#${esc(String(r.bio.number))}</span>`
+    : `<span class="pc-jnum" data-jnum-loading="${esc(String(r.pid))}" hidden></span>`;
   $('modalBody').innerHTML = `
-    <div class="pc-head hero-card-head">
-      <img class="headshot" src="${esc(r.headshot)}" alt="" ${imgFallback}>
+    <div class="pc-head hero-card-head" style="--pc-tc:${tc}">
+      <img class="headshot" src="${esc(r.headshot)}" alt="" ${imgFallback} style="border-color:${tc};box-shadow:0 0 22px ${tc}">
       <div>
-        <h3 class="pc-name">${esc(r.name)}</h3>
+        <h3 class="pc-name">${jnumChip}${esc(r.name)}</h3>
         <div><img class="tlogo" src="${teamLogoUrl(r.team)}" alt="" ${imgFallback}>
           <span class="muted">${esc(r.team)} · ${esc(r.pos)} · ${g ? esc(g.away + ' @ ' + g.home) : ''}</span></div>
       </div>
       <div style="margin-left:auto;text-align:center">
-        <div class="hero-card-num">${Math.round(r.p * 100)}<small>%</small></div>
+        <div class="hero-card-num" style="color:${lightenHex(tc, 0.55)};text-shadow:0 0 16px ${tc}">${Math.round(r.p * 100)}<small>%</small></div>
         <div class="hero-card-label">Anytime Goal</div>
         <div class="pc-fair">${r.fair} fair</div>
       </div>
     </div>
     <div class="pc-status">${lineBadge}${statusPill}</div>
-    ${playerBioHtml(r, !r.bio)}
+    ${pcTonightHtml(r, g)}
     <div class="stat-inline"><span><strong>${r.goals}</strong> goals</span><span><strong>${r.assists}</strong> assists</span><span><strong>${r.points}</strong> points</span><span><strong>${r.gp}</strong> GP</span></div>
+    ${vsGoalieEdgeHtml(r, g)}
+    ${formHtml}
+    ${pcLastGameHtml(l5)}
+    ${zoneNote}
     <div class="section-div"></div>
     ${linematesHtml(r)}
+    ${pcDetailsHtml(r)}
     <div class="section-div"></div>
     ${vsGoalieHtml(r, g)}
-    <details class="factors-details">
-      <summary class="sec-title" style="cursor:pointer">Factors <span style="color:var(--gold)">how we got here</span></summary>
-      <table class="factor-table">${factorRows}
-        <tr><td>Expected goals (λ)</td><td>${r.lam.toFixed(3)}</td></tr>
-        <tr><td>Opponent</td><td>${esc(r.oppAbbr)} goalie ${(r.oppSv * 100).toFixed(1)}% SV</td></tr>
-      </table>
-    </details>
-    <p class="small muted">Season: ${r.goals}G ${r.assists}A ${r.points}P / ${r.gp}GP · Last 5: ${l5g}G, ${l5s} SOG${r.zone.lowSample ? ' · <em>zone share uses league-average (small sample)</em>' : ''}</p>
-    <div class="sec-title">vs League Average</div>
-    ${statBarsHtml(r)}
     <h4 style="margin:.8rem 0 .2rem">Markets <span class="muted small">Poisson over/under</span></h4>
     ${marketsHtml}
-    <div class="parlay-add">
-      <select id="parlayLegSelect" aria-label="Choose a parlay leg">${legOpts.join('')}</select>
-      <button class="btn" id="parlayAddBtn">Add to parlay</button>
-    </div>
+    <div class="sec-title">vs League Average</div>
+    ${statBarsHtml(r)}
     <details class="rink-details" open>
       <summary class="sec-title" style="cursor:pointer"><span id="rinkTitle" style="color:var(--gold)">Shot map</span> <span class="muted small">recent games, attacking ↑</span></summary>
       <div style="margin:.4rem 0"><button class="pill on" id="rinkShots">Shots</button> <button class="pill" id="rinkGoals">Goals</button></div>
@@ -2017,7 +2498,18 @@ function openPlayer(pid, gameId) {
         <span><span class="dot" style="background:#d4a017"></span>goal</span>
       <span><span class="dot" style="background:#a06414"></span>slot</span> <span><span class="dot" style="background:#c42c1e"></span>low slot</span></div>
     </details>
-    ${heatMapSectionHtml(r)}`;
+    ${heatMapSectionHtml(r)}
+    <details class="factors-details">
+      <summary class="sec-title" style="cursor:pointer">Factors <span style="color:var(--gold)">how we got here</span></summary>
+      <table class="factor-table">${factorRows}
+        <tr><td>Expected goals (λ)</td><td>${r.lam.toFixed(3)}</td></tr>
+        <tr><td>Opponent</td><td>${esc(r.oppAbbr)} goalie ${(r.oppSv * 100).toFixed(1)}% SV</td></tr>
+      </table>
+    </details>
+    <div class="parlay-add">
+      <select id="parlayLegSelect" aria-label="Choose a parlay leg">${legOpts.join('')}</select>
+      <button class="btn" id="parlayAddBtn">Add to parlay</button>
+    </div>`;
   $('playerModal').classList.remove('hidden');
   ensurePlayerBio(r);
   // map follows the Markets dropdown on open; pills let you switch without closing
@@ -2173,6 +2665,8 @@ async function openGoalie(goalieId, teamAbbrev, gameId) {
 /* ---------------- views & refresh ---------------- */
 /* Home + Top Shelf code lives in home.js */
 function renderAll() {
+  restoreMarketKind();
+  syncLiveBadge();
   renderSlate();
   renderGoals();
   renderBoard();
@@ -2224,9 +2718,13 @@ function applyBoxscoreToGame(g, bs) {
   return snap;
 }
 function rerenderLiveViews() {
+  syncLiveBadge();
   if (state.view === 'slate') renderSlate();
   if (state.view === 'goals') renderGoals();
   if (state.view === 'board') renderBoard();
+  if (state.view === 'home') renderHomeTonight(); // keep Tonight scores/clock fresh on Center Ice
+  if (state.section === 'lab') shelfSyncNav(); // keep Live dot + bar label fresh on ticks
+  refreshOpenSheet();
 }
 /* ---------------- GitHub Actions live-score file ----------------
    The live.yml workflow polls the NHL API every 5 min and writes
@@ -2355,6 +2853,30 @@ async function refreshScores() {
   }
   rerenderLiveViews();
 }
+/* ---------------- Collapsible Top Shelf nav ----------------
+   Slim bar showing the current section + chevron; expands to the 2×3
+   pill stack. First arrival at Top Shelf per SESSION starts EXPANDED
+   (user's call); picking a section collapses it, and after that the bar
+   just toggles. First-visit state is a plain variable — NOT localStorage,
+   so a fresh session sees it expanded again. No burger icon: the sports
+   switcher already owns ☰. View switching itself is untouched. */
+let shelfNavFirstVisit = true; // session only
+const SHELF_LABELS = { markets: 'Markets', longshots: 'Longshots', parlay: 'Parlay', slate: 'Slate', goals: 'Live', board: 'Board' };
+function shelfSetExpanded(expanded) {
+  const stack = $('shelfStack'), bar = $('shelfBar');
+  if (!stack || !bar) return;
+  stack.classList.toggle('show', expanded);
+  bar.classList.toggle('open', expanded);
+  bar.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+}
+function shelfSyncNav() {
+  const cur = $('shelfCurrent'), dot = $('liveTabDot');
+  if (!cur) return;
+  const anyLive = (state.games || []).some(isWatchable);
+  const label = SHELF_LABELS[state.view] || 'Markets';
+  cur.innerHTML = (state.view === 'goals' && anyLive ? '<span class="live-dot on"></span>' : '') + esc(label);
+  if (dot) dot.classList.toggle('on', anyLive);
+}
 const HOME_VIEWS = ['home', 'standings', 'teamlineup', 'playoffodds'];
 const LAB_VIEWS = ['markets', 'longshots', 'parlay', 'slate', 'goals', 'board'];
 function setView(v) {
@@ -2366,6 +2888,10 @@ function setView(v) {
   const labNav = $('labNav');
   if (labNav) labNav.hidden = state.section !== 'lab';
   document.querySelectorAll('.tab').forEach((t) => t.classList.toggle('active', t.dataset.view === v));
+  if (state.section === 'lab') {
+    if (shelfNavFirstVisit) shelfSetExpanded(true); // first arrival per session: expanded
+    shelfSyncNav();
+  }
   document.querySelectorAll('.view').forEach((s) => s.classList.toggle('active', s.id === 'view-' + v));
   const arn = $('autoRefreshNote');
   if (arn) arn.style.visibility = v === 'slate' ? 'visible' : 'hidden';
@@ -2399,7 +2925,18 @@ function startAutoRefresh() {
 }
 /* ---------------- boot ---------------- */
 document.querySelectorAll('.tab').forEach((t) =>
-  t.addEventListener('click', () => setView(t.dataset.view)));
+  t.addEventListener('click', () => {
+    setView(t.dataset.view);
+    // Picking a section collapses the stack and ends the first-visit state.
+    shelfNavFirstVisit = false;
+    shelfSetExpanded(false);
+  }));
+// Collapsible shelf bar: toggles the 2×3 stack (after first-visit expansion).
+const shelfBar = $('shelfBar');
+if (shelfBar) shelfBar.addEventListener('click', () => {
+  const stack = $('shelfStack');
+  shelfSetExpanded(!(stack && stack.classList.contains('show')));
+});
 // Bottom nav: Home / Center Ice / Top Shelf section switching
 document.querySelectorAll('.bnav-btn[data-section]').forEach((b) =>
   b.addEventListener('click', () => setSection(b.dataset.section)));
@@ -2492,10 +3029,23 @@ document.addEventListener('click', (e) => {
   const cell = e.target.closest('.lu-cell[data-pid]');
   if (cell && cell.dataset.pid) openPlayer(cell.dataset.pid, cell.dataset.gid);
 });
+// player-card linemate headshots open that linemate's card
+document.addEventListener('click', (e) => {
+  const mate = e.target.closest('.pc-mate[data-pid]');
+  if (mate && mate.dataset.pid) openPlayer(mate.dataset.pid, mate.dataset.gid);
+});
 // goalie heads in the matchup popup open the goalie card
 document.addEventListener('click', (e) => {
   const gh = e.target.closest('.goalie-open[data-goalie]');
   if (gh && gh.dataset.goalie) openGoalie(gh.dataset.goalie, gh.dataset.team, gh.dataset.game);
+});
+// game-sheet scorer rows replay the goal animation (goal-anim.js)
+document.addEventListener('click', (e) => {
+  const row = e.target.closest('[data-sheet-goal]');
+  if (!row) return;
+  const [gid, idx] = row.dataset.sheetGoal.split(':');
+  const gl = (sheetGoalsByGame[gid] || [])[+idx];
+  if (gl && typeof playGoalAnimation === 'function') playGoalAnimation(gl);
 });
 async function boot(isReload, date) {
   try {

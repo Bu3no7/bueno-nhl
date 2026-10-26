@@ -44,6 +44,95 @@ function setSection(sec) {
     setView(labViews.includes(state.view) ? state.view : 'markets');
   }
 }
+/* ---- Home: tonight strip (tap a game for the sheet) ---- */
+function renderHomeTonight() {
+  const el = $('homeTonightBody');
+  if (!el) return;
+  const games = state.games || [];
+  if (!games.length) {
+    el.innerHTML = `<p class="muted">Loading…</p>`;
+    return;
+  }
+  el.innerHTML = `<div class="ci-tonight-strip">` + games.map((g) => {
+    const pbp = g.pbp;
+    const as = pbp ? pbp.awayTeam.score : 0;
+    const hs = pbp ? pbp.homeTeam.score : 0;
+    const isLive = g.state === 'LIVE' || g.state === 'CRIT';
+    const isFinal = g.state === 'OFF' || g.state === 'FINAL';
+    let timeHtml, scoreHtml = '';
+    if (isLive) {
+      const n = pbp && pbp.periodDescriptor ? pbp.periodDescriptor.number : '';
+      const label = n > 3 ? (n === 4 ? 'OT' : 'SO') : `P${n}`;
+      const clock = pbp && pbp.clock ? pbp.clock.timeRemaining || '' : '';
+      timeHtml = `<span class="ci-live">● LIVE ${label} · ${esc(clock)}</span>`;
+      scoreHtml = `<div class="ci-score">${as}–${hs}</div>`;
+    } else if (isFinal) {
+      timeHtml = `<span class="muted">Final</span>`;
+      scoreHtml = `<div class="ci-score">${as}–${hs}</div>`;
+    } else {
+      const dt = new Date(g.startUTC);
+      timeHtml = `<span>${esc(dt.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }))}</span>`;
+    }
+    return `<button class="ci-tonight-game" data-gid="${g.id}" type="button" title="Open game sheet">
+      <span class="ci-time">${timeHtml}</span>
+      <span class="ci-match"><img src="${teamLogoUrl(g.away)}" alt="" ${imgFallback}><b>${esc(g.away)}</b><span class="muted">@</span><img src="${teamLogoUrl(g.home)}" alt="" ${imgFallback}><b>${esc(g.home)}</b></span>
+      ${scoreHtml}
+      <span class="ci-tap">Open sheet ▸</span>
+    </button>`;
+  }).join('') + `</div>`;
+  el.querySelectorAll('.ci-tonight-game').forEach((b) =>
+    b.addEventListener('click', () => openMatchup(b.dataset.gid)));
+}
+/* ---- Home: tonight's goalies strip (tap for the full goalie card) ---- */
+function renderHomeGoalies() {
+  const el = $('homeGoaliesBody');
+  if (!el) return;
+  const games = state.games || [];
+  if (!games.length) {
+    el.innerHTML = `<p class="muted">Loading…</p>`;
+    return;
+  }
+  const seen = new Set();
+  const chips = [];
+  for (const g of games) {
+    for (const team of [g.away, g.home]) {
+      const pg = panelGoalie(g, team);
+      if (!pg.id || seen.has(pg.id)) continue;
+      seen.add(pg.id);
+      chips.push({ ...pg, team, gameId: g.id });
+    }
+  }
+  if (!chips.length) {
+    el.innerHTML = `<p class="muted">Goalies announced closer to puck drop.</p>`;
+    return;
+  }
+  el.innerHTML = `<div class="ci-goalies">` + chips.map((c) => {
+    const tc = TEAM_COLORS[c.team] || '#888';
+    const initials = c.name.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase();
+    const sv = goalieSvCache[c.id];
+    const svHtml = sv != null
+      ? `<small>${esc(c.team)} · ${(sv * 100).toFixed(1)}% SV</small>`
+      : `<small>${esc(c.team)} · <span data-sv-for="${c.id}">…</span> SV</small>`;
+    return `<button class="ci-goalie goalie-open" data-goalie="${c.id}" data-team="${esc(c.team)}" data-game="${c.gameId}" type="button" style="--ci-tc:${tc}" title="Open ${esc(c.name)} card">
+      <img src="${esc(headshotUrl(c.team, c.id))}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <span class="ci-goalie-fb">${esc(initials)}</span>
+      <b>${esc(c.name.split(' ').slice(-1)[0])}</b>
+      ${svHtml}<br>
+      <span class="ci-tag ${c.tag === 'Confirmed' ? 'ok' : 'proj'}">${esc(c.tag || '')}</span>
+    </button>`;
+  }).join('') + `</div>`;
+  // Fill in save % for goalies not yet cached (same source the sheet uses).
+  // The existing document .goalie-open handler opens the full card on tap.
+  for (const c of chips) {
+    if (goalieSvCache[c.id] != null) continue;
+    getGoalieSvPct(c.id).then((sv) => {
+      if (sv == null) return;
+      el.querySelectorAll(`[data-sv-for="${c.id}"]`).forEach((s) => {
+        s.textContent = `${(sv * 100).toFixed(1)}%`;
+      });
+    });
+  }
+}
 /* ---- Home: top picks ---- */
 function renderHomePicks() {
   const el = $('homePicksBody');
@@ -58,12 +147,18 @@ function renderHomePicks() {
     const g = state.games.find((gg) => String(gg.id) === String(r.gameId));
     const matchup = g ? `${g.away} @ ${g.home}` : esc(r.team);
     const pct = Math.round(r.p * 100);
+    // Team-color glow, same sizes as the player-card header (22px ring,
+    // 16px number shadow, lightened fill). No team color → no inline
+    // style, so the card keeps its existing generic teal.
+    const tc = TEAM_COLORS[r.team];
+    const headStyle = tc ? ` style="border:2px solid ${tc};box-shadow:0 0 22px ${tc}"` : '';
+    const numStyle = tc ? ` style="color:${lightenHex(tc, 0.55)};text-shadow:0 0 16px ${tc}"` : '';
     return `<div class="pick-card hero-pick" data-pid="${r.pid}" data-gid="${r.gameId}" role="button" tabindex="0">
-      <img class="pick-card-head" src="${esc(r.headshot || '')}" alt="" ${imgFallback}>
+      <img class="pick-card-head" src="${esc(r.headshot || '')}" alt="" ${imgFallback}${headStyle}>
       <div class="pick-card-name">${esc(r.name)}</div>
       <div class="pick-card-team"><img src="${teamLogoUrl(r.team)}" alt="">${esc(r.team)}</div>
       <div class="pick-card-meta">${esc(matchup)} · ${r.goals}G</div>
-      <div class="pick-card-num">${pct}<small>%</small></div>
+      <div class="pick-card-num"${numStyle}>${pct}<small>%</small></div>
       <div class="pick-fair">${r.fair} fair</div>
     </div>`;
   }).join('') + `</div>`;
@@ -341,7 +436,9 @@ function oddsClass(p) {
   return p >= 85 ? 'odds-high' : p >= 60 ? 'odds-mid' : 'odds-low';
 }
 function renderHome() {
+  renderHomeTonight();
   renderHomePicks();
+  renderHomeGoalies();
   renderHomeResults();
   renderHomeStandings();
   renderPlayoffOdds();

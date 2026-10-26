@@ -419,6 +419,7 @@ details.pc-sec[open ] summary .chev { transform: rotate(90deg); }
       <div class="pb-calc-row"><label>Stake $ <input id="pbStake" type="number" value="10" min="1"></label><span>Payout <b id="pbPayout">—</b> · profit <b id="pbProfit">—</b></span></div>
       <div class="pb-calc-row"><label>Book offers <input id="pbBook" type="text" placeholder="+450"></label><b id="pbVerdict"></b></div>
     </div>
+    <div id="pbSendWrap" style="margin-top:.8rem"></div>
   </section>
 </section>
 
@@ -1284,6 +1285,129 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
       verdict.textContent = ev >= 0 ? 'Edge +' + ev.toFixed(0) + '% vs the model' : 'Book is shorter than fair (' + ev.toFixed(0) + '%)';
       verdict.style.color = ev >= 0 ? '#7ce8b8' : '#ff9c9c';
     } else verdict.textContent = '';
+    renderPbSend();
+  }
+  /* ================= Send to book (Gambly / Pikkit) =================
+     Text handoff only: format the ticket, copy it, open the bot page.
+     No API key, no backend, no placement — the user confirms at the
+     book's price. Link targets are the bots' own documented pages. */
+  const PB_STB_GAMBLY = 'https://gambly.com/gambly-bot';
+  const PB_STB_PIKKIT = 'https://pikkit.com/autofill';
+  const PB_STB_CHECK = [
+    'Book price wins over model fair — check every leg at the book before confirming.',
+    'If a line moved or a market isn’t offered, that leg may fail to match — rebuild just that leg in the book.',
+    'You set the stake and place the bet. Nothing here places it for you.'
+  ];
+  function pbStbLegGame(name) {
+    const row = (mktRows || []).find((r) => r.name === name);
+    const team = row ? row.team : null;
+    if (!team) return { team: null, game: null };
+    const game = (tonightGames || []).find((g) => g.home.abbr === team || g.away.abbr === team) || null;
+    return { team, game };
+  }
+  function pbStbWording(label) {
+    const m = String(label).match(/^(.+?) (\d+)\+ (PTS|REB|AST|3PM|PRA)$/);
+    if (!m) return label; // unparseable leg: send verbatim rather than dropping it
+    const line = (parseFloat(m[2]) - 0.5);
+    const map = { PTS: 'Points', REB: 'Rebounds', AST: 'Assists', '3PM': 'Threes', PRA: 'Points + Rebounds + Assists' };
+    return 'Over ' + line + ' ' + map[m[3]];
+  }
+  function pbStbTicket() {
+    if (!parlayLegs.length) return null;
+    const dateStr = new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+    // One leg is a straight bet, not a parlay: label it honestly and show
+    // its own fair (no correlation question for a single leg).
+    if (parlayLegs.length === 1) {
+      const l = parlayLegs[0];
+      const m = String(l.label).match(/^(.+?) (\d+)\+ (PTS|REB|AST|3PM|PRA)$/);
+      const name = m ? m[1] : l.label;
+      const lg = pbStbLegGame(name);
+      const matchup = lg.game ? lg.game.away.abbr + ' @ ' + lg.game.home.abbr : (lg.team || '');
+      const fair = nbaFairOdds(l.p);
+      return [
+        'Straight bet — Bueno Sports — ' + dateStr,
+        '1. ' + name + (matchup ? ' (' + matchup + ')' : '') + ' — ' + pbStbWording(l.label),
+        fair !== '–' ? 'Model fair — reference only, NOT the book price: ' + fair : 'Model fair unavailable — check the edge at the book’s price.',
+        'Book price wins over model fair — check every leg at the book before confirming.'
+      ].join('\n');
+    }
+    const resolved = parlayLegs.map((l) => {
+      const m = String(l.label).match(/^(.+?) (\d+)\+ (PTS|REB|AST|3PM|PRA)$/);
+      const name = m ? m[1] : l.label;
+      const lg = pbStbLegGame(name);
+      return { leg: l, name, game: lg.game, team: lg.team };
+    });
+    const sgpGame = resolved.every((r) => r.game) && resolved.every((r) => String(r.game.id) === String(resolved[0].game.id)) ? resolved[0].game : null;
+    const header = sgpGame
+      ? 'Same-Game Parlay — ' + sgpGame.away.abbr + ' @ ' + sgpGame.home.abbr + ' — Bueno Sports — ' + dateStr
+      : 'Parlay — Bueno Sports — ' + dateStr;
+    const lines = resolved.map((r, i) => {
+      const matchup = r.game ? r.game.away.abbr + ' @ ' + r.game.home.abbr : (r.team || '');
+      return (i + 1) + '. ' + r.name + (matchup ? ' (' + matchup + ')' : '') + ' — ' + pbStbWording(r.leg.label);
+    });
+    let footer;
+    if (sgpGame) footer = 'Combined fair withheld — legs in one game correlate. Check the edge at the book’s price.';
+    else {
+      const fair = nbaFairOdds(combinedP());
+      footer = fair !== '–' ? 'Model fair — reference only, NOT the book price: ' + fair : 'Model fair unavailable — check the edge at the book’s price.';
+    }
+    return [header].concat(lines).concat([footer, 'Book price wins over model fair — check every leg at the book before confirming.']).join('\n');
+  }
+  async function pbStbCopy(text) {
+    try { await navigator.clipboard.writeText(text); return true; } catch (e) { /* fallback below */ }
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      const ok = document.execCommand('copy'); ta.remove(); return !!ok;
+    } catch (e2) { return false; }
+  }
+  function pbStbSend(ticket, url, statusEl, fallbackEl, doneMsg) {
+    pbStbCopy(ticket).then((ok) => {
+      if (ok) { statusEl.textContent = doneMsg; window.open(url, '_blank', 'noopener'); }
+      else {
+        statusEl.textContent = 'Copy didn’t work in this browser — copy the ticket below manually.';
+        fallbackEl.value = ticket; fallbackEl.classList.remove('hidden'); fallbackEl.select();
+      }
+    });
+  }
+  function renderPbSend() {
+    const wrap = $('pbSendWrap');
+    if (!wrap) return;
+    if (!parlayLegs.length) { wrap.innerHTML = ''; return; }
+    wrap.innerHTML =
+      '<button class="btn" id="pbStbOpen" type="button">Send to book</button>' +
+      '<div id="pbStbChooser" class="stb-chooser hidden">' +
+      '<ul class="stb-check">' + PB_STB_CHECK.map((c) => '<li>' + esc(c) + '</li>').join('') + '</ul>' +
+      '<div class="stb-row">' +
+      '<button class="btn" id="pbStbGambly" type="button">Via Gambly</button>' +
+      '<button class="btn" id="pbStbPikkit" type="button">Via Pikkit</button>' +
+      '<button class="ghost-btn" id="pbStbCopy" type="button">Copy ticket text</button>' +
+      '</div>' +
+      '<p class="muted small" id="pbStbStatus"></p>' +
+      '<textarea id="pbStbFallback" class="stb-fallback hidden" rows="8" readonly aria-label="Ticket text"></textarea>' +
+      '</div>';
+    $('pbStbOpen').addEventListener('click', () => $('pbStbChooser').classList.toggle('hidden'));
+    const statusEl = $('pbStbStatus'), fallbackEl = $('pbStbFallback');
+    $('pbStbGambly').addEventListener('click', () => {
+      const t = pbStbTicket();
+      if (t) pbStbSend(t, PB_STB_GAMBLY, statusEl, fallbackEl, 'Ticket copied — paste it into Gambly Chat, then follow its deeplink to your book.');
+    });
+    $('pbStbPikkit').addEventListener('click', () => {
+      const t = pbStbTicket();
+      if (t) pbStbSend(t, PB_STB_PIKKIT, statusEl, fallbackEl, 'Ticket copied — paste it into Pikkit QuickPick, then Autofill to your book.');
+    });
+    $('pbStbCopy').addEventListener('click', () => {
+      const t = pbStbTicket();
+      if (!t) return;
+      pbStbCopy(t).then((ok) => {
+        if (ok) statusEl.textContent = 'Ticket copied.';
+        else {
+          statusEl.textContent = 'Copy didn’t work in this browser — copy the ticket below manually.';
+          fallbackEl.value = t; fallbackEl.classList.remove('hidden'); fallbackEl.select();
+        }
+      });
+    });
   }
   function parseAmerican(s) {
     const n = parseInt(String(s == null ? '' : s).replace(/[^0-9+-]/g, ''), 10);

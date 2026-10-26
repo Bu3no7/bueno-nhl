@@ -62,6 +62,10 @@
     </div>
   </div>
   <nav class="nav-groups lab-nav" id="labNav" aria-label="Sections" hidden>
+    <button class="shelf-bar" id="shelfBar" type="button" aria-expanded="true" aria-controls="shelfStack">
+      <b id="shelfCurrent">Markets</b><span class="shelf-chev">▾</span>
+    </button>
+    <div class="shelf-stack show" id="shelfStack">
     <div class="nav-group">
       <div class="nav-grid">
         <button class="tab active" data-view="markets" role="tab">Markets</button>
@@ -72,9 +76,10 @@
     <div class="nav-group">
       <div class="nav-grid">
         <button class="tab" data-view="slate" role="tab">Slate</button>
-        <button class="tab" data-view="goals" role="tab">Live</button>
+        <button class="tab" data-view="goals" role="tab"><span class="live-dot" id="liveTabDot"></span>Live</button>
         <button class="tab" data-view="board" role="tab">Board</button>
       </div>
+    </div>
     </div>
   </nav>
 </header>
@@ -90,9 +95,17 @@
       <p class="muted small">NHL anytime-goal probabilities &middot; live data</p>
     </div>
     <div class="home-grid">
+      <div class="home-card" id="homeTonightCard">
+        <h3>Tonight <span class="muted small">tap a game for the sheet</span></h3>
+        <div id="homeTonightBody"><p class="muted">Loading…</p></div>
+      </div>
       <div class="home-card" id="homePicksCard">
         <h3>Top Goal Scorer Picks <span class="muted small">tap for player card</span></h3>
         <div id="homePicksBody"><p class="muted">Loading…</p></div>
+      </div>
+      <div class="home-card" id="homeGoaliesCard">
+        <h3>Tonight's goalies <span class="muted small">tap for the full goalie card</span></h3>
+        <div id="homeGoaliesBody"><p class="muted">Loading…</p></div>
       </div>
       <details class="home-card card-collapse" id="homeResultsCard">
         <summary class="yday-summary">Yesterday's results <span class="muted small">tap to expand · tap a scorer for goal animation</span></summary>
@@ -306,6 +319,7 @@
     </div>
     <div id="parlayLegs"></div>
     <div id="parlayTotals" style="margin-top:.8rem"></div>
+    <div id="sendToBookWrap" style="margin-top:.8rem"></div>
 
     <div class="calc-sep"></div>
     <h3 class="calc-head">Book parlay</h3>
@@ -355,7 +369,7 @@
 <nav class="bottom-nav" aria-label="Main">
   <a class="bnav-btn" href="index.html"><span class="bnav-ico">⌂</span><span>Home</span></a>
   <button class="bnav-btn active" data-section="home" type="button"><span class="bnav-ico">🏒</span><span>Center Ice</span></button>
-  <button class="bnav-btn" data-section="lab" type="button"><span class="bnav-ico">🥅</span><span>Top Shelf</span></button>
+  <button class="bnav-btn" data-section="lab" type="button"><span class="bnav-ico">🥅</span><span>Top Shelf</span><span class="bnav-live-badge" id="bnavLiveBadge" hidden></span></button>
   <button class="bnav-btn" type="button" data-sports-menu><span class="bnav-ico">☰</span><span>Sports</span></button>
 </nav>
 
