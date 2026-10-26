@@ -2059,7 +2059,7 @@ function renderParlayTotals() {
    odds fetching, no placement — the user confirms at the book's price.
    Link targets are the bots' own documented pages; no other bot URLs
    are used here. */
-const STB_GAMBLY_URL = 'https://gambly.com/gambly-bot';
+const STB_GAMBLY_URL = 'https://gambly.com/chat';
 const STB_PIKKIT_URL = 'https://pikkit.com/autofill';
 const STB_CHECKLIST = [
   'Book price wins over model fair — check every leg at the book before confirming.',
