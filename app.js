@@ -2094,41 +2094,10 @@ function stbNhlLegWording(l) {
 function stbNhlTicket() {
   const legs = state.parlay || [];
   if (!legs.length) return null;
-  // One leg is a straight bet, not a parlay: label it honestly and show
-  // its own fair (no correlation question for a single leg).
-  if (legs.length === 1) {
-    const l = legs[0], game = stbNhlLegGame(l);
-    const matchup = game ? `${game.away} @ ${game.home}` : l.team;
-    const dec = americanToDecimal(l.fair);
-    return [
-      `Straight bet — Bueno Sports — ${stbDateStr()}`,
-      `1. ${l.name} (${matchup}) — ${stbNhlLegWording(l)}`,
-      dec && dec > 1
-        ? `Model fair — reference only, NOT the book price: ${decimalToAmerican(dec)}`
-        : 'Model fair unavailable — check the edge at the book’s price.',
-      'Book price wins over model fair — check every leg at the book before confirming.',
-    ].join('\n');
-  }
-  const resolved = legs.map((l) => ({ leg: l, game: stbNhlLegGame(l) }));
-  const sgpGame = resolved.every((r) => r.game) && resolved.every((r) => String(r.game.id) === String(resolved[0].game.id))
-    ? resolved[0].game : null;
-  const header = sgpGame
-    ? `Same-Game Parlay — ${sgpGame.away} @ ${sgpGame.home} — Bueno Sports — ${stbDateStr()}`
-    : `Parlay — Bueno Sports — ${stbDateStr()}`;
-  const lines = resolved.map((r, i) => {
-    const matchup = r.game ? `${r.game.away} @ ${r.game.home}` : r.leg.team;
-    return `${i + 1}. ${r.leg.name} (${matchup}) — ${stbNhlLegWording(r.leg)}`;
-  });
-  let footer;
-  if (sgpGame) {
-    footer = 'Combined fair withheld — legs in one game correlate. Check the edge at the book’s price.';
-  } else {
-    const decs = legs.map((l) => americanToDecimal(l.fair)).filter((d) => d && d > 1);
-    footer = decs.length === legs.length
-      ? `Model fair — reference only, NOT the book price: ${decimalToAmerican(decs.reduce((a, b) => a * b, 1))}`
-      : 'Model fair unavailable — check the edge at the book’s price.';
-  }
-  return [header, ...lines, footer, 'Book price wins over model fair — check every leg at the book before confirming.'].join('\n');
+  // Copied text is legs only: player + market, nothing else. Fair odds
+  // stay visible in the ticket totals on screen and the book-price
+  // checklist stays in the chooser — neither is pasted to the bot.
+  return legs.map((l) => `${l.name} — ${stbNhlLegWording(l)}`).join('\n');
 }
 async function stbCopyText(text) {
   try {

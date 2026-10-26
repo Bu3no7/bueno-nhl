@@ -1314,44 +1314,14 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
   }
   function pbStbTicket() {
     if (!parlayLegs.length) return null;
-    const dateStr = new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
-    // One leg is a straight bet, not a parlay: label it honestly and show
-    // its own fair (no correlation question for a single leg).
-    if (parlayLegs.length === 1) {
-      const l = parlayLegs[0];
+    // Copied text is legs only: player + market, nothing else. Fair odds
+    // stay visible in the ticket area on screen and the book-price
+    // checklist stays in the chooser — neither is pasted to the bot.
+    return parlayLegs.map((l) => {
       const m = String(l.label).match(/^(.+?) (\d+)\+ (PTS|REB|AST|3PM|PRA)$/);
       const name = m ? m[1] : l.label;
-      const lg = pbStbLegGame(name);
-      const matchup = lg.game ? lg.game.away.abbr + ' @ ' + lg.game.home.abbr : (lg.team || '');
-      const fair = nbaFairOdds(l.p);
-      return [
-        'Straight bet — Bueno Sports — ' + dateStr,
-        '1. ' + name + (matchup ? ' (' + matchup + ')' : '') + ' — ' + pbStbWording(l.label),
-        fair !== '–' ? 'Model fair — reference only, NOT the book price: ' + fair : 'Model fair unavailable — check the edge at the book’s price.',
-        'Book price wins over model fair — check every leg at the book before confirming.'
-      ].join('\n');
-    }
-    const resolved = parlayLegs.map((l) => {
-      const m = String(l.label).match(/^(.+?) (\d+)\+ (PTS|REB|AST|3PM|PRA)$/);
-      const name = m ? m[1] : l.label;
-      const lg = pbStbLegGame(name);
-      return { leg: l, name, game: lg.game, team: lg.team };
-    });
-    const sgpGame = resolved.every((r) => r.game) && resolved.every((r) => String(r.game.id) === String(resolved[0].game.id)) ? resolved[0].game : null;
-    const header = sgpGame
-      ? 'Same-Game Parlay — ' + sgpGame.away.abbr + ' @ ' + sgpGame.home.abbr + ' — Bueno Sports — ' + dateStr
-      : 'Parlay — Bueno Sports — ' + dateStr;
-    const lines = resolved.map((r, i) => {
-      const matchup = r.game ? r.game.away.abbr + ' @ ' + r.game.home.abbr : (r.team || '');
-      return (i + 1) + '. ' + r.name + (matchup ? ' (' + matchup + ')' : '') + ' — ' + pbStbWording(r.leg.label);
-    });
-    let footer;
-    if (sgpGame) footer = 'Combined fair withheld — legs in one game correlate. Check the edge at the book’s price.';
-    else {
-      const fair = nbaFairOdds(combinedP());
-      footer = fair !== '–' ? 'Model fair — reference only, NOT the book price: ' + fair : 'Model fair unavailable — check the edge at the book’s price.';
-    }
-    return [header].concat(lines).concat([footer, 'Book price wins over model fair — check every leg at the book before confirming.']).join('\n');
+      return name + ' — ' + pbStbWording(l.label);
+    }).join('\n');
   }
   async function pbStbCopy(text) {
     try { await navigator.clipboard.writeText(text); return true; } catch (e) { /* fallback below */ }
