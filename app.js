@@ -1122,7 +1122,8 @@ async function renderSlate() {
       const favA = wp.a >= wp.b;
       const plFav = favA ? fairOdds(plA) : fairOdds(plB);
       const plDog = favA ? fairOdds(1 - plB) : fairOdds(1 - plA);
-      return `<div class="game-odds"><span><strong>ML</strong> ${esc(g.away)} ${mlA} · ${esc(g.home)} ${mlB}</span><span><strong>PL</strong> ${favA ? esc(g.away) + ' −1.5' : esc(g.home) + ' −1.5'} ${plFav}</span><span><strong>Total</strong> ${total}</span></div>`;
+      const colA = TEAM_COLORS[g.away] || '#7d90a5', colB = TEAM_COLORS[g.home] || '#7d90a5';
+      return `<div class="game-odds"><span class="pill"><span class="lbl">ML</span><span class="dot" style="background:${colA}"></span><b>${esc(g.away)} ${mlA}</b><span class="sep">·</span><span class="dot" style="background:${colB}"></span><b>${esc(g.home)} ${mlB}</b></span><span class="pill"><span class="lbl">PL</span><b>${favA ? esc(g.away) + ' −1.5' : esc(g.home) + ' −1.5'} ${plFav}</b></span><span class="pill"><span class="lbl">Total</span><b>${total}</b></span></div>`;
     } catch (e) { return ''; }
   };
   grid.innerHTML = state.games.map((g) => {

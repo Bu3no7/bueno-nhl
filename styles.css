@@ -292,6 +292,12 @@ main { max-width: 1120px; margin: 0 auto; padding: 1.4rem 1rem 2.2rem; }
 .game-odds { display: flex; flex-wrap: wrap; gap: .3rem .7rem; font-size: .74rem; color: var(--muted-2); margin-top: .45rem; padding-top: .45rem; border-top: 1px solid rgba(255,255,255,.06); font-variant-numeric: tabular-nums; }
 .game-odds span { white-space: nowrap; }
 .game-odds span strong { color: var(--muted); font-weight: 600; }
+/* Slate-card odds pills (small): ML combined into one pill with team dots */
+.game-odds .pill { display: inline-flex; align-items: center; gap: 5px; background: #16233a; border: 1px solid #2a3c5c; border-radius: 999px; padding: 4px 10px; font-size: 12px; color: #e8eef6; }
+.game-odds .pill .lbl { color: #7d90a5; font-weight: 700; font-size: 11px; letter-spacing: .06em; }
+.game-odds .pill .dot { width: 7px; height: 7px; border-radius: 50%; flex: none; }
+.game-odds .pill .sep { color: #7d90a5; }
+.game-odds .pill b { font-weight: 800; }
 .game-goalies { display: flex; align-items: center; justify-content: center; gap: .4rem; margin-top: .35rem; font-size: .78rem; }
 .gg-name { background: none; border: none; color: var(--teal); font: inherit; cursor: pointer; padding: .1rem .2rem; display: inline-flex; align-items: center; gap: .3rem; }
 .gg-name:hover { text-decoration: underline; }
