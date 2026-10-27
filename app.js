@@ -336,8 +336,9 @@ async function ctxFromPrecomputed(dateStr) {
   // standings straight into the cache getStandings() checks
   state.standingsCache = { key: dateStr, map: pre.standings || {} };
   state.zonePbps = zonePbps;
+  state.zoneShots = pre.zoneShots || {};
   state.recentIds = recentIds;
-  return { games, pbps, rosterMap, recentIds, zonePbps, goalieSv: pre.goalieSv || {}, lines: pre.lines || {} };
+  return { games, pbps, rosterMap, recentIds, zonePbps, zoneShots: pre.zoneShots || {}, goalieSv: pre.goalieSv || {}, lines: pre.lines || {} };
 }
 async function ctxFromLive(dateStr) {
   const sched = await fetchJSON(`${API}/schedule/${dateStr}`);
@@ -415,7 +416,7 @@ async function loadDate(dateStr) {
     renderEmpty('No NHL games scheduled for this date.');
     return;
   }
-  const { games, pbps, rosterMap, recentIds, zonePbps, goalieSv } = ctx;
+  const { games, pbps, rosterMap, recentIds, zonePbps, zoneShots, goalieSv } = ctx;
   const dfoLines = ctx.lines || {};
   // build skater list
   const skaterDefs = []; // {pid, name, pos, team, gameId, headshot}
@@ -458,11 +459,15 @@ async function loadDate(dateStr) {
   const landings = await limitedMap(defs, 4, async (d) => {
     try { return await getPlayer(d.pid); } catch (e) { return null; }
   });
-  // zone shots per skater: tonight's pbp + recent finals for their team
+  // zone shots per skater: tonight's pbp + recent finals for their team.
+  // zoneByPid feeds the MODEL (old shotsFromPbp, frozen behavior);
+  // displayByPid feeds the DISPLAY maps (goals + per-period rotation).
   const zoneByPid = {};
-  defs.forEach((d) => { zoneByPid[d.pid + ':' + d.gameId] = []; });
+  const displayByPid = {};
+  defs.forEach((d) => { zoneByPid[d.pid + ':' + d.gameId] = []; displayByPid[d.pid + ':' + d.gameId] = []; });
   const pushZone = (pbp, onlyPid) => {
     if (!pbp) return;
+    const dmap = displayShotsByPid(pbp);
     for (const d of defs) {
       if (onlyPid && d.pid !== onlyPid) continue;
       const key = d.pid + ':' + d.gameId;
@@ -470,6 +475,7 @@ async function loadDate(dateStr) {
       const shots = shotsFromPbp(pbp, d.pid);
       // only count shots where the shooter's team matches (avoid traded-player noise)
       zoneByPid[key].push(...shots);
+      displayByPid[key].push(...(dmap[d.pid] || []));
     }
   };
   games.forEach((g, i) => { if (pbps[i]) pushZone(pbps[i]); });
@@ -494,6 +500,11 @@ async function loadDate(dateStr) {
       isLongshot: m.p <= LONGSHOT_DISPLAY_P,
       markets: computeMarkets(s, d.pos),
       shots: zoneByPid[d.pid + ':' + d.gameId] || [],
+      matchupShots: displayByPid[d.pid + ':' + d.gameId] || [],
+      // Season shots from the bundle (display only — the model's zone factor
+      // above still uses the load-time window). Live-path bundles predate
+      // zoneShots, so those rows fall back in heatMapShots().
+      seasonShots: ((zoneShots || {})[d.pid] || []).map(([x, y, gl]) => ({ x, y, goal: gl === 1 })),
     };
   });
   /* ---------------- lines ----------------
@@ -2467,7 +2478,8 @@ function openPlayer(pid, gameId) {
         <span><span class="dot" style="background:#d4a017"></span>goal</span>
       <span><span class="dot" style="background:#a06414"></span>slot</span> <span><span class="dot" style="background:#c42c1e"></span>low slot</span></div>
     </details>
-    ${heatMapSectionHtml(r)}
+    ${heatMapSectionHtml(r, matchupHeatShots(r), 'Match-up heat map', 'recent games')}
+    ${seasonHeatMapHtml(r)}
     <details class="factors-details">
       <summary class="sec-title" style="cursor:pointer">Factors <span style="color:var(--gold)">how we got here</span></summary>
       <table class="factor-table">${factorRows}
@@ -2485,7 +2497,8 @@ function openPlayer(pid, gameId) {
   const mk = state.marketKind;
   let rinkMode = ['atg', 'twoplus', 'firstgoal'].includes(mk) ? 'goals' : 'shots';
   const drawRinkMode = () => {
-    const data = rinkMode === 'goals' ? r.shots.filter((s) => s.goal) : r.shots;
+    const mapShots = r.matchupShots || r.shots;
+    const data = rinkMode === 'goals' ? mapShots.filter((s) => s.goal) : mapShots;
     $('rinkTitle').textContent = rinkMode === 'goals' ? 'Goal map' : 'Shot map';
     $('rinkShots').classList.toggle('on', rinkMode === 'shots');
     $('rinkGoals').classList.toggle('on', rinkMode === 'goals');
@@ -2497,10 +2510,49 @@ function openPlayer(pid, gameId) {
   $('parlayAddBtn').addEventListener('click', () => addParlayLeg(r, $('parlayLegSelect').value));
 }
 function closePlayer() { $('playerModal').classList.add('hidden'); }
-/* ---------------- goal heat map (player card) ----------------
-   Where a skater's goals come from: heat grid over his shot attempts
-   (tonight + recent games, normalized attacking coords), the slot /
-   home-plate area outlined, goals starred, and zone stats as chips. */
+/* ---------------- heat maps (player card) ----------------
+   Two maps, one renderer (heatMapSectionHtml):
+   - Match-up heat map: tonight's live pbp + the team's recent finals,
+     rebuilt fresh at card-open (matchupHeatShots), so it updates live.
+   - Season heat map: season-to-date shots from the bundle (builder
+     section 6b) + tonight's live pbp merged at card-open (heatMapShots).
+   Both use the DISPLAY shot path (displayShotsFromPbp: goals via
+   scoringPlayerId, per-period rotation into attacking frame). The
+   model's zone factor still uses the old shotsFromPbp window — that
+   input is frozen pending a backtest, per keep-what-wins. */
+function heatMapShots(r) {
+  // Season shots from the bundle (regular-season finals before slate date)
+  // plus tonight's live pbp shots merged at card-open, so the map updates
+  // as goals happen. No overlap: season shots exclude tonight's game.
+  // [] when the bundle predates zoneShots (season block explains).
+  if (!r.seasonShots || !r.seasonShots.length) return [];
+  const g = (state.games || []).find((gg) => gg.id === r.gameId);
+  const live = g && g.pbp ? displayShotsFromPbp(g.pbp, r.pid) : [];
+  return r.seasonShots.concat(live);
+}
+function matchupHeatShots(r) {
+  // Fresh at card-open: tonight's live pbp + the team's recent finals,
+  // display-corrected. Falls back to the load-time window when live
+  // data is missing (e.g. pregame with no pbp yet still gets recents).
+  const g = (state.games || []).find((gg) => gg.id === r.gameId);
+  const live = g && g.pbp ? displayShotsFromPbp(g.pbp, r.pid) : [];
+  let recent = [];
+  for (const id of ((state.recentIds || {})[r.team] || [])) {
+    const zp = (state.zonePbps || {})[id];
+    if (zp) recent.push(...displayShotsFromPbp(zp, r.pid));
+  }
+  const merged = live.concat(recent);
+  return merged.length ? merged : (r.matchupShots || r.shots || []);
+}
+function seasonHeatMapHtml(r) {
+  if (!r.seasonShots || !r.seasonShots.length) {
+    return `<details class="rink-details heat-details">
+      <summary class="sec-title" style="cursor:pointer"><span style="color:var(--gold)">Season heat map</span> <span class="muted small">every goal this season</span></summary>
+      <p class="muted small" style="margin:.5rem 0 0">Season map arrives with the next slate build.</p>
+    </details>`;
+  }
+  return heatMapSectionHtml(r, heatMapShots(r), 'Season heat map', 'every goal this season');
+}
 const HOME_PLATE = [[89, -9], [69, -22], [54, -22], [54, 22], [69, 22], [89, 9]];
 function inHomePlate(x, y) {
   let inside = false;
@@ -2522,12 +2574,11 @@ function zoneStats(shots) {
   for (const s of shots) { const k = zoneOf(s.x, s.y); z[k].att++; if (s.goal) z[k].goals++; }
   return z;
 }
-function heatMapSectionHtml(r) {
-  const shots = r.shots || [];
-  if (shots.length < 5) {
+function heatMapSectionHtml(r, shots, title, sub, emptyText) {
+  if (!shots || shots.length < 5) {
     return `<details class="rink-details heat-details">
-      <summary class="sec-title" style="cursor:pointer"><span style="color:var(--gold)">Goal heat map</span> <span class="muted small">where his goals come from</span></summary>
-      <p class="muted small" style="margin:.5rem 0 0">Not enough shot data yet — the map fills in as games are played.</p>
+      <summary class="sec-title" style="cursor:pointer"><span style="color:var(--gold)">${title}</span> <span class="muted small">${sub}</span></summary>
+      <p class="muted small" style="margin:.5rem 0 0">${emptyText || 'Not enough shot data yet — the map fills in as games are played.'}</p>
     </details>`;
   }
   const zs = zoneStats(shots);
@@ -2542,7 +2593,7 @@ function heatMapSectionHtml(r) {
       ? 'Does his damage from distance — point shots and perimeter looks.'
       : 'Scores from all over the zone — no single home base.');
   return `<details class="rink-details heat-details">
-    <summary class="sec-title" style="cursor:pointer"><span style="color:var(--gold)">Goal heat map</span> <span class="muted small">where his goals come from</span></summary>
+    <summary class="sec-title" style="cursor:pointer"><span style="color:var(--gold)">${title}</span> <span class="muted small">${sub}</span></summary>
     <div class="zonemap">
       <svg viewBox="0 0 380 430" aria-hidden="true">
         <defs>
@@ -2764,10 +2815,11 @@ async function tryLiveFileTick() {
   return applied > 0;
 }
 // A game is "watchable" if it's marked live, OR if its start time has passed
-// but the bundle still says FUT (stale bundle — e.g. data built before puck drop).
+// but the bundle still says FUT or PRE (stale bundle — e.g. data built
+// before puck drop; the bundle's pregame state is PRE, not FUT).
 function isWatchable(g) {
   if (g.state === 'LIVE' || g.state === 'CRIT') return true;
-  if (g.state === 'FUT' && g.startUTC) {
+  if ((g.state === 'FUT' || g.state === 'PRE') && g.startUTC) {
     try { return new Date(g.startUTC).getTime() <= Date.now(); } catch (e) { return false; }
   }
   return false;

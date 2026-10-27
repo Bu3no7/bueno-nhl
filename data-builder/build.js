@@ -326,7 +326,7 @@ async function main() {
       away: g.awayTeam.abbrev, home: g.homeTeam.abbrev,
       state: g.gameState, startUTC: g.startTimeUTC,
     })),
-    pbps: {}, rosters: {}, recentIds: {}, zonePbps: {},
+    pbps: {}, rosters: {}, recentIds: {}, zonePbps: {}, zoneShots: {},
     players: {}, goalieSv: {}, standings: {}, lines: {},
   };
   if (!games.length) {
@@ -409,6 +409,44 @@ async function main() {
     nFetch++;
     if (d) out.players[String(pid)] = slimPlayer(d);
   });
+
+  // 6b. season-to-date zone shots per skater (heat maps): regular-season
+  // finals for slate teams before dateStr, normalized to attacking coords.
+  // Compact: pid -> [[x, y, goal(1/0)], ...]. Tonight's games are excluded
+  // (gameDate < dateStr), so the site merges live pbp shots at card-open
+  // with zero overlap. Only slate skaters are kept, to bound bundle size.
+  {
+    const seenGameIds = new Set();
+    const seasonGames = [];
+    await E.limitedMap(teams, 4, async (t) => {
+      let sched = null;
+      try { sched = await counted(E.fetchJSON(`${API}/club-schedule-season/${t}/${seasonId}`)); } catch (e) { /* skip team */ }
+      if (!sched) return;
+      for (const g of (sched.games || [])) {
+        if (g.gameType !== 2) continue;
+        if (g.gameState !== 'OFF' && g.gameState !== 'FINAL') continue;
+        if (!(g.gameDate < dateStr)) continue;
+        if (seenGameIds.has(g.id)) continue;
+        seenGameIds.add(g.id);
+        seasonGames.push(g.id);
+      }
+    });
+    console.log(`[data-builder] ${seasonGames.length} season finals for zone shots`);
+    await E.limitedMap(seasonGames, 4, async (id) => {
+      let full = null;
+      try { full = await counted(E.fetchJSON(`${API}/gamecenter/${id}/play-by-play`)); } catch (e) { return; }
+      if (!full) return;
+      const slim = slimPbp(full);
+      if (!slim) return;
+      // displayShotsByPid: goals via scoringPlayerId, per-period rotation
+      const byPid = E.displayShotsByPid(slim);
+      for (const [sid, shots] of Object.entries(byPid)) {
+        if (!pidSet.has(Number(sid))) continue;
+        (out.zoneShots[sid] = out.zoneShots[sid] || []).push(
+          ...shots.map((s) => [Math.round(s.x * 10) / 10, Math.round(s.y * 10) / 10, s.goal ? 1 : 0]));
+      }
+    });
+  }
 
   // goalie save pct per game — EXACT site logic replicated: goalieForGame()
   // takes the FIRST goalieInNetId seen in chronological play order of the

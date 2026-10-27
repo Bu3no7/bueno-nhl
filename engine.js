@@ -188,6 +188,10 @@ async function recentFinalsByTeam(apiBase, beforeDate, maxN) {
 
 function shotsFromPbp(pbp, playerId) {
   // all attempts by playerId with coords, normalized to attacking +x
+  // MODEL PATH — do not "fix" without a backtest: NHL goal plays carry
+  // scoringPlayerId, not shootingPlayerId, so goals are excluded here by
+  // data shape, and the model's zone factor was validated on that input.
+  // Display code (heat maps, goal map) uses displayShotsFromPbp instead.
   const out = [];
   const homeId = pbp.homeTeam.id;
   const homeDefSide = pbp.homeTeamDefendingSide;
@@ -201,6 +205,45 @@ function shotsFromPbp(pbp, playerId) {
     out.push({ x: n.x, y: n.y, goal: k === 'goal' });
   }
   return out;
+}
+
+// DISPLAY PATH — heat maps and goal map. Two corrections over shotsFromPbp:
+// 1. Goals attribute via scoringPlayerId (goal plays have no shootingPlayerId).
+// 2. Coords rotate per period into attacking frame: the home team's period-1
+//    shot median fixes period-1 orientation (homeTeamDefendingSide is null
+//    on final-game pbps, so it can't be trusted), ends alternate each period,
+//    and the rotation is 180° ((x,y) -> (-x,-y)) so left/right stay consistent.
+function displayShotsByPid(pbp) {
+  const homeId = pbp.homeTeam.id;
+  const ATT = ['shot-on-goal', 'goal', 'missed-shot', 'blocked-shot'];
+  const p1xs = [];
+  for (const p of (pbp.plays || [])) {
+    const det = p.details || {};
+    const pd = p.periodDescriptor || {};
+    if (pd.number !== 1 || !ATT.includes(p.typeDescKey)) continue;
+    if (det.xCoord == null || det.eventOwnerTeamId !== homeId) continue;
+    p1xs.push(det.xCoord);
+  }
+  p1xs.sort((a, b) => a - b);
+  const homePlusP1 = p1xs.length ? p1xs[Math.floor(p1xs.length / 2)] > 0 : true;
+  const homeAttacksPlus = (period) => homePlusP1 === (period % 2 === 1);
+  const byPid = {};
+  for (const p of (pbp.plays || [])) {
+    const k = p.typeDescKey;
+    if (!ATT.includes(k)) continue;
+    const det = p.details || {};
+    const shooter = k === 'goal' ? det.scoringPlayerId : det.shootingPlayerId;
+    if (shooter == null || det.xCoord == null || det.yCoord == null) continue;
+    const period = (p.periodDescriptor || {}).number || 1;
+    const isHome = det.eventOwnerTeamId === homeId;
+    const attPlus = isHome ? homeAttacksPlus(period) : !homeAttacksPlus(period);
+    const shot = { x: attPlus ? det.xCoord : -det.xCoord, y: attPlus ? det.yCoord : -det.yCoord, goal: k === 'goal' };
+    (byPid[shooter] = byPid[shooter] || []).push(shot);
+  }
+  return byPid;
+}
+function displayShotsFromPbp(pbp, playerId) {
+  return (displayShotsByPid(pbp)[playerId] || []);
 }
 
 function goalieForGame(pbp) {
@@ -387,7 +430,7 @@ if (typeof module !== 'undefined' && module.exports) {
     clamp, fetchJSON, limitedMap,
     parseToi, fmtToi, regress, priorsFor, computeProb, regressTeamXG,
     normalizeShot, zoneShareFor, skaterSeason,
-    recentFinalsByTeam, shotsFromPbp, goalieForGame,
+    recentFinalsByTeam, shotsFromPbp, displayShotsByPid, displayShotsFromPbp, goalieForGame,
     simLambda, poissonSample, pickWeighted, pickWeightedBy, simUnits,
     drawAssistCount, assignGoal, scoreStateRates, simGameTrace, simOneGame,
   };
