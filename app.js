@@ -2548,11 +2548,11 @@ function matchupHeatShots(r) {
 function seasonHeatMapHtml(r) {
   if (!r.seasonShots || !r.seasonShots.length) {
     return `<details class="rink-details heat-details">
-      <summary class="sec-title" style="cursor:pointer"><span style="color:var(--gold)">Season heat map</span> <span class="muted small">every goal this season</span></summary>
+      <summary class="sec-title" style="cursor:pointer"><span style="color:var(--gold)">Season heat map</span> <span class="muted small">where his shots come from this season</span></summary>
       <p class="muted small" style="margin:.5rem 0 0">Season map arrives with the next slate build.</p>
     </details>`;
   }
-  return heatMapSectionHtml(r, heatMapShots(r), 'Season heat map', 'every goal this season');
+  return heatMapSectionHtml(r, heatMapShots(r), 'Season heat map', 'where his shots come from this season', null, { showGoals: false, minShots: 1 });
 }
 const HOME_PLATE = [[89, -9], [69, -22], [54, -22], [54, 22], [69, 22], [89, 9]];
 function inHomePlate(x, y) {
@@ -2575,8 +2575,14 @@ function zoneStats(shots) {
   for (const s of shots) { const k = zoneOf(s.x, s.y); z[k].att++; if (s.goal) z[k].goals++; }
   return z;
 }
-function heatMapSectionHtml(r, shots, title, sub, emptyText) {
-  if (!shots || shots.length < 5) {
+function heatMapSectionHtml(r, shots, title, sub, emptyText, opts) {
+  // Season map renders percentages-only (no per-zone goal counts) with a
+  // 1-shot floor so depth guys show too; Match-up keeps goals + the 5-shot
+  // floor by default. Season goal totals already live in the card's
+  // stat-inline line, so nothing is lost by dropping G chips here.
+  const showGoals = !opts || opts.showGoals !== false;
+  const minShots = (opts && opts.minShots) || 5;
+  if (!shots || shots.length < minShots) {
     return `<details class="rink-details heat-details">
       <summary class="sec-title" style="cursor:pointer"><span style="color:var(--gold)">${title}</span> <span class="muted small">${sub}</span></summary>
       <p class="muted small" style="margin:.5rem 0 0">${emptyText || 'Not enough shot data yet — the map fills in as games are played.'}</p>
@@ -2586,10 +2592,10 @@ function heatMapSectionHtml(r, shots, title, sub, emptyText) {
   const total = shots.length;
   const pct = (k) => Math.round((zs[k].att / total) * 100);
   const hot = ['lowSlot', 'slot', 'left', 'right', 'point'].reduce((a, b) => (zs[a].att >= zs[b].att ? a : b));
-  const zlabel = (k, name, left, top) => `<div class="zlabel" style="left:${left}%; top:${top}%"><div class="zname">${name}</div><div class="zbig${k === hot ? ' hot' : ''}">${pct(k)}%</div><div class="zchips"><span class="zchip"><b>${zs[k].att}</b> att</span><span class="zchip g"><b>${zs[k].goals}</b> G</span></div></div>`;
+  const zlabel = (k, name, left, top) => `<div class="zlabel" style="left:${left}%; top:${top}%"><div class="zname">${name}</div><div class="zbig${k === hot ? ' hot' : ''}">${pct(k)}%</div><div class="zchips"><span class="zchip"><b>${zs[k].att}</b> att</span>${showGoals ? `<span class="zchip g"><b>${zs[k].goals}</b> G</span>` : ''}</div></div>`;
   const slotShare = (zs.lowSlot.att + zs.slot.att) / total;
   const take = slotShare >= 0.5
-    ? `Lives in the slot — ${Math.round(slotShare * 100)}% of his shots come from the home-plate area${zs.lowSlot.goals ? ', and the low slot is where the goals are' : ''}.`
+    ? `Lives in the slot — ${Math.round(slotShare * 100)}% of his shots come from the home-plate area${(showGoals && zs.lowSlot.goals) ? ', and the low slot is where the goals are' : ''}.`
     : (zs.point.att / total >= 0.3
       ? 'Does his damage from distance — point shots and perimeter looks.'
       : 'Scores from all over the zone — no single home base.');
@@ -2629,7 +2635,7 @@ function heatMapSectionHtml(r, shots, title, sub, emptyText) {
       ${zlabel('right', 'RIGHT SIDE', 81, 40)}
       ${zlabel('point', 'POINT', 50, 85)}
     </div>
-    <div class="outside-strip">OUTSIDE THE ZONE: ${zs.outside.att} ATT · ${pct('outside')}% · ${zs.outside.goals} G</div>
+    <div class="outside-strip">OUTSIDE THE ZONE: ${zs.outside.att} ATT · ${pct('outside')}%${showGoals ? ` · ${zs.outside.goals} G` : ''}</div>
     <p class="small muted" style="margin:.55rem 0 0">${take} <span class="muted">(${total} attempts tracked)</span></p>
   </details>`;
 }
