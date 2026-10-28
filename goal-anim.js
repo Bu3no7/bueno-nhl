@@ -1,10 +1,17 @@
 /* ---------------- Video game goal animation ---------------- */
-/* Air-hockey table edition: the rink is a glossy air-hockey table with
-   rails and a goal slot. The camera pans into the table, then tracks the
-   puck from the real pbp shot spot into the slot. Players are numbered
-   discs in their team colors, and a buzzer box on top of the slot flashes
-   (with a horn) when the puck goes in. Used by live scorer rows AND the
-   Yesterday's results recap — both call playGoalAnimation. */
+/* Rink replay edition: the goal takeover keeps its overlay (scorer
+   banner, team logos, headshot, horn), but the animation inside is a
+   top-down rink replay in Bueno style — dark ice, glowing team-color
+   dots with jersey numbers, attack going left like the reference replay.
+   The play runs smooth, not quick: dots fade in at the faceoff, glide
+   on curved paths into the zone, the puck rides with the scorer, then
+   flies from the real pbp shot spot into the net, where a buzzer-red
+   goal light behind the net lights up with the horn.
+   Real anchors from the pbp: faceoff at center, shot spot, net, scorer,
+   assists, goalie. The skaters' glide paths between those anchors are
+   staged — the public feed doesn't carry full player tracking.
+   Used by live scorer rows AND the Yesterday's results recap — both
+   call playGoalAnimation. */
 const GOAL_TYPE_STYLE = {
   EV: { label: 'EVEN STRENGTH', color: '#3adbe3' },
   PP: { label: 'POWER PLAY', color: '#ffd700' },
@@ -52,8 +59,6 @@ function animateGoalRink(gl, onDone) {
   const canvas = document.getElementById('rinkAnim');
   const ctx = canvas.getContext('2d');
   const W = canvas.width, H = canvas.height;
-  const F = W * 0.76;
-  const SIN = Math.sin(0.44), COS = Math.cos(0.44);
   const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 
   // --- team colors (TEAM_COLORS lives in app.js, loaded before this file) ---
@@ -69,69 +74,117 @@ function animateGoalRink(gl, onDone) {
     const r = parseInt(m[1].slice(0, 2), 16), g = parseInt(m[1].slice(2, 4), 16), b = parseInt(m[1].slice(4, 6), 16);
     return (0.299 * r + 0.587 * g + 0.114 * b) > 150 ? '#111' : '#fff';
   }
+  // glow ink: lighten dark team colors so dots read on dark ice
+  function glowCol(hex) {
+    const m = /^#([0-9a-f]{6})$/i.exec(hex || '');
+    if (!m) return '#7fd4e8';
+    const r = parseInt(m[1].slice(0, 2), 16), g = parseInt(m[1].slice(2, 4), 16), b = parseInt(m[1].slice(4, 6), 16);
+    const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+    if (lum > 90) return hex;
+    const f = 1.7;
+    const mix = (v) => Math.min(255, Math.round(v * f + 40));
+    return `rgb(${mix(r)},${mix(g)},${mix(b)})`;
+  }
 
-  // --- shot spot from real pbp coords (mirrored so the slot is always far) ---
+  // --- shot spot from real pbp coords, mirrored into attacking frame (goal at +89) ---
   let gx = gl.x, gy = gl.y;
   if (gx != null && gx < 0) { gx = -gx; gy = -gy; }
-  const start = (gx != null && gy != null)
-    ? { x: clamp((gy / 42.5) * 100, -90, 90), z: clamp(20 + ((gx + 100) / 200) * 285, 180, 282) }
-    : { x: -48, z: 238 };
-  const goal = { x: 0, z: 296 };
+  const shot = (gx != null && gy != null)
+    ? { x: clamp(gx, 25, 86), y: clamp(gy, -38, 38) }
+    : { x: 60, y: -15 };
+  // Attack goes LEFT on canvas, like the reference replay: +89 (goal) -> left edge.
+  const mapX = (x) => W - ((x + 100) / 200) * W;
+  const mapY = (y) => ((y + 42) / 84) * H;
 
-  let cam = { x: 60, z: -40, h: 170 };
-  function project(x, z, h) {
-    const dx = x - cam.x, dz = z - cam.z;
-    const fwd = dz * COS + (cam.h - h) * SIN;
-    if (fwd < 25) return null;
-    const right = dx, up = dz * SIN + (h - cam.h) * COS;
-    return { sx: W / 2 + right * F / fwd, sy: H * 0.52 - up * F / fwd, s: F / fwd };
-  }
-  const poly = (pts, fill, stroke, w) => {
-    if (pts.some(p => !p)) return;
-    ctx.beginPath(); ctx.moveTo(pts[0].sx, pts[0].sy);
-    pts.slice(1).forEach(p => ctx.lineTo(p.sx, p.sy)); ctx.closePath();
-    if (fill) { ctx.fillStyle = fill; ctx.fill(); }
-    if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = w || 2; ctx.stroke(); }
-  };
-  const seg = (a, b, col, w) => {
-    if (!a || !b) return;
-    ctx.beginPath(); ctx.moveTo(a.sx, a.sy); ctx.lineTo(b.sx, b.sy);
-    ctx.strokeStyle = col; ctx.lineWidth = w || 2; ctx.stroke();
-  };
-  const circle3d = (cx, cz, r, col, w) => {
-    ctx.beginPath();
-    for (let i = 0; i <= 40; i++) {
-      const a = i / 40 * Math.PI * 2;
-      const p = project(cx + Math.cos(a) * r, cz + Math.sin(a) * r * 1.6, 0);
-      if (!p) return;
-      i === 0 ? ctx.moveTo(p.sx, p.sy) : ctx.lineTo(p.sx, p.sy);
-    }
-    ctx.strokeStyle = col; ctx.lineWidth = w || 2; ctx.stroke();
-  };
-
-  // players: scorer + assists in scorer-team colors, goalie + defender in opp colors
+  // --- skaters: scorer ends at the real shot spot; assists + fillers stage around it ---
+  const CX = (v, lo, hi) => clamp(v, lo, hi);
   const skaters = [
-    { x: 0, z: 282, num: '', col: oppCol, big: true },
-    { x: -26, z: 266, num: '', col: oppCol },
+    { num: gl.scorerNum ? String(gl.scorerNum) : '', col: scorerCol, x0: 0, y0: 0, x1: shot.x, y1: shot.y, star: true },
+    { num: (gl.assistNums && gl.assistNums[0]) ? String(gl.assistNums[0]) : '', col: scorerCol, x0: -10, y0: 12, x1: CX(shot.x - 25, 25, 85), y1: CX(shot.y + 22, -38, 38) },
+    { num: (gl.assistNums && gl.assistNums[1]) ? String(gl.assistNums[1]) : '', col: scorerCol, x0: -10, y0: -12, x1: CX(shot.x - 30, 25, 85), y1: CX(shot.y - 20, -38, 38) },
+    { num: '', col: scorerCol, x0: 8, y0: 16, x1: 55, y1: 10 },
+    { num: '', col: scorerCol, x0: 8, y0: -16, x1: 70, y1: 8 },
+    { num: '', col: oppCol, x0: 84, y0: 0, x1: 84, y1: 0, goalie: true },
+    { num: '', col: oppCol, x0: 60, y0: -10, x1: 74, y1: -14 },
+    { num: '', col: oppCol, x0: 60, y0: 10, x1: 74, y1: 14 },
+    { num: '', col: oppCol, x0: 40, y0: 0, x1: 60, y1: 0 },
   ];
-  if (gl.assistNums && gl.assistNums[0]) skaters.push({ x: clamp(start.x + 40, -90, 90), z: clamp(start.z - 40, 60, 280), num: String(gl.assistNums[0]), col: scorerCol });
-  if (gl.assistNums && gl.assistNums[1]) skaters.push({ x: clamp(start.x - 52, -90, 90), z: clamp(start.z - 26, 60, 280), num: String(gl.assistNums[1]), col: scorerCol });
-  function disc(p, shake) {
-    const pr = project(p.x, p.z, 0);
-    if (!pr) return;
-    const r = Math.max(6, 11 * pr.s);
-    ctx.beginPath(); ctx.ellipse(pr.sx + shake, pr.sy + r * 0.9 + shake, r * 0.95, r * 0.32, 0, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(0,0,0,.25)'; ctx.fill();
-    ctx.beginPath(); ctx.arc(pr.sx + shake, pr.sy + shake, r, 0, Math.PI * 2);
-    ctx.fillStyle = p.col; ctx.fill();
-    ctx.strokeStyle = 'rgba(255,255,255,.85)'; ctx.lineWidth = 1.5; ctx.stroke();
-    ctx.beginPath(); ctx.ellipse(pr.sx - r * 0.35 + shake, pr.sy - r * 0.4 + shake, r * 0.4, r * 0.22, -0.6, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(255,255,255,.28)'; ctx.fill();
-    if (p.num) {
-      ctx.fillStyle = numInk(p.col); ctx.font = `800 ${Math.max(8, r * 0.95)}px system-ui`;
-      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.fillText(p.num, pr.sx + shake, pr.sy + shake + 1);
+  // Gentle curve per skater so the skate arcs instead of running on rails.
+  skaters.forEach((s, i) => {
+    const dx = s.x1 - s.x0, dy = s.y1 - s.y0, len = Math.hypot(dx, dy) || 1;
+    const bend = (i % 2 === 0 ? 1 : -1) * (6 + (i % 3) * 4);
+    s.cx = (s.x0 + s.x1) / 2 + (-dy / len) * bend;
+    s.cy = (s.y0 + s.y1) / 2 + (dx / len) * bend;
+    s.delay = i * 0.12;
+  });
+
+  // --- timeline (seconds): smooth, not quick — same pacing as the approved draft ---
+  const FADE_IN = 1.4, GLIDE_START = 1.4, GLIDE_DUR = 6.0;
+  const PUCK_AT = 8.0, PUCK_DUR = 1.0, GOAL_AT = 9.0, RINK_END = 10.2;
+  function smooth(t) { t = Math.max(0, Math.min(1, t)); return t * t * t * (t * (t * 6 - 15) + 10); }
+  function quad(p0, p1, p2, t) {
+    const u = 1 - t;
+    return { x: u * u * p0.x + 2 * u * t * p1.x + t * t * p2.x,
+             y: u * u * p0.y + 2 * u * t * p1.y + t * t * p2.y };
+  }
+  function skaterPos(s, t) {
+    const local = (t - GLIDE_START - s.delay) / GLIDE_DUR;
+    if (local <= 0) return { x: s.x0, y: s.y0 };
+    return quad({ x: s.x0, y: s.y0 }, { x: s.cx, y: s.cy }, { x: s.x1, y: s.y1 }, smooth(local));
+  }
+
+  function drawRink() {
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#0a1e33'; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = 'rgba(120,180,230,0.05)';
+    ctx.beginPath(); ctx.ellipse(W / 2, H * 0.3, W * 0.48, H * 0.28, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = '#c23b3b'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(mapX(89), 0); ctx.lineTo(mapX(89), H); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(mapX(-89), 0); ctx.lineTo(mapX(-89), H); ctx.stroke();
+    ctx.strokeStyle = '#3b82c4'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(mapX(25), 0); ctx.lineTo(mapX(25), H); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(mapX(-25), 0); ctx.lineTo(mapX(-25), H); ctx.stroke();
+    ctx.strokeStyle = 'rgba(194,59,59,0.85)'; ctx.lineWidth = 1.5; ctx.setLineDash([5, 5]);
+    ctx.beginPath(); ctx.moveTo(mapX(0), 0); ctx.lineTo(mapX(0), H); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.strokeStyle = 'rgba(220,80,80,0.8)'; ctx.lineWidth = 1.5;
+    for (const [fx, fy] of [[69, 22], [69, -22], [-69, 22], [-69, -22]]) {
+      ctx.beginPath(); ctx.arc(mapX(fx), mapY(fy), 13, 0, Math.PI * 2); ctx.stroke();
+      ctx.fillStyle = 'rgba(220,80,80,0.9)';
+      ctx.beginPath(); ctx.arc(mapX(fx), mapY(fy), 2, 0, Math.PI * 2); ctx.fill();
     }
+    ctx.beginPath(); ctx.arc(mapX(0), mapY(0), 13, 0, Math.PI * 2); ctx.stroke();
+    ctx.strokeStyle = '#d7e3f4'; ctx.lineWidth = 2;
+    ctx.strokeRect(mapX(89) - 4, mapY(0) - 9, 6, 18);
+    ctx.strokeRect(mapX(-89) - 2, mapY(0) - 9, 6, 18);
+    // buzzer-red goal light housing behind the attacking net (lit at GOAL_AT)
+    ctx.beginPath(); ctx.arc(mapX(89) - 14, mapY(0), 7, 0, Math.PI * 2);
+    ctx.fillStyle = '#2a0d0d'; ctx.fill();
+    ctx.strokeStyle = '#5a2020'; ctx.lineWidth = 1.5; ctx.stroke();
+    // faint gold slot wash
+    ctx.fillStyle = 'rgba(255,215,106,0.07)';
+    ctx.beginPath();
+    ctx.moveTo(mapX(89), mapY(-9)); ctx.lineTo(mapX(69), mapY(-22)); ctx.lineTo(mapX(54), mapY(-22));
+    ctx.lineTo(mapX(54), mapY(22)); ctx.lineTo(mapX(69), mapY(22)); ctx.lineTo(mapX(89), mapY(9));
+    ctx.closePath(); ctx.fill();
+  }
+
+  function drawDot(s, pos, alpha) {
+    const cx = mapX(pos.x), cy = mapY(pos.y);
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.beginPath(); ctx.arc(cx, cy, s.goalie ? 11 : 10, 0, Math.PI * 2);
+    ctx.fillStyle = s.col;
+    ctx.shadowColor = glowCol(s.col);
+    ctx.shadowBlur = s.star ? 14 : 8;
+    ctx.fill(); ctx.shadowBlur = 0;
+    ctx.strokeStyle = 'rgba(255,255,255,.85)'; ctx.lineWidth = 1.5; ctx.stroke();
+    if (s.num) {
+      ctx.fillStyle = numInk(s.col); ctx.font = 'bold 9px system-ui';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(s.num, cx, cy);
+    }
+    ctx.restore();
   }
 
   // goal horn, guarded (takeover is click-triggered, so audio is allowed)
@@ -157,131 +210,61 @@ function animateGoalRink(gl, onDone) {
     } catch (e) { /* visuals carry it */ }
   }
 
-  const PAN = 1200, FLIGHT = 800, CELEB = 900;
-  const easeIO = t => t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
-  const easeOut = t => 1 - Math.pow(1 - t, 3);
-  const lerp = (a, b, t) => a + (b - a) * t;
   const t0 = performance.now();
-  let done = false, buzzed = false;
+  let done = false, hornPlayed = false, trail = [];
 
   function draw(t) {
-    ctx.clearRect(0, 0, W, H);
-    let px = start.x, pz = start.z;
-    if (t < PAN) {
-      const k = easeIO(t / PAN);
-      cam.x = lerp(60, start.x * 0.55, k);
-      cam.z = lerp(-40, start.z - 135, k);
-      cam.h = lerp(170, 95, k);
-    } else {
-      const st = Math.min((t - PAN) / FLIGHT, 1), e = easeOut(st);
-      px = start.x + (goal.x - start.x) * e;
-      pz = start.z + (goal.z - start.z) * e;
-      cam.x = px * 0.55; cam.z = pz - 135; cam.h = 95;
+    drawRink();
+    const fade = Math.min(1, t / FADE_IN);
+    let kap = null;
+    for (const s of skaters) {
+      const pos = skaterPos(s, t);
+      if (s.star) kap = pos;
+      drawDot(s, pos, fade);
     }
-    const scored = t >= PAN + FLIGHT;
-    const shake = scored ? (Math.random() - 0.5) * 5 : 0;
+    // Puck: rides with the scorer through the glide, then flies to the net with a fading trail.
+    let puck;
+    if (t < PUCK_AT) { puck = kap; }
+    else if (t < PUCK_AT + PUCK_DUR) {
+      const k = 1 - Math.pow(1 - Math.min(1, (t - PUCK_AT) / PUCK_DUR), 2);
+      puck = { x: kap.x + (89 - kap.x) * k, y: kap.y + (0 - kap.y) * k };
+    } else { puck = { x: 89, y: 0 }; }
+    if (t >= PUCK_AT && t < GOAL_AT + 0.4) {
+      trail.push({ x: puck.x, y: puck.y });
+      if (trail.length > 16) trail.shift();
+    }
+    ctx.save();
+    trail.forEach((p, i) => {
+      ctx.globalAlpha = (i / trail.length) * 0.5;
+      ctx.beginPath(); ctx.arc(mapX(p.x), mapY(p.y), 2.5, 0, Math.PI * 2);
+      ctx.fillStyle = '#ffffff'; ctx.fill();
+    });
+    ctx.restore();
+    ctx.beginPath(); ctx.arc(mapX(puck.x), mapY(puck.y), 3.5, 0, Math.PI * 2);
+    ctx.fillStyle = '#0b0f14'; ctx.shadowColor = '#fff'; ctx.shadowBlur = 6; ctx.fill(); ctx.shadowBlur = 0;
 
-    // table slab side
-    poly([project(-122, 20, 0), project(122, 20, 0), project(122, 20, -26), project(-122, 20, -26)], '#101820', null);
-    // glossy playfield
-    const top = [[-110, 20], [110, 20], [110, 305], [-110, 305]].map(p => project(p[0], p[1], 0));
-    if (top.every(Boolean)) {
-      const g = ctx.createLinearGradient(0, top[0].sy, 0, top[2].sy);
-      g.addColorStop(0, '#f7fafc'); g.addColorStop(0.55, '#dbe8f0'); g.addColorStop(1, '#c2d5e2');
-      ctx.beginPath(); ctx.moveTo(top[0].sx, top[0].sy);
-      top.slice(1).forEach(p => ctx.lineTo(p.sx, p.sy)); ctx.closePath();
-      ctx.fillStyle = g; ctx.fill();
-      ctx.strokeStyle = 'rgba(90,120,150,.6)'; ctx.lineWidth = 1.5; ctx.stroke();
-    }
-    // air holes
-    for (let gx2 = -100; gx2 <= 100; gx2 += 20) {
-      for (let gz = 30; gz <= 300; gz += 22) {
-        const p = project(gx2, gz, 0);
-        if (!p) continue;
-        ctx.beginPath(); ctx.arc(p.sx + shake, p.sy + shake, Math.max(0.7, 1.1 * p.s), 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(90,120,140,.35)'; ctx.fill();
-      }
-    }
-    // markings
-    seg(project(-110, 160, 0), project(110, 160, 0), 'rgba(220,40,50,.9)', 3);
-    seg(project(-110, 292, 0), project(110, 292, 0), 'rgba(40,110,220,.8)', 2);
-    circle3d(start.x, start.z, 20, 'rgba(220,40,50,.65)', 2);
-    circle3d(0, 160, 26, 'rgba(40,110,220,.55)', 2);
-    // goal slot
-    poly([project(-14, 296, 0), project(26, 296, 0), project(26, 308, 0), project(-14, 308, 0)], '#0a0f16', null);
-    // rails (gap left at the slot)
-    const rail = (ptsTop, ptsSide) => {
-      poly(ptsTop, '#e11d2e', 'rgba(255,255,255,.35)', 1);
-      poly(ptsSide, '#7f0f1a', null);
-    };
-    rail(
-      [project(-124, 20, 18), project(-104, 20, 18), project(-104, 305, 18), project(-124, 305, 18)],
-      [project(-124, 20, 18), project(-124, 305, 18), project(-124, 305, 0), project(-124, 20, 0)]);
-    rail(
-      [project(104, 20, 18), project(124, 20, 18), project(124, 305, 18), project(104, 305, 18)],
-      [project(124, 20, 18), project(124, 305, 18), project(124, 305, 0), project(124, 20, 0)]);
-    rail(
-      [project(-124, 292, 18), project(-14, 292, 18), project(-14, 308, 18), project(-124, 308, 18)],
-      [project(-124, 292, 18), project(-124, 308, 18), project(-124, 308, 0), project(-124, 292, 0)]);
-    rail(
-      [project(26, 292, 18), project(124, 292, 18), project(124, 308, 18), project(26, 308, 18)],
-      [project(124, 292, 18), project(124, 308, 18), project(124, 308, 0), project(124, 292, 0)]);
-    // NET BUZZER above the slot
-    const bp = project(0, 300, 32);
-    if (bp) {
-      const bw = Math.max(10, 20 * bp.s), bh = Math.max(7, 12 * bp.s);
+    if (t >= GOAL_AT) {
+      if (!hornPlayed) { hornPlayed = true; horn(); }
+      const pulse = 0.5 + 0.5 * Math.sin((t - GOAL_AT) * 2.5); // gentle pulse, not a strobe
+      ctx.fillStyle = `rgba(255,215,106,${0.10 + 0.08 * pulse})`;
+      ctx.fillRect(mapX(89) - 30, 0, 30, H);
+      // buzzer-red goal light: bright red beacon behind the net, on with the horn
+      const lx = mapX(89) - 14, ly = mapY(0);
       ctx.save();
-      ctx.translate(bp.sx + shake, bp.sy + shake);
-      ctx.fillStyle = '#1a1f28'; ctx.strokeStyle = scored ? '#ff2d2d' : '#5a6a7d'; ctx.lineWidth = 1.5;
-      ctx.beginPath(); ctx.roundRect(-bw / 2, -bh, bw, bh, 3); ctx.fill(); ctx.stroke();
-      ctx.beginPath(); ctx.arc(0, -bh - 1, bw * 0.28, 0, Math.PI * 2);
-      ctx.fillStyle = scored ? '#ff2d2d' : '#5c1a1a'; ctx.fill();
-      if (scored) {
-        ctx.shadowColor = '#ff2d2d'; ctx.shadowBlur = 16;
-        ctx.beginPath(); ctx.arc(0, -bh - 1, bw * 0.28, 0, Math.PI * 2); ctx.fill();
-        ctx.shadowBlur = 0;
-        const ringR = bw * (0.6 + ((performance.now() / 280) % 1) * 1.6);
-        ctx.beginPath(); ctx.arc(0, -bh - 1, ringR, 0, Math.PI * 2);
-        ctx.strokeStyle = 'rgba(255,45,45,.6)'; ctx.lineWidth = 2; ctx.stroke();
-      }
+      ctx.globalAlpha = 0.20 + 0.12 * pulse;
+      ctx.beginPath(); ctx.arc(lx, ly, 20, 0, Math.PI * 2);
+      ctx.fillStyle = '#ff2222'; ctx.fill();
+      ctx.globalAlpha = 1;
+      ctx.beginPath(); ctx.arc(lx, ly, 7, 0, Math.PI * 2);
+      ctx.fillStyle = '#ff2a2a'; ctx.shadowColor = '#ff2222'; ctx.shadowBlur = 22; ctx.fill(); ctx.shadowBlur = 0;
       ctx.restore();
     }
-    // players far-to-near
-    [...skaters].sort((a, b) => b.z - a.z).forEach(p => disc(p, shake));
-    // scorer disc at the shot spot
-    disc({ x: start.x, z: start.z, num: gl.scorerNum ? String(gl.scorerNum) : '', col: scorerCol }, shake);
-    // puck: trail in flight, resting at the stick before the shot
-    const puckAt = (tt) => {
-      if (tt < PAN) return { x: start.x + 4, z: start.z + 4 };
-      const st = Math.min((tt - PAN) / FLIGHT, 1), e = easeOut(st);
-      return { x: start.x + (goal.x - start.x) * e, z: start.z + (goal.z - start.z) * e };
-    };
-    if (t >= PAN) {
-      for (let i = 6; i >= 0; i--) {
-        const pos = puckAt(Math.max(PAN, t - i * 14));
-        const pr = project(pos.x, pos.z, 0);
-        if (!pr) continue;
-        ctx.beginPath(); ctx.arc(pr.sx + shake, pr.sy + shake, Math.max(2, 4.5 * pr.s * (1 - i / 8)), 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(225,29,46,${0.9 - i * 0.11})`; ctx.fill();
-      }
-    }
-    const pos = puckAt(t);
-    const pr = project(pos.x, pos.z, 0);
-    if (pr) {
-      const r = Math.max(3, 5 * pr.s);
-      ctx.beginPath(); ctx.arc(pr.sx + shake, pr.sy + shake, r, 0, Math.PI * 2);
-      ctx.fillStyle = '#e11d2e'; ctx.fill();
-      ctx.strokeStyle = 'rgba(255,255,255,.85)'; ctx.lineWidth = 1; ctx.stroke();
-      ctx.beginPath(); ctx.arc(pr.sx + shake, pr.sy + shake, r * 0.45, 0, Math.PI * 2);
-      ctx.fillStyle = '#fff'; ctx.fill();
-    }
-    if (scored && !buzzed) { buzzed = true; horn(); }
   }
 
   (function frame(now) {
-    const t = now - t0;
+    const t = (now - t0) / 1000;
     draw(t);
-    if (t < PAN + FLIGHT + CELEB) requestAnimationFrame(frame);
+    if (t < RINK_END) requestAnimationFrame(frame);
     else if (!done) { done = true; onDone(); }
   })(t0);
 }
