@@ -3007,6 +3007,89 @@ if (goalFilterClear) goalFilterClear.addEventListener('click', () => {
   if (goalGameSelect) goalGameSelect.value = 'all';
   renderGoalProbs();
 });
+/* ---------------- Center Ice search ----------------
+   One bar at the top of Center Ice (view-home): live search across
+   tonight's players, goalies, matchups, lineups, and the slate.
+   Players first (most-tapped lookup), then Goalies, Matchups, Lineups,
+   Slate. Slate fires on "slate"/"tonight" or as a fallback when nothing
+   else matches. 5 rows per group. Enter opens the first result. */
+const CI_TEAM_FULL = { ANA: 'Anaheim Ducks', BOS: 'Boston Bruins', BUF: 'Buffalo Sabres', CGY: 'Calgary Flames', CAR: 'Carolina Hurricanes', CHI: 'Chicago Blackhawks', COL: 'Colorado Avalanche', CBJ: 'Columbus Blue Jackets', DAL: 'Dallas Stars', DET: 'Detroit Red Wings', EDM: 'Edmonton Oilers', FLA: 'Florida Panthers', LAK: 'Los Angeles Kings', MIN: 'Minnesota Wild', MTL: 'Montreal Canadiens', NSH: 'Nashville Predators', NJD: 'New Jersey Devils', NYI: 'New York Islanders', NYR: 'New York Rangers', OTT: 'Ottawa Senators', PHI: 'Philadelphia Flyers', PIT: 'Pittsburgh Penguins', SJS: 'San Jose Sharks', SEA: 'Seattle Kraken', STL: 'St. Louis Blues', TBL: 'Tampa Bay Lightning', TOR: 'Toronto Maple Leafs', UTA: 'Utah Mammoth', VAN: 'Vancouver Canucks', VGK: 'Vegas Golden Knights', WSH: 'Washington Capitals', WPG: 'Winnipeg Jets' };
+const CI_CAP = 5;
+const ciNorm = (s) => String(s == null ? '' : s).toLowerCase();
+const ciTeamHay = (abbr) => ciNorm(abbr + ' ' + (CI_TEAM_FULL[abbr] || ''));
+function ciGoHome() {
+  const inp = $('ciSearchInput'); if (inp) inp.value = '';
+  const res = $('ciSearchResults'); if (res) { res.innerHTML = ''; res.classList.remove('open'); }
+  const clr = $('ciSearchClear'); if (clr) clr.classList.remove('show');
+}
+function ciRow(labelHtml, subHtml, onClick) {
+  const b = document.createElement('button'); b.type = 'button'; b.className = 'ci-row';
+  b.innerHTML = '<span>' + labelHtml + '</span><span class="act">' + subHtml + '</span>';
+  b.addEventListener('click', onClick); return b;
+}
+function ciGroup(title, rows) {
+  if (!rows.length) return null;
+  const d = document.createElement('div'); d.className = 'ci-group';
+  const h = document.createElement('h4'); h.textContent = title; d.appendChild(h);
+  rows.forEach((r) => d.appendChild(r)); return d;
+}
+function ciRenderSearch() {
+  const inp = $('ciSearchInput'); const res = $('ciSearchResults'); const clr = $('ciSearchClear');
+  if (!inp || !res) return;
+  const q = ciNorm(inp.value).trim();
+  if (clr) clr.classList.toggle('show', !!q);
+  res.innerHTML = '';
+  if (!q) { res.classList.remove('open'); return; }
+  res.classList.add('open');
+  const games = state.games || [];
+  const skaters = state.skaters || [];
+  const pRows = skaters.filter((s) => ciNorm(s.name).includes(q) || ciTeamHay(s.team).includes(q)).slice(0, CI_CAP).map((s) => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'ci-row';
+    b.innerHTML = '<span>' + esc(s.name) + ' <span class="muted small">' + esc(CI_TEAM_FULL[s.team] || s.team) + '</span></span><span class="pct">' + Math.round(s.p * 100) + '%</span>';
+    b.addEventListener('click', () => { ciGoHome(); openPlayer(s.pid, s.gameId); });
+    return b;
+  });
+  const seenG = new Set(); const gList = [];
+  for (const g of games) for (const team of [g.away, g.home]) {
+    const pg = panelGoalie(g, team);
+    if (!pg.id || seenG.has(pg.id)) continue;
+    seenG.add(pg.id); gList.push({ ...pg, team, gameId: g.id });
+  }
+  const gRows = gList.filter((x) => ciNorm(x.name).includes(q) || ciTeamHay(x.team).includes(q)).slice(0, CI_CAP).map((x) =>
+    ciRow(esc(x.name) + ' <span class="muted small">' + esc(CI_TEAM_FULL[x.team] || x.team) + '</span>', 'goalie card', () => { ciGoHome(); openGoalie(x.id, x.team, x.gameId); }));
+  const mRows = games.filter((g) => ciTeamHay(g.away).includes(q) || ciTeamHay(g.home).includes(q)
+    || q.split(/\s+/).every((t) => (ciTeamHay(g.away) + ' ' + ciTeamHay(g.home)).includes(t))).slice(0, CI_CAP).map((g) => {
+    const t = g.startUTC ? new Date(g.startUTC).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) : '';
+    return ciRow(esc(CI_TEAM_FULL[g.away] || g.away) + ' @ ' + esc(CI_TEAM_FULL[g.home] || g.home), esc(t) + ' · game sheet', () => { ciGoHome(); openMatchup(g.id); });
+  });
+  const teamSet = [];
+  for (const g of games) for (const t of [g.away, g.home]) if (!teamSet.includes(t)) teamSet.push(t);
+  const lRows = teamSet.filter((t) => ciTeamHay(t).includes(q)).slice(0, CI_CAP).map((t) =>
+    ciRow(esc(CI_TEAM_FULL[t] || t) + ' lineup', 'lineup view', () => { ciGoHome(); openTeamLineup(t); }));
+  const built = [ciGroup('Players', pRows), ciGroup('Goalies', gRows), ciGroup('Matchups', mRows), ciGroup('Lineups', lRows)].filter(Boolean);
+  if (q.includes('slate') || q.includes('tonight') || built.length === 0) {
+    built.push(ciGroup('Slate', [ciRow("Tonight's slate · " + games.length + ' games', 'slate view', () => { ciGoHome(); setView('slate'); renderSlate(); })]));
+  }
+  built.forEach((d) => res.appendChild(d));
+  if (!res.children.length) {
+    const e = document.createElement('div'); e.className = 'ci-empty';
+    e.textContent = "Nothing found for '" + inp.value.trim() + "'. Try a player, goalie, team, or matchup.";
+    res.appendChild(e);
+  }
+}
+const ciSearchInput = $('ciSearchInput');
+if (ciSearchInput) {
+  ciSearchInput.addEventListener('input', ciRenderSearch);
+  ciSearchInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      const first = $('ciSearchResults') && $('ciSearchResults').querySelector('.ci-row');
+      if (first) { e.preventDefault(); first.click(); }
+    }
+  });
+}
+const ciSearchClear = $('ciSearchClear');
+if (ciSearchClear) ciSearchClear.addEventListener('click', () => { ciGoHome(); if (ciSearchInput) ciSearchInput.focus(); });
+/* ---------------- end Center Ice search ---------------- */
 $('teamFilter').addEventListener('change', (e) => applyTeamFilter(e.target.value));
 const mktFilter = $('mktTeamFilter');
 if (mktFilter) mktFilter.addEventListener('change', (e) => applyTeamFilter(e.target.value));

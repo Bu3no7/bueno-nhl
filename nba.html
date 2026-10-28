@@ -37,6 +37,23 @@
 .fb-perf-row { display: flex; gap: .6rem; overflow-x: auto; padding-bottom: .3rem; scrollbar-width: none; }
 .fb-perf-row::-webkit-scrollbar { display: none; }
 .fb-perf { flex: none; width: 118px; background: var(--card2, #101a2c); border: 1px solid var(--border); border-radius: 14px; padding: .7rem .6rem .6rem; text-align: center; cursor: pointer; }
+/* Top Picks (home): dropdown stat filter + horizontal face-card scroll, mirrors NHL .pick-cards */
+.tp-strip { display: flex; gap: .6rem; overflow-x: auto; padding-bottom: .3rem; scrollbar-width: none; }
+.tp-strip::-webkit-scrollbar { display: none; }
+.tp-card { flex: none; width: 150px; background: var(--card2, #101a2c); border: 1px solid var(--border); border-radius: 14px; padding: .85rem .7rem .75rem; text-align: center; cursor: pointer; }
+.tp-card:active { border-color: #FF7A1A; }
+.tp-head { width: 84px; height: 84px; border-radius: 50%; object-fit: cover; background: var(--card, #0d1420); }
+.tp-name { font-weight: 700; font-size: 1rem; margin-top: .5rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tp-team { display: flex; align-items: center; justify-content: center; gap: .35rem; color: var(--muted); font-size: .8rem; margin-top: .2rem; }
+.tp-team img { width: 18px; height: 18px; }
+.tp-meta { color: var(--muted); font-size: .72rem; margin-top: .15rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tp-num { font-size: 1.9rem; font-weight: 800; color: #FF7A1A; line-height: 1; text-shadow: 0 0 16px rgba(255,122,26,.35); font-variant-numeric: tabular-nums; margin-top: .5rem; }
+#nbaTpSelect { width: 100%; margin: .5rem 0 .8rem; padding: .6rem .7rem; font-size: .95rem; background: var(--card2, #101a2c); border: 1px solid var(--border); border-radius: 10px; color: inherit; outline: none; }
+/* NBA search (top of view-home): reuse shared .ci-* styles, NBA orange accents */
+.nba-search-wrap .ci-search input:focus { border-color: #FF7A1A; box-shadow: 0 0 0 2px rgba(255,122,26,.25); }
+.nba-search-wrap .ci-group h4 { color: #FF7A1A; }
+.nba-search-wrap .ci-row:active { border-color: #FF7A1A; }
+.nba-search-wrap .ci-row .pct { color: #FF7A1A; }
 .fb-perf img.hs { width: 58px; height: 58px; border-radius: 50%; object-fit: cover; object-position: top; background: #0e1626; }
 .fb-perf .pname { font-weight: 700; font-size: .8rem; margin-top: .4rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .fb-perf .pteam { display: flex; align-items: center; justify-content: center; gap: .3rem; color: var(--muted); font-size: .7rem; margin-top: .1rem; }
@@ -77,22 +94,15 @@
 .fb-collapse[open ] summary { padding-bottom: .4rem; }
 .fb-collapse > div { padding: 0 .95rem .9rem; }
 .fb-mkt-table tbody tr.fb-prow { cursor: pointer; }
-/* ---- Fast Break header: hamburger + bottom sheet (replaces the pill bar) ---- */
-.fb-head { display: flex; align-items: center; gap: .55rem; margin: 0 0 .2rem; }
-.fb-head .fb-title { font-size: 1.05rem; font-weight: 800; display: flex; align-items: center; gap: .55rem; }
-.fb-head .fb-title::before { content: ''; width: 4px; height: 18px; border-radius: 2px; background: #FF7A1A; flex: none; }
-.fb-burger { margin-left: auto; display: flex; align-items: center; gap: .5rem; background: #0b1322; border: 1px solid var(--border); color: var(--text); border-radius: 11px; padding: .55rem .8rem; font-size: .9rem; font-weight: 700; cursor: pointer; font-family: inherit; }
-.fb-burger-ico { color: #FF7A1A; font-size: 1rem; }
-.fb-sheet-wrap { position: fixed; inset: 0; background: rgba(2,5,10,.6); display: none; z-index: 600; }
-.fb-sheet-wrap.open { display: block; }
-.fb-sheet { position: absolute; left: 0; right: 0; bottom: 0; max-width: 560px; margin: 0 auto; background: #0d1728; border: 1px solid var(--border); border-bottom: none; border-radius: 18px 18px 0 0; padding: 1rem 1rem calc(1.4rem + env(safe-area-inset-bottom)); }
-.fb-sheet-title { color: var(--muted); font-size: .72rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; margin-bottom: .6rem; }
-.fb-sheet-item { display: flex; align-items: center; gap: .5rem; width: 100%; text-align: left; background: var(--card2); border: 1px solid var(--border); color: var(--text); border-radius: 12px; padding: .75rem .85rem; font-size: .98rem; font-weight: 800; margin-bottom: .45rem; cursor: pointer; font-family: inherit; }
-.fb-sheet-item .fb-sheet-sub { color: var(--muted); font-size: .72rem; font-weight: 600; }
-.fb-sheet-item.on { border-color: rgba(255,122,26,.55); }
-.fb-sheet-check { margin-left: auto; color: #FF7A1A; font-weight: 800; visibility: hidden; }
-.fb-sheet-item.on .fb-sheet-check { visibility: visible; }
-.fb-sheet-cancel { width: 100%; background: none; border: none; color: var(--muted); font-size: .9rem; font-weight: 700; padding: .55rem 0 .1rem; cursor: pointer; font-family: inherit; }
+/* ---- Fast Break menu: collapsible, replaces the hamburger + bottom sheet ---- */
+.fb-menu { border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); margin-bottom: .8rem; }
+.fb-menu-head { display: flex; align-items: center; gap: .5rem; width: 100%; text-align: left; background: none; border: none; color: var(--text); padding: .8rem .25rem; font-size: 1rem; font-weight: 800; cursor: pointer; font-family: inherit; }
+.fb-menu-cur { color: #FF7A1A; font-weight: 700; }
+.fb-menu-chev { margin-left: auto; color: var(--muted); font-size: .85rem; }
+.fb-menu-body { display: none; }
+.fb-menu-body.open { display: block; }
+.fb-menu-item { display: block; width: 100%; text-align: left; background: none; border: none; border-top: 1px solid var(--border); color: var(--text); padding: .7rem .25rem; font-size: .98rem; font-weight: 600; cursor: pointer; font-family: inherit; }
+.fb-menu-item.on { color: #FF7A1A; box-shadow: inset 2px 0 0 #FF7A1A; padding-left: .6rem; }
 .fb-slim-head { display: flex; align-items: baseline; gap: .5rem; margin: .85rem 0 .55rem; }
 .fb-slim-head h2 { font-size: 1.05rem; font-weight: 800; margin: 0; }
 .fb-slim-head .right { margin-left: auto; color: var(--muted); font-size: .75rem; font-weight: 600; }
@@ -345,11 +355,29 @@ details.pc-sec[open ] summary .chev { transform: rotate(90deg); }
     <img src="https://a.espncdn.com/i/teamlogos/leagues/500/nba.png" alt="NBA">
     <p class="muted small" style="margin-top:.4rem">NBA scores, standings &amp; top performers · live data</p>
   </div>
+  <div class="nba-search-wrap">
+    <div class="ci-search">
+      <input id="nbaSearchInput" type="search" placeholder="Search players, teams, matchups…" autocomplete="off" aria-label="Search NBA">
+      <button class="ci-clear" id="nbaSearchClear" type="button" aria-label="Clear search">×</button>
+    </div>
+    <div class="ci-results" id="nbaSearchResults"></div>
+  </div>
   <div class="home-grid">
     <details class="home-card fb-collapse" id="nbaGamesCard">
       <summary class="fb-sec-title">Tonight <span class="sub" id="nbaDateLabel"></span> <span class="sub" id="nbaTonightHint"></span></summary>
       <div id="nbaGamesBody"><p class="muted">Loading…</p></div>
     </details>
+    <div class="home-card" id="nbaTopPicksCard">
+      <h3 class="fb-sec-title">Top Picks <span class="sub">tonight's projections</span></h3>
+      <select id="nbaTpSelect" aria-label="Choose a stat">
+        <option value="points">Points</option>
+        <option value="rebounds">Rebounds</option>
+        <option value="assists">Assists</option>
+        <option value="threes">Projected 3s</option>
+        <option value="pra">PRA</option>
+      </select>
+      <div class="tp-strip" id="nbaTpStrip"><p class="muted">Pricing tonight's slate…</p></div>
+    </div>
     <div class="home-card" id="nbaTopCard">
       <h3 class="fb-sec-title">Top performers <span class="sub">tonight</span></h3>
       <div id="nbaTopBody"><p class="muted">Loading…</p></div>
@@ -362,18 +390,15 @@ details.pc-sec[open ] summary .chev { transform: rotate(90deg); }
 </section>
 
 <section id="view-lab" class="view">
-  <div class="fb-head">
-    <span class="fb-title">The Fast Break</span>
-    <button class="fb-burger" id="fbBurger" type="button" aria-label="Choose view"><span class="fb-burger-ico">☰</span><span id="fbBurgerView">Slate</span></button>
-  </div>
-  <div class="fb-sheet-wrap" id="fbSheetWrap">
-    <div class="fb-sheet">
-      <div class="fb-sheet-title">The Fast Break — choose a view</div>
-      <button class="fb-sheet-item on" data-fbview="slate" type="button">Slate<span class="fb-sheet-sub">model cards · live scores</span><span class="fb-sheet-check">✓</span></button>
-      <button class="fb-sheet-item" data-fbview="markets" type="button">Markets<span class="fb-sheet-sub">fair lines · P+R+A · ladders</span><span class="fb-sheet-check">✓</span></button>
-      <button class="fb-sheet-item" data-fbview="paint" type="button">In the Paint<span class="fb-sheet-sub">live player tracker</span><span class="fb-sheet-check">✓</span></button>
-      <button class="fb-sheet-item" data-fbview="parlay" type="button">Parlay builder<span class="fb-sheet-sub">combine legs · price the ticket</span><span class="fb-sheet-check">✓</span></button>
-      <button class="fb-sheet-cancel" id="fbSheetCancel" type="button">Cancel</button>
+  <div class="fb-menu">
+    <button class="fb-menu-head" id="fbMenuHead" type="button" aria-expanded="true">
+      <span>⚡ The Fast Break</span><span class="fb-menu-cur" id="fbMenuCur">Slate</span><span class="fb-menu-chev" id="fbMenuChev">▴</span>
+    </button>
+    <div class="fb-menu-body open" id="fbMenuBody">
+      <button class="fb-menu-item on" data-fbview="slate" type="button">Slate</button>
+      <button class="fb-menu-item" data-fbview="markets" type="button">Markets</button>
+      <button class="fb-menu-item" data-fbview="paint" type="button">In the Paint</button>
+      <button class="fb-menu-item" data-fbview="parlay" type="button">Parlay builder</button>
     </div>
   </div>
 
@@ -673,6 +698,108 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
     topEl.querySelectorAll('.fb-perf').forEach((el) => el.addEventListener('click', () => openPlayerCard(el.dataset.pid)));
   }
 
+  // ---- Top Picks (home): dropdown stat filter + horizontal face-card scroll ----
+  let tpStat = 'points';
+  function renderTopPicks() {
+    const strip = $('nbaTpStrip'); if (!strip) return;
+    if (!mktRows) { strip.innerHTML = '<p class="muted">Pricing tonight\'s slate…</p>'; return; }
+    if (!mktRows.length) { strip.innerHTML = '<p class="muted">No projections tonight.</p>'; return; }
+    const top = [...mktRows].filter((r) => r.markets && r.markets[tpStat] && r.markets[tpStat].mean != null)
+      .sort((a, b) => b.markets[tpStat].mean - a.markets[tpStat].mean).slice(0, 5);
+    if (!top.length) { strip.innerHTML = '<p class="muted">No projections for this stat.</p>'; return; }
+    strip.innerHTML = top.map((r) =>
+      '<div class="tp-card" data-pid="' + r.id + '" role="button" tabindex="0">'
+      + '<img class="tp-head" src="' + headshot(r.id) + '" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">'
+      + '<div class="tp-name">' + esc(r.name) + '</div>'
+      + '<div class="tp-team"><img src="' + logoUrl(r.team) + '" alt="">' + esc(r.team) + '</div>'
+      + '<div class="tp-meta">' + esc((r.home ? 'vs ' : '@ ') + r.oppAbbr) + ' · ' + r.min + ' min</div>'
+      + '<div class="tp-num">' + r.markets[tpStat].mean.toFixed(1) + '</div></div>').join('');
+    strip.querySelectorAll('.tp-card').forEach((el) => el.addEventListener('click', () => openPlayerCard(el.dataset.pid)));
+  }
+  const tpSelect = $('nbaTpSelect');
+  if (tpSelect) tpSelect.addEventListener('change', () => { tpStat = tpSelect.value; renderTopPicks(); });
+
+  // ---- NBA search (home top): players, matchups, lineups, slate ----
+  // Mirrors the Center Ice search: live filter, grouped results, 5 per group,
+  // Slate fires on "slate"/"tonight" or as a fallback. No goalies on this page;
+  // lineup rows open the game sheet, where Lineups is the default-open section.
+  const NBA_CAP = 5;
+  const nbaNorm = (s) => String(s == null ? '' : s).toLowerCase();
+  const nbaTeamHay = (t) => nbaNorm((t.abbr || '') + ' ' + (t.name || ''));
+  function nbaSearchGoHome() {
+    const inp = $('nbaSearchInput'); if (inp) inp.value = '';
+    const res = $('nbaSearchResults'); if (res) { res.innerHTML = ''; res.classList.remove('open'); }
+    const clr = $('nbaSearchClear'); if (clr) clr.classList.remove('show');
+  }
+  function nbaGoSlate() {
+    document.querySelectorAll('[data-bnav]').forEach((x) => x.classList.toggle('active', x.dataset.bnav === 'lab'));
+    document.getElementById('view-home').classList.remove('active');
+    document.getElementById('view-lab').classList.add('active');
+    setFbView('slate');
+  }
+  function nbaSRow(labelHtml, subHtml, onClick) {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'ci-row';
+    b.innerHTML = '<span>' + labelHtml + '</span><span class="act">' + subHtml + '</span>';
+    b.addEventListener('click', onClick); return b;
+  }
+  function nbaSGroup(title, rows) {
+    if (!rows.length) return null;
+    const d = document.createElement('div'); d.className = 'ci-group';
+    const h = document.createElement('h4'); h.textContent = title; d.appendChild(h);
+    rows.forEach((r) => d.appendChild(r)); return d;
+  }
+  function renderNbaSearch() {
+    const inp = $('nbaSearchInput'); const res = $('nbaSearchResults'); const clr = $('nbaSearchClear');
+    if (!inp || !res) return;
+    const q = nbaNorm(inp.value).trim();
+    if (clr) clr.classList.toggle('show', !!q);
+    res.innerHTML = '';
+    if (!q) { res.classList.remove('open'); return; }
+    res.classList.add('open');
+    if (!mktRows && !mktLoading) window.loadMarkets();
+    const games = tonightGames || [];
+    const rows = mktRows || [];
+    const pRows = rows.filter((r) => nbaNorm(r.name).includes(q) || nbaNorm(r.team).includes(q) || nbaNorm(r.teamName).includes(q)).slice(0, NBA_CAP).map((r) => {
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'ci-row';
+      const pts = r.markets && r.markets.points ? r.markets.points.mean : null;
+      b.innerHTML = '<span>' + esc(r.name) + ' <span class="muted small">' + esc(r.team) + ' vs ' + esc(r.oppAbbr) + '</span></span>'
+        + (pts != null ? '<span class="pct">' + pts.toFixed(1) + ' PTS</span>' : '');
+      b.addEventListener('click', () => { nbaSearchGoHome(); openPlayerCard(r.id); });
+      return b;
+    });
+    const mRows = games.filter((g) => nbaTeamHay(g.away).includes(q) || nbaTeamHay(g.home).includes(q)
+      || q.split(/\s+/).every((t) => (nbaTeamHay(g.away) + ' ' + nbaTeamHay(g.home)).includes(t))).slice(0, NBA_CAP).map((g) =>
+      nbaSRow(esc(g.away.name) + ' @ ' + esc(g.home.name), 'game sheet', () => { nbaSearchGoHome(); openGame(g.id); }));
+    const teamSet = [];
+    for (const g of games) for (const t of [g.away, g.home]) if (!teamSet.some((x) => x.abbr === t.abbr)) teamSet.push(t);
+    const lRows = teamSet.filter((t) => nbaTeamHay(t).includes(q)).slice(0, NBA_CAP).map((t) => {
+      const g = games.find((gg) => gg.away.abbr === t.abbr || gg.home.abbr === t.abbr);
+      return nbaSRow(esc(t.name) + ' lineup', 'game sheet · lineups open', () => { nbaSearchGoHome(); if (g) openGame(g.id); });
+    });
+    const built = [nbaSGroup('Players', pRows), nbaSGroup('Matchups', mRows), nbaSGroup('Lineups', lRows)].filter(Boolean);
+    if (q.includes('slate') || q.includes('tonight') || built.length === 0) {
+      built.push(nbaSGroup('Slate', [nbaSRow("Tonight's slate · " + games.length + ' games', 'slate view', () => { nbaSearchGoHome(); nbaGoSlate(); })]));
+    }
+    built.forEach((d) => res.appendChild(d));
+    if (!res.children.length) {
+      const e = document.createElement('div'); e.className = 'ci-empty';
+      e.textContent = "Nothing found for '" + inp.value.trim() + "'. Try a player, team, or matchup.";
+      res.appendChild(e);
+    }
+  }
+  const nbaSearchInput = $('nbaSearchInput');
+  if (nbaSearchInput) {
+    nbaSearchInput.addEventListener('input', renderNbaSearch);
+    nbaSearchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const first = $('nbaSearchResults') && $('nbaSearchResults').querySelector('.ci-row');
+        if (first) { e.preventDefault(); first.click(); }
+      }
+    });
+  }
+  const nbaSearchClear = $('nbaSearchClear');
+  if (nbaSearchClear) nbaSearchClear.addEventListener('click', () => { nbaSearchGoHome(); if (nbaSearchInput) nbaSearchInput.focus(); });
+
   // ---- Slate (model cards + live tracker + Top looks) ----
   function gameProjFor(g) {
     if (!teamRatings) return null;
@@ -870,6 +997,8 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
     renderSlate();
     await fetchLivePlayers();
     renderTop();
+    renderTopPicks();
+    if (!mktRows && !mktLoading) window.loadMarkets();
     renderPaint();
     if (gameOpenId) renderGame();
     if (cardPid) renderCard(cardPid, true);
@@ -1214,6 +1343,7 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
     renderParlay();
     if (gameOpenId) renderGame();
     if (cardPid) renderCard(cardPid, true);
+    renderTopPicks();
   };
 
   /* ================= Parlay builder ================= */
@@ -1769,7 +1899,7 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
     syncParlayUI();
   }
 
-  /* ================= Fast Break views (hamburger sheet) ================= */
+  /* ================= Fast Break views (collapsible menu) ================= */
   const FB_VIEW_NAMES = { slate: 'Slate', markets: 'Markets', paint: 'In the Paint', parlay: 'Parlay builder' };
   let fbView = 'slate';
   function setFbView(v) {
@@ -1778,24 +1908,23 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
       const el = $('nba-view-' + x);
       if (el) el.classList.toggle('active', x === v);
     });
-    const bv = $('fbBurgerView');
-    if (bv) bv.textContent = FB_VIEW_NAMES[v];
-    document.querySelectorAll('.fb-sheet-item').forEach((it) => it.classList.toggle('on', it.dataset.fbview === v));
+    const cur = $('fbMenuCur');
+    if (cur) cur.textContent = FB_VIEW_NAMES[v];
+    document.querySelectorAll('.fb-menu-item').forEach((it) => it.classList.toggle('on', it.dataset.fbview === v));
     if (v === 'markets') window.loadMarkets();
     if (v === 'slate') { loadRatings().then(() => renderSlate()); window.loadMarkets(); }
     if (v === 'paint') renderPaint();
     if (v === 'parlay') { renderParlay(); window.loadMarkets(); }
   }
-  const sheetWrap = $('fbSheetWrap');
-  const burger = $('fbBurger');
-  if (burger && sheetWrap) burger.addEventListener('click', () => sheetWrap.classList.add('open'));
-  if (sheetWrap) {
-    sheetWrap.addEventListener('click', (e) => { if (e.target === sheetWrap) sheetWrap.classList.remove('open'); });
-    const cancel = $('fbSheetCancel');
-    if (cancel) cancel.addEventListener('click', () => sheetWrap.classList.remove('open'));
-    sheetWrap.querySelectorAll('.fb-sheet-item').forEach((it) =>
-      it.addEventListener('click', () => { sheetWrap.classList.remove('open'); setFbView(it.dataset.fbview); }));
+  const fbMenuHead = $('fbMenuHead'), fbMenuBody = $('fbMenuBody'), fbMenuChev = $('fbMenuChev');
+  function fbMenuSet(open) {
+    if (fbMenuBody) fbMenuBody.classList.toggle('open', open);
+    if (fbMenuHead) fbMenuHead.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (fbMenuChev) fbMenuChev.textContent = open ? '▴' : '▾';
   }
+  if (fbMenuHead) fbMenuHead.addEventListener('click', () => fbMenuSet(!(fbMenuBody && fbMenuBody.classList.contains('open'))));
+  document.querySelectorAll('.fb-menu-item').forEach((it) =>
+    it.addEventListener('click', () => { setFbView(it.dataset.fbview); fbMenuSet(false); }));
   window.fbOnLabOpen = function() { setFbView(fbView); };
 
   // ---- kickoff ----

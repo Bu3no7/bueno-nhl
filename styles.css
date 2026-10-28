@@ -1211,3 +1211,21 @@ tr.team-row:focus-visible { outline: 2px solid var(--teal); outline-offset: -2px
 .stb-check { margin: 0 0 .6rem 1.1rem; font-size: .8rem; color: var(--muted, #9fb0c8); line-height: 1.55; }
 .stb-row { display: flex; gap: .5rem; flex-wrap: wrap; }
 .stb-fallback { width: 100%; margin-top: .6rem; background: #0b1322; border: 1px solid var(--border, #ffffff22); border-radius: 10px; color: var(--text, #e8edf5); padding: .6rem; font-family: inherit; font-size: .8rem; }
+
+/* Center Ice search (top of view-home): live search across tonight's
+   players, goalies, matchups, lineups, and the slate. */
+.ci-search { position: relative; margin: .75rem 0 .5rem; }
+.ci-search input { width: 100%; padding: .8rem 2.5rem .8rem 1rem; font-size: 1rem; background: var(--panel); border: 1px solid var(--border); border-radius: 12px; color: var(--text); outline: none; }
+.ci-search input:focus { border-color: var(--gold); box-shadow: 0 0 0 2px var(--gold-wash); }
+.ci-search input::placeholder { color: var(--muted); }
+.ci-clear { position: absolute; right: .6rem; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--muted); font-size: 1.3rem; cursor: pointer; display: none; line-height: 1; }
+.ci-clear.show { display: block; }
+.ci-results { display: none; }
+.ci-results.open { display: block; margin-bottom: 1rem; }
+.ci-group { margin: 0 0 1rem; }
+.ci-group h4 { margin: 0 0 .35rem; color: var(--gold); font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; }
+.ci-row { display: flex; justify-content: space-between; align-items: center; gap: .5rem; background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: .65rem .8rem; margin-bottom: .4rem; cursor: pointer; text-align: left; width: 100%; color: var(--text); font-size: .95rem; }
+.ci-row:active { border-color: var(--gold); }
+.ci-row .pct { color: var(--teal); font-weight: 700; white-space: nowrap; }
+.ci-row .act { color: var(--muted); font-size: .8rem; white-space: nowrap; }
+.ci-empty { color: var(--muted); font-size: .9rem; padding: .5rem 0; }
