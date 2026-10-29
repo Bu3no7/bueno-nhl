@@ -17,6 +17,11 @@
 <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&display=swap" rel="stylesheet">
 </head>
 <body>
+<div class="page-topbar">
+  <button class="top-btn" type="button" data-sports-menu>☰ <span>Sports</span></button>
+  <span class="topbar-label">Home</span>
+  <button class="top-btn icon-only" id="hsOpenBtn" type="button" aria-label="Search">🔍</button>
+</div>
 <header class="site-header">
   <div class="brand-bar">
     <a class="bueno-logo" href="index.html" aria-label="Bueno Sports home">
@@ -33,30 +38,43 @@
       <h2>Bueno Sports</h2>
       <p class="muted small">Every sport. One model shop. Fair prices, graded nightly.</p>
     </div>
+    <div class="home-card about-card" id="aboutCard">
+      <h3>About Bueno Sports</h3>
+      <p>Bueno Sports is a model shop, not a tip sheet. Every price on this site comes out of a statistical model we built and grade ourselves — anytime goals in the NHL, home runs in MLB, player props in the NBA — priced as fair, no-vig odds from live data.</p>
+      <p>The models run on free, public data (the NHL's own API, ESPN, the MLB Stats API) and weigh what actually moves a prop: form, ice time and line deployment, the matchup, the goalie or pitcher, and where a player does his damage on the ice. Two engines check each other — an exact analytical model and a correlated Monte Carlo simulation — so a number has to survive both before it makes the board.</p>
+      <p>The house rule is simple: <strong>backtest first, keep what wins.</strong> Every model is graded against real results, every night. Ideas that don't beat the version already live get dropped, however good they sound — and when the model is wrong, the miss stays on the record.</p>
+      <p class="muted small">Bueno Sports is a probabilities project, not betting advice. A fair price tells you what a prop is worth, not what will happen.</p>
+    </div>
+    <div class="home-card quicklinks-card">
+      <h3>Quick links</h3>
+      <div class="quicklinks">
+        <a class="qlink" href="https://dong-tool.netlify.app/nfl/">Ron’s Tools 🧰</a>
+      </div>
+    </div>
     <div class="sport-grid">
       <a class="sport-card" href="/nhl.html">
         <span class="sport-card-ico"><img class="sport-card-logo" src="https://assets.nhle.com/logos/nhl/svg/NHL_light.svg" alt="" onerror="this.parentNode.textContent='🏒'"></span>
-        <span class="sport-card-name">NHL</span>
+        <span class="sport-card-name">Hockey</span>
         <span class="sport-card-line" id="landNhlLine">Loading tonight's slate…</span>
         <span class="sport-card-cta">Enter Center Ice →</span>
       </a>
       <a class="sport-card" href="/nba.html">
         <span class="sport-card-ico"><img class="sport-card-logo" src="https://a.espncdn.com/i/teamlogos/leagues/500/nba.png" alt="" onerror="this.parentNode.textContent='🏀'"></span>
-        <span class="sport-card-name">NBA</span>
+        <span class="sport-card-name">Basketball</span>
         <span class="sport-card-line" id="landNbaLine">Live scores, board &amp; standings</span>
-        <span class="sport-card-cta">Open NBA →</span>
+        <span class="sport-card-cta">Open Basketball →</span>
       </a>
       <a class="sport-card" href="/mlb.html">
         <span class="sport-card-ico"><img class="sport-card-logo" src="https://a.espncdn.com/i/teamlogos/leagues/500/mlb.png" alt="" onerror="this.parentNode.textContent='⚾'"></span>
-        <span class="sport-card-name">MLB</span>
+        <span class="sport-card-name">Baseball</span>
         <span class="sport-card-line" id="landMlbLine">Home-run probabilities</span>
-        <span class="sport-card-cta">Open MLB →</span>
+        <span class="sport-card-cta">Open Baseball →</span>
       </a>
       <a class="sport-card" href="/nfl.html">
         <span class="sport-card-ico"><img class="sport-card-logo" src="https://a.espncdn.com/i/teamlogos/leagues/500/nfl.png" alt="" onerror="this.parentNode.textContent='🏈'"></span>
-        <span class="sport-card-name">NFL</span>
+        <span class="sport-card-name">Football</span>
         <span class="sport-card-line" id="landNflLine">Scores &amp; standings</span>
-        <span class="sport-card-cta">Open NFL →</span>
+        <span class="sport-card-cta">Open Football →</span>
       </a>
       <a class="sport-card" href="/ufc.html">
         <span class="sport-card-ico"><img class="sport-card-logo logo-invert" src="https://a.espncdn.com/i/teamlogos/leagues/500/ufc.png" alt="" onerror="this.parentNode.textContent='🥊'"></span>
@@ -71,24 +89,6 @@
         <span class="sport-card-cta">Peek →</span>
       </a>
     </div>
-    <div class="home-card about-card" id="aboutCard">
-      <h3>About Bueno Sports</h3>
-      <p>Bueno Sports is a model shop, not a tip sheet. Every price on this site comes out of a statistical model we built and grade ourselves — anytime goals in the NHL, home runs in MLB, player props in the NBA — priced as fair, no-vig odds from live data.</p>
-      <p>The models run on free, public data (the NHL's own API, ESPN, the MLB Stats API) and weigh what actually moves a prop: form, ice time and line deployment, the matchup, the goalie or pitcher, and where a player does his damage on the ice. Two engines check each other — an exact analytical model and a correlated Monte Carlo simulation — so a number has to survive both before it makes the board.</p>
-      <p>The house rule is simple: <strong>backtest first, keep what wins.</strong> Every model is graded against real results, every night. Ideas that don't beat the version already live get dropped, however good they sound — and when the model is wrong, the miss stays on the record.</p>
-      <p class="muted small">Bueno Sports is a probabilities project, not betting advice. A fair price tells you what a prop is worth, not what will happen.</p>
-    </div>
-    <div class="home-card quicklinks-card">
-      <h3>Quick links</h3>
-      <div class="quicklinks">
-        <a class="qlink" href="/nhl.html"><img class="qlink-logo" src="https://assets.nhle.com/logos/nhl/svg/NHL_light.svg" alt="" onerror="this.remove()">NHL</a>
-        <a class="qlink" href="/nba.html"><img class="qlink-logo" src="https://a.espncdn.com/i/teamlogos/leagues/500/nba.png" alt="" onerror="this.remove()">NBA</a>
-        <a class="qlink" href="/mlb.html"><img class="qlink-logo" src="https://a.espncdn.com/i/teamlogos/leagues/500/mlb.png" alt="" onerror="this.remove()">MLB</a>
-        <a class="qlink" href="/nfl.html"><img class="qlink-logo" src="https://a.espncdn.com/i/teamlogos/leagues/500/nfl.png" alt="" onerror="this.remove()">NFL</a>
-        <a class="qlink" href="/ufc.html"><img class="qlink-logo logo-invert" src="https://a.espncdn.com/i/teamlogos/leagues/500/ufc.png" alt="" onerror="this.remove()">UFC</a>
-        <a class="qlink" href="/soccer.html"><img class="qlink-logo" src="https://a.espncdn.com/i/teamlogos/leagues/500/mls.png" alt="" onerror="this.remove()">Soccer</a>
-      </div>
-    </div>
     <div class="home-card contact-card" id="contactCard">
       <h3>Contact Us</h3>
       <p>Questions, feedback, or a market you want us to price next? The Bueno Sports inbox is open.</p>
@@ -101,12 +101,26 @@
   <p class="muted small">Data: official NHL API, ESPN and the MLB Stats API, fetched live in your browser. No accounts, no tracking, no cookies. Not betting advice.</p>
 </footer>
 
+<div class="hs-overlay" id="hsOverlay" hidden>
+  <div class="hs-inner">
+    <div class="hs-bar">
+      <div class="ci-search">
+        <input id="hsInput" type="search" placeholder="Search Hockey &amp; Basketball players, teams, sports…" autocomplete="off" aria-label="Search Bueno Sports">
+        <button class="ci-clear" id="hsClear" type="button" aria-label="Clear search">×</button>
+      </div>
+      <button class="hs-cancel" id="hsCancel" type="button">Cancel</button>
+    </div>
+    <p class="hs-hint">Searches what Bueno Sports has so far — mainly Hockey &amp; Basketball. Tap a result to jump straight to it.</p>
+    <div class="hs-results" id="hsResults"></div>
+  </div>
+</div>
+
 <nav class="bottom-nav" aria-label="Main">
   <a class="bnav-btn active" href="index.html"><span class="bnav-ico">⌂</span><span>Home</span></a>
-  <button class="bnav-btn" type="button" data-sports-menu><span class="bnav-ico">☰</span><span>Sports</span></button>
 </nav>
 
 <script src="landing.js"></script>
+<script src="home-search.js"></script>
 <script src="sports-menu.js"></script>
 </body>
 </html>

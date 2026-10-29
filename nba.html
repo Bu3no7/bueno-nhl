@@ -347,6 +347,11 @@ details.pc-sec[open ] summary .chev { transform: rotate(90deg); }
 </style>
 </head>
 <body>
+<div class="page-topbar">
+  <button class="top-btn" type="button" data-sports-menu>☰ <span>Sports</span></button>
+  <span class="topbar-label">Basketball</span>
+  <span style="width:44px"></span>
+</div>
 <div id="loadingBar" class="loading hidden"><span id="loadingText">Loading…</span></div>
 
 <section id="view-home" class="view active">
@@ -452,10 +457,8 @@ details.pc-sec[open ] summary .chev { transform: rotate(90deg); }
 <div class="gm-overlay" id="nbaGameOverlay"><div class="gm-sheet" id="nbaGameSheet"></div></div>
 
 <nav class="bottom-nav" aria-label="Main">
-  <a class="bnav-btn" href="index.html"><span class="bnav-ico">⌂</span><span>Home</span></a>
   <button class="bnav-btn active" data-bnav="home"><span class="bnav-ico">🏀</span><span>NBA</span></button>
   <button class="bnav-btn" data-bnav="lab"><span class="bnav-ico">⚡</span><span>The Fast Break</span></button>
-  <button class="bnav-btn" type="button" data-sports-menu><span class="bnav-ico">☰</span><span>Sports</span></button>
 </nav>
 
 <script src="nba-engine.js"></script>
@@ -1344,7 +1347,26 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
     if (gameOpenId) renderGame();
     if (cardPid) renderCard(cardPid, true);
     renderTopPicks();
+    tryPendingNba();
   };
+
+  /* Home-search handoff: index.html stores the tapped player; once
+     pricing/data lands we open his card. The key stays until the
+     player is actually found (or goes stale after 10 minutes). */
+  function tryPendingNba() {
+    let raw = null;
+    try { raw = localStorage.getItem('bueno-pending-open'); } catch (e) { return; }
+    if (!raw) return;
+    let p = null;
+    try { p = JSON.parse(raw); } catch (e) { try { localStorage.removeItem('bueno-pending-open'); } catch (_) {} return; }
+    if (!p || p.type !== 'nba' || !p.pid) return;
+    if (Date.now() - (p.ts || 0) > 10 * 60 * 1000) { try { localStorage.removeItem('bueno-pending-open'); } catch (_) {} return; }
+    const pid = String(p.pid);
+    if (pricedById[pid] || liveByPid[pid] || knownPlayers[pid]) {
+      try { localStorage.removeItem('bueno-pending-open'); } catch (e) {}
+      openPlayerCard(pid);
+    }
+  }
 
   /* ================= Parlay builder ================= */
   let parlayLegs = (() => {
@@ -1936,6 +1958,11 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
   // Warm the ratings in the background so Slate model cards are ready
   // when The Fast Break opens (same fetches the pricing run reuses).
   loadRatings().then(() => renderSlate()).catch(() => {});
+  // Home-search handoff: if we arrived from the home search, try the
+  // live data first, then warm pricing so the tapped player's card opens.
+  let pendingNba = null;
+  try { pendingNba = JSON.parse(localStorage.getItem('bueno-pending-open') || 'null'); } catch (e) {}
+  if (pendingNba && pendingNba.type === 'nba') { tryPendingNba(); window.loadMarkets(); }
 })();
 </script>
 <script src="sports-menu.js"></script>

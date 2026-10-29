@@ -1229,3 +1229,37 @@ tr.team-row:focus-visible { outline: 2px solid var(--teal); outline-offset: -2px
 .ci-row .pct { color: var(--teal); font-weight: 700; white-space: nowrap; }
 .ci-row .act { color: var(--muted); font-size: .8rem; white-space: nowrap; }
 .ci-empty { color: var(--muted); font-size: .9rem; padding: .5rem 0; }
+
+/* ---------------- Top utility bar (☰ Sports left · search right) ----------------
+   On Home the search button sits top-right; on the Hockey/Basketball/
+   Baseball pages only the ☰ Sports button shows, top-left. The sports
+   sheet it opens (sports-menu.js) now carries Home as its top row. */
+.page-topbar {
+  position: sticky; top: 0; z-index: 150;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: .5rem .8rem;
+  background: rgba(4, 7, 12, .92);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+}
+.top-btn {
+  display: inline-flex; align-items: center; gap: .45rem;
+  background: var(--panel); color: var(--text);
+  border: 1px solid var(--border); border-radius: 999px;
+  padding: .5rem .95rem; font-size: .95rem; font-weight: 600;
+  font-family: inherit; cursor: pointer;
+}
+.top-btn:active { border-color: var(--gold); }
+.top-btn.icon-only { padding: .5rem .8rem; font-size: 1.05rem; }
+.topbar-label { font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+
+/* ---------------- Home search overlay ---------------- */
+.hs-overlay { position: fixed; inset: 0; z-index: 610; background: rgba(2, 4, 8, .97); overflow-y: auto; }
+.hs-overlay[hidden] { display: none; }
+.hs-inner { max-width: 560px; margin: 0 auto; padding: 1rem .9rem 2rem; }
+.hs-bar { display: flex; gap: .5rem; align-items: center; }
+.hs-bar .ci-search { flex: 1; margin: 0; }
+.hs-cancel { background: none; border: none; color: var(--gold); font-size: .95rem; font-weight: 600; font-family: inherit; cursor: pointer; padding: .5rem .2rem; white-space: nowrap; }
+.hs-hint { color: var(--muted); font-size: .82rem; margin: .65rem .1rem 0; }
+.hs-results { margin-top: 1rem; }
+.hs-results .ci-row .pct.orange { color: #FF9E45; }

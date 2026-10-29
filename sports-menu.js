@@ -4,13 +4,13 @@
    that sport's page. Emoji shows only if a logo fails to load. */
 (function () {
   const SPORTS = [
-    { key: 'nhl', name: 'NHL', href: 'nhl.html', emoji: '🏒',
+    { key: 'nhl', name: 'Hockey', href: 'nhl.html', emoji: '🏒',
       logo: 'https://assets.nhle.com/logos/nhl/svg/NHL_light.svg' },
-    { key: 'nba', name: 'NBA', href: 'nba.html', emoji: '🏀',
+    { key: 'nba', name: 'Basketball', href: 'nba.html', emoji: '🏀',
       logo: 'https://a.espncdn.com/i/teamlogos/leagues/500/nba.png' },
-    { key: 'mlb', name: 'MLB', href: 'mlb.html', emoji: '⚾',
+    { key: 'mlb', name: 'Baseball', href: 'mlb.html', emoji: '⚾',
       logo: 'https://a.espncdn.com/i/teamlogos/leagues/500/mlb.png' },
-    { key: 'nfl', name: 'NFL', href: 'nfl.html', emoji: '🏈',
+    { key: 'nfl', name: 'Football', href: 'nfl.html', emoji: '🏈',
       logo: 'https://a.espncdn.com/i/teamlogos/leagues/500/nfl.png' },
     { key: 'ufc', name: 'UFC', href: 'ufc.html', emoji: '🥊', invert: true,
       logo: 'https://a.espncdn.com/i/teamlogos/leagues/500/ufc.png' },
@@ -18,7 +18,8 @@
       logo: 'https://a.espncdn.com/i/teamlogos/leagues/500/mls.png' },
   ];
   const here = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
-  const currentKey = here === '' || here === 'index.html' ? null
+  const isHome = here === '' || here === 'index.html';
+  const currentKey = isHome ? null
     : (SPORTS.find((s) => s.href === here) || {}).key || null;
 
   const sheet = document.createElement('div');
@@ -33,6 +34,11 @@
         <span>Choose a sport</span>
         <button class="sports-close" type="button" aria-label="Close">&times;</button>
       </div>
+      <a class="sports-row${isHome ? ' current' : ''}" href="index.html">
+        <span class="sports-ico">⌂</span>
+        <span class="sports-name">Home</span>
+        ${isHome ? '<span class="sports-tag">You\'re here</span>' : '<span class="sports-arrow">›</span>'}
+      </a>
       ${SPORTS.map((s) => `
       <a class="sports-row${s.key === currentKey ? ' current' : ''}" href="${s.href}">
         <span class="sports-ico"><img src="${s.logo}" alt="" loading="lazy"${s.invert ? ' class="logo-invert"' : ''} onerror="this.parentNode.textContent='${s.emoji}'"></span>

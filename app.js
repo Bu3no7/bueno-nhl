@@ -3158,10 +3158,28 @@ document.addEventListener('click', (e) => {
   const gl = (sheetGoalsByGame[gid] || [])[+idx];
   if (gl && typeof playGoalAnimation === 'function') playGoalAnimation(gl);
 });
+/* Home-search handoff: index.html stores the tapped player, we open
+   his card once the slate has loaded. One-shot — the key is removed
+   on first read, and stale handoffs (>10 min) are dropped. */
+function tryOpenPendingPlayer() {
+  let raw = null;
+  try {
+    raw = localStorage.getItem('bueno-pending-open');
+    if (raw) localStorage.removeItem('bueno-pending-open');
+  } catch (e) { /* no storage, no handoff */ }
+  if (!raw) return;
+  let p = null;
+  try { p = JSON.parse(raw); } catch (e) { return; }
+  if (!p || p.type !== 'nhl' || !p.pid) return;
+  if (Date.now() - (p.ts || 0) > 10 * 60 * 1000) return;
+  const row = state.skaters.find((r) => r.pid === p.pid);
+  if (row) openPlayer(row.pid, row.gameId || p.gameId);
+}
 async function boot(isReload, date) {
   try {
     await loadDate(date || state.date);
     renderAll();
+    tryOpenPendingPlayer();
   } catch (err) {
     console.error(err);
     showLoading('');
