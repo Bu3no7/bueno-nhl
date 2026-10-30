@@ -871,6 +871,7 @@ canvas.grink { width: 100%; height: auto; background: #0a1120; border-radius: 10
 
 /* ---------------- Bottom nav (Home / NHL Lab) ---------------- */
 body { padding-bottom: 68px; }
+body.no-bnav { padding-bottom: 0; }
 .bottom-nav {
   position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
   display: flex; background: rgba(13, 20, 32, .97);
