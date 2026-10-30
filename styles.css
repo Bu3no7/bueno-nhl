@@ -1018,6 +1018,36 @@ tr.team-row:focus-visible { outline: 2px solid var(--teal); outline-offset: -2px
   font-weight: 600; font-size: .9rem;
 }
 .qlink:hover { border-color: var(--teal); color: var(--teal); }
+/* Quick links: partner tools, Discord, YouTube channels */
+.ql-sub { color: var(--muted); font-size: .82rem; margin: -.25rem 0 .75rem; }
+.ql-tools { display: grid; grid-template-columns: 1fr 1.18fr; gap: .55rem; }
+.ql-tool { display: flex; justify-content: center; text-align: center; min-height: 50px; line-height: 1.18; font-weight: 700; }
+.ql-tool-gmg { border-color: rgba(53, 214, 111, .42); background: linear-gradient(180deg, rgba(53, 214, 111, .10), #101a2c 72%); }
+.ql-tool-gmg:hover { border-color: #35d66f; color: #35d66f; }
+.ql-discord { margin-top: .55rem; min-height: 56px; display: flex; align-items: center; gap: .7rem; padding: .55rem .75rem; border-radius: 999px; background: linear-gradient(90deg, rgba(88, 101, 242, .18), #101a2c 68%); border: 1px solid rgba(88, 101, 242, .52); color: var(--text); text-decoration: none; }
+.ql-discord:hover { border-color: #5865f2; text-decoration: none; }
+.ql-discord-mark { width: 38px; height: 38px; flex: none; border-radius: 50%; background: #5865f2; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.18rem; color: #fff; box-shadow: 0 0 14px rgba(88, 101, 242, .35); }
+.ql-discord-copy { flex: 1; min-width: 0; }
+.ql-discord-kicker { display: block; color: #aeb6ff; font-size: .62rem; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; line-height: 1.1; }
+.ql-discord-name { display: block; font-weight: 700; font-size: .96rem; line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ql-open-arrow { color: var(--teal); font-size: 1.05rem; font-weight: 800; }
+.ql-divider { display: flex; align-items: center; gap: .7rem; margin: 1.05rem 0 .7rem; color: var(--muted); }
+.ql-divider::before, .ql-divider::after { content: ""; height: 1px; background: var(--border); flex: 1; }
+.ql-divider span { font-size: .66rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+.yt-head { display: flex; align-items: center; justify-content: space-between; gap: .8rem; margin: .1rem 0 .65rem; }
+.yt-lockup { display: flex; align-items: center; gap: .48rem; color: #fff; }
+.yt-word { font-family: Arial, Helvetica, sans-serif; font-size: 1.48rem; font-weight: 800; letter-spacing: -1.7px; line-height: 1; }
+.yt-note { color: var(--muted); font-size: .73rem; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; white-space: nowrap; }
+.ql-channels { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; max-width: 640px; }
+.ql-channel { min-height: 184px; display: flex; flex-direction: column; align-items: center; text-align: center; padding: .8rem .62rem .75rem; border-radius: 18px; background: linear-gradient(180deg, #111b2d, #0b1220); border: 1px solid #22314b; color: var(--text); text-decoration: none; }
+.ql-channel:hover { border-color: rgba(255, 0, 51, .48); text-decoration: none; }
+.ql-logo-stage { height: 92px; width: 100%; display: flex; align-items: center; justify-content: center; margin-bottom: .55rem; }
+.ql-logo-gmg img { width: 100%; max-width: 250px; max-height: 72px; object-fit: contain; display: block; }
+.ql-logo-buf img { width: 92px; height: 92px; object-fit: contain; display: block; }
+.ql-channel-name { font-weight: 700; font-size: .93rem; line-height: 1.22; }
+.ql-channel-open { margin-top: auto; color: var(--teal); font-size: .78rem; font-weight: 700; padding-top: .35rem; }
+.ql-tap-note { color: var(--muted); font-size: .74rem; text-align: center; margin: .6rem 0 0; }
+@media (max-width: 480px) { .ql-tool { font-size: .82rem; padding: .45rem .5rem; } }
 .contact-card { margin-top: .9rem; }
 .contact-line { font-size: 1rem; }
 
