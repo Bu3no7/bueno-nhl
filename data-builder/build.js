@@ -285,6 +285,44 @@ function slimStandings(d) {
   return map;
 }
 
+/* ---------------- shared retry + failure accounting ----------------
+   Every section fetch goes through fetchRetry (same 1s/2s/4s backoff the
+   player landings already had). Final failures are counted per section and
+   logged at the end; the health gate below decides whether the bundle is
+   fit to publish at all. */
+const failCounts = { schedule: 0, pbp: 0, roster: 0, zonePbp: 0, landing: 0, clubSchedule: 0, seasonFinal: 0, standings: 0 };
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+async function fetchRetry(url, section, retries = 3) {
+  let lastErr = null;
+  for (let n = 0; n <= retries; n++) {
+    try { return await E.fetchJSON(url); }
+    catch (e) {
+      lastErr = e;
+      if (n < retries) await sleep(1000 * Math.pow(2, n));
+    }
+  }
+  if (section && failCounts[section] != null) failCounts[section]++;
+  throw lastErr;
+}
+
+/* ---------------- zone-finals cache ----------------
+   Season-final play-by-plays are immutable once final, so the slimmed
+   per-game zone-shot result is cached on disk (data-builder/cache/
+   zone-finals.json, committed by the Actions workflow alongside data/)
+   and only finals not already cached are fetched. Cache shape:
+   { "<gameId>": { "<pid>": [[x, y, goal01], ...] } } (unfiltered — the
+   per-slate pid filter is applied when merging into a bundle). */
+const CACHE_DIR = path.join(__dirname, 'cache');
+const ZONE_CACHE_FILE = path.join(CACHE_DIR, 'zone-finals.json');
+function loadZoneCache() {
+  try { return JSON.parse(fs.readFileSync(ZONE_CACHE_FILE, 'utf8')) || {}; }
+  catch (e) { return {}; }
+}
+function saveZoneCache(cache) {
+  if (!fs.existsSync(CACHE_DIR)) fs.mkdirSync(CACHE_DIR, { recursive: true });
+  fs.writeFileSync(ZONE_CACHE_FILE, JSON.stringify(cache));
+}
+
 const playerCache = new Map();
 async function getPlayer(pid, retries = 3) {
   if (playerCache.has(pid)) return playerCache.get(pid);
@@ -313,7 +351,7 @@ async function main() {
   const counted = (p) => { nFetch++; return p; };
 
   // 1. schedule
-  const sched = await counted(E.fetchJSON(`${API}/schedule/${dateStr}`));
+  const sched = await counted(fetchRetry(`${API}/schedule/${dateStr}`, 'schedule'));
   const day = (sched.gameWeek || []).find((w) => w.date === dateStr);
   const games = day ? day.games : [];
   console.log(`[data-builder] ${games.length} games on slate`);
@@ -337,9 +375,9 @@ async function main() {
 
   // 2. per-game pbps (keep full copies for the goalieForGame replication below)
   const fullPbpCache = {};
-  const pbps = await E.limitedMap(games, 4, async (g) => {
+  const pbps = await E.limitedMap(games, 3, async (g) => {
     try {
-      const full = await counted(E.fetchJSON(`${API}/gamecenter/${g.id}/play-by-play`));
+      const full = await counted(fetchRetry(`${API}/gamecenter/${g.id}/play-by-play`, 'pbp'));
       fullPbpCache[String(g.id)] = full;
       return slimPbp(full);
     }
@@ -353,9 +391,9 @@ async function main() {
     games.filter((g, i) => !pbps[i] || !(pbps[i].rosterSpots || []).length)
       .flatMap((g) => [g.awayTeam.abbrev, g.homeTeam.abbrev])
   )];
-  await E.limitedMap(rosterTeams, 4, async (t) => {
+  await E.limitedMap(rosterTeams, 3, async (t) => {
     try {
-      const r = await counted(E.fetchJSON(`${API}/roster/${t}/${seasonId}`));
+      const r = await counted(fetchRetry(`${API}/roster/${t}/${seasonId}`, 'roster'));
       out.rosters[t] = {
         forwards: (r.forwards || []).map(slimRosterSpot),
         defensemen: (r.defensemen || []).map(slimRosterSpot),
@@ -370,8 +408,8 @@ async function main() {
   const teams = [...new Set(games.flatMap((g) => [g.awayTeam.abbrev, g.homeTeam.abbrev]))];
   for (const t of teams) out.recentIds[t] = recentByTeam[t] || [];
   const zoneIds = [...new Set(Object.values(out.recentIds).flat())];
-  await E.limitedMap(zoneIds, 4, async (id) => {
-    try { out.zonePbps[String(id)] = slimPbp(await counted(E.fetchJSON(`${API}/gamecenter/${id}/play-by-play`))); }
+  await E.limitedMap(zoneIds, 3, async (id) => {
+    try { out.zonePbps[String(id)] = slimPbp(await counted(fetchRetry(`${API}/gamecenter/${id}/play-by-play`, 'zonePbp'))); }
     catch (e) { /* skip */ }
   });
   console.log(`[data-builder] ${zoneIds.length} zone pbps`);
@@ -404,10 +442,11 @@ async function main() {
   }
   const allPids = [...pidSet, ...goalieIds];
   console.log(`[data-builder] ${pidSet.size} skaters + ${goalieIds.size} goalies = ${allPids.length} landings`);
-  await E.limitedMap(allPids, 4, async (pid) => {
+  await E.limitedMap(allPids, 3, async (pid) => {
     const d = await getPlayer(pid).catch(() => null);
     nFetch++;
     if (d) out.players[String(pid)] = slimPlayer(d);
+    else failCounts.landing++;
   });
 
   // 6b. season-to-date zone shots per skater (heat maps): regular-season
@@ -415,12 +454,13 @@ async function main() {
   // Compact: pid -> [[x, y, goal(1/0)], ...]. Tonight's games are excluded
   // (gameDate < dateStr), so the site merges live pbp shots at card-open
   // with zero overlap. Only slate skaters are kept, to bound bundle size.
+  let seasonFinalCount = 0;
   {
     const seenGameIds = new Set();
     const seasonGames = [];
-    await E.limitedMap(teams, 4, async (t) => {
+    await E.limitedMap(teams, 3, async (t) => {
       let sched = null;
-      try { sched = await counted(E.fetchJSON(`${API}/club-schedule-season/${t}/${seasonId}`)); } catch (e) { /* skip team */ }
+      try { sched = await counted(fetchRetry(`${API}/club-schedule-season/${t}/${seasonId}`, 'clubSchedule')); } catch (e) { /* skip team */ }
       if (!sched) return;
       for (const g of (sched.games || [])) {
         if (g.gameType !== 2) continue;
@@ -431,45 +471,77 @@ async function main() {
         seasonGames.push(g.id);
       }
     });
+    seasonFinalCount = seasonGames.length;
     console.log(`[data-builder] ${seasonGames.length} season finals for zone shots`);
-    await E.limitedMap(seasonGames, 4, async (id) => {
+    // Finals are immutable: reuse the cached slimmed zone shots and only
+    // fetch finals the cache has never seen.
+    const zoneCache = loadZoneCache();
+    let cacheHits = 0, cacheDirty = false;
+    await E.limitedMap(seasonGames, 3, async (id) => {
+      const key = String(id);
+      if (zoneCache[key]) { cacheHits++; return; }
       let full = null;
-      try { full = await counted(E.fetchJSON(`${API}/gamecenter/${id}/play-by-play`)); } catch (e) { return; }
+      try { full = await counted(fetchRetry(`${API}/gamecenter/${id}/play-by-play`, 'seasonFinal')); } catch (e) { return; }
       if (!full) return;
       const slim = slimPbp(full);
       if (!slim) return;
       // displayShotsByPid: goals via scoringPlayerId, per-period rotation
       const byPid = E.displayShotsByPid(slim);
+      const entry = {};
       for (const [sid, shots] of Object.entries(byPid)) {
-        if (!pidSet.has(Number(sid))) continue;
-        (out.zoneShots[sid] = out.zoneShots[sid] || []).push(
-          ...shots.map((s) => [Math.round(s.x * 10) / 10, Math.round(s.y * 10) / 10, s.goal ? 1 : 0]));
+        entry[sid] = shots.map((s) => [Math.round(s.x * 10) / 10, Math.round(s.y * 10) / 10, s.goal ? 1 : 0]);
       }
+      zoneCache[key] = entry;
+      cacheDirty = true;
     });
-  }
-
-  // goalie save pct per game — EXACT site logic replicated: goalieForGame()
-  // takes the FIRST goalieInNetId seen in chronological play order of the
-  // FULL pbp (before slimming). One sv% per game, applied to all skaters.
-  const fullPbps = {};
-  games.forEach((g, i) => { fullPbps[String(g.id)] = fullPbpCache[String(g.id)] || null; });
-  games.forEach((g) => {
-    const gid = String(g.id);
-    const full = fullPbps[gid];
-    let goalieId = null;
-    if (full) {
-      for (const p of (full.plays || [])) {
-        const det = p.details || {};
-        if (det.goalieInNetId) { goalieId = det.goalieInNetId; break; }
+    if (cacheDirty) saveZoneCache(zoneCache);
+    console.log(`[data-builder] zone cache: ${cacheHits} hits, ${seasonGames.length - cacheHits} fetched`);
+    for (const id of seasonGames) {
+      const entry = zoneCache[String(id)];
+      if (!entry) continue;
+      for (const [sid, shots] of Object.entries(entry)) {
+        if (!pidSet.has(Number(sid))) continue;
+        (out.zoneShots[sid] = out.zoneShots[sid] || []).push(...shots);
       }
     }
+  }
+
+  // goalie save pct per game, PER TEAM: goalieSv[gid] = {away, home} =
+  // the save pct of that team's goalie; app.js prices each skater against
+  // the OPPOSING team's value (plain numbers from older bundles still work).
+  // Starter source, in order: (1) tonight's pbp once plays exist (the slim
+  // pbp's _starters, i.e. first goalieInNetId per team); (2) pregame, the
+  // projected starter — the goalie who started the team's most recent
+  // final (zonePbps _starters). Previously the pregame path found no
+  // goalieInNetId in an empty pbp and defaulted EVERY game to flat 0.900.
+  const svOf = (goalieId) => {
     const slim = goalieId ? out.players[String(goalieId)] : null;
-    out.goalieSv[gid] = (slim && slim.sub.savePctg) || 0.900;
+    return (slim && slim.sub.savePctg) || null;
+  };
+  const projectedStarterId = (team) => {
+    const zid = (out.recentIds[team] || [])[0];
+    const zp = zid ? out.zonePbps[String(zid)] : null;
+    if (!zp) return null;
+    const st = zp._starters || {};
+    if (zp.homeTeam && zp.homeTeam.abbrev === team) return (st.home || {}).id || null;
+    if (zp.awayTeam && zp.awayTeam.abbrev === team) return (st.away || {}).id || null;
+    return null;
+  };
+  games.forEach((g, i) => {
+    const gid = String(g.id);
+    const st = (pbps[i] && pbps[i]._starters) || {};
+    const awayId = (st.away || {}).id || projectedStarterId(g.awayTeam.abbrev);
+    const homeId = (st.home || {}).id || projectedStarterId(g.homeTeam.abbrev);
+    const awaySv = svOf(awayId), homeSv = svOf(homeId);
+    out.goalieSv[gid] = {
+      away: awaySv != null ? awaySv : (homeSv != null ? homeSv : 0.900),
+      home: homeSv != null ? homeSv : (awaySv != null ? awaySv : 0.900),
+    };
   });
 
   // 7. standings
   try {
-    const st = await counted(E.fetchJSON(`${API}/standings/${dateStr}`));
+    const st = await counted(fetchRetry(`${API}/standings/${dateStr}`, 'standings'));
     out.standings = slimStandings(st);
   } catch (e) { out.standings = {}; }
 
@@ -479,6 +551,53 @@ async function main() {
     if (L) out.lines[t] = L;
   });
   console.log(`[data-builder] DFO lines for ${Object.keys(out.lines).length}/${teams.length} teams`);
+
+  console.log(`[data-builder] fetch failures by section: ${JSON.stringify(failCounts)}`);
+
+  /* ---------------- HEALTH GATE ----------------
+     A degraded bundle must never reach the site: on failure we exit
+     non-zero WITHOUT overwriting data/<date>.json, so the Actions job
+     fails and its commit step never runs (the last good bundle stays
+     live and the browser's live fallback covers the gap). */
+  const gateFailures = [];
+  const playerCoverage = allPids.length ? Object.keys(out.players).length / allPids.length : 0;
+  if (playerCoverage < 0.95) {
+    gateFailures.push(`player coverage ${(playerCoverage * 100).toFixed(1)}% (${Object.keys(out.players).length}/${allPids.length} landings) < 95%`);
+  }
+  if (seasonFinalCount > 0 && !Object.keys(out.zoneShots).length) {
+    gateFailures.push(`zoneShots empty despite ${seasonFinalCount} prior finals`);
+  }
+  if (!Object.keys(out.standings).length) {
+    gateFailures.push('standings empty');
+  }
+  const svValues = Object.values(out.goalieSv).flatMap((v) =>
+    (typeof v === 'number' ? [v] : Object.values(v || {})));
+  if (svValues.length && svValues.every((v) => v === 0.900)) {
+    gateFailures.push('goalieSv is flat 0.900 for every team');
+  } else if (svValues.length > 2 && svValues.every((v) => v === svValues[0])) {
+    gateFailures.push('goalieSv identical across all games');
+  }
+  const coveredTeams = new Set(Object.keys(out.rosters).filter((t) => {
+    const r = out.rosters[t] || {};
+    return ((r.forwards || []).length + (r.defensemen || []).length) > 0;
+  }));
+  games.forEach((g, i) => {
+    const pbp = pbps[i];
+    if (pbp && (pbp.rosterSpots || []).length) {
+      coveredTeams.add(g.awayTeam.abbrev);
+      coveredTeams.add(g.homeTeam.abbrev);
+    }
+  });
+  const missingTeams = teams.filter((t) => !coveredTeams.has(t));
+  if (missingTeams.length) {
+    gateFailures.push(`no roster for slate teams: ${missingTeams.join(', ')}`);
+  }
+  if (gateFailures.length) {
+    console.error(`[data-builder] HEALTH GATE FAILED for ${dateStr} — bundle NOT written, existing file kept:`);
+    for (const f of gateFailures) console.error(`  - ${f}`);
+    process.exit(1);
+  }
+  console.log(`[data-builder] health gate passed: players ${Object.keys(out.players).length}/${allPids.length}, zoneShots ${Object.keys(out.zoneShots).length} skaters, standings ${Object.keys(out.standings).length} teams`);
 
   write(out);
   const bytes = fs.statSync(path.join(DATA_DIR, `${dateStr}.json`)).size;

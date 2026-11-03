@@ -308,6 +308,17 @@ async function ctxFromPrecomputed(dateStr) {
     pre = d;
   } catch (e) { return null; }
   if (!pre.games.length) return { empty: true };
+  // Health smell test: a degraded bundle (every goalie a flat .900 AND no
+  // zone shots — the data builder's known throttle failure) is unusable.
+  // Returning null here takes the normal live-fallback path below instead
+  // of pricing skaters off defaults.
+  {
+    const svVals = Object.values(pre.goalieSv || {}).flatMap((v) =>
+      (typeof v === 'number' ? [v] : Object.values(v || {})));
+    const flatGoalies = svVals.length > 0 && svVals.every((v) => v === 0.9);
+    const noZoneShots = !pre.zoneShots || !Object.keys(pre.zoneShots).length;
+    if (flatGoalies && noZoneShots) return null;
+  }
   // reshape the slim games to the schedule-like shape the shared code reads
   const games = pre.games.map((g) => ({
     id: g.id,
@@ -491,7 +502,12 @@ async function loadDate(dateStr) {
     const z = zoneShareFor(zoneByPid[d.pid + ':' + d.gameId] || []);
     const g = games.find((gg) => gg.id === d.gameId);
     const oppAbbr = (d.team === g.awayTeam.abbrev) ? g.homeTeam.abbrev : g.awayTeam.abbrev;
-    const oppSv = goalieSv[d.gameId] || 0.900;
+    // goalieSv is per-team ({away, home}) in new bundles: a skater faces
+    // the OPPOSING team's goalie. Older bundles hold one number per game.
+    const gsEntry = goalieSv[d.gameId];
+    const oppSv = (typeof gsEntry === 'number')
+      ? gsEntry
+      : (gsEntry ? ((d.team === g.awayTeam.abbrev ? gsEntry.home : gsEntry.away) || 0.900) : 0.900);
     const m = computeProb(s, z.share, oppSv, d.pos);
     return {
       ...d, ...s, zone: z, oppSv, oppAbbr,
