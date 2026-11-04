@@ -39,7 +39,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           if [ -d data ] && [ -n "$(ls -A data 2>/dev/null)" ]; then
-            git add data/
+           git add data/ data-builder/cache/
             if ! git diff --cached --quiet; then
               git commit -m "data: build ${PHX_DATE}"
               git push
