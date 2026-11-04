@@ -15,6 +15,9 @@
 <meta name="description" content="Bueno Sports: live NHL anytime-goal-scorer probabilities. Factor-based Poisson model, refreshed from official NHL data.">
 <link rel="stylesheet" href="styles.css">
 <style>
+/* ---- NHL hero: NBA-style stacked logos (Bueno on top, league logo under) ---- */
+.nhl-hero { flex: 1; align-self: center; text-align: center; padding: .2rem 0 .1rem; }
+.nhl-hero img.league-logo { height: 62px; margin-top: .15rem; }
 /* ---- NHL mobile fit: tables sized for a phone screen ---- */
 @media (max-width: 600px) {
   .table-wrap th, .table-wrap td { padding: .4rem .22rem; font-size: .78rem; }
@@ -103,8 +106,10 @@ body.sport-glass .snap,body.sport-glass .goal-item,body.sport-glass .pc-bio{box-
 </div>
 <header class="site-header" id="siteHeader">
   <div class="brand-bar">
-    <a class="bueno-logo" href="index.html" aria-label="Bueno Sports home"><svg viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><polyline points="20,200 70,168 110,178 150,118 190,88 220,52" fill="none" stroke="#1E9E54" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/><circle cx="220" cy="52" r="13" fill="#4ADE80"/></svg><h1 class="word">Bueno•Sports</h1></a>
-    <p class="tagline">NHL anytime-goal probabilities &middot; live data</p>
+    <div class="nhl-hero">
+      <a class="bueno-logo center sm" href="index.html" aria-label="Bueno Sports home"><svg viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><polyline points="20,200 70,168 110,178 150,118 190,88 220,52" fill="none" stroke="#1E9E54" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/><circle cx="220" cy="52" r="13" fill="#4ADE80"/></svg><span class="word">Bueno•Sports</span></a>
+      <img class="league-logo" src="https://a.espncdn.com/i/teamlogos/leagues/500/nhl.png" alt="NHL">
+    </div>
     <button id="headerToggle" class="header-toggle" type="button" aria-label="Collapse header" aria-expanded="true">▾</button>
   </div>
   <div class="util-bar">
