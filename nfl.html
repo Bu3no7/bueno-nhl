@@ -197,6 +197,23 @@
   .winbar,.kb{box-shadow:inset 0 1px 0 rgba(255,255,255,.12)}
   .search-overlay{background:rgba(5,10,22,.8);backdrop-filter:blur(18px) saturate(1.3);-webkit-backdrop-filter:blur(18px) saturate(1.3)}
   .search-bar input{background:linear-gradient(155deg,rgba(130,170,255,.14),rgba(6,12,26,.5));backdrop-filter:blur(12px) saturate(1.35);-webkit-backdrop-filter:blur(12px) saturate(1.35);border:1px solid rgba(165,195,255,.26);box-shadow:inset 0 1px 0 rgba(255,255,255,.16)}
+  /* sports sheet (self-contained copy of the styles.css rules, glass finish) */
+  .sports-sheet{position:fixed;inset:0;z-index:600}
+  .sports-sheet[hidden]{display:none}
+  .sports-backdrop{position:absolute;inset:0;background:rgba(2,6,12,.62)}
+  .sports-panel{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(165deg,rgba(20,36,70,.88),rgba(8,15,32,.92));backdrop-filter:blur(18px) saturate(1.35);-webkit-backdrop-filter:blur(18px) saturate(1.35);border-top:1px solid rgba(165,195,255,.28);border-radius:18px 18px 0 0;padding:.6rem .9rem calc(.9rem + env(safe-area-inset-bottom));max-width:560px;margin:0 auto;animation:sports-up .18s ease-out;box-shadow:inset 0 1px 0 rgba(255,255,255,.16)}
+  @keyframes sports-up{from{transform:translateY(24px);opacity:.4}to{transform:none;opacity:1}}
+  .sports-head{display:flex;align-items:center;justify-content:space-between;font-weight:800;font-size:1rem;padding:.35rem .2rem .6rem;color:#f2f5f9}
+  .sports-close{background:none;border:none;color:#8b96ab;font-size:1.5rem;line-height:1;cursor:pointer;padding:.1rem .4rem}
+  .sports-row{display:flex;align-items:center;gap:.8rem;padding:.6rem .5rem;border-radius:12px;color:#f2f5f9;text-decoration:none}
+  .sports-row:active{background:#101a2c}
+  .sports-row.current{background:#101a2c}
+  .sports-ico{width:44px;height:40px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex:none}
+  .sports-ico img{max-height:40px;max-width:44px;object-fit:contain}
+  .sports-ico .logo-invert,.sports-row .logo-invert{filter:invert(1)}
+  .sports-name{font-weight:700;font-size:1.02rem;flex:1}
+  .sports-tag{color:#3adbe3;font-size:.8rem;font-weight:700}
+  .sports-arrow{color:#8b96ab;font-size:1.25rem}
 </style>
 </head>
 <body>
