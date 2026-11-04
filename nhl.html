@@ -17,6 +17,15 @@
 <style>
 /* ---- NHL hero: NBA-style stacked logos (Bueno on top, league logo under) ---- */
 .home-hero { padding: .7rem 0 .3rem; display: flex; flex-direction: column; align-items: center; }
+/* ---- Top Shelf nav: Fast Break menu layout (ported from the NBA page) ---- */
+#labNav .shelf-bar { background: none; border: none; border-radius: 0; justify-content: flex-start; gap: .5rem; padding: .8rem .25rem; font-size: 1rem; }
+#labNav .ts-title { font-weight: 800; }
+#labNav #shelfCurrent { color: var(--teal); font-weight: 700; }
+#labNav .shelf-chev { margin-left: auto; font-size: .85rem; }
+#labNav .shelf-stack { gap: 0; }
+#labNav .shelf-stack .tab { display: block; width: 100%; text-align: left; background: none; border: none; border-top: 1px solid var(--border); border-radius: 0; box-shadow: none; color: var(--text); padding: .7rem .25rem; font-size: .98rem; font-weight: 600; }
+#labNav .shelf-stack .tab:hover { color: var(--text); background: rgba(255,255,255,.04); }
+#labNav .shelf-stack .tab.active { color: var(--teal); background: none; border-top: 1px solid var(--border); box-shadow: inset 2px 0 0 var(--teal); padding-left: .6rem; }
 .home-hero .home-nhl-logo { width: 62px; height: 62px; }
 .home-hero .hero-bueno-logo { width: min(185px, 56vw); height: auto; display: block; margin: 0 auto; filter: drop-shadow(0 0 10px rgba(212,175,55,.30)); }
 .hero-logo-wrap { position: relative; display: inline-block; line-height: 0; margin-bottom: .35rem; }
@@ -133,23 +142,15 @@ body.sport-glass .header-toggle{width:auto;height:auto;padding:.5rem 1.05rem;bor
   </div>
   <nav class="nav-groups lab-nav" id="labNav" aria-label="Sections" hidden>
     <button class="shelf-bar" id="shelfBar" type="button" aria-expanded="true" aria-controls="shelfStack">
-      <b id="shelfCurrent">Markets</b><span class="shelf-chev">▾</span>
+      <span class="ts-title">🥅 Top Shelf</span><b id="shelfCurrent">Markets</b><span class="shelf-chev">▾</span>
     </button>
     <div class="shelf-stack show" id="shelfStack">
-    <div class="nav-group">
-      <div class="nav-grid">
-        <button class="tab active" data-view="markets" role="tab">Markets</button>
-        <button class="tab" data-view="longshots" role="tab">Longshots</button>
-        <button class="tab" data-view="parlay" role="tab">Parlay</button>
-      </div>
-    </div>
-    <div class="nav-group">
-      <div class="nav-grid">
-        <button class="tab" data-view="slate" role="tab">Slate</button>
-        <button class="tab" data-view="goals" role="tab"><span class="live-dot" id="liveTabDot"></span>Live</button>
-        <button class="tab" data-view="board" role="tab">Board</button>
-      </div>
-    </div>
+      <button class="tab active" data-view="markets" role="tab">Markets</button>
+      <button class="tab" data-view="longshots" role="tab">Longshots</button>
+      <button class="tab" data-view="parlay" role="tab">Parlay</button>
+      <button class="tab" data-view="slate" role="tab">Slate</button>
+      <button class="tab" data-view="goals" role="tab"><span class="live-dot" id="liveTabDot"></span>Live</button>
+      <button class="tab" data-view="board" role="tab">Board</button>
     </div>
   </nav>
 </header>
