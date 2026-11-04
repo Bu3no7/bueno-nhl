@@ -183,6 +183,8 @@
   .kdist-row .kb{flex:1;height:10px;background:var(--panel2);border:1px solid var(--line);border-radius:99px;overflow:hidden}
   .kdist-row .kf{height:100%;background:var(--chalk);border-radius:99px}
   .kdist-row .kv{width:38px;text-align:right;font-weight:700;color:var(--chalk)}
+.bye-logo{background:transparent!important;border-color:transparent!important;box-shadow:none!important}
+  .bye-logo img{width:34px;height:34px}
 </style>
 </head>
 <body>
@@ -311,7 +313,7 @@
 <section class="view" id="view-kicker">
   <div class="backbar"><span class="backbtn" id="kBackBtn">‹ Back</span></div>
   <div class="phead">
-    <div class="face gold" id="kFace">CL</div>
+    <div class="face gold" id="kFace"></div>
     <div><h3 id="kName">Cam Little</h3><p id="kMeta">K · JACKSONVILLE JAGUARS</p></div>
   </div>
   <div class="card" style="margin-top:12px">
@@ -327,7 +329,7 @@
 <section class="view" id="view-player">
   <div class="backbar"><span class="backbtn" id="backBtn">‹ Back</span></div>
   <div class="phead">
-    <div class="face gold" id="pFace">DH</div>
+    <div class="face gold" id="pFace"></div>
     <div><h3 id="pName">Derrick Henry</h3><p id="pMeta">RB · BALTIMORE RAVENS · AT JACKSONVILLE · THU 6:15 PM</p></div>
   </div>
   <div class="card" style="margin-top:12px">
@@ -392,7 +394,7 @@ function show(id){
 function faceHtml(key, name, gold){
   var col = gold ? "#e8b64c" : (TEAMCOLOR[key] || "#2b3d66");
   var img = FACES[key] ? '<img src="https://a.espncdn.com/i/headshots/nfl/players/full/'+FACES[key]+'.png" alt="" onerror="this.remove()">' : "";
-  return '<div class="face'+(gold?" gold":"")+'" style="border-color:'+col+'"><span class="ini">'+ini(name)+'</span>'+img+'</div>';
+  return '<div class="face'+(gold?" gold":"")+'" style="border-color:'+col+';box-shadow:0 0 14px '+col+'80, 0 0 5px '+col+'">'+img+'</div>';
 }
 function pickRow(r){
   var attr = r.p ? ' data-p="'+r.p+'"' : (r.k ? ' data-k="'+r.k+'"' : "");
@@ -509,8 +511,9 @@ function topLooks(team, gameKey){
 function openPlayer(key){
   var d = PLAYERS[key]; if(!d) return;
   var pf = $("pFace");
-  pf.innerHTML = '<span class="ini">'+d.face+'</span>' + (FACES[key] ? '<img src="https://a.espncdn.com/i/headshots/nfl/players/full/'+FACES[key]+'.png" alt="" onerror="this.remove()">' : '');
+  pf.innerHTML = (FACES[key] ? '<img src="https://a.espncdn.com/i/headshots/nfl/players/full/'+FACES[key]+'.png" alt="" onerror="this.remove()">' : '');
   pf.style.borderColor = TEAMCOLOR[key] || "#e8b64c";
+  pf.style.boxShadow = "0 0 22px " + (TEAMCOLOR[key] || "#e8b64c") + "90, 0 0 6px " + (TEAMCOLOR[key] || "#e8b64c");
   $("pName").textContent = d.name; $("pMeta").textContent = d.meta;
   if(d.q){
     $("pDistTitle").textContent = d.market + " YARDS · THE FIELD VIEW";
@@ -537,8 +540,9 @@ function openPlayer(key){
 function openKicker(key){
   var d = KICKERS[key]; if(!d) return;
   var kf = $("kFace");
-  kf.innerHTML = '<span class="ini">'+d.face+'</span>' + (FACES[key] ? '<img src="https://a.espncdn.com/i/headshots/nfl/players/full/'+FACES[key]+'.png" alt="" onerror="this.remove()">' : '');
+  kf.innerHTML = (FACES[key] ? '<img src="https://a.espncdn.com/i/headshots/nfl/players/full/'+FACES[key]+'.png" alt="" onerror="this.remove()">' : '');
   kf.style.borderColor = TEAMCOLOR[key] || "#e8b64c";
+  kf.style.boxShadow = "0 0 22px " + (TEAMCOLOR[key] || "#e8b64c") + "90, 0 0 6px " + (TEAMCOLOR[key] || "#e8b64c");
   $("kName").textContent = d.name; $("kMeta").textContent = d.meta;
   $("kDist").innerHTML = d.dist.map(function(r){ return '<div class="kdist-row"><div class="kl">'+r[0]+'</div><div class="kb"><div class="kf" style="width:'+r[1]+'%"></div></div><div class="kv">'+r[1]+'%</div></div>'; }).join("");
   $("kPrices").innerHTML = d.prices.map(function(t){ return '<div class="tdbox'+(t[4]?" hot":"")+'"><span>'+t[0]+'</span><b>'+t[1]+' '+t[2]+'</b><i>'+t[3]+'</i></div>'; }).join("");
@@ -553,7 +557,7 @@ function renderBoard(key){
   b.rows.forEach(function(r){
     var attr = r.p ? ' data-p="'+r.p+'"' : (r.k ? ' data-k="'+r.k+'"' : "");
     var fk = r.p || r.k;
-    var fimg = fk && FACES[fk] ? '<img class="bface" style="border-color:'+(TEAMCOLOR[fk]||"#2b3d66")+'" src="https://a.espncdn.com/i/headshots/nfl/players/full/'+FACES[fk]+'.png" alt="" onerror="this.remove()">' : "";
+    var fimg = fk && FACES[fk] ? '<img class="bface" style="border-color:'+(TEAMCOLOR[fk]||"#2b3d66")+';box-shadow:0 0 9px '+(TEAMCOLOR[fk]||"#2b3d66")+'80" src="https://a.espncdn.com/i/headshots/nfl/players/full/'+FACES[fk]+'.png" alt="" onerror="this.remove()">' : "";
     h += '<tr'+attr+'><td>'+fimg+'<b>'+r.name+'</b><span class="sub">'+r.sub+'</span></td>';
     r.cells.forEach(function(c, i){
       if(i===0){ h += '<td class="r line"><b>'+c[0]+'</b><span>'+c[1]+'</span></td>'; }
