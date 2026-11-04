@@ -40,7 +40,7 @@ function setSection(sec) {
     setView('home');
   } else {
     // Top Shelf: show the lab sub-view (default to markets)
-    const labViews = ['markets', 'longshots', 'parlay', 'slate', 'goals', 'board'];
+    const labViews = ['markets', 'leaders', 'longshots', 'parlay', 'slate', 'goals', 'board'];
     setView(labViews.includes(state.view) ? state.view : 'markets');
   }
 }

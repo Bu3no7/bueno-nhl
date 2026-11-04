@@ -2905,7 +2905,7 @@ async function refreshScores() {
    so a fresh session sees it expanded again. No burger icon: the sports
    switcher already owns ☰. View switching itself is untouched. */
 let shelfNavFirstVisit = true; // session only
-const SHELF_LABELS = { markets: 'Markets', longshots: 'Longshots', parlay: 'Parlay', slate: 'Slate', goals: 'Live', board: 'Board' };
+const SHELF_LABELS = { markets: 'Markets', leaders: 'Leaders', longshots: 'Longshots', parlay: 'Parlay', slate: 'Slate', goals: 'Live', board: 'Board' };
 function shelfSetExpanded(expanded) {
   const stack = $('shelfStack'), bar = $('shelfBar');
   if (!stack || !bar) return;
@@ -2922,7 +2922,7 @@ function shelfSyncNav() {
   if (dot) dot.classList.toggle('on', anyLive);
 }
 const HOME_VIEWS = ['home', 'standings', 'teamlineup', 'playoffodds'];
-const LAB_VIEWS = ['markets', 'longshots', 'parlay', 'slate', 'goals', 'board'];
+const LAB_VIEWS = ['markets', 'leaders', 'longshots', 'parlay', 'slate', 'goals', 'board'];
 function setView(v) {
   state.view = v;
   // Keep the section in sync with the view
