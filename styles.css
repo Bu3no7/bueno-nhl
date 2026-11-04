@@ -1308,3 +1308,9 @@ tr.heat-row.cold { background: linear-gradient(90deg, rgba(229, 72, 77, .07), tr
 body.sport-glass .ls-card.heat-edge-hot, .ls-card.heat-edge-hot { border-color: rgba(46, 204, 113, .6); box-shadow: 0 0 16px rgba(46, 204, 113, .35), inset 0 0 18px rgba(46, 204, 113, .07); }
 body.sport-glass .ls-card.heat-edge-mid, .ls-card.heat-edge-mid { border-color: rgba(245, 197, 66, .55); box-shadow: 0 0 14px rgba(245, 197, 66, .28), inset 0 0 18px rgba(245, 197, 66, .06); }
 body.sport-glass .ls-card.heat-edge-cold, .ls-card.heat-edge-cold { border-color: rgba(229, 72, 77, .5); box-shadow: 0 0 14px rgba(229, 72, 77, .28), inset 0 0 18px rgba(229, 72, 77, .06); }
+
+/* ---------------- parlay quick-add (+) ---------------- */
+.addbtn { width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--border); background: rgba(255, 255, 255, .05); color: var(--teal); font-size: 1.05rem; font-weight: 800; line-height: 1; cursor: pointer; font-family: inherit; padding: 0; }
+.addbtn:active { transform: scale(.94); }
+.addbtn.added { background: var(--teal); border-color: var(--teal); color: #062a2e; box-shadow: 0 0 10px rgba(58, 219, 227, .45); }
+.ls-add { display: flex; align-items: center; margin-left: .55rem; }

@@ -834,7 +834,7 @@ function heatBands(rows, getP, ref) {
   return m;
 }
 const HEAT_LEGEND = '<p class="muted small heat-legend"><span class="heat-dot hot"></span>Model\'s strongest tonight <span class="heat-dot mid"></span>middle <span class="heat-dot cold"></span>weakest \u00b7 heat re-scores as lineups confirm</p>';
-function probTableHtml(rows, pKey, fairKey, bands) {
+function probTableHtml(rows, pKey, fairKey, bands, v) {
   return rows.map((r) => {
     const b = bands ? bands.get(r.pid) : null;
     return `
@@ -843,6 +843,7 @@ function probTableHtml(rows, pKey, fairKey, bands) {
       <td><span class="team-cell"><img src="${teamLogoUrl(r.team)}" alt="" ${imgFallback}>${esc(r.team)}</span></td>
       <td class="num"><strong>${pct1(r[pKey])}</strong></td>
       <td class="num">${r[fairKey]}</td>
+      ${v ? `<td class="num">${addBtnHtml(r, v)}</td>` : ''}
     </tr>`;
   }).join('');
 }
@@ -1130,10 +1131,10 @@ function renderGoalProbs() {
   let html;
   if (type === 'twoplus') {
     const all = twoPlusProbs();
-    html = probTableHtml(filterGoalRows(all), 'tpP', 'tpFair', heatBands(all, (r) => r.tpP, HEAT_REF.twoplus));
+    html = probTableHtml(filterGoalRows(all), 'tpP', 'tpFair', heatBands(all, (r) => r.tpP, HEAT_REF.twoplus), 'twoplus');
   } else if (type === 'firstgoal') {
     const all = firstGoalProbs();
-    html = probTableHtml(filterGoalRows(all), 'fgP', 'fgFair', heatBands(all, (r) => r.fgP, HEAT_REF.firstgoal));
+    html = probTableHtml(filterGoalRows(all), 'fgP', 'fgFair', heatBands(all, (r) => r.fgP, HEAT_REF.firstgoal), 'firstgoal');
   } else {
     const bands = heatBands(state.skaters, (r) => r.p, HEAT_REF.atg);
     const rows = filterGoalRows(state.skaters.slice().sort((a, b) => b.p - a.p));
@@ -1143,9 +1144,10 @@ function renderGoalProbs() {
       <td><span class="team-cell"><img src="${teamLogoUrl(r.team)}" alt="" ${imgFallback}>${esc(r.team)}</span></td>
       <td class="num"><strong>${pct1(r.p)}</strong></td>
       <td class="num">${r.fair}</td>
+      <td class="num">${addBtnHtml(r, 'atg')}</td>
     </tr>`; }).join('');
   }
-  tb.innerHTML = html || '<tr><td colspan="4" class="muted">No skaters match.</td></tr>';
+  tb.innerHTML = html || '<tr><td colspan="5" class="muted">No skaters match.</td></tr>';
   wirePnameClicks(tb);
 }
 async function renderSlate() {
@@ -1930,6 +1932,7 @@ function renderLongshots() {
         <div class="ls-stats">${esc(r.team)} · ${esc(r.pos)} · ${pct1(r.p)} model · ${r.goals}G/${r.gp}GP</div>
       </div>
       <div class="ls-odds"><div class="fair">${r.fair}</div><div class="ls-stats">fair</div></div>
+      <div class="ls-add">${addBtnHtml(r, 'atg')}</div>
     </div>`).join('');
   el.querySelectorAll('.pname').forEach((b) =>
     b.addEventListener('click', () => openPlayer(b.dataset.pid, b.dataset.gid)));
@@ -1954,11 +1957,12 @@ function renderMarkets() {
         <td><span class="team-cell"><img src="${teamLogoUrl(r.team)}" alt="" ${imgFallback}>${esc(r.team)}</span></td>
         ${r.markets[kind].map((m) => `
           <td class="num"><strong>${pct1(m.over)}</strong><div class="small muted">${m.overFair}</div></td>`).join('')}
+        <td class="num">${addBtnHtml(r, kind + '|' + MARKET_HEADLINE[kind])}</td>
       </tr>`; }).join('');
     return `<h3 class="mkt-title">${meta.label} <span class="muted small">over / under · Poisson λ from ${meta.short}/game</span></h3>
       <div class="table-wrap"><table><thead><tr><th>Skater</th><th>Team</th>
-      ${MARKET_LINES[kind].map((l) => `<th class="num">o${l}</th>`).join('')}</tr></thead>
-      <tbody>${body || `<tr><td colspan="${2 + MARKET_LINES[kind].length}" class="muted">No skaters.</td></tr>`}</tbody></table></div>` + HEAT_LEGEND;
+      ${MARKET_LINES[kind].map((l) => `<th class="num">o${l}</th>`).join('')}<th></th></tr></thead>
+      <tbody>${body || `<tr><td colspan="${3 + MARKET_LINES[kind].length}" class="muted">No skaters.</td></tr>`}</tbody></table></div>` + HEAT_LEGEND;
   }).join('');
   wrap.querySelectorAll('.pname').forEach((b) =>
     b.addEventListener('click', () => openPlayer(b.dataset.pid, b.dataset.gid)));
@@ -2061,28 +2065,65 @@ function renderLeaders() {
   wirePnameClicks(grid);
 }
 /* ---------------- parlay builder ---------------- */
-function addParlayLeg(r, v) {
-  let leg;
+function buildLeg(r, v) {
   if (v === 'atg') {
-    if (!(r.p > 0.0005)) return;
-    leg = { key: `${r.pid}:atg`, name: r.name, team: r.team, gameId: r.gameId, label: 'Anytime goal', prob: r.p, fair: r.fair };
-  } else {
-    const [kind, lineStr] = String(v).split('|');
-    const line = parseFloat(lineStr);
-    const m = (r.markets[kind] || []).find((x) => x.line === line);
-    if (!m || !(m.over > 0.0005) || m.overFair === '–') return;
-    leg = { key: `${r.pid}:${kind}:${line}`, name: r.name, team: r.team, gameId: r.gameId, label: `${MARKET_META[kind].label} o${line}`, prob: m.over, fair: m.overFair };
+    if (!(r.p > 0.0005)) return null;
+    return { key: `${r.pid}:atg`, name: r.name, team: r.team, gameId: r.gameId, label: 'Anytime goal', prob: r.p, fair: r.fair };
   }
+  if (v === 'twoplus') {
+    const lam = Math.max(r.lam, 0);
+    const p = 1 - Math.exp(-lam) * (1 + lam);
+    if (!(p > 0.0005)) return null;
+    return { key: `${r.pid}:twoplus`, name: r.name, team: r.team, gameId: r.gameId, label: 'Brace (2+ goals)', prob: p, fair: fairOddsSafe(p) };
+  }
+  if (v === 'firstgoal') {
+    let denom = 0;
+    for (const sk of state.skaters) if (sk.gameId === r.gameId) denom += Math.max(sk.lam, 0);
+    const p = denom > 0 ? Math.max(r.lam, 0) / denom : 0;
+    if (!(p > 0.0005)) return null;
+    return { key: `${r.pid}:firstgoal`, name: r.name, team: r.team, gameId: r.gameId, label: 'First goal', prob: p, fair: fairOddsSafe(p) };
+  }
+  const [kind, lineStr] = String(v).split('|');
+  const line = parseFloat(lineStr);
+  const m = (r.markets[kind] || []).find((x) => x.line === line);
+  if (!m || !(m.over > 0.0005) || m.overFair === '–') return null;
+  return { key: `${r.pid}:${kind}:${line}`, name: r.name, team: r.team, gameId: r.gameId, label: `${MARKET_META[kind].label} o${line}`, prob: m.over, fair: m.overFair };
+}
+function addParlayLeg(r, v) {
+  const leg = buildLeg(r, v);
+  if (!leg) return;
   if (!state.parlay.some((l) => l.key === leg.key)) state.parlay.push(leg);
   closePlayer();
   setView('parlay');
+  renderParlay();
+}
+/* Quick-add from the market boards: the + on a row toggles that market's
+   leg for the player without leaving the board; the button shows ✓
+   while the leg is in the parlay. */
+function addBtnHtml(r, v) {
+  const leg = buildLeg(r, v);
+  if (!leg) return '';
+  const on = state.parlay.some((l) => l.key === leg.key);
+  return `<button class="addbtn${on ? ' added' : ''}" data-add="${esc(v)}" data-pid="${r.pid}" type="button" title="${on ? 'Remove from parlay' : 'Add to parlay'}" aria-label="Toggle parlay leg">${on ? '✓' : '+'}</button>`;
+}
+function toggleParlayLeg(r, v, btn) {
+  const leg = buildLeg(r, v);
+  if (!leg) return;
+  const i = state.parlay.findIndex((l) => l.key === leg.key);
+  if (i >= 0) state.parlay.splice(i, 1); else state.parlay.push(leg);
+  if (btn) {
+    const on = i < 0;
+    btn.classList.toggle('added', on);
+    btn.textContent = on ? '✓' : '+';
+    btn.title = on ? 'Remove from parlay' : 'Add to parlay';
+  }
   renderParlay();
 }
 function renderParlay() {
   const el = $('parlayLegs');
   if (!el) return;
   if (!state.parlay.length) {
-    el.innerHTML = '<p class="muted">No legs yet — open any player card and use the parlay dropdown to add one.</p>';
+    el.innerHTML = '<p class="muted">No legs yet — tap + on any market row to add one, or open a player card and use the parlay dropdown.</p>';
   } else {
     el.innerHTML = state.parlay.map((l, i) => `
       <div class="parlay-leg">
@@ -3032,6 +3073,12 @@ if (oddsBack) oddsBack.addEventListener('click', () => setView('home'));
 document.addEventListener('click', (e) => {
   const pr = e.target.closest('.hero-pick[data-pid]');
   if (pr && pr.dataset.pid) openPlayer(pr.dataset.pid, pr.dataset.gid);
+});
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('.addbtn');
+  if (!b) return;
+  const r = state.skaters.find((sk) => String(sk.pid) === String(b.dataset.pid));
+  if (r) toggleParlayLeg(r, b.dataset.add, b);
 });
 // Home + standings + odds: team rows open the team lineup view
 document.addEventListener('click', (e) => {
