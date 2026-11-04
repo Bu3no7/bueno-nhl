@@ -805,14 +805,43 @@ function pnameBtn(r) {
   const hs = r.headshot || headshotUrl(r.team, r.pid);
   return `<button class="pname" data-pid="${r.pid}" data-gid="${r.gameId}"><img class="pavatar" src="${esc(hs)}" alt="" ${imgFallback}>${esc(r.name)}</button>`;
 }
-function probTableHtml(rows, pKey, fairKey) {
-  return rows.map((r) => `
-    <tr>
-      <td>${pnameBtn(r)}</td>
+/* ---------------- market heat (good-bet glow) ----------------
+   Every market table scores each name: green = the model's strongest
+   looks tonight, yellow = middle of the pack, red = weakest. The score
+   blends the skater's percentile within tonight's market (60%) with his
+   raw probability against the market's elite reference (40%), so green
+   takes both relative and absolute strength. Bands are computed at
+   render time from the currently priced skaters, so the heat re-scores
+   on every refresh \u2014 as lineups confirm and goalies lock in, names move. */
+const HEAT_REF = { atg: 0.45, twoplus: 0.25, firstgoal: 0.10, shots: 0.75, assists: 0.65, points: 0.55, longshot: 0.12 };
+function heatBandOf(score) { return score >= 67 ? 'hot' : score >= 40 ? 'mid' : 'cold'; }
+function heatBands(rows, getP, ref) {
+  const vals = rows.map(getP).sort((a, b) => a - b);
+  const n = vals.length;
+  const m = new Map();
+  if (!n) return m;
+  for (const r of rows) {
+    const v = getP(r);
+    let below = 0;
+    while (below < n && vals[below] < v) below++;
+    const pctile = n > 1 ? (below / (n - 1)) * 100 : 50;
+    const abs = Math.min(100, (v / ref) * 100);
+    m.set(r.pid, heatBandOf(0.6 * pctile + 0.4 * abs));
+  }
+  return m;
+}
+const HEAT_LEGEND = '<p class="muted small heat-legend"><span class="heat-dot hot"></span>Model\'s strongest tonight <span class="heat-dot mid"></span>middle <span class="heat-dot cold"></span>weakest \u00b7 heat re-scores as lineups confirm</p>';
+function probTableHtml(rows, pKey, fairKey, bands) {
+  return rows.map((r) => {
+    const b = bands ? bands.get(r.pid) : null;
+    return `
+    <tr${b ? ` class="heat-row ${b}"` : ''}>
+      <td>${b ? `<span class="heat-dot ${b}"></span>` : ''}${pnameBtn(r)}</td>
       <td><span class="team-cell"><img src="${teamLogoUrl(r.team)}" alt="" ${imgFallback}>${esc(r.team)}</span></td>
       <td class="num"><strong>${pct1(r[pKey])}</strong></td>
       <td class="num">${r[fairKey]}</td>
-    </tr>`).join('');
+    </tr>`;
+  }).join('');
 }
 function wirePnameClicks(tbody) {
   tbody.querySelectorAll('.pname').forEach((b) =>
@@ -1097,18 +1126,21 @@ function renderGoalProbs() {
   const type = GOAL_KINDS.includes(state.marketKind) ? state.marketKind : 'atg';
   let html;
   if (type === 'twoplus') {
-    html = probTableHtml(filterGoalRows(twoPlusProbs()), 'tpP', 'tpFair');
+    const all = twoPlusProbs();
+    html = probTableHtml(filterGoalRows(all), 'tpP', 'tpFair', heatBands(all, (r) => r.tpP, HEAT_REF.twoplus));
   } else if (type === 'firstgoal') {
-    html = probTableHtml(filterGoalRows(firstGoalProbs()), 'fgP', 'fgFair');
+    const all = firstGoalProbs();
+    html = probTableHtml(filterGoalRows(all), 'fgP', 'fgFair', heatBands(all, (r) => r.fgP, HEAT_REF.firstgoal));
   } else {
+    const bands = heatBands(state.skaters, (r) => r.p, HEAT_REF.atg);
     const rows = filterGoalRows(state.skaters.slice().sort((a, b) => b.p - a.p));
-    html = rows.map((r) => `
-    <tr>
-      <td>${pnameBtn(r)}</td>
+    html = rows.map((r) => { const b = bands.get(r.pid); return `
+    <tr class="heat-row ${b}">
+      <td><span class="heat-dot ${b}"></span>${pnameBtn(r)}</td>
       <td><span class="team-cell"><img src="${teamLogoUrl(r.team)}" alt="" ${imgFallback}>${esc(r.team)}</span></td>
       <td class="num"><strong>${pct1(r.p)}</strong></td>
       <td class="num">${r.fair}</td>
-    </tr>`).join('');
+    </tr>`; }).join('');
   }
   tb.innerHTML = html || '<tr><td colspan="4" class="muted">No skaters match.</td></tr>';
   wirePnameClicks(tb);
@@ -1886,11 +1918,12 @@ function renderLongshots() {
   const ls = state.skaters.filter((r) => r.isLongshot).sort((a, b) => b.p - a.p);
   const el = $('longshotsList');
   if (!ls.length) { el.innerHTML = '<p class="muted">No longshots on this slate.</p>'; return; }
+  const lsBands = heatBands(ls, (r) => r.p, HEAT_REF.longshot);
   el.innerHTML = ls.map((r) => `
-    <div class="ls-card">
+    <div class="ls-card heat-edge-${lsBands.get(r.pid)}">
       <img class="headshot" src="${esc(r.headshot || headshotUrl(r.team, r.pid))}" alt="" ${imgFallback}>
       <div class="ls-info">
-        <button class="pname" data-pid="${r.pid}" data-gid="${r.gameId}">${esc(r.name)}</button>
+        <span class="heat-dot ${lsBands.get(r.pid)}"></span><button class="pname" data-pid="${r.pid}" data-gid="${r.gameId}">${esc(r.name)}</button>
         <div class="ls-stats">${esc(r.team)} · ${esc(r.pos)} · ${pct1(r.p)} model · ${r.goals}G/${r.gp}GP</div>
       </div>
       <div class="ls-odds"><div class="fair">${r.fair}</div><div class="ls-stats">fair</div></div>
@@ -1911,17 +1944,18 @@ function renderMarkets() {
     const sorted = rows.slice()
       .sort((a, b) => marketOver(b, kind, MARKET_HEADLINE[kind]) - marketOver(a, kind, MARKET_HEADLINE[kind]))
       .slice(0, 80);
-    const body = sorted.map((r) => `
-      <tr>
-        <td>${pnameBtn(r)}</td>
+    const bands = heatBands(state.skaters, (r) => marketOver(r, kind, MARKET_HEADLINE[kind]), HEAT_REF[kind]);
+    const body = sorted.map((r) => { const b = bands.get(r.pid); return `
+      <tr class="heat-row ${b}">
+        <td><span class="heat-dot ${b}"></span>${pnameBtn(r)}</td>
         <td><span class="team-cell"><img src="${teamLogoUrl(r.team)}" alt="" ${imgFallback}>${esc(r.team)}</span></td>
         ${r.markets[kind].map((m) => `
           <td class="num"><strong>${pct1(m.over)}</strong><div class="small muted">${m.overFair}</div></td>`).join('')}
-      </tr>`).join('');
+      </tr>`; }).join('');
     return `<h3 class="mkt-title">${meta.label} <span class="muted small">over / under · Poisson λ from ${meta.short}/game</span></h3>
       <div class="table-wrap"><table><thead><tr><th>Skater</th><th>Team</th>
       ${MARKET_LINES[kind].map((l) => `<th class="num">o${l}</th>`).join('')}</tr></thead>
-      <tbody>${body || `<tr><td colspan="${2 + MARKET_LINES[kind].length}" class="muted">No skaters.</td></tr>`}</tbody></table></div>`;
+      <tbody>${body || `<tr><td colspan="${2 + MARKET_LINES[kind].length}" class="muted">No skaters.</td></tr>`}</tbody></table></div>` + HEAT_LEGEND;
   }).join('');
   wrap.querySelectorAll('.pname').forEach((b) =>
     b.addEventListener('click', () => openPlayer(b.dataset.pid, b.dataset.gid)));

@@ -1294,3 +1294,17 @@ tr.team-row:focus-visible { outline: 2px solid var(--teal); outline-offset: -2px
 .hs-hint { color: var(--muted); font-size: .82rem; margin: .65rem .1rem 0; }
 .hs-results { margin-top: 1rem; }
 .hs-results .ci-row .pct.orange { color: #FF9E45; }
+
+/* ---------------- market heat (good-bet glow) ---------------- */
+.heat-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: .45rem; vertical-align: 1px; }
+.heat-dot.hot { background: #2ecc71; box-shadow: 0 0 8px 2px rgba(46, 204, 113, .55); }
+.heat-dot.mid { background: #f5c542; box-shadow: 0 0 8px 2px rgba(245, 197, 66, .45); }
+.heat-dot.cold { background: #e5484d; box-shadow: 0 0 8px 2px rgba(229, 72, 77, .45); }
+tr.heat-row.hot { background: linear-gradient(90deg, rgba(46, 204, 113, .10), transparent 65%); }
+tr.heat-row.mid { background: linear-gradient(90deg, rgba(245, 197, 66, .07), transparent 65%); }
+tr.heat-row.cold { background: linear-gradient(90deg, rgba(229, 72, 77, .07), transparent 65%); }
+.heat-legend .heat-dot { margin-right: .3rem; }
+.heat-legend .heat-dot:not(:first-child) { margin-left: .7rem; }
+.ls-card.heat-edge-hot { border-color: rgba(46, 204, 113, .55); box-shadow: 0 0 14px rgba(46, 204, 113, .22); }
+.ls-card.heat-edge-mid { border-color: rgba(245, 197, 66, .45); }
+.ls-card.heat-edge-cold { border-color: rgba(229, 72, 77, .4); }
