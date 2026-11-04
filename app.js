@@ -824,7 +824,10 @@ function heatBands(rows, getP, ref) {
     const v = getP(r);
     let below = 0;
     while (below < n && vals[below] < v) below++;
-    const pctile = n > 1 ? (below / (n - 1)) * 100 : 50;
+    let ties = 0;
+    while (below + ties < n && vals[below + ties] === v) ties++;
+    const rank = below + Math.max(0, ties - 1) / 2;
+    const pctile = n > 1 ? (rank / (n - 1)) * 100 : 50;
     const abs = Math.min(100, (v / ref) * 100);
     m.set(r.pid, heatBandOf(0.6 * pctile + 0.4 * abs));
   }

@@ -1305,6 +1305,6 @@ tr.heat-row.mid { background: linear-gradient(90deg, rgba(245, 197, 66, .07), tr
 tr.heat-row.cold { background: linear-gradient(90deg, rgba(229, 72, 77, .07), transparent 65%); }
 .heat-legend .heat-dot { margin-right: .3rem; }
 .heat-legend .heat-dot:not(:first-child) { margin-left: .7rem; }
-.ls-card.heat-edge-hot { border-color: rgba(46, 204, 113, .55); box-shadow: 0 0 14px rgba(46, 204, 113, .22); }
-.ls-card.heat-edge-mid { border-color: rgba(245, 197, 66, .45); }
-.ls-card.heat-edge-cold { border-color: rgba(229, 72, 77, .4); }
+body.sport-glass .ls-card.heat-edge-hot, .ls-card.heat-edge-hot { border-color: rgba(46, 204, 113, .6); box-shadow: 0 0 16px rgba(46, 204, 113, .35), inset 0 0 18px rgba(46, 204, 113, .07); }
+body.sport-glass .ls-card.heat-edge-mid, .ls-card.heat-edge-mid { border-color: rgba(245, 197, 66, .55); box-shadow: 0 0 14px rgba(245, 197, 66, .28), inset 0 0 18px rgba(245, 197, 66, .06); }
+body.sport-glass .ls-card.heat-edge-cold, .ls-card.heat-edge-cold { border-color: rgba(229, 72, 77, .5); box-shadow: 0 0 14px rgba(229, 72, 77, .28), inset 0 0 18px rgba(229, 72, 77, .06); }
