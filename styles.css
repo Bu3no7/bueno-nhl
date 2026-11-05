@@ -1176,6 +1176,54 @@ tr.team-row:focus-visible { outline: 2px solid var(--teal); outline-offset: -2px
 /* Round-2 card polish */
 .pc-jnum { font-size: .78rem; color: var(--pc-tc, #888); border: 1px solid var(--pc-tc, #888); border-radius: 8px; padding: 2px 7px; margin-right: .5rem; vertical-align: 3px; }
 .pc-lastgame { margin: 0 0 .8rem; font-size: .85rem; color: var(--muted); }
+/* ---------------- ice time · last 6 (minutes sidecar) ---------------- */
+.pc-min { margin: .6rem 0 .8rem; background: rgba(8, 14, 28, .45); border: 1px solid rgba(255, 255, 255, .12); border-radius: 14px; padding: .7rem .8rem .8rem; }
+.pc-min-h { display: flex; justify-content: space-between; align-items: baseline; }
+.pc-min-t { font-size: .72rem; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; color: var(--teal); }
+.pc-min-avg { font-size: .95rem; font-weight: 800; color: var(--gold); }
+.min-chart { position: relative; margin-top: .35rem; }
+.min-avgline { position: absolute; left: 0; right: 0; border-top: 2px dashed rgba(245, 185, 66, .8); pointer-events: none; }
+.min-cols { display: flex; gap: 6px; }
+.min-col { flex: 1; display: flex; flex-direction: column; align-items: center; background: none; border: none; color: inherit; font: inherit; padding: 0; cursor: pointer; }
+.min-val { height: 1.05rem; font-size: .78rem; font-weight: 700; }
+.min-barzone { height: 92px; display: flex; align-items: flex-end; justify-content: center; width: 100%; }
+.min-bar { display: block; width: 68%; max-width: 44px; border-radius: 7px 7px 3px 3px; background: var(--teal); }
+.min-col.sel .min-bar { box-shadow: 0 0 0 2px var(--gold), 0 0 14px rgba(58, 219, 227, .35); }
+.min-labs { display: flex; gap: 6px; margin-top: .3rem; }
+.min-lab { flex: 1; text-align: center; font-size: .72rem; color: var(--muted); }
+.min-hint { text-align: center; font-size: .72rem; color: var(--muted); margin-top: .45rem; }
+.min-map { border-top: 1px solid rgba(255, 255, 255, .09); margin-top: .55rem; padding-top: .55rem; }
+.min-map-h { display: flex; justify-content: space-between; align-items: baseline; gap: .5rem; }
+.min-map-t { font-size: .85rem; font-weight: 700; }
+.min-legend { display: flex; gap: .55rem; font-size: .7rem; color: var(--muted); white-space: nowrap; }
+.min-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: .25rem; vertical-align: -1px; }
+.min-track { position: relative; height: 34px; border-radius: 10px; background: rgba(148, 42, 48, .42); border: 1px solid rgba(255, 255, 255, .25); margin-top: .5rem; overflow: hidden; }
+.min-seg { position: absolute; top: 4px; bottom: 4px; border-radius: 5px; min-width: 3px; background-image: linear-gradient(180deg, rgba(255, 255, 255, .35), rgba(255, 255, 255, 0) 45%); }
+.min-seg.k0 { background-color: #34d399; box-shadow: 0 0 8px rgba(52, 211, 153, .5); }
+.min-seg.k1 { background-color: #f5b942; box-shadow: 0 0 8px rgba(245, 185, 66, .55); }
+.min-seg.k2 { background-color: #60a5fa; box-shadow: 0 0 8px rgba(96, 165, 250, .5); }
+.min-div { position: absolute; top: 0; bottom: 0; width: 1px; background: rgba(255, 255, 255, .45); }
+.min-plabels { position: relative; height: 1rem; margin-top: .2rem; }
+.min-plab { position: absolute; transform: translateX(-50%); font-size: .68rem; font-weight: 700; color: var(--muted); }
+.min-chips { display: flex; gap: .4rem; flex-wrap: wrap; margin-top: .5rem; }
+.min-chip { font-size: .75rem; font-weight: 700; padding: .28rem .55rem; border-radius: 8px; background: rgba(255, 255, 255, .07); border: 1px solid rgba(255, 255, 255, .18); }
+.min-chip.pp { color: var(--gold); border-color: rgba(245, 185, 66, .7); background: rgba(245, 185, 66, .12); }
+.min-chip.pk { color: var(--blue); border-color: rgba(94, 168, 255, .7); background: rgba(94, 168, 255, .12); }
+/* ---------------- chemistry (chem sidecar) ---------------- */
+.chem-sec-t { font-size: .72rem; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); margin: .8rem 0 .45rem; }
+.chem-split { display: flex; height: 34px; border-radius: 9px; overflow: hidden; font-size: .8rem; font-weight: 800; }
+.chem-split span { display: flex; align-items: center; justify-content: center; color: #0a101c; white-space: nowrap; overflow: hidden; }
+.chem-split .cs-gold { background: var(--gold); }
+.chem-split .cs-teal { background: var(--teal); }
+.chem-sub { font-size: .8rem; color: var(--muted); margin: .4rem 0 0; }
+.chem-row { display: flex; align-items: center; gap: .6rem; margin: .34rem 0; }
+.chem-name { width: 6.4rem; flex: none; font-size: .85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chem-track { flex: 1; height: 15px; border-radius: 7px; background: rgba(255, 255, 255, .13); overflow: hidden; }
+.chem-fill { display: block; height: 100%; border-radius: 7px; }
+.chem-fill.teal { background: var(--teal); }
+.chem-fill.gold { background: var(--gold); }
+.chem-fill.blue { background: var(--blue); }
+.chem-pct { width: 2.6rem; flex: none; text-align: right; font-size: .85rem; font-weight: 800; }
 .pc-details { margin: 0 0 .8rem; font-size: .8rem; color: var(--muted); }
 .pc-details summary { cursor: pointer; list-style: none; }
 .pc-details summary::-webkit-details-marker { display: none; }

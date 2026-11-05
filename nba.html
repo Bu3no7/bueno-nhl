@@ -287,6 +287,47 @@ details.pc-sec summary::before { content: ''; width: 4px; height: 14px; border-r
 details.pc-sec summary .chev { margin-left: auto; color: #FF7A1A; letter-spacing: 0; }
 details.pc-sec[open ] summary .chev { transform: rotate(90deg); }
 .pc-sec-body { padding: .3rem 0 .4rem; }
+/* ---------------- minutes · last 6 (on/off map) ---------------- */
+.mn-head { display: flex; justify-content: flex-end; }
+.mn-avg { font-size: .95rem; font-weight: 800; color: #f5b942; }
+.mn-chart { position: relative; margin-top: .35rem; }
+.mn-avgline { position: absolute; left: 0; right: 0; border-top: 2px dashed rgba(245, 185, 66, .8); pointer-events: none; }
+.mn-cols { display: flex; gap: 6px; }
+.mn-col { flex: 1; display: flex; flex-direction: column; align-items: center; background: none; border: none; color: inherit; font: inherit; padding: 0; cursor: pointer; }
+.mn-val { height: 1.05rem; font-size: .78rem; font-weight: 700; }
+.mn-barzone { height: 92px; display: flex; align-items: flex-end; justify-content: center; width: 100%; }
+.mn-bar { display: block; width: 68%; max-width: 44px; border-radius: 7px 7px 3px 3px; background: #3adbe3; }
+.mn-col.sel .mn-bar { box-shadow: 0 0 0 2px #f5b942, 0 0 14px rgba(58, 219, 227, .35); }
+.mn-labs { display: flex; gap: 6px; margin-top: .3rem; }
+.mn-lab { flex: 1; text-align: center; font-size: .72rem; color: var(--muted); }
+.mn-hint { text-align: center; font-size: .72rem; color: var(--muted); margin-top: .45rem; }
+.mn-map { border-top: 1px solid rgba(255, 255, 255, .09); margin-top: .55rem; padding-top: .55rem; }
+.mn-map-h { display: flex; justify-content: space-between; align-items: baseline; gap: .5rem; }
+.mn-map-t { font-size: .85rem; font-weight: 700; }
+.mn-legend { display: flex; gap: .55rem; font-size: .7rem; color: var(--muted); white-space: nowrap; }
+.mn-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: .25rem; vertical-align: -1px; }
+.mn-track { position: relative; height: 34px; border-radius: 10px; background: rgba(148, 42, 48, .42); border: 1px solid rgba(255, 255, 255, .25); margin-top: .5rem; overflow: hidden; }
+.mn-seg { position: absolute; top: 4px; bottom: 4px; border-radius: 5px; min-width: 3px; background-color: #34d399; box-shadow: 0 0 8px rgba(52, 211, 153, .5); background-image: linear-gradient(180deg, rgba(255, 255, 255, .35), rgba(255, 255, 255, 0) 45%); }
+.mn-div { position: absolute; top: 0; bottom: 0; width: 1px; background: rgba(255, 255, 255, .45); }
+.mn-plabels { position: relative; height: 1rem; margin-top: .2rem; }
+.mn-plab { position: absolute; transform: translateX(-50%); font-size: .68rem; font-weight: 700; color: var(--muted); }
+.mn-chips { display: flex; gap: .4rem; flex-wrap: wrap; margin-top: .5rem; }
+.mn-chip { font-size: .75rem; font-weight: 700; padding: .28rem .55rem; border-radius: 8px; background: rgba(255, 255, 255, .07); border: 1px solid rgba(255, 255, 255, .18); }
+/* ---------------- chemistry ---------------- */
+.ch-sec-t { font-size: .72rem; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); margin: .8rem 0 .45rem; }
+.ch-split { display: flex; height: 34px; border-radius: 9px; overflow: hidden; font-size: .8rem; font-weight: 800; }
+.ch-split span { display: flex; align-items: center; justify-content: center; color: #0a101c; white-space: nowrap; overflow: hidden; }
+.ch-split .cs-teal { background: #3adbe3; }
+.ch-split .cs-gray { background: #78869e; }
+.ch-sub { font-size: .8rem; color: var(--muted); margin: .4rem 0 0; }
+.ch-row { display: flex; align-items: center; gap: .6rem; margin: .34rem 0; }
+.ch-name { width: 6.4rem; flex: none; font-size: .85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ch-track { flex: 1; height: 15px; border-radius: 7px; background: rgba(255, 255, 255, .13); overflow: hidden; }
+.ch-fill { display: block; height: 100%; border-radius: 7px; }
+.ch-fill.teal { background: #3adbe3; }
+.ch-fill.gold { background: #f5b942; }
+.ch-fill.blue { background: #60a5fa; }
+.ch-pct { width: 2.6rem; flex: none; text-align: right; font-size: .85rem; font-weight: 800; }
 .pc-price-row { display: flex; align-items: center; gap: .55rem; padding: .42rem 0; font-variant-numeric: tabular-nums; }
 .pc-price-row + .pc-price-row { border-top: 1px solid rgba(31,44,68,.45); }
 .pc-price-row.combo { background: rgba(255,122,26,.06); border-radius: 10px; padding: .5rem .5rem; margin-top: .3rem; border-top: none; }
@@ -1125,17 +1166,102 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
     lsSet('bueno-nba-mkt-v1', dayCache);
     return ratings;
   }
-  // last-4 completed games per athlete for a team: full stat lines
-  // (minutes feed the engine; the lines feed the player card).
+  // last-6 completed games per athlete for a team: full stat lines
+  // (minutes feed the engine; the lines feed the player card; stints
+  // rebuilt from substitution plays feed the card's on/off map).
   // Team block is verified against the summary before its lines are used.
+  function stintsForEvent(sum, statBlock) {
+    const athletes = (statBlock && statBlock.athletes) || [];
+    const labels = (statBlock && statBlock.labels) || [];
+    const minIx = labels.indexOf('MIN');
+    const byName = {}, boxMin = {}, starters = [];
+    for (const a of athletes) {
+      const pid = (a.athlete || {}).id, nm = (a.athlete || {}).displayName || '';
+      if (!pid || !nm) continue;
+      byName[nm] = String(pid);
+      const s = a.stats || [];
+      boxMin[pid] = s.length && minIx >= 0 ? (parseFloat(s[minIx]) || 0) : 0;
+      if (a.starter && s.length) starters.push(String(pid));
+    }
+    const plays = sum.plays || [];
+    if (!plays.length) return { gl: 2880, byPid: {} };
+    const plen = (p) => (p <= 4 ? 720 : 300);
+    // ESPN clocks are usually "M:SS" but switch to bare decimal seconds
+    // ("19.4") late in periods — both forms must parse or sub events
+    // at period ends get lost and the stint totals stop reconciling.
+    const clockRemain = (disp) => {
+      const s = String(disp || '');
+      const m = s.match(/^(\d+):(\d{2})(?:\.\d+)?$/);
+      if (m) return Number(m[1]) * 60 + Number(m[2]);
+      const f = parseFloat(s);
+      return isNaN(f) ? 0 : f;
+    };
+    let maxP = 4;
+    const evs = [];
+    plays.forEach((pl, ix) => {
+      const per = (pl.period || {}).number || 0;
+      if (per > maxP) maxP = per;
+      if (!per) return;
+      const remain = clockRemain((pl.clock || {}).displayValue);
+      let base = 0;
+      for (let p = 1; p < per; p++) base += plen(p);
+      const elapsed = base + Math.max(0, plen(per) - remain);
+      const m = String(pl.text || '').match(/^(.+?) enters the game for (.+)$/);
+      if (m) evs.push({ t: elapsed, on: byName[m[1].trim()], off: byName[m[2].trim()], ix });
+    });
+    let gl = 0;
+    for (let p = 1; p <= maxP; p++) gl += plen(p);
+    evs.sort((a, b) => a.t - b.t || a.ix - b.ix);
+    const open = {}, done = {};
+    const close = (pid, t) => {
+      if (open[pid] == null) return;
+      if (t > open[pid]) (done[pid] = done[pid] || []).push([open[pid], t]);
+      delete open[pid];
+    };
+    for (const pid of starters) open[pid] = 0;
+    for (const e of evs) {
+      if (e.off) close(e.off, e.t);
+      if (e.on && open[e.on] == null) open[e.on] = e.t;
+    }
+    for (const pid of Object.keys(open)) close(pid, gl);
+    const byPid = {};
+    for (const [pid, st] of Object.entries(done)) {
+      const tot = st.reduce((a, iv) => a + (iv[1] - iv[0]), 0);
+      // trust the parse only if it lands near the box-score minutes
+      if (boxMin[pid] && Math.abs(tot - boxMin[pid] * 60) <= 90) byPid[pid] = st;
+    }
+    return { gl, byPid };
+  }
+  // assist credits from play text: "Scorer makes ... (Assister assists)".
+  // Only this team's players resolve (the name map is this team's block).
+  function chemFromPlays(sum, statBlock) {
+    const byName = {};
+    for (const a of (statBlock && statBlock.athletes) || []) {
+      const pid = (a.athlete || {}).id, nm = (a.athlete || {}).displayName || '';
+      if (pid && nm) byName[nm] = String(pid);
+    }
+    const out = { astFgm: {}, fed: {}, feeds: {} };
+    for (const pl of sum.plays || []) {
+      const m = String(pl.text || '').match(/^(.+?) makes .*?\((.+?) assists\)/);
+      if (!m) continue;
+      const scorer = byName[m[1].trim()], ast = byName[m[2].trim()];
+      if (!scorer || !ast) continue;
+      out.astFgm[scorer] = (out.astFgm[scorer] || 0) + 1;
+      (out.fed[scorer] = out.fed[scorer] || {})[ast] = ((out.fed[scorer] || {})[ast] || 0) + 1;
+      (out.feeds[ast] = out.feeds[ast] || {})[scorer] = ((out.feeds[ast] || {})[scorer] || 0) + 1;
+    }
+    return out;
+  }
   async function recentGamesByTeam(teamId) {
     const sched = await getJSON(API + '/teams/' + teamId + '/schedule');
     const past = (sched.events || []).filter((e) => {
       const t = (((e.competitions || [])[0] || {}).status || {}).type || {};
       return t.completed;
-    }).sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 4);
+    }).sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 6);
     const byPlayer = {}; // pid -> [gameLine, ...] most recent first
     const names = {};
+    const chem = {}; // pid -> { fgm, astFgm, fed:{}, feeds:{}, shared:{}, minSec }
+    let chemGames = 0;
     let lineup = null; // most recent game's starters + rotation
     for (const ev of past) {
       const comp = (ev.competitions || [])[0] || {};
@@ -1151,6 +1277,25 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
       const statBlock = (block.statistics || [])[0] || {};
       const labels = statBlock.labels || [];
       const ix = (k) => labels.indexOf(k);
+      const stints = stintsForEvent(sum, statBlock);
+      const chemEv = chemFromPlays(sum, statBlock);
+      chemGames++;
+      const chemFor = (pid) => chem[pid] || (chem[pid] = { fgm: 0, astFgm: 0, fed: {}, feeds: {}, shared: {}, minSec: 0 });
+      for (const [pid, n] of Object.entries(chemEv.astFgm)) chemFor(pid).astFgm += n;
+      for (const [pid, m2] of Object.entries(chemEv.fed)) { const c = chemFor(pid); for (const [k, v] of Object.entries(m2)) c.fed[k] = (c.fed[k] || 0) + v; }
+      for (const [pid, m2] of Object.entries(chemEv.feeds)) { const c = chemFor(pid); for (const [k, v] of Object.entries(m2)) c.feeds[k] = (c.feeds[k] || 0) + v; }
+      // shared court time from validated stint intervals
+      const sp = Object.entries(stints.byPid);
+      for (const [pid, st] of sp) {
+        const c = chemFor(pid);
+        c.minSec += st.reduce((a, iv) => a + (iv[1] - iv[0]), 0);
+        for (const [pid2, st2] of sp) {
+          if (pid2 === pid) continue;
+          let ov = 0;
+          for (const [s1, e1] of st) for (const [s2, e2] of st2) ov += Math.max(0, Math.min(e1, e2) - Math.max(s1, s2));
+          if (ov > 0) c.shared[pid2] = (c.shared[pid2] || 0) + ov;
+        }
+      }
       if (!lineup) {
         const rows = (statBlock.athletes || []).map((a) => {
           const s = a.stats || [];
@@ -1174,9 +1319,11 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
         const s = a.stats || [];
         if (!s.length) continue;
         const tpt = String(s[ix('3PT')] || '0-0').split('-')[0];
+        chemFor(String(pid)).fgm += parseInt(String(s[ix('FG')] || '0-0').split('-')[0], 10) || 0;
         (byPlayer[pid] = byPlayer[pid] || []).push({
           date: dateStr, opp: oppAbbr, homeAway,
           min: parseFloat(s[ix('MIN')]) || 0,
+          st: stints.byPid[pid] || null, gl: stints.gl,
           pts: parseInt(s[ix('PTS')], 10) || 0,
           reb: parseInt(s[ix('REB')], 10) || 0,
           ast: parseInt(s[ix('AST')], 10) || 0,
@@ -1185,7 +1332,7 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
         names[pid] = (a.athlete || {}).displayName || '';
       }
     }
-    return { byPlayer, names, lineup };
+    return { byPlayer, names, lineup, chem, chemGames };
   }
 
   async function priceTonight() {
@@ -1226,6 +1373,7 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
             oppAbbr: opp.abbr, oppName: opp.name, home: side === 'home',
             oppDefRtg: ratings[opp.id].defRtg, paceAdj,
             recentGames: mins, recentLines: lines, gameId: g.id,
+            chem: (rec.chem || {})[pid] || null, chemNames: rec.names || {}, chemGames: rec.chemGames || 0,
           });
         }
       }
@@ -1280,6 +1428,7 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
         gameId: job.gameId, oppAbbr: job.oppAbbr, oppName: job.oppName, home: job.home,
         min: Math.round(priced.minutes), markets: mk,
         seasonAvgs, recentLines: job.recentLines, factors,
+        chem: job.chem, chemNames: job.chemNames, chemGames: job.chemGames,
       };
     });
     lsSet('bueno-nba-mkt-v1', dayCache);
@@ -1857,6 +2006,120 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
     return h;
   }
 
+  const nbaMinSel = {}; // pid -> selected game index (oldest -> newest)
+  function mnFmtClock(s) {
+    s = Math.round(s || 0);
+    return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+  }
+  function mnFmtDate(ds) {
+    const MON = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const m = String(ds || '').match(/^(\d{2})-(\d{2})$/);
+    return m ? MON[Number(m[1])] + ' ' + Number(m[2]) : (ds || '');
+  }
+  function mnMapHtml(g) {
+    if (!g) return '';
+    const title = esc(g.homeAway) + ' ' + esc(g.opp) + ' · ' + esc(mnFmtDate(g.date));
+    if (!g.st || !g.st.length) {
+      return '<div class="mn-map"><div class="mn-map-h"><span class="mn-map-t">' + title + '</span></div>' +
+        '<p class="muted small" style="margin:.4rem 0 0">On/off detail isn\'t available for this game.</p></div>';
+    }
+    const gl = g.gl || 2880;
+    const pct = (s) => (s / gl) * 100;
+    const segs = g.st.map((iv) =>
+      '<span class="mn-seg" style="left:' + pct(iv[0]).toFixed(2) + '%;width:' + Math.max(0.7, pct(iv[1] - iv[0])).toFixed(2) + '%"></span>').join('');
+    const bounds = [];
+    { let acc = 0, p = 1; while (acc < gl) { acc += p <= 4 ? 720 : 300; if (acc < gl) bounds.push(acc); p++; } }
+    const divs = bounds.map((t) => '<span class="mn-div" style="left:' + pct(t).toFixed(2) + '%"></span>').join('');
+    const periods = [];
+    { let acc = 0, p = 1; while (acc < gl) { const L = p <= 4 ? 720 : 300; periods.push({ s: acc, e: Math.min(gl, acc + L), lab: p <= 4 ? 'Q' + p : 'OT' }); acc += L; p++; } }
+    const plabs = periods.map((P) =>
+      '<span class="mn-plab" style="left:' + pct((P.s + P.e) / 2).toFixed(2) + '%">' + P.lab + '</span>').join('');
+    const chips = periods.map((P) => {
+      let tot = 0;
+      for (const iv of g.st) tot += Math.max(0, Math.min(iv[1], P.e) - Math.max(iv[0], P.s));
+      return '<span class="mn-chip">' + P.lab + ' ' + mnFmtClock(tot) + '</span>';
+    }).join('');
+    return '<div class="mn-map">' +
+      '<div class="mn-map-h"><span class="mn-map-t">' + title + '</span>' +
+      '<span class="mn-legend"><span><i style="background:#34d399"></i>on</span><span><i style="background:#e24b4b"></i>off</span></span></div>' +
+      '<div class="mn-track">' + segs + divs + '</div>' +
+      '<div class="mn-plabels">' + plabs + '</div>' +
+      '<div class="mn-chips">' + chips + '</div></div>';
+  }
+  function minutesHtml(row) {
+    const games = (row.recentLines || []).slice(0, 6).reverse(); // oldest -> newest
+    if (!games.length) return '<p class="muted small">No recent games on file yet.</p>';
+    let sel = nbaMinSel[row.id];
+    if (sel == null || sel >= games.length) sel = games.length - 1;
+    nbaMinSel[row.id] = sel;
+    const maxMin = Math.max(...games.map((g) => g.min), 1);
+    const avg = games.reduce((a, g) => a + g.min, 0) / games.length;
+    const avgPx = Math.min(92, (avg / maxMin) * 92); // .mn-barzone is 92px tall
+    const cols = games.map((g, i) => {
+      const hgt = Math.max(9, (g.min / maxMin) * 100);
+      return '<button type="button" class="mn-col' + (i === sel ? ' sel' : '') + '" data-mn="' + i + '">' +
+        '<span class="mn-val">' + Math.round(g.min) + '</span>' +
+        '<span class="mn-barzone"><span class="mn-bar" style="height:' + hgt.toFixed(1) + '%"></span></span></button>';
+    }).join('');
+    const labs = games.map((g) => '<span class="mn-lab">' + esc(g.homeAway + g.opp) + '</span>').join('');
+    return '<div class="mn-head"><span class="mn-avg">L6 AVG ' + (Math.round(avg * 10) / 10) + '</span></div>' +
+      '<div class="mn-chart"><div class="mn-avgline" style="bottom:' + avgPx.toFixed(0) + 'px"></div><div class="mn-cols">' + cols + '</div></div>' +
+      '<div class="mn-labs">' + labs + '</div>' +
+      '<div class="mn-hint">Tap a bar to break down that game</div>' +
+      '<div data-mn-map>' + mnMapHtml(games[sel]) + '</div>';
+  }
+
+  function chemShortName(row, pid) {
+    const full = (row.chemNames || {})[pid] || '';
+    if (!full) return '';
+    const parts = full.split(' ');
+    return parts.length > 1 ? parts.slice(1).join(' ') : full;
+  }
+  function chemRowsHtml(row, map, base, cls) {
+    const entries = Object.entries(map || {})
+      .map(([pid, n]) => ({ name: chemShortName(row, pid), n }))
+      .filter((x) => x.name && x.n > 0)
+      .sort((a, b) => b.n - a.n)
+      .slice(0, 5);
+    if (!entries.length || !base) return '';
+    return entries.map((x) => {
+      const p = Math.round((x.n / base) * 100);
+      return '<div class="ch-row"><span class="ch-name">' + esc(x.name) + '</span>' +
+        '<span class="ch-track"><span class="ch-fill ' + cls + '" style="width:' + Math.max(3, p) + '%"></span></span>' +
+        '<span class="ch-pct">' + p + '%</span></div>';
+    }).join('');
+  }
+  function chemHtml(row) {
+    const c = row.chem;
+    if (!c || !(c.fgm >= 5)) return '<p class="muted small">Not enough recent games on file yet.</p>';
+    const astP = Math.round((c.astFgm / c.fgm) * 100);
+    const ownP = 100 - astP;
+    const splitLab = (p, txt) => (p >= 26 ? txt + ' ' + p + '%' : p + '%');
+    let h = '<div class="ch-sec-t" style="margin-top:.1rem">How his baskets happen</div>' +
+      '<div class="ch-split"><span class="cs-teal" style="width:' + astP + '%">' + splitLab(astP, 'ASSISTED') + '</span>' +
+      '<span class="cs-gray" style="width:' + ownP + '%">' + splitLab(ownP, 'CREATED HIS OWN') + '</span></div>' +
+      '<p class="ch-sub">' + c.astFgm + ' of his ' + c.fgm + ' made shots were set up by a teammate</p>';
+    const fed = chemRowsHtml(row, c.fed, c.fgm, 'teal');
+    if (fed) h += '<div class="ch-sec-t">Fed by · % of his ' + c.fgm + ' baskets</div>' + fed;
+    const astTot = Object.values(c.feeds || {}).reduce((a, b) => a + b, 0);
+    const feeds = chemRowsHtml(row, c.feeds, astTot, 'gold');
+    if (feeds) h += '<div class="ch-sec-t">Feeds · % of his ' + astTot + ' assists</div>' + feeds;
+    if (c.minSec > 0) {
+      const shared = Object.entries(c.shared || {})
+        .map(([pid, secs]) => ({ name: chemShortName(row, pid), pct: Math.round((secs / c.minSec) * 100) }))
+        .filter((x) => x.name && x.pct >= 5)
+        .sort((a, b) => b.pct - a.pct)
+        .slice(0, 5);
+      if (shared.length) {
+        h += '<div class="ch-sec-t">Shares the court with · % of his minutes</div>' + shared.map((x) =>
+          '<div class="ch-row"><span class="ch-name">' + esc(x.name) + '</span>' +
+          '<span class="ch-track"><span class="ch-fill blue" style="width:' + Math.max(3, x.pct) + '%"></span></span>' +
+          '<span class="ch-pct">' + x.pct + '%</span></div>').join('');
+      }
+    }
+    return h;
+  }
+
   function renderCard(pid, preserve) {
     if (!cardSheet) return;
     const openSecs = {};
@@ -1902,6 +2165,11 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
         '<span class="pc-pr-odds">O ' + m.over + ' · U ' + m.under + '</span></div>';
     }).join('');
     h += sec('lines', "Tonight's fair lines", linesHtml, true);
+    // Minutes · last 6 (open by default — the on/off visual)
+    const minGames = (row.recentLines || []).slice(0, 6);
+    if (minGames.length) h += sec('minutes', 'Minutes · last ' + minGames.length, minutesHtml(row), true);
+    // Chemistry (open by default)
+    if (row.chem && row.chem.fgm >= 5) h += sec('chem', 'Chemistry · last ' + (row.chemGames || minGames.length), chemHtml(row), true);
     // Milestones
     const ladHtml = MKT_KEYS.map((key) => {
       const lad = row.markets[key].ladder || [];
@@ -1968,6 +2236,8 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
     if (cb) cb.addEventListener('click', closeCard);
     cardSheet.querySelectorAll('[data-legbtn]').forEach((b) =>
       b.addEventListener('click', () => addLeg(b.dataset.label, parseFloat(b.dataset.p))));
+    cardSheet.querySelectorAll('[data-mn]').forEach((b) =>
+      b.addEventListener('click', () => { nbaMinSel[row.id] = Number(b.dataset.mn); renderCard(pid, true); }));
     syncParlayUI();
   }
 

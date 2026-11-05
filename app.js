@@ -2474,6 +2474,171 @@ function drawRink(canvas, shots, teamColor) {
   rinkPath();
   ctx.strokeStyle = 'rgba(235,242,255,0.55)'; ctx.lineWidth = 3; ctx.stroke();
 }
+/* ---------------- ice time · last 6 (minutes sidecar) ----------------
+   data/min-<date>.json is built by data-builder/minutes.js: per skater,
+   the last 6 games with TOI bars and a shift map (green even strength,
+   gold power play, blue penalty kill, red off). Loaded lazily on the
+   first card open; a missing sidecar just hides the section. */
+let minSidecar = null, minSidecarState = 'idle'; // idle | loading | ok | fail
+const minSel = {}; // pid -> selected game index
+function minFmtSec(s) {
+  s = Math.round(s || 0);
+  return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+}
+function minFmtDate(dstr) {
+  if (!dstr) return '';
+  return new Date(dstr + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+async function loadMinSidecar() {
+  if (minSidecarState === 'loading' || minSidecarState === 'ok') return;
+  minSidecarState = 'loading';
+  try {
+    const r = await fetch(`data/min-${state.date}.json`, { headers: { 'Accept': 'application/json' } });
+    if (!r.ok) throw new Error('no sidecar');
+    minSidecar = await r.json();
+    minSidecarState = 'ok';
+  } catch (e) { minSidecarState = 'fail'; }
+}
+function minGamesFor(r) {
+  return (minSidecar && minSidecar.players && minSidecar.players[String(r.pid)]) || [];
+}
+function pcMinSlotHtml(r) {
+  if (minSidecarState === 'ok') return pcMinutesHtml(r);
+  if (minSidecarState === 'fail') return '';
+  return `<div class="pc-min" data-min-slot="${esc(String(r.pid))}"><div class="pc-min-h"><span class="pc-min-t">Ice time</span></div><p class="muted small" style="margin:.35rem 0 0">Loading ice time…</p></div>`;
+}
+function pcMinutesHtml(r) {
+  const games = minGamesFor(r);
+  if (!games.length) return '';
+  const sel = Math.max(0, Math.min(minSel[r.pid] != null ? minSel[r.pid] : games.length - 1, games.length - 1));
+  minSel[r.pid] = sel;
+  const maxToi = Math.max(...games.map((g) => g.toi), 1);
+  const avgSec = (r.toiMin || 0) * 60;
+  const avgBottomPx = Math.min(92, (avgSec / maxToi) * 92); // .min-barzone is 92px tall
+  const cols = games.map((g, i) => {
+    const h = Math.max(9, (g.toi / maxToi) * 100);
+    return `<button type="button" class="min-col${i === sel ? ' sel' : ''}" data-mi="${i}" aria-label="Break down the game ${g.hr === 'R' ? 'at' : 'vs'} ${esc(g.opp)}">
+      <span class="min-val">${minFmtSec(g.toi)}</span>
+      <span class="min-barzone"><span class="min-bar" style="height:${h.toFixed(1)}%"></span></span>
+    </button>`;
+  }).join('');
+  const labs = games.map((g) => `<span class="min-lab">${esc(g.hr === 'R' ? '@' + g.opp : g.opp)}</span>`).join('');
+  return `<div class="pc-min" data-min-root>
+    <div class="pc-min-h"><span class="pc-min-t">Ice time · last ${games.length}</span><span class="pc-min-avg">AVG ${fmtToi(r.toiMin || 0)}</span></div>
+    <div class="min-chart"><div class="min-avgline" style="bottom:${avgBottomPx.toFixed(0)}px"></div><div class="min-cols">${cols}</div></div>
+    <div class="min-labs">${labs}</div>
+    <div class="min-hint">Tap a bar to break down that game</div>
+    ${minMapHtml(games[sel])}
+  </div>`;
+}
+function minMapHtml(g) {
+  if (!g) return '';
+  const len = g.len || (g.per && g.per[3] > 0 ? 3900 : 3600);
+  const pct = (s) => (s / len) * 100;
+  const segs = (g.seg || []).map(([s, e, k]) =>
+    `<span class="min-seg k${k}" style="left:${pct(s).toFixed(2)}%;width:${Math.max(0.7, pct(e - s)).toFixed(2)}%"></span>`).join('');
+  const divs = [1200, 2400, 3600].filter((t) => t < len)
+    .map((t) => `<span class="min-div" style="left:${pct(t).toFixed(2)}%"></span>`).join('');
+  const nPer = len > 3600 ? 4 : 3;
+  const plabs = [];
+  for (let i = 0; i < nPer; i++) {
+    const c = i < 3 ? i * 1200 + 600 : 3750;
+    plabs.push(`<span class="min-plab" style="left:${pct(c).toFixed(2)}%">${i < 3 ? 'P' + (i + 1) : 'OT'}</span>`);
+  }
+  const chips = [];
+  for (let i = 0; i < nPer; i++) {
+    if (i === 3 && !(g.per[3] > 0)) continue;
+    chips.push(`<span class="min-chip">${i < 3 ? 'P' + (i + 1) : 'OT'} ${minFmtSec(g.per[i])}</span>`);
+  }
+  if (g.pp >= 10) chips.push(`<span class="min-chip pp">PP ${minFmtSec(g.pp)}</span>`);
+  if (g.pk >= 10) chips.push(`<span class="min-chip pk">PK ${minFmtSec(g.pk)}</span>`);
+  const legend = [];
+  if (g.pp > 0) legend.push('<span><i style="background:#f5b942"></i>PP</span>');
+  if (g.pk > 0) legend.push('<span><i style="background:#60a5fa"></i>PK</span>');
+  legend.push('<span><i style="background:#34d399"></i>even</span>');
+  legend.push('<span><i style="background:#e24b4b"></i>off</span>');
+  return `<div class="min-map">
+    <div class="min-map-h"><span class="min-map-t">${g.hr === 'R' ? 'at' : 'vs'} ${esc(g.opp)} · ${esc(minFmtDate(g.d))}</span><span class="min-legend">${legend.join('')}</span></div>
+    <div class="min-track">${segs}${divs}</div>
+    <div class="min-plabels">${plabs.join('')}</div>
+    <div class="min-chips">${chips.join('')}</div>
+  </div>`;
+}
+function wireMinutes(r) {
+  const body = $('modalBody');
+  if (!body) return;
+  body.querySelectorAll('[data-mi]').forEach((b) => b.addEventListener('click', () => {
+    minSel[r.pid] = Number(b.dataset.mi);
+    const root = body.querySelector('[data-min-root]');
+    if (root) { root.outerHTML = pcMinutesHtml(r); wireMinutes(r); }
+  }));
+}
+async function ensureMinutes(r) {
+  await loadMinSidecar();
+  if (minSidecarState !== 'ok') return;
+  const body = $('modalBody');
+  if (!body) return;
+  const slot = body.querySelector(`[data-min-slot="${esc(String(r.pid))}"]`);
+  if (slot) { slot.outerHTML = pcMinutesHtml(r); wireMinutes(r); }
+}
+/* ---------------- chemistry (chem sidecar) ----------------
+   data/chem-<date>.json from data-builder/chem.js: season goal
+   involvement (scores vs sets up, fed by, feeds) + shared-TOI %. */
+let chemSidecar = null, chemSidecarState = 'idle';
+async function loadChemSidecar() {
+  if (chemSidecarState === 'loading' || chemSidecarState === 'ok') return;
+  chemSidecarState = 'loading';
+  try {
+    const r = await fetch(`data/chem-${state.date}.json`, { headers: { 'Accept': 'application/json' } });
+    if (!r.ok) throw new Error('no sidecar');
+    chemSidecar = await r.json();
+    chemSidecarState = 'ok';
+  } catch (e) { chemSidecarState = 'fail'; }
+}
+function pcChemSlotHtml(r) {
+  if (chemSidecarState === 'ok') return pcChemHtml(r);
+  if (chemSidecarState === 'fail') return '';
+  return `<div class="pc-min" data-chem-slot="${esc(String(r.pid))}"><div class="pc-min-h"><span class="pc-min-t">Chemistry</span></div><p class="muted small" style="margin:.35rem 0 0">Loading chemistry…</p></div>`;
+}
+function chemRowsHtml(list, base, cls) {
+  if (!list || !list.length || !base) return '';
+  return list.map((x) => {
+    const p = Math.round((x.n / base) * 100);
+    return `<div class="chem-row"><span class="chem-name">${esc(x.name)}</span><span class="chem-track"><span class="chem-fill ${cls}" style="width:${Math.max(3, p)}%"></span></span><span class="chem-pct">${p}%</span></div>`;
+  }).join('');
+}
+function pcChemHtml(r) {
+  const c = (chemSidecar && chemSidecar.players && chemSidecar.players[String(r.pid)]) || null;
+  if (!c || (c.g + c.a) < 4) return '';
+  const inv = c.g + c.a;
+  const scoreP = Math.round((c.g / inv) * 100);
+  const setupP = 100 - scoreP;
+  const splitLab = (p, txt) => (p >= 26 ? `${txt} ${p}%` : `${p}%`);
+  let h = `<div class="pc-min" data-chem-root>
+    <div class="pc-min-h"><span class="pc-min-t">Chemistry</span></div>
+    <div class="chem-sec-t" style="margin-top:.55rem">Role · his ${inv} goal involvements this season</div>
+    <div class="chem-split"><span class="cs-gold" style="width:${scoreP}%">${splitLab(scoreP, 'SCORES')}</span><span class="cs-teal" style="width:${setupP}%">${splitLab(setupP, 'SETS UP')}</span></div>
+    <p class="chem-sub">${c.g} goals · ${c.a} assists${c.a >= 3 ? ` — ${c.a1} of the ${c.a} assists are primary` : ''}</p>`;
+  if (c.g >= 3 && c.fed && c.fed.length) {
+    h += `<div class="chem-sec-t">Fed by · % of his ${c.g} goals with an assist from</div>${chemRowsHtml(c.fed, c.g, 'teal')}`;
+  }
+  if (c.a >= 3 && c.feeds && c.feeds.length) {
+    h += `<div class="chem-sec-t">Feeds · % of his ${c.a} assists finished by</div>${chemRowsHtml(c.feeds, c.a, 'gold')}`;
+  }
+  if (c.shared && c.shared.length) {
+    h += `<div class="chem-sec-t">Shares the ice with · last ${c.sharedGames} games</div>` + c.shared.map((x) =>
+      `<div class="chem-row"><span class="chem-name">${esc(x.name)}</span><span class="chem-track"><span class="chem-fill blue" style="width:${Math.max(3, x.pct)}%"></span></span><span class="chem-pct">${x.pct}%</span></div>`).join('');
+  }
+  return h + '</div>';
+}
+async function ensureChem(r) {
+  await loadChemSidecar();
+  if (chemSidecarState !== 'ok') return;
+  const body = $('modalBody');
+  if (!body) return;
+  const slot = body.querySelector(`[data-chem-slot="${esc(String(r.pid))}"]`);
+  if (slot) slot.outerHTML = pcChemHtml(r);
+}
 function openPlayer(pid, gameId) {
   const r = state.skaters.find((s) => String(s.pid) === String(pid) && String(s.gameId) === String(gameId));
   if (!r) return;
@@ -2554,6 +2719,8 @@ function openPlayer(pid, gameId) {
     <div class="stat-inline"><span><strong>${r.goals}</strong> goals</span><span><strong>${r.assists}</strong> assists</span><span><strong>${r.points}</strong> points</span><span><strong>${r.gp}</strong> GP</span></div>
     ${vsGoalieEdgeHtml(r, g)}
     ${formHtml}
+    ${pcMinSlotHtml(r)}
+    ${pcChemSlotHtml(r)}
     ${pcLastGameHtml(l5)}
     ${zoneNote}
     <div class="section-div"></div>
@@ -2587,6 +2754,9 @@ function openPlayer(pid, gameId) {
       <button class="btn" id="parlayAddBtn">Add to parlay</button>
     </div>`;
   $('playerModal').classList.remove('hidden');
+  wireMinutes(r);
+  ensureMinutes(r);
+  ensureChem(r);
   ensurePlayerBio(r);
   // map follows the Markets dropdown on open; pills let you switch without closing
   const mk = state.marketKind;
