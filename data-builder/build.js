@@ -324,7 +324,7 @@ function saveZoneCache(cache) {
 }
 
 const playerCache = new Map();
-async function getPlayer(pid, retries = 3) {
+async function getPlayer(pid, retries = 5) {
   if (playerCache.has(pid)) return playerCache.get(pid);
   const attempt = async (n) => {
     try {
@@ -333,7 +333,10 @@ async function getPlayer(pid, retries = 3) {
       return d;
     } catch (e) {
       if (n < retries) {
-        await new Promise((r) => setTimeout(r, 1000 * Math.pow(2, n))); // 1s, 2s, 4s backoff
+        // 1s, 2s, 4s, 8s, 16s backoff with jitter — the landing endpoint
+        // rate-limits in bursts; a plain 1/2/4 ladder was not enough on
+        // big slates (44/512 failures on 2026-11-05 from two networks).
+        await new Promise((r) => setTimeout(r, 1000 * Math.pow(2, n) * (0.7 + Math.random() * 0.6)));
         return attempt(n + 1);
       }
       playerCache.set(pid, null);
@@ -442,12 +445,25 @@ async function main() {
   }
   const allPids = [...pidSet, ...goalieIds];
   console.log(`[data-builder] ${pidSet.size} skaters + ${goalieIds.size} goalies = ${allPids.length} landings`);
+  const failedPids = [];
   await E.limitedMap(allPids, 3, async (pid) => {
     const d = await getPlayer(pid).catch(() => null);
     nFetch++;
     if (d) out.players[String(pid)] = slimPlayer(d);
-    else failCounts.landing++;
+    else { failCounts.landing++; failedPids.push(pid); }
   });
+  // Repair pass: landing failures cluster in rate-limit bursts, so a slower
+  // second sweep after a breather rescues most of them before the gate judges.
+  if (failedPids.length) {
+    console.log(`[data-builder] landing repair pass: ${failedPids.length} pids`);
+    await sleep(10000);
+    await E.limitedMap(failedPids, 2, async (pid) => {
+      playerCache.delete(pid);
+      const d = await getPlayer(pid, 5).catch(() => null);
+      if (d) { out.players[String(pid)] = slimPlayer(d); failCounts.landing--; }
+    });
+    console.log(`[data-builder] landing repair done: ${Object.keys(out.players).length}/${allPids.length} players`);
+  }
 
   // 6b. season-to-date zone shots per skater (heat maps): regular-season
   // finals for slate teams before dateStr, normalized to attacking coords.
