@@ -300,7 +300,7 @@
   <div class="card featured" id="tdLooks"></div>
   <h2 class="sec">TOP YARDAGE LOOKS <span>fair medians</span></h2>
   <div class="card" id="yardLooks"></div>
-  <h2 class="sec">ON BYE · WEEK 9 <span>no prices this week</span></h2>
+  <h2 class="sec">ON BYE · WEEK 10 <span>no prices this week</span></h2>
   <div class="card" id="byeWrap"></div>
   <h2 class="sec">HOW IT WORKS <span>the short version</span></h2>
   <div class="card">
@@ -323,7 +323,7 @@
 
 <!-- ============ VIEW: SLATE ============ -->
 <section class="view" id="view-slate">
-  <h2 class="sec">WEEK 9 SLATE <span>game model · live tracker</span></h2>
+  <h2 class="sec">WEEK 10 SLATE <span>game model · live tracker</span></h2>
   <div id="slateWrap"></div>
   <h2 class="sec">STANDINGS <span>by division</span></h2>
   <div id="standingsWrap"></div>
@@ -333,7 +333,7 @@
 <section class="view" id="view-game">
   <div class="backbar"><span class="backbtn" id="gameBackBtn">‹ Slate</span></div>
   <div class="phead">
-    <div><h3 id="gTitle">Baltimore at Jacksonville</h3><p id="gMeta">THU 6:15 PM · WEEK 9 · GAME BREAKDOWN</p></div>
+    <div><h3 id="gTitle">Baltimore at Jacksonville</h3><p id="gMeta">THU 6:15 PM · WEEK 10 · GAME BREAKDOWN</p></div>
   </div>
   <div id="gBody"></div>
 </section>
@@ -399,7 +399,7 @@
 </nav>
 
 <script>
-/* ===== Bueno Football — production build. Prices: data/nfl-2026-w9.json (NFL props model v1 + FG model). Live: ESPN feed. ===== */
+/* ===== Bueno Football — production build. Prices: data/nfl-2026-w10.json (NFL props model v1 + FG model). Live: ESPN feed. ===== */
 var TEAMNAME = {ARI:"Arizona Cardinals",ATL:"Atlanta Falcons",BAL:"Baltimore Ravens",BUF:"Buffalo Bills",CAR:"Carolina Panthers",CHI:"Chicago Bears",CIN:"Cincinnati Bengals",CLE:"Cleveland Browns",DAL:"Dallas Cowboys",DEN:"Denver Broncos",DET:"Detroit Lions",GB:"Green Bay Packers",HOU:"Houston Texans",IND:"Indianapolis Colts",JAX:"Jacksonville Jaguars",KC:"Kansas City Chiefs",LAC:"Los Angeles Chargers",LAR:"Los Angeles Rams",LV:"Las Vegas Raiders",MIA:"Miami Dolphins",MIN:"Minnesota Vikings",NE:"New England Patriots",NO:"New Orleans Saints",NYG:"New York Giants",NYJ:"New York Jets",PHI:"Philadelphia Eagles",PIT:"Pittsburgh Steelers",SEA:"Seattle Seahawks",SF:"San Francisco 49ers",TB:"Tampa Bay Buccaneers",TEN:"Tennessee Titans",WSH:"Washington Commanders"};
 var TEAMCOLOR32 = {ARI:"#97233F",ATL:"#A71930",BAL:"#241773",BUF:"#00338D",CAR:"#0085CA",CHI:"#C83803",CIN:"#FB4F14",CLE:"#311D00",DAL:"#003594",DEN:"#FB4F14",DET:"#0076B6",GB:"#FFB612",HOU:"#A71930",IND:"#002C5F",JAX:"#006778",KC:"#E31837",LAC:"#FFC20E",LAR:"#FFD100",LV:"#A5ACAF",MIA:"#008E97",MIN:"#4F2683",NE:"#C8102E",NO:"#D3BC8D",NYG:"#0B2265",NYJ:"#125740",PHI:"#004C54",PIT:"#FFB612",SEA:"#69BE28",SF:"#AA0000",TB:"#D50A0A",TEN:"#4B92DB",WSH:"#FFB612"};
 var B = null, PLAYERS = {}, KICKERS = {}, GAMES = {}, BOARDS = {}, FACES = {}, TEAMCOLOR = {}, BYID = {}, TEAMINFO = {}, LIVE = {}, WP = {}, SEARCH_ITEMS = [];
@@ -756,7 +756,9 @@ function parseSummary(espnId, d){
   SUMMARIES[espnId] = out;
 }
 function fetchESPN(){
-  fetch("https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?week="+B.week+"&seasontype=2&dates=2026").then(function(r){ return r.json(); }).then(function(d){
+  /* ESPN calls this slate week 9; B.week is our numbering (10) and drives
+     the labels only — the live fetch must use the ESPN week. */
+  fetch("https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?week=9&seasontype=2&dates=2026").then(function(r){ return r.json(); }).then(function(d){
     parseScoreboard(d);
     renderSlate(); renderLiveNow();
     var inGames = B.games.filter(function(g){ return LIVE[g.espnId] && LIVE[g.espnId].state!=="pre"; });
@@ -806,7 +808,7 @@ document.addEventListener("click", function(e){
   var gEl = e.target.closest("[data-game]");
   if(gEl){ renderGame(gEl.getAttribute("data-game")); }
 });
-fetch("data/nfl-2026-w9.json").then(function(r){ return r.json(); }).then(function(bundle){
+fetch("data/nfl-2026-w10.json").then(function(r){ return r.json(); }).then(function(bundle){
   B = bundle;
   buildObjects();
   renderBoard("td");
@@ -817,7 +819,7 @@ fetch("data/nfl-2026-w9.json").then(function(r){ return r.json(); }).then(functi
   fetchESPN();
   setInterval(fetchESPN, 60000);
 }).catch(function(){
-  $("boardWrap").innerHTML = '<p class="note" style="margin:12px 2px">The Week 9 price bundle could not load. Refresh in a moment.</p>';
+  $("boardWrap").innerHTML = '<p class="note" style="margin:12px 2px">The Week 10 price bundle could not load. Refresh in a moment.</p>';
 });
 </script>
 
