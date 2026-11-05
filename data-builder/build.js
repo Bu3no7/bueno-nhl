@@ -445,24 +445,27 @@ async function main() {
   }
   const allPids = [...pidSet, ...goalieIds];
   console.log(`[data-builder] ${pidSet.size} skaters + ${goalieIds.size} goalies = ${allPids.length} landings`);
-  const failedPids = [];
-  await E.limitedMap(allPids, 3, async (pid) => {
+  let failedPids = [];
+  await E.limitedMap(allPids, 2, async (pid) => {
     const d = await getPlayer(pid).catch(() => null);
     nFetch++;
     if (d) out.players[String(pid)] = slimPlayer(d);
     else { failCounts.landing++; failedPids.push(pid); }
   });
-  // Repair pass: landing failures cluster in rate-limit bursts, so a slower
-  // second sweep after a breather rescues most of them before the gate judges.
-  if (failedPids.length) {
-    console.log(`[data-builder] landing repair pass: ${failedPids.length} pids`);
-    await sleep(10000);
+  // Repair passes: landing failures cluster in rate-limit bursts, so slower
+  // sweeps after a breather rescue most of them before the gate judges.
+  // Two sweeps (added 2026-11-05 after a hardened build still failed once
+  // in Actions while an earlier run the same day passed clean).
+  for (let sweep = 1; sweep <= 2 && failedPids.length; sweep++) {
+    console.log(`[data-builder] landing repair sweep ${sweep}: ${failedPids.length} pids`);
+    await sleep(sweep === 1 ? 10000 : 20000);
     await E.limitedMap(failedPids, 2, async (pid) => {
       playerCache.delete(pid);
       const d = await getPlayer(pid, 5).catch(() => null);
       if (d) { out.players[String(pid)] = slimPlayer(d); failCounts.landing--; }
     });
-    console.log(`[data-builder] landing repair done: ${Object.keys(out.players).length}/${allPids.length} players`);
+    failedPids = failedPids.filter((pid) => !out.players[String(pid)]);
+    console.log(`[data-builder] landing repair sweep ${sweep} done: ${Object.keys(out.players).length}/${allPids.length} players`);
   }
 
   // 6b. season-to-date zone shots per skater (heat maps): regular-season
