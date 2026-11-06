@@ -405,7 +405,7 @@ tr.scored td:first-child .pname { color: #8ff5f7; text-shadow: 0 0 14px rgba(58,
 
 /* ---------- player modal ---------- */
 .modal {
-  position: fixed; inset: 0; z-index: 100; background: rgba(3, 5, 9, .78);
+  position: fixed; inset: 0; z-index: 300; background: rgba(3, 5, 9, .78);
   -webkit-backdrop-filter: blur(5px); backdrop-filter: blur(5px);
   display: flex; align-items: center; justify-content: center; padding: 1rem;
 }
@@ -1116,9 +1116,12 @@ tr.team-row:focus-visible { outline: 2px solid var(--teal); outline-offset: -2px
 
 /* ---- NHL game sheet (slate-card expansion) ---- */
 /* Player/goalie cards open above the matchup sheet: both modals share
-   z-index 100 and the matchup modal sits later in the DOM, so without
-   this the goalie card opened from a sheet would paint behind it. */
-#playerModal { z-index: 110; }
+   the .modal layer and the matchup modal sits later in the DOM, so without
+   this the goalie card opened from a sheet would paint behind it. The
+   whole modal layer (300) also sits above the page chrome — .page-topbar
+   is z-index 150 and .bottom-nav is 200 — so an open card is never
+   covered by the top or bottom nav (Alex's report, 2026-11-06). */
+#playerModal { z-index: 310; }
 .gs-head { margin: -.2rem 0 .9rem; padding: .6rem .4rem .2rem; border-radius: 14px; }
 .gs-sec { border-top: 1px solid var(--border-soft); }
 .gs-sec summary { padding: .8rem .2rem; font-weight: 750; font-size: .95rem; cursor: pointer; list-style: none; }
