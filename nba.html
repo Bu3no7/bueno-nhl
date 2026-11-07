@@ -405,6 +405,75 @@ details.pc-sec[open ] summary .chev { transform: rotate(90deg); }
 .pb-calc { border-top: 1px solid rgba(31,44,68,.6); margin-top: 1rem; padding-top: .7rem; }
 .pb-calc-row { display: flex; align-items: center; justify-content: space-between; gap: .6rem; padding: .35rem 0; font-size: .88rem; color: var(--muted); font-variant-numeric: tabular-nums; flex-wrap: wrap; }
 .pb-calc-row b { color: var(--text); }
+
+/* ---- Markets filter (mock v3) ---- */
+.mf-bar { display:flex; gap:.5rem; margin:.1rem 0 .5rem; }
+.mf-search { flex:1; background:#0b1322; border:1px solid var(--border); border-radius:11px; color:var(--text); font-size:.92rem; font-weight:600; padding:.62rem .8rem; font-family:inherit; min-width:0; }
+.mf-search:focus { outline:2px solid #FF7A1A; outline-offset:1px; }
+.mf-btn { position:relative; background:#FF7A1A; color:#0a0a0e; border:1px solid #FF7A1A; border-radius:11px; font-weight:800; font-size:.92rem; padding:.62rem 1rem; cursor:pointer; font-family:inherit; flex:none; }
+.mf-badge { position:absolute; top:-9px; right:-9px; background:#3adbe3; color:#06202a; border-radius:50%; min-width:22px; height:22px; line-height:22px; font-size:.75rem; font-weight:800; padding:0 4px; }
+.mf-chips { display:flex; gap:.4rem; flex-wrap:wrap; margin:.1rem 0 .4rem; }
+.mf-chip { background:rgba(58,219,227,.1); color:#3adbe3; border:1px solid rgba(58,219,227,.55); border-radius:999px; padding:.22rem .65rem; font-size:.76rem; font-weight:700; cursor:pointer; font-family:inherit; }
+.mf-chip.red { background:rgba(240,102,94,.12); color:#ffa79f; border-color:rgba(240,102,94,.55); }
+.mf-count { color:#f5b942; font-weight:700; font-size:.82rem; margin:.1rem 0 .5rem; }
+.mf-count .clear { color:#f0665e; float:right; cursor:pointer; font-weight:800; background:none; border:none; font-family:inherit; font-size:.82rem; }
+.fl-overlay { position:fixed; inset:0; background:rgba(2,5,10,.65); display:none; z-index:615; }
+.fl-overlay.open { display:block; }
+.fl-sheet { position:absolute; left:0; right:0; bottom:0; top:9%; max-width:560px; margin:0 auto; background:var(--card); border:1px solid var(--border); border-bottom:none; border-radius:18px 18px 0 0; padding:1rem 1.05rem 2rem; overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; }
+.fl-sheet h3 { font-size:1.15rem; font-weight:800; margin:0 2rem .2rem 0; }
+.fl-sec { font-size:.7rem; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:#f5b942; margin:1rem 0 .45rem; }
+.fl-games { display:flex; gap:.4rem; flex-wrap:wrap; }
+.fl-game { background:var(--card2); border:1px solid var(--border); color:var(--text); border-radius:999px; padding:.34rem .7rem; font-size:.8rem; font-weight:700; cursor:pointer; font-family:inherit; }
+.fl-game.off { background:rgba(240,102,94,.14); color:#ffa79f; border-color:rgba(240,102,94,.6); text-decoration:line-through; }
+.fl-note { color:var(--muted); font-size:.76rem; margin-top:.35rem; }
+.fl-hidebar { display:flex; gap:.45rem; }
+.fl-hidebar input { flex:1; background:#0b1322; border:1px solid var(--border); border-radius:11px; color:var(--text); font-size:.9rem; padding:.55rem .7rem; font-family:inherit; min-width:0; }
+.fl-hidebar button { background:var(--card2); border:1px solid var(--border); color:var(--text); border-radius:11px; font-weight:700; padding:.55rem .8rem; cursor:pointer; font-family:inherit; }
+.fl-tog { display:flex; align-items:center; gap:.6rem; padding:.5rem 0; font-size:.92rem; cursor:pointer; }
+.fl-tog input { width:20px; height:20px; accent-color:#3adbe3; flex:none; }
+.fl-slider { width:100%; accent-color:#3adbe3; }
+.fl-foot { display:flex; gap:.5rem; margin-top:1.1rem; }
+.fl-foot .ghost { flex:1; background:var(--card2); border:1px solid var(--border); color:var(--text); border-radius:12px; padding:.7rem; font-weight:700; cursor:pointer; font-family:inherit; }
+.fl-foot .go { flex:2; background:#FF7A1A; border:1px solid #FF7A1A; color:#0a0a0e; border-radius:12px; padding:.7rem; font-weight:800; cursor:pointer; font-family:inherit; }
+/* ---- Defensive Matchups (home) ---- */
+.dm-row { display:flex; align-items:center; gap:.6rem; padding:.55rem 0; cursor:pointer; }
+.dm-row + .dm-row { border-top:1px solid rgba(31,44,68,.5); }
+.dm-rank { color:var(--muted); font-weight:800; width:16px; text-align:right; flex:none; }
+.dm-row img.hs { width:46px; height:46px; border-radius:50%; object-fit:cover; object-position:top; background:var(--card2); flex:none; }
+.dm-name { font-weight:700; font-size:.92rem; }
+.dm-sub { color:var(--muted); font-size:.72rem; font-weight:600; }
+.dm-stats { margin-left:auto; display:flex; gap:.85rem; text-align:center; flex:none; }
+.dm-stat .v { font-weight:800; font-size:1.02rem; font-variant-numeric:tabular-nums; }
+.dm-stat .v.ora { color:#FF7A1A; }
+.dm-stat .k { color:var(--muted); font-size:.6rem; letter-spacing:.07em; text-transform:uppercase; }
+.dm-chip { border-radius:999px; padding:.16rem .55rem; font-size:.66rem; font-weight:800; border:1px solid; flex:none; }
+.dm-chip.atk { color:#4ade80; border-color:rgba(74,222,128,.55); background:rgba(74,222,128,.1); }
+.dm-chip.earn { color:#f5b942; border-color:rgba(245,185,66,.55); background:rgba(245,185,66,.1); }
+.dm-chip.tough { color:#f0665e; border-color:rgba(240,102,94,.55); background:rgba(240,102,94,.1); }
+.dm-chip.cold { color:#8b96ab; border-color:rgba(139,150,171,.55); background:rgba(139,150,171,.1); }
+/* ---- Shot zones (player card) ---- */
+.zn-court { background:#0a101d; border-radius:12px; padding:.3rem .15rem .05rem; }
+.zn-table { width:100%; border-collapse:collapse; font-variant-numeric:tabular-nums; margin-top:.55rem; }
+.zn-table th { color:var(--muted); font-size:.64rem; letter-spacing:.07em; text-transform:uppercase; text-align:right; padding:.3rem .25rem; border-bottom:1px solid var(--border); }
+.zn-table th:first-child { text-align:left; }
+.zn-table td { padding:.42rem .25rem; font-size:.84rem; text-align:right; }
+.zn-table tbody tr + tr td { border-top:1px solid rgba(31,44,68,.45); }
+.zn-table td:first-child { text-align:left; font-weight:700; }
+.zn-table td .sub { display:block; color:var(--muted); font-size:.7rem; font-weight:600; }
+.zn-read { border-radius:999px; padding:.13rem .5rem; font-size:.64rem; font-weight:800; border:1px solid; white-space:nowrap; }
+.zn-read.open { color:#4ade80; border-color:rgba(74,222,128,.55); }
+.zn-read.tough { color:#f0665e; border-color:rgba(240,102,94,.55); }
+.zn-read.mid { color:#3adbe3; border-color:rgba(58,219,227,.55); }
+.zn-read.dim { color:#8b96ab; border-color:rgba(139,150,171,.5); }
+.zn-call { background:rgba(245,185,66,.09); border:1px solid rgba(245,185,66,.5); border-radius:12px; padding:.6rem .7rem; margin-top:.6rem; font-size:.85rem; line-height:1.5; }
+.zn-call b { color:#f5b942; letter-spacing:.06em; font-size:.7rem; display:block; margin-bottom:.2rem; }
+/* ---- standings rows + team sheet ---- */
+.fb-srow[data-tid] { cursor:pointer; }
+.fb-srow[data-tid]:active { background:rgba(255,122,26,.07); }
+.tm-form { display:flex; gap:.35rem; flex-wrap:wrap; margin:.4rem 0 .2rem; }
+.tm-wl { border-radius:8px; padding:.18rem .5rem; font-size:.72rem; font-weight:800; border:1px solid; }
+.tm-wl.w { color:#4ade80; border-color:rgba(74,222,128,.5); }
+.tm-wl.l { color:#f0665e; border-color:rgba(240,102,94,.5); }
 .pb-calc-row input { width: 76px; background: var(--card2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); padding: .3rem .45rem; font-size: .88rem; font-family: inherit; }
 </style>
 <style id="sport-glass-css">
@@ -418,7 +487,7 @@ body.sport-glass .page-topbar{background:linear-gradient(165deg,rgba(20,36,70,.6
 body.sport-glass .modal{background:rgba(3,5,9,.52);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
 body.sport-glass .modal-card{background:linear-gradient(155deg,rgba(130,170,255,.17),rgba(6,12,26,.58));backdrop-filter:blur(16px) saturate(1.4);-webkit-backdrop-filter:blur(16px) saturate(1.4)}
 body.sport-glass .snap,body.sport-glass .goal-item,body.sport-glass .pc-bio{box-shadow:inset 0 1px 0 rgba(255,255,255,.1)}
-body.sport-glass .pc-sheet,body.sport-glass .gm-sheet,body.sport-glass .sl-gcard,body.sport-glass .pt-board{background:linear-gradient(155deg,rgba(130,170,255,.15),rgba(6,12,26,.58));border-color:rgba(165,195,255,.22);backdrop-filter:blur(16px) saturate(1.4);-webkit-backdrop-filter:blur(16px) saturate(1.4);box-shadow:inset 0 1px 0 rgba(255,255,255,.13)}
+body.sport-glass .pc-sheet,body.sport-glass .gm-sheet,body.sport-glass .sl-gcard,body.sport-glass .pt-board,body.sport-glass .fl-sheet{background:linear-gradient(155deg,rgba(130,170,255,.15),rgba(6,12,26,.58));border-color:rgba(165,195,255,.22);backdrop-filter:blur(16px) saturate(1.4);-webkit-backdrop-filter:blur(16px) saturate(1.4);box-shadow:inset 0 1px 0 rgba(255,255,255,.13)}
 body.sport-glass .pc-overlay,body.sport-glass .gm-overlay{background:rgba(2,5,10,.5);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
 </style>
 </head>
@@ -496,6 +565,11 @@ body.sport-glass .pc-overlay,body.sport-glass .gm-overlay{background:rgba(2,5,10
       </select>
       <div class="tp-strip" id="nbaTpStrip"><p class="muted">Pricing tonight's slate…</p></div>
     </div>
+    <div class="home-card" id="nbaDefMatchCard">
+      <h3 class="fb-sec-title">Defensive Matchups <span class="sub">his form vs tonight's defense</span></h3>
+      <div id="nbaDefMatchBody"><p class="muted">Pricing tonight's slate…</p></div>
+      <p class="muted small" style="margin-top:.35rem">DEF ALLOWS = points that defense gives up per game, last 10. Tap a row for his player card.</p>
+    </div>
     <div class="home-card" id="nbaTopCard">
       <h3 class="fb-sec-title">Top performers <span class="sub">tonight</span></h3>
       <div id="nbaTopBody"><p class="muted">Loading…</p></div>
@@ -538,6 +612,9 @@ body.sport-glass .pc-overlay,body.sport-glass .gm-overlay{background:rgba(2,5,10
       <button class="fb-mkt-pill" data-mkt="ra" type="button">R+A</button>
       <button class="fb-mkt-pill" data-mkt="dd" type="button">Double-Double</button>
     </div>
+    <div class="mf-bar"><input class="mf-search" id="nbaMktSearch" type="search" placeholder="Search a player or team…" aria-label="Search a player or team" autocomplete="off"><button class="mf-btn" id="nbaFilterBtn" type="button">⧩ Filters<span class="mf-badge" id="nbaFilterBadge" style="display:none">0</span></button></div>
+    <div class="mf-chips" id="nbaFilterChips"></div>
+    <div class="mf-count" id="nbaFilterCount" style="display:none"></div>
     <div class="table-wrap"><table class="fb-mkt-table">
       <thead><tr><th>Player</th><th class="num">MIN</th><th class="num">Proj</th><th class="num">Fair line</th><th class="num">Over</th><th class="num">Hit %</th><th class="num">Under</th></tr></thead>
       <tbody id="nbaMktBody"><tr><td colspan="7" class="muted">Pricing tonight's slate…</td></tr></tbody>
@@ -570,6 +647,8 @@ body.sport-glass .pc-overlay,body.sport-glass .gm-overlay{background:rgba(2,5,10
 
 <div class="pc-overlay" id="nbaCardOverlay"><div class="pc-sheet" id="nbaCardSheet"></div></div>
 <div class="gm-overlay" id="nbaGameOverlay"><div class="gm-sheet" id="nbaGameSheet"></div></div>
+<div class="gm-overlay" id="nbaTeamOverlay"><div class="gm-sheet" id="nbaTeamSheet"></div></div>
+<div class="fl-overlay" id="nbaFilterOverlay"><div class="fl-sheet" id="nbaFilterSheet"><button class="pc-close" id="flCloseBtn" type="button" aria-label="Close">✕</button><h3>Filter the board</h3><div class="fl-sec">Filter out a game</div><div class="fl-games" id="flGames"></div><p class="fl-note">Tap a game to hide the whole game. Tap again to bring it back.</p><div class="fl-sec">Filter out a team or player</div><div class="fl-hidebar"><input id="flHideInput" type="search" placeholder="Type a name to hide… e.g. Clingan, Lakers" autocomplete="off"><button id="flHideAdd" type="button">Hide</button></div><div class="mf-chips" id="flHideChips" style="margin-top:.45rem"></div><div class="fl-sec">Hide rows</div><label class="fl-tog"><input type="checkbox" id="flHideStarted"> Games already started</label><label class="fl-tog"><input type="checkbox" id="flHideInj"> Players OUT or questionable</label><label class="fl-tog"><input type="checkbox" id="flHideBench"> Bench — under 20 projected minutes</label><label class="fl-tog"><input type="checkbox" id="flStartersOnly"> Starters only</label><div class="fl-sec">Minimum hit % · <span id="flMinHitVal" style="color:#3adbe3">0%</span></div><input class="fl-slider" id="flMinHit" type="range" min="0" max="90" step="5" value="0"><div class="fl-foot"><button class="ghost" id="flClear" type="button">Clear all</button><button class="go" id="flDone" type="button">Show players</button></div></div></div>
 
 <nav class="bottom-nav" aria-label="Main">
   <button class="bnav-btn active" data-bnav="home"><span class="bnav-ico">🏀</span><span>NBA</span></button>
@@ -645,6 +724,8 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
 
   let tonightGames = [];   // {id, state, detail, start, venue, home:{id,abbr,name,score,record}, away:{...}}
   let standingsByTeamId = {}; // id -> {pa} from completed-season standings
+  let standingsInfo = {}; // teamId -> {abbr, name, wins, losses, gb, conf}
+  const allTeamsById = {}; // teamId -> {id, abbr, name}
   let teamRatings = null;  // teamId -> {pace, offRtg, defRtg}
   let lgPace = 100;
   let livePlayers = [];    // box-score rows for started games
@@ -675,7 +756,11 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
           let cut = '';
           if (i === 5) cut = '<div class="fb-cutline"></div>';
           if (i === 9) cut = '<div class="fb-cutline playin"></div>';
-          return '<div class="fb-srow"><span class="fb-seed">' + (i + 1) + '</span>' +
+          if (e.team && e.team.id) {
+            standingsInfo[e.team.id] = { abbr: e.team.abbreviation, name: e.team.displayName || e.team.name || '', wins: st.wins || '0', losses: st.losses || '0', gb: st.gamesBehind || '—', conf: conf.name || '' };
+            allTeamsById[e.team.id] = { id: e.team.id, abbr: e.team.abbreviation, name: e.team.displayName || e.team.name || '' };
+          }
+          return '<div class="fb-srow" data-tid="' + (e.team ? e.team.id : '') + '" data-abbr="' + esc(e.team.abbreviation) + '" role="button" tabindex="0" title="Tap for team sheet"><span class="fb-seed">' + (i + 1) + '</span>' +
             '<img src="' + logoUrl(e.team.abbreviation) + '" alt="">' +
             '<span class="sabbr">' + esc(e.team.abbreviation) + '</span>' +
             '<span class="srec"><b>' + (st.wins || '0') + '</b>-' + (st.losses || '0') + '</span>' +
@@ -684,6 +769,11 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
         return '<div class="fb-conf"><h4>' + esc(conf.name || '') + '</h4>' + rows + '</div>';
       }).join('');
       standEl.innerHTML = html || '<p class="muted">Standings unavailable.</p>';
+      standEl.querySelectorAll('.fb-srow[data-tid]').forEach((el) => {
+        if (!el.dataset.tid) return;
+        el.addEventListener('click', () => openTeamSheet(el.dataset.tid));
+        el.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') openTeamSheet(el.dataset.tid); });
+      });
     } catch (e) { empty(standEl, 'Standings unavailable.'); }
     try { // completed-season points against -> defensive rating base
       const d2 = await getJSON('https://site.api.espn.com/apis/v2/sports/basketball/nba/standings?season=' + SEASON_DONE);
@@ -718,6 +808,7 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
         away: { id: (away.team || {}).id, abbr: (away.team || {}).abbreviation, name: (away.team || {}).displayName, score: away.score, record: rec(away), rgb: teamColorRgb(away.team) },
       };
     });
+    for (const g of tonightGames) for (const t of [g.home, g.away]) if (t.id) allTeamsById[t.id] = { id: t.id, abbr: t.abbr, name: t.name };
     return tonightGames.length > 0;
   }
 
@@ -1116,6 +1207,7 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
     await fetchLivePlayers();
     renderTop();
     renderTopPicks();
+    renderDefMatch();
     if (!mktRows && !mktLoading) window.loadMarkets();
     renderPaint();
     if (gameOpenId) renderGame();
@@ -1281,19 +1373,39 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
     const past = (sched.events || []).filter((e) => {
       const t = (((e.competitions || [])[0] || {}).status || {}).type || {};
       return t.completed;
-    }).sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 6);
+    }).sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 10);
     const byPlayer = {}; // pid -> [gameLine, ...] most recent first
     const names = {};
+    // ---- shot zones (last 6 only): player zones + what this defense allowed ----
+    const ZKEYS = ['rim', 'paint', 'mid', 'c3', 'ab3'];
+    const zBlank = () => ({ rim: { att: 0, mk: 0 }, paint: { att: 0, mk: 0 }, mid: { att: 0, mk: 0 }, c3: { att: 0, mk: 0 }, ab3: { att: 0, mk: 0 } });
+    const zoneOf = (x, y, is3) => {
+      const d = Math.hypot(x - 25, y);
+      if (d <= 4.5) return 'rim';
+      if (x >= 17 && x <= 33 && y <= 14) return 'paint';
+      if (is3) return (y <= 12 && (x <= 8 || x >= 42)) ? 'c3' : 'ab3';
+      return 'mid';
+    };
+    const zonesByPlayer = {}, shotsByPlayer = {};
+    const defZones = zBlank();
+    const defAllowList = []; // opponent points per completed game, most recent first
     const chem = {}; // pid -> { fgm, astFgm, fed:{}, feeds:{}, shared:{}, minSec }
     let chemGames = 0;
     let lineup = null; // most recent game's starters + rotation
+    let evIdx = 0;
     for (const ev of past) {
+      const detail = evIdx < 6; // minutes/chemistry/zones stay last-6; lines extend to 10 for form
+      evIdx++;
       const comp = (ev.competitions || [])[0] || {};
       const oppC = (comp.competitors || []).find((c) => String((c.team || {}).id) !== String(teamId)) || {};
       const oppAbbr = (oppC.team || {}).abbreviation || '';
       const homeAway = ((comp.competitors || []).find((c) => String((c.team || {}).id) === String(teamId)) || {}).homeAway === 'home' ? 'vs' : '@';
       const d = new Date(ev.date);
       const dateStr = p2(d.getMonth() + 1) + '-' + p2(d.getDate());
+      { const oc = (comp.competitors || []).find((c) => String((c.team || {}).id) !== String(teamId));
+        const sc = oc ? oc.score : null;
+        const v = sc == null ? NaN : parseFloat(typeof sc === 'object' ? sc.displayValue : sc);
+        if (Number.isFinite(v)) defAllowList.push(v); }
       const sum = await getJSON(API + '/summary?event=' + ev.id);
       const blocks = (sum.boxscore || {}).players || [];
       const block = blocks.find((tp) => String((tp.team || {}).id) === String(teamId));
@@ -1301,9 +1413,28 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
       const statBlock = (block.statistics || [])[0] || {};
       const labels = statBlock.labels || [];
       const ix = (k) => labels.indexOf(k);
-      const stints = stintsForEvent(sum, statBlock);
-      const chemEv = chemFromPlays(sum, statBlock);
-      chemGames++;
+      const stints = detail ? stintsForEvent(sum, statBlock) : { gl: 2880, byPid: {} };
+      const chemEv = detail ? chemFromPlays(sum, statBlock) : { astFgm: {}, fed: {}, feeds: {} };
+      if (detail) chemGames++;
+      if (detail) {
+        for (const pl of sum.plays || []) {
+          if (!pl.shootingPlay || !(pl.pointsAttempted >= 2) || !pl.coordinate) continue;
+          const cx = pl.coordinate.x, cy = pl.coordinate.y;
+          if (!Number.isFinite(cx) || !Number.isFinite(cy) || Math.abs(cx) > 1000 || Math.abs(cy) > 1000) continue;
+          const zk = zoneOf(cx, cy, pl.pointsAttempted === 3);
+          const mk = pl.scoreValue > 0 ? 1 : 0;
+          if (String((pl.team || {}).id) === String(teamId)) {
+            const part = (pl.participants || []).find((x) => x && x.athlete && x.athlete.id);
+            if (!part) continue;
+            const pid2 = String(part.athlete.id);
+            const zb = zonesByPlayer[pid2] || (zonesByPlayer[pid2] = zBlank());
+            zb[zk].att++; zb[zk].mk += mk;
+            (shotsByPlayer[pid2] = shotsByPlayer[pid2] || []).push({ x: cx, y: cy, mk });
+          } else {
+            defZones[zk].att++; defZones[zk].mk += mk;
+          }
+        }
+      }
       const chemFor = (pid) => chem[pid] || (chem[pid] = { fgm: 0, astFgm: 0, fed: {}, feeds: {}, shared: {}, minSec: 0 });
       for (const [pid, n] of Object.entries(chemEv.astFgm)) chemFor(pid).astFgm += n;
       for (const [pid, m2] of Object.entries(chemEv.fed)) { const c = chemFor(pid); for (const [k, v] of Object.entries(m2)) c.fed[k] = (c.fed[k] || 0) + v; }
@@ -1343,7 +1474,7 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
         const s = a.stats || [];
         if (!s.length) continue;
         const tpt = String(s[ix('3PT')] || '0-0').split('-')[0];
-        chemFor(String(pid)).fgm += parseInt(String(s[ix('FG')] || '0-0').split('-')[0], 10) || 0;
+        if (detail) chemFor(String(pid)).fgm += parseInt(String(s[ix('FG')] || '0-0').split('-')[0], 10) || 0;
         (byPlayer[pid] = byPlayer[pid] || []).push({
           date: dateStr, opp: oppAbbr, homeAway,
           min: parseFloat(s[ix('MIN')]) || 0,
@@ -1356,7 +1487,9 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
         names[pid] = (a.athlete || {}).displayName || '';
       }
     }
-    return { byPlayer, names, lineup, chem, chemGames };
+    const avgN = (arr, n) => arr.length ? Math.round((arr.slice(0, n).reduce((a, b) => a + b, 0) / Math.min(n, arr.length)) * 10) / 10 : null;
+    return { byPlayer, names, lineup, chem, chemGames, zonesByPlayer, shotsByPlayer, defZones,
+      defAllow: { l5: avgN(defAllowList, 5), l10: avgN(defAllowList, 10), n: defAllowList.length } };
   }
 
   async function priceTonight() {
@@ -1397,6 +1530,10 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
             oppAbbr: opp.abbr, oppName: opp.name, home: side === 'home',
             oppDefRtg: ratings[opp.id].defRtg, paceAdj,
             recentGames: mins, recentLines: lines, gameId: g.id,
+            zones: (rec.zonesByPlayer || {})[pid] || null,
+            shots: (rec.shotsByPlayer || {})[pid] || [],
+            oppZones: (teamRecent[opp.id] || {}).defZones || null,
+            oppDefAllow: (teamRecent[opp.id] || {}).defAllow || null,
             chem: (rec.chem || {})[pid] || null, chemNames: rec.names || {}, chemGames: rec.chemGames || 0,
           });
         }
@@ -1451,6 +1588,9 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
         paceAdj: job.paceAdj,
       };
       return {
+        ptsL5: (() => { const a = (job.recentLines || []).slice(0, 5).map((l) => l.pts); return a.length ? Math.round((a.reduce((x, y) => x + y, 0) / a.length) * 10) / 10 : null; })(),
+        ptsL10: (() => { const a = (job.recentLines || []).slice(0, 10).map((l) => l.pts); return a.length ? Math.round((a.reduce((x, y) => x + y, 0) / a.length) * 10) / 10 : null; })(),
+        zones: job.zones, shots: job.shots, oppZones: job.oppZones, oppDefAllow: job.oppDefAllow,
         id: job.pid, name: job.name, team: job.team, teamName: job.teamName, teamId: job.teamId,
         gameId: job.gameId, oppAbbr: job.oppAbbr, oppName: job.oppName, home: job.home,
         min: Math.round(priced.minutes), markets: mk,
@@ -1527,22 +1667,156 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
     } catch (e) { /* grading is best-effort */ }
   }
 
+  // ---- Markets filter state (mock v3): filter OUT games / teams / players / rows ----
+  const mktFilter = { q: '', hiddenGames: new Set(), hiddenNames: [], hideStarted: false, hideInj: false, hideBench: false, startersOnly: false, minHit: 0 };
+  const mktHitOf = (r) => mktCurrent === 'dd' ? (r.dd ? r.dd.p : 0) : (r.markets[mktCurrent] ? r.markets[mktCurrent].pOver : 0);
+  function isStarterRow(r) {
+    const live = liveByPid[r.id];
+    if (live && live.gameId && String(live.gameId) === String(r.gameId)) return !!live.starter;
+    const lu = lineupByTeamId[r.teamId];
+    return !!(lu && (lu.starters || []).some((x) => String(x.pid) === String(r.id)));
+  }
+  function mktRowVisible(r) {
+    const F = mktFilter;
+    if (F.hiddenGames.has(String(r.gameId))) return false;
+    if (F.q) {
+      const hay = (r.name + ' ' + r.team + ' ' + (r.teamName || '') + ' ' + r.oppAbbr).toLowerCase();
+      if (!hay.includes(F.q)) return false;
+    }
+    for (const hn of F.hiddenNames) {
+      const hay = (r.name + ' ' + r.team + ' ' + (r.teamName || '')).toLowerCase();
+      if (hay.includes(hn.needle)) return false;
+    }
+    if (F.hideStarted) { const g = gameById(r.gameId); if (g && g.state !== 'pre') return false; }
+    if (F.hideInj && injuryByPid[String(r.id)]) return false;
+    if (F.hideBench && r.min < 20) return false;
+    if (F.startersOnly && !isStarterRow(r)) return false;
+    if (F.minHit > 0 && mktHitOf(r) * 100 < F.minHit) return false;
+    return true;
+  }
+  function mktFilterCount() {
+    const F = mktFilter;
+    return F.hiddenGames.size + F.hiddenNames.length + (F.hideStarted ? 1 : 0) + (F.hideInj ? 1 : 0) + (F.hideBench ? 1 : 0) + (F.startersOnly ? 1 : 0) + (F.minHit > 0 ? 1 : 0);
+  }
+  function renderFilterUI() {
+    const F = mktFilter;
+    const badge = $('nbaFilterBadge');
+    const n = mktFilterCount();
+    if (badge) { badge.style.display = n ? '' : 'none'; badge.textContent = n; }
+    const chips = [];
+    for (const gid of F.hiddenGames) {
+      const g = gameById(gid);
+      chips.push({ kind: 'game', val: gid, label: 'Game hidden: ' + (g ? g.away.abbr + ' @ ' + g.home.abbr : gid) + ' ✕', red: false });
+    }
+    for (const hn of F.hiddenNames) chips.push({ kind: 'name', val: hn.needle, label: hn.label + ' ✕', red: true });
+    if (F.minHit > 0) chips.push({ kind: 'minhit', val: '', label: F.minHit + '% + ✕', red: false });
+    if (F.startersOnly) chips.push({ kind: 'starters', val: '', label: 'Starters only ✕', red: false });
+    if (F.hideStarted) chips.push({ kind: 'started', val: '', label: 'Hide started ✕', red: false });
+    if (F.hideInj) chips.push({ kind: 'inj', val: '', label: 'Hide OUT/Q ✕', red: false });
+    if (F.hideBench) chips.push({ kind: 'bench', val: '', label: 'Hide bench <20 ✕', red: false });
+    const chipsEl = $('nbaFilterChips');
+    if (chipsEl) chipsEl.innerHTML = chips.map((c) => '<button class="mf-chip' + (c.red ? ' red' : '') + '" type="button" data-chip="' + c.kind + '" data-val="' + esc(c.val) + '">' + esc(c.label) + '</button>').join('');
+    const hideChipsEl = $('flHideChips');
+    if (hideChipsEl) hideChipsEl.innerHTML = F.hiddenNames.map((hn) => '<button class="mf-chip red" type="button" data-chip="name" data-val="' + esc(hn.needle) + '">' + esc(hn.label) + ' ✕</button>').join('');
+    const cntEl = $('nbaFilterCount');
+    if (cntEl) {
+      if (mktRows) {
+        const shown = mktRows.filter(mktRowVisible).length;
+        cntEl.style.display = '';
+        cntEl.innerHTML = 'Showing ' + shown + ' of ' + mktRows.length + ' players · ' + (mktCurrent === 'dd' ? 'Double-Double' : MKT_LABEL[mktCurrent] || mktCurrent) + (n ? '<button class="clear" id="mfClearAll" type="button">Clear all</button>' : '');
+        const clr = $('mfClearAll');
+        if (clr) clr.addEventListener('click', clearMktFilter);
+      } else cntEl.style.display = 'none';
+    }
+    const doneBtn = $('flDone');
+    if (doneBtn && mktRows) doneBtn.textContent = 'Show ' + mktRows.filter(mktRowVisible).length + ' players';
+    const mv = $('flMinHitVal');
+    if (mv) mv.textContent = F.minHit + '%';
+  }
+  function clearMktFilter() {
+    mktFilter.hiddenGames.clear(); mktFilter.hiddenNames = [];
+    mktFilter.hideStarted = mktFilter.hideInj = mktFilter.hideBench = mktFilter.startersOnly = false;
+    mktFilter.minHit = 0;
+    const set = (id, v) => { const el = $(id); if (el) el.checked = v; };
+    set('flHideStarted', false); set('flHideInj', false); set('flHideBench', false); set('flStartersOnly', false);
+    const sl = $('flMinHit'); if (sl) sl.value = '0';
+    buildFilterGames();
+    renderMarkets();
+  }
+  function buildFilterGames() {
+    const wrap = $('flGames');
+    if (!wrap) return;
+    wrap.innerHTML = tonightGames.map((g) =>
+      '<button class="fl-game' + (mktFilter.hiddenGames.has(String(g.id)) ? ' off' : '') + '" type="button" data-gid="' + g.id + '">' +
+      (mktFilter.hiddenGames.has(String(g.id)) ? '✕ ' : '◉ ') + esc(g.away.abbr + ' @ ' + g.home.abbr) + '</button>').join('');
+    wrap.querySelectorAll('.fl-game').forEach((b) => b.addEventListener('click', () => {
+      const gid = String(b.dataset.gid);
+      if (mktFilter.hiddenGames.has(gid)) mktFilter.hiddenGames.delete(gid); else mktFilter.hiddenGames.add(gid);
+      buildFilterGames(); renderMarkets();
+    }));
+  }
+  function openFilterSheet() {
+    buildFilterGames(); renderFilterUI();
+    const ov = $('nbaFilterOverlay');
+    if (ov) ov.classList.add('open');
+  }
+  function closeFilterSheet() {
+    const ov = $('nbaFilterOverlay');
+    if (ov) ov.classList.remove('open');
+  }
+
+  // ---- Defensive Matchups (home, Tonight view) ----
+  function renderDefMatch() {
+    const el = $('nbaDefMatchBody');
+    if (!el) return;
+    if (!mktRows) { el.innerHTML = '<p class="muted">Pricing tonight\'s slate…</p>'; return; }
+    const cands = mktRows.filter((r) => r.ptsL10 != null && r.oppDefAllow && r.oppDefAllow.l10 != null)
+      .map((r) => ({ r, score: (r.oppDefAllow.l10 - 105) + (r.ptsL5 - r.ptsL10) + Math.min(r.ptsL5, 35) * 0.15 }))
+      .sort((a, b) => b.score - a.score).slice(0, 8);
+    if (!cands.length) { el.innerHTML = '<p class="muted">Matchups land once tonight\'s slate is priced.</p>'; return; }
+    el.innerHTML = '<div class="dm-head" style="display:flex;gap:.85rem;justify-content:flex-end;color:var(--muted);font-size:.6rem;letter-spacing:.07em;text-transform:uppercase;padding:.1rem 0 .2rem"><span style="width:2.6rem;text-align:center">Last 5</span><span style="width:2.6rem;text-align:center">Last 10</span><span style="width:3.4rem;text-align:center">Def allows</span><span style="width:3.2rem"></span></div>' +
+      cands.map(({ r }, i) => {
+        const allow = r.oppDefAllow.l10;
+        let verdict, cls;
+        if (allow >= 110 && r.ptsL5 < 20) { verdict = 'SOFT DEF, COLD'; cls = 'cold'; }
+        else if (allow >= 110 && r.ptsL5 >= r.ptsL10 - 1) { verdict = 'ATTACK'; cls = 'atk'; }
+        else if (allow <= 107.5 || r.ptsL5 <= r.ptsL10 - 4) { verdict = 'TOUGH'; cls = 'tough'; }
+        else { verdict = 'EARN IT'; cls = 'earn'; }
+        return '<div class="dm-row" data-pid="' + r.id + '" role="button" tabindex="0"><span class="dm-rank">' + (i + 1) + '</span>' +
+          '<img class="hs" src="' + headshot(r.id) + '" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">' +
+          '<span><span class="dm-name">' + esc(r.name) + '</span><br><span class="dm-sub">' + esc(r.team) + ' vs ' + esc(r.oppAbbr) + ' · PTS per game</span></span>' +
+          '<span class="dm-stats"><span class="dm-stat"><span class="v">' + r.ptsL5.toFixed(1) + '</span></span>' +
+          '<span class="dm-stat"><span class="v" style="color:var(--muted)">' + r.ptsL10.toFixed(1) + '</span></span>' +
+          '<span class="dm-stat"><span class="v ora">' + allow.toFixed(1) + '</span></span></span>' +
+          '<span class="dm-chip ' + cls + '">' + verdict + '</span></div>';
+      }).join('');
+    el.querySelectorAll('.dm-row').forEach((row) => row.addEventListener('click', () => openPlayerCard(row.dataset.pid)));
+  }
+
   function renderMarkets() {
     if (!mktBody) return;
     if (!mktRows) {
       mktBody.innerHTML = '<tr><td colspan="7" class="muted">Pricing tonight\'s slate…</td></tr>';
+      renderFilterUI();
       return;
     }
     if (!mktRows.length) {
       mktBody.innerHTML = '<tr><td colspan="7" class="muted">No prices yet — check back closer to tip-off.</td></tr>';
+      renderFilterUI();
       return;
     }
     const mktOf = (r) => mktCurrent === 'dd'
       ? { mean: r.dd ? r.dd.expCats : 0, line: 1.5, over: nbaFairOdds(r.dd ? r.dd.p : 0), under: nbaFairOdds(1 - (r.dd ? r.dd.p : 0)), pOver: r.dd ? r.dd.p : 0 }
       : r.markets[mktCurrent];
-    const rows = [...mktRows].sort((a, b) => mktCurrent === 'dd'
+    const allFiltered = mktRows.filter(mktRowVisible);
+    const rows = [...allFiltered].sort((a, b) => mktCurrent === 'dd'
       ? (b.dd ? b.dd.p : 0) - (a.dd ? a.dd.p : 0)
-      : b.markets[mktCurrent].mean - a.markets[mktCurrent].mean).slice(0, 30);
+      : b.markets[mktCurrent].mean - a.markets[mktCurrent].mean).slice(0, mktFilterCount() || mktFilter.q ? 60 : 30);
+    if (!rows.length) {
+      mktBody.innerHTML = '<tr><td colspan="7" class="muted">Every player is filtered out — loosen a filter to bring names back.</td></tr>';
+      renderFilterUI();
+      return;
+    }
     mktBody.innerHTML = rows.map((r) => {
       const m = mktOf(r);
       return '<tr class="fb-prow" data-pid="' + r.id + '"><td><span class="fb-bplayer"><img class="hs" src="' + headshot(r.id) + '" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">' +
@@ -1555,6 +1829,7 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
         '<td class="num">' + m.under + '</td></tr>';
     }).join('');
     mktBody.querySelectorAll('tr.fb-prow').forEach((tr) => tr.addEventListener('click', () => openPlayerCard(tr.dataset.pid)));
+    renderFilterUI();
   }
   document.querySelectorAll('#nbaMktPills .fb-mkt-pill').forEach((b) =>
     b.addEventListener('click', () => {
@@ -1563,6 +1838,50 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
       mktCurrent = b.dataset.mkt;
       renderMarkets();
     }));
+  // Markets filter wiring
+  const mktSearchEl = $('nbaMktSearch');
+  if (mktSearchEl) mktSearchEl.addEventListener('input', () => { mktFilter.q = mktSearchEl.value.trim().toLowerCase(); renderMarkets(); });
+  const filterBtn = $('nbaFilterBtn');
+  if (filterBtn) filterBtn.addEventListener('click', openFilterSheet);
+  const flClose = $('flCloseBtn');
+  if (flClose) flClose.addEventListener('click', closeFilterSheet);
+  const flDoneBtn = $('flDone');
+  if (flDoneBtn) flDoneBtn.addEventListener('click', closeFilterSheet);
+  const flClearBtn = $('flClear');
+  if (flClearBtn) flClearBtn.addEventListener('click', clearMktFilter);
+  const flOverlay = $('nbaFilterOverlay');
+  if (flOverlay) flOverlay.addEventListener('click', (e) => { if (e.target === flOverlay) closeFilterSheet(); });
+  const flHideAdd = () => {
+    const inp = $('flHideInput');
+    if (!inp) return;
+    const v = inp.value.trim();
+    if (!v) return;
+    if (!mktFilter.hiddenNames.some((h) => h.needle === v.toLowerCase())) mktFilter.hiddenNames.push({ label: v, needle: v.toLowerCase() });
+    inp.value = '';
+    renderMarkets();
+  };
+  const flHideBtn = $('flHideAdd');
+  if (flHideBtn) flHideBtn.addEventListener('click', flHideAdd);
+  const flHideInput = $('flHideInput');
+  if (flHideInput) flHideInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); flHideAdd(); } });
+  const bindTog = (id, key) => { const el = $(id); if (el) el.addEventListener('change', () => { mktFilter[key] = el.checked; renderMarkets(); }); };
+  bindTog('flHideStarted', 'hideStarted'); bindTog('flHideInj', 'hideInj'); bindTog('flHideBench', 'hideBench'); bindTog('flStartersOnly', 'startersOnly');
+  const flSlider = $('flMinHit');
+  if (flSlider) flSlider.addEventListener('input', () => { mktFilter.minHit = Number(flSlider.value) || 0; renderMarkets(); });
+  document.addEventListener('click', (e) => {
+    const chip = e.target.closest ? e.target.closest('[data-chip]') : null;
+    if (!chip) return;
+    const kind = chip.dataset.chip, val = chip.dataset.val;
+    if (kind === 'game') mktFilter.hiddenGames.delete(String(val));
+    if (kind === 'name') mktFilter.hiddenNames = mktFilter.hiddenNames.filter((h) => h.needle !== val);
+    if (kind === 'minhit') { mktFilter.minHit = 0; const sl = $('flMinHit'); if (sl) sl.value = '0'; }
+    if (kind === 'starters') { mktFilter.startersOnly = false; const el = $('flStartersOnly'); if (el) el.checked = false; }
+    if (kind === 'started') { mktFilter.hideStarted = false; const el = $('flHideStarted'); if (el) el.checked = false; }
+    if (kind === 'inj') { mktFilter.hideInj = false; const el = $('flHideInj'); if (el) el.checked = false; }
+    if (kind === 'bench') { mktFilter.hideBench = false; const el = $('flHideBench'); if (el) el.checked = false; }
+    buildFilterGames();
+    renderMarkets();
+  });
 
   window.loadMarkets = async function() {
     if (mktRows || mktLoading) { renderMarkets(); return; }
@@ -1573,6 +1892,8 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
     mktLoading = false;
     pricedById = {};
     for (const r of mktRows) pricedById[r.id] = r;
+    loadInjuries().then(() => renderMarkets());
+    renderDefMatch();
     renderMarkets();
     renderSlate();
     renderPaint();
@@ -1599,6 +1920,22 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
       try { localStorage.removeItem('bueno-pending-open'); } catch (e) {}
       openPlayerCard(pid);
     }
+  }
+
+  // ---- injuries (for the Markets filter's OUT/questionable toggle) ----
+  let injuryByPid = {};
+  async function loadInjuries() {
+    try {
+      const d = await getJSON(API + '/injuries');
+      const out = {};
+      for (const t of d.injuries || []) {
+        for (const inj of t.injuries || []) {
+          const pid = inj.athlete && inj.athlete.id;
+          if (pid) out[String(pid)] = inj.status || 'Out';
+        }
+      }
+      injuryByPid = out;
+    } catch (e) { /* filter toggle simply has nothing to hide */ }
   }
 
   /* ================= Parlay builder ================= */
@@ -1998,6 +2335,92 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
   }
   if (gmOverlay) gmOverlay.addEventListener('click', (e) => { if (e.target === gmOverlay) closeGame(); });
 
+  /* ================= Team sheet (standings tap, NHL-style) ================= */
+  const teamOverlay = $('nbaTeamOverlay'), teamSheet = $('nbaTeamSheet');
+  function closeTeam() { if (teamOverlay) teamOverlay.classList.remove('open'); }
+  if (teamOverlay) teamOverlay.addEventListener('click', (e) => { if (e.target === teamOverlay) closeTeam(); });
+  async function openTeamSheet(tid) {
+    if (!teamSheet) return;
+    tid = String(tid);
+    const info = standingsInfo[tid] || {};
+    const base = allTeamsById[tid] || {};
+    const tGame = tonightGames.flatMap((g) => [g.home, g.away]).find((t) => String(t.id) === tid);
+    const abbr = info.abbr || base.abbr || (tGame && tGame.abbr) || '';
+    const name = info.name || base.name || (tGame && tGame.name) || abbr;
+    const rec = (tGame && tGame.record) || (info.wins != null ? info.wins + '-' + info.losses : '');
+    teamSheet.innerHTML = '<button class="pc-close" id="tmCloseBtn" type="button" aria-label="Close">✕</button>' +
+      '<div class="gm-head"><h3>' + esc(name) + '</h3><div class="gm-sub">' + (rec ? esc(rec) : '') + (info.conf ? ' · ' + esc(info.conf) : '') + (info.gb && info.gb !== '—' ? ' · ' + esc(info.gb) + ' GB' : '') + '</div></div>' +
+      '<p class="muted small" style="margin-top:.7rem">Loading roster &amp; recent form…</p>';
+    if (teamOverlay) teamOverlay.classList.add('open');
+    teamSheet.scrollTop = 0;
+    const cb0 = $('tmCloseBtn');
+    if (cb0) cb0.addEventListener('click', closeTeam);
+    let roster = [], form = [];
+    try {
+      const d = await getJSON(API + '/teams/' + tid + '/roster');
+      let list = d.athletes || [];
+      if (list.length && list[0] && list[0].items) list = list.flatMap((g2) => g2.items || []);
+      roster = list.map((a) => ({ pid: String(a.id || (a.athlete || {}).id || ''), name: a.displayName || (a.athlete || {}).displayName || '', pos: (a.position || {}).abbreviation || '' })).filter((x) => x.pid && x.name);
+    } catch (e) { /* fall back to priced/lineup names below */ }
+    try {
+      const sch = await getJSON(API + '/teams/' + tid + '/schedule');
+      const done = (sch.events || []).filter((e) => { const t = (((e.competitions || [])[0] || {}).status || {}).type || {}; return t.completed; })
+        .sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
+      form = done.map((e) => {
+        const comp = (e.competitions || [])[0] || {};
+        const me = (comp.competitors || []).find((c) => String((c.team || {}).id) === tid) || {};
+        const op = (comp.competitors || []).find((c) => String((c.team || {}).id) !== tid) || {};
+        const sc = (c) => { const v = c.score; return v == null ? NaN : parseFloat(typeof v === 'object' ? v.displayValue : v); };
+        const ms = sc(me), os = sc(op);
+        return { opp: (op.team || {}).abbreviation || '', ha: me.homeAway === 'home' ? 'vs' : '@', w: Number.isFinite(ms) && Number.isFinite(os) ? ms > os : null, score: Number.isFinite(ms) && Number.isFinite(os) ? Math.round(ms) + '–' + Math.round(os) : '' };
+      });
+    } catch (e) { /* form is best-effort */ }
+    if (!teamOverlay.classList.contains('open')) return;
+    // priced players tonight for this team first, then last-game starters, then the rest
+    const priced = (mktRows || []).filter((r) => String(r.teamId) === tid).sort((a, b) => b.markets.points.mean - a.markets.points.mean);
+    const lu = lineupByTeamId[tid];
+    const starterIds = new Set(lu ? (lu.starters || []).map((x) => String(x.pid)) : []);
+    const byPid = {};
+    for (const r of priced) byPid[String(r.id)] = { pid: String(r.id), name: r.name, pos: '', priced: r };
+    for (const x of roster) {
+      if (!byPid[x.pid]) byPid[x.pid] = x;
+      else if (x.pos) byPid[x.pid].pos = x.pos;
+      knownPlayers[x.pid] = { name: x.name, team: abbr };
+    }
+    if (lu) for (const x of [...(lu.starters || []), ...(lu.bench || [])]) if (!byPid[String(x.pid)]) byPid[String(x.pid)] = { pid: String(x.pid), name: x.name, pos: x.pos || '' };
+    for (const p of livePlayers) if (p.team === abbr && !byPid[String(p.id)]) byPid[String(p.id)] = { pid: String(p.id), name: p.name, pos: p.pos || '' };
+    const ordered = Object.values(byPid).sort((a, b) => {
+      const pa = a.priced ? a.priced.markets.points.mean : -1, pb = b.priced ? b.priced.markets.points.mean : -1;
+      if (pb !== pa) return pb - pa;
+      const sa = starterIds.has(a.pid) ? 1 : 0, sb = starterIds.has(b.pid) ? 1 : 0;
+      if (sb !== sa) return sb - sa;
+      return a.name.localeCompare(b.name);
+    });
+    let h = '<button class="pc-close" id="tmCloseBtn" type="button" aria-label="Close">✕</button>';
+    h += '<div class="gm-head"><h3><img src="' + logoUrl(abbr) + '" alt="" style="width:26px;height:26px;vertical-align:-6px;margin-right:.4rem">' + esc(name) + '</h3>' +
+      '<div class="gm-sub">' + (rec ? esc(rec) : '') + (info.conf ? ' · ' + esc(info.conf) : '') + (info.gb && info.gb !== '—' ? ' · ' + esc(info.gb) + ' GB' : '') + '</div></div>';
+    if (form.length) {
+      h += '<div class="gm-sec">Recent form · last ' + form.length + '</div><div class="tm-form">' +
+        form.map((f) => '<span class="tm-wl ' + (f.w ? 'w' : 'l') + '">' + (f.w ? 'W' : 'L') + ' ' + esc(f.ha) + ' ' + esc(f.opp) + (f.score ? ' · ' + esc(f.score) : '') + '</span>').join('') + '</div>';
+    }
+    h += '<div class="gm-sec">Roster · tap a player for his card</div>';
+    h += ordered.length ? ordered.map((x) => {
+      const live = liveByPid[x.pid];
+      const line = x.priced
+        ? '<span class="lu-line">proj <b>' + x.priced.min + '</b> MIN · <b>' + x.priced.markets.points.mean.toFixed(1) + '</b> PTS</span>'
+        : live ? '<span class="lu-line"><b>' + live.pts + '</b> PTS tonight</span>'
+        : starterIds.has(x.pid) ? '<span class="lu-line">starter · last game</span>' : '';
+      return '<div class="lu-row" data-pid="' + x.pid + '"><img class="hs" src="' + headshot(x.pid) + '" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">' +
+        '<span class="lu-name">' + esc(x.name) + (x.pos ? '<span class="lu-pos">' + esc(x.pos) + '</span>' : '') + '</span>' + line + '</div>';
+    }).join('') : '<p class="muted small">Roster unavailable right now.</p>';
+    h += '<p class="gm-note">Priced players carry tonight&rsquo;s model projection; everyone else still opens his card.</p>';
+    teamSheet.innerHTML = h;
+    const cb = $('tmCloseBtn');
+    if (cb) cb.addEventListener('click', closeTeam);
+    teamSheet.querySelectorAll('.lu-row').forEach((el) => el.addEventListener('click', () => openPlayerCard(el.dataset.pid)));
+  }
+  window.openTeamSheet = openTeamSheet;
+
   /* ================= Player card ================= */
   let cardPid = null;
   const cardOverlay = $('nbaCardOverlay'), cardSheet = $('nbaCardSheet');
@@ -2185,6 +2608,68 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
     return h;
   }
 
+  // ---- Shot zones (display only — never feeds the price) ----
+  const ZONE_DEFS = [
+    ['rim', 'At the rim', 'in'], ['paint', 'In the paint', 'in'], ['mid', 'Mid-range', 'mid'],
+    ['c3', 'Corner 3', 'three'], ['ab3', 'Above-break 3', 'three'],
+  ];
+  function zonesHtml(row) {
+    const z = row.zones, oz = row.oppZones;
+    const tot = z ? ZONE_DEFS.reduce((a, [k]) => a + (z[k] ? z[k].att : 0), 0) : 0;
+    if (!z || tot < 10) return '<p class="muted small">Not enough charted shots in his last 6 games yet.</p>';
+    const oTot = oz ? ZONE_DEFS.reduce((a, [k]) => a + (oz[k] ? oz[k].att : 0), 0) : 0;
+    const fg = (b) => b && b.att ? Math.round((b.mk / b.att) * 100) : null;
+    const readFor = (k, kind, share, ofg) => {
+      if (share < 8 || ofg == null) return ['SMALL SAMPLE', 'dim'];
+      if (kind === 'in') return ofg >= 60 ? ['OPEN', 'open'] : ofg <= 52 ? ['TOUGH', 'tough'] : ['EARN IT', 'mid'];
+      if (kind === 'mid') return ofg >= 46 ? ['OPEN', 'open'] : ofg <= 40 ? ['TOUGH', 'tough'] : ['EARN IT', 'mid'];
+      return ofg >= 37 ? ['OPEN', 'open'] : ofg <= 33 ? ['TOUGH', 'tough'] : ['EARN IT', 'mid'];
+    };
+    let dots = '';
+    for (const sh of row.shots || []) {
+      const X = (sh.x * 6).toFixed(0), Y = (282 - (sh.y + 5) * 6).toFixed(0);
+      dots += sh.mk
+        ? '<circle cx="' + X + '" cy="' + Y + '" r="3.1" fill="#3adbe3" fill-opacity=".85"/>'
+        : '<path d="M' + (X - 3) + ' ' + (Y - 3) + ' L' + (X + 3) + ' ' + (Y + 3) + ' M' + (X + 3) + ' ' + (Y - 3) + ' L' + (X - 3) + ' ' + (Y + 3) + '" stroke="#96a5be" stroke-width="1.3" stroke-opacity=".7"/>';
+    }
+    let h = '<div class="zn-court"><svg viewBox="0 0 300 282" width="100%" style="display:block">' +
+      '<rect x="3" y="3" width="294" height="276" rx="6" fill="none" stroke="#2a3a58" stroke-width="2"/>' +
+      '<rect x="102" y="168" width="96" height="114" fill="rgba(255,122,26,.07)" stroke="#2a3a58" stroke-width="2"/>' +
+      '<circle cx="150" cy="168" r="36" fill="none" stroke="#2a3a58" stroke-width="2"/>' +
+      '<path d="M21 282 L21 198 A142.5 142.5 0 0 1 279 198 L279 282" fill="none" stroke="#2a3a58" stroke-width="2"/>' +
+      '<circle cx="150" cy="250.5" r="13.5" fill="none" stroke="#FF7A1A" stroke-width="2"/>' + dots + '</svg></div>' +
+      '<p class="muted small" style="margin-top:.35rem">● made · × missed · his last 6 games</p>';
+    h += '<table class="zn-table"><thead><tr><th>Zone</th><th>His FG%</th><th>' + esc(row.oppAbbr) + ' allows</th><th>Read</th></tr></thead><tbody>';
+    let best = null;
+    for (const [k, label, kind] of ZONE_DEFS) {
+      const b = z[k] || { att: 0, mk: 0 };
+      const share = Math.round((b.att / tot) * 100);
+      const myFg = fg(b);
+      const ob = oz ? oz[k] : null;
+      const ofg = fg(ob);
+      const oShare = ob && oTot ? Math.round((ob.att / oTot) * 100) : null;
+      const rd = readFor(k, kind, share, ofg);
+      if (share >= 15 && ofg != null) {
+        const score = share * ofg;
+        if (!best || score > best.score) best = { label, share, myFg, ofg, oShare, score, open: rd[0] === 'OPEN' };
+      }
+      h += '<tr><td>' + label + '<span class="sub">' + share + '% of his shots · ' + b.mk + ' of ' + b.att + '</span></td>' +
+        '<td>' + (myFg == null ? '—' : myFg + '%') + '</td>' +
+        '<td>' + (ofg == null ? '—' : ofg + '%') + (oShare == null ? '' : '<span class="sub">' + oShare + '% of shots vs them</span>') + '</td>' +
+        '<td><span class="zn-read ' + rd[1] + '">' + rd[0] + '</span></td></tr>';
+    }
+    h += '</tbody></table>';
+    if (best) {
+      h += '<div class="zn-call"><b>THE OVERLAP</b>' +
+        (best.open
+          ? esc(best.label) + ' is the opening: ' + best.share + '% of his shots at ' + best.myFg + '% FG, and ' + esc(row.oppAbbr) + ' gives up ' + best.ofg + '% shooting there' + (best.oShare != null ? ' on ' + best.oShare + '% of all shots against them.' : '.')
+          : 'His volume lives in ' + esc(best.label.toLowerCase()) + ' (' + best.share + '% of shots, ' + best.myFg + '% FG) — ' + esc(row.oppAbbr) + ' allows ' + best.ofg + '% there, so nothing is free tonight.') +
+        '</div>';
+    }
+    h += '<p class="muted small" style="margin-top:.45rem">Last 6 games · Display only — not in the price.</p>';
+    return h;
+  }
+
   function renderCard(pid, preserve) {
     if (!cardSheet) return;
     const openSecs = {};
@@ -2245,6 +2730,8 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
     // Performance bars · last 6 (open by default)
     const perfGames = (row.recentLines || []).slice(0, 6);
     if (perfGames.length >= 3) h += sec('perf', 'Performance · last ' + perfGames.length, perfHtml(row), true);
+    // Shot zones · last 6 (display only)
+    h += sec('zones', 'Shot zones · last 6', zonesHtml(row), false);
     // Milestones
     const ladHtml = MKT_KEYS.map((key) => {
       const lad = row.markets[key].ladder || [];
