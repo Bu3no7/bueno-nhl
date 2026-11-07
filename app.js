@@ -2639,6 +2639,79 @@ async function ensureChem(r) {
   const slot = body.querySelector(`[data-chem-slot="${esc(String(r.pid))}"]`);
   if (slot) slot.outerHTML = pcChemHtml(r);
 }
+/* ---------------- finishing vs shot quality (finish sidecar) ----------------
+   data/finish-<date>.json is exported LOCALLY by
+   ~/workspace/nhl-specific/shooter-xg/export_finish.py (frozen sklearn
+   xG model — it cannot run in the Actions node builder) and committed,
+   same pattern as the manual healthy-bundle fallback. Window =
+   2025-26 + this season to date: goals vs expected goals (xG), with the
+   multiplier shrunk toward the position average. DISPLAY ONLY — it
+   feeds no price anywhere. Loaded lazily on the first card open; a
+   missing sidecar (or a player under the sample floor) hides the
+   section silently. */
+let finSidecar = null, finSidecarState = 'idle'; // idle | loading | ok | fail
+async function loadFinSidecar() {
+  if (finSidecarState === 'loading' || finSidecarState === 'ok') return;
+  finSidecarState = 'loading';
+  try {
+    const r = await fetch(`data/finish-${state.date}.json`, { headers: { 'Accept': 'application/json' } });
+    if (!r.ok) throw new Error('no sidecar');
+    finSidecar = await r.json();
+    finSidecarState = 'ok';
+  } catch (e) { finSidecarState = 'fail'; }
+}
+function pcFinSlotHtml(r) {
+  if (finSidecarState === 'ok') return pcFinHtml(r);
+  if (finSidecarState === 'fail') return '';
+  return `<div class="pc-min" data-fin-slot="${esc(String(r.pid))}"><div class="pc-min-h"><span class="pc-min-t">Finishing</span></div><p class="muted small" style="margin:.35rem 0 0">Loading finishing…</p></div>`;
+}
+function pcFinHtml(r) {
+  const f = (finSidecar && finSidecar.players && finSidecar.players[String(r.pid)]) || null;
+  if (!f) return '';
+  const mult = f.mult;
+  const band = mult >= 1.10 ? 'up' : mult < 0.95 ? 'down' : 'mid';
+  const chip = band === 'up' ? 'BURYING HIS CHANCES' : band === 'down' ? 'GETTING CHANCES, NOT FINISHING' : 'RIGHT AT EXPECTATION';
+  const multCol = band === 'up' ? 'var(--teal)' : band === 'down' ? 'var(--gold)' : 'inherit';
+  const maxv = Math.max(f.goals, f.xg, 1);
+  const diff = f.goals - f.xg;
+  const delta = diff >= 0.5 ? `+${diff.toFixed(1)} goals above what his shots usually produce`
+    : diff <= -0.5 ? `${Math.abs(diff).toFixed(1)} goals below what his shots usually produce`
+    : 'Right in line with what his shots usually produce';
+  const through = finSidecar.through
+    ? new Date(finSidecar.through + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+    : '';
+  let h = `<div class="pc-min" data-fin-root>
+    <div class="pc-min-h"><span class="pc-min-t">Finishing</span><span class="fin-mult" style="color:${multCol}">${mult.toFixed(2)}×</span></div>
+    <div class="fin-win">${esc(finSidecar.windowLabel || '2025-26 + this season')} · goals vs shot quality${through ? ` · through ${esc(through)}` : ''}</div>
+    <span class="fin-chip ${band}">${chip}</span>
+    <div class="fin-bar-row"><div class="fin-bar-lab"><span>GOALS</span><span class="fin-bar-val">${f.goals}</span></div><div class="fin-track"><span class="fin-fill goals" style="width:${(f.goals / maxv * 100).toFixed(1)}%"></span></div></div>
+    <div class="fin-bar-row"><div class="fin-bar-lab"><span>EXPECTED (SHOT QUALITY)</span><span class="fin-bar-val">${f.xg.toFixed(1)}</span></div><div class="fin-track"><span class="fin-fill xg" style="width:${(f.xg / maxv * 100).toFixed(1)}%"></span></div></div>
+    <p class="fin-delta">${delta}</p>`;
+  const l10 = f.last10 || [];
+  if (l10.length >= 3) {
+    const maxG = Math.max(3, ...l10.map((x) => x.g));
+    const cols = l10.map((x) => {
+      const bh = x.g > 0 ? Math.max(10, (x.g / maxG) * 100) : 0;
+      const ty = Math.min(96, (x.xg / maxG) * 100);
+      return `<div class="fin-col"><span class="fin-gnum">${x.g > 0 ? x.g : ''}</span><span class="fin-gzone">${x.g > 0 ? `<span class="fin-gbar" style="height:${bh.toFixed(0)}%"></span>` : ''}<span class="fin-tick" style="bottom:${ty.toFixed(0)}%"></span></span></div>`;
+    }).join('');
+    const tg = l10.reduce((a, x) => a + x.g, 0);
+    const tx = l10.reduce((a, x) => a + x.xg, 0);
+    h += `<div class="chem-sec-t">Last ${l10.length} games · this season</div>
+    <div class="fin-strip">${cols}</div>
+    <p class="fin-cap">Teal = goals · gold tick = expected that game · ${tg} goals vs ${tx.toFixed(1)} expected</p>`;
+  }
+  h += `<p class="fin-foot">What he's done with his chances — not a price input.</p></div>`;
+  return h;
+}
+async function ensureFinish(r) {
+  await loadFinSidecar();
+  if (finSidecarState !== 'ok') return;
+  const body = $('modalBody');
+  if (!body) return;
+  const slot = body.querySelector(`[data-fin-slot="${esc(String(r.pid))}"]`);
+  if (slot) slot.outerHTML = pcFinHtml(r);
+}
 function openPlayer(pid, gameId) {
   const r = state.skaters.find((s) => String(s.pid) === String(pid) && String(s.gameId) === String(gameId));
   if (!r) return;
@@ -2721,6 +2794,7 @@ function openPlayer(pid, gameId) {
     ${formHtml}
     ${pcMinSlotHtml(r)}
     ${pcChemSlotHtml(r)}
+    ${pcFinSlotHtml(r)}
     ${pcLastGameHtml(l5)}
     ${zoneNote}
     <div class="section-div"></div>
@@ -2757,6 +2831,7 @@ function openPlayer(pid, gameId) {
   wireMinutes(r);
   ensureMinutes(r);
   ensureChem(r);
+  ensureFinish(r);
   ensurePlayerBio(r);
   // map follows the Markets dropdown on open; pills let you switch without closing
   const mk = state.marketKind;
