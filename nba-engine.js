@@ -106,6 +106,29 @@ function nbaPraMarket(markets) {
   return { mean: Math.round(mean * 10) / 10, dist: { kind: 'normal', mean, sd: Math.sqrt(variance) } };
 }
 
+/* Rebounds + Assists market: the PRA combo math minus points — means add,
+   negative-binomial variances add, total approximated Normal. */
+function nbaRaMarket(markets) {
+  const reb = markets.rebounds, ast = markets.assists;
+  const mean = reb.mean + ast.mean;
+  const nbVar = (d) => d.mean + (d.mean * d.mean) / d.k;
+  const variance = nbVar(reb.dist) + nbVar(ast.dist);
+  return { mean: Math.round(mean * 10) / 10, dist: { kind: 'normal', mean, sd: Math.sqrt(variance) } };
+}
+
+/* Double-double: P(at least two of PTS / REB / AST reach 10) from the three
+   marginal distributions — independence given minutes, the same assumption
+   the combo markets use. Also returns the triple-double probability and
+   the expected number of double-figure categories. */
+function nbaDoubleDouble(markets) {
+  const pP = nbaProbOver(markets.points.dist, 9.5);
+  const pR = nbaProbOver(markets.rebounds.dist, 9.5);
+  const pA = nbaProbOver(markets.assists.dist, 9.5);
+  const td = pP * pR * pA;
+  const dd = pP * pR + pP * pA + pR * pA - 2 * td;
+  return { p: dd, td, expCats: pP + pR + pA };
+}
+
 /* ---------- Game model (win %, spread, total) ----------
    Built from the same ratings the player engine uses (offRtg / defRtg
    per 100 possessions + pace, completed-season ESPN core stats).
@@ -290,6 +313,6 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     NBA_PRIORS, nbaRates, nbaProjectMinutes, nbaPricePlayer,
     nbaProbOver, nbaMedianLine, nbaFairOdds, nbaNormCdf, nbaNbCdf, nbaBinomCdf,
-    nbaOppFactor, nbaEnvFactors, nbaPraMarket, nbaGameProjection,
+    nbaOppFactor, nbaEnvFactors, nbaPraMarket, nbaRaMarket, nbaDoubleDouble, nbaGameProjection,
   };
 }

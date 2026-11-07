@@ -313,6 +313,27 @@ details.pc-sec[open ] summary .chev { transform: rotate(90deg); }
 .mn-plab { position: absolute; transform: translateX(-50%); font-size: .68rem; font-weight: 700; color: var(--muted); }
 .mn-chips { display: flex; gap: .4rem; flex-wrap: wrap; margin-top: .5rem; }
 .mn-chip { font-size: .75rem; font-weight: 700; padding: .28rem .55rem; border-radius: 8px; background: rgba(255, 255, 255, .07); border: 1px solid rgba(255, 255, 255, .18); }
+/* ---------------- performance bars (last-6 by market) ---------------- */
+.pf-block { margin-top: .9rem; }
+.pf-block:first-child { margin-top: .1rem; }
+.pf-head { display: flex; justify-content: space-between; align-items: baseline; }
+.pf-label { font-size: .72rem; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; color: #f5b942; }
+.pf-avg { font-size: .78rem; font-weight: 700; color: var(--muted); }
+.pf-vals { display: flex; gap: 6px; margin-top: .25rem; }
+.pf-val { flex: 1; text-align: center; font-size: .78rem; font-weight: 700; height: 1.05rem; }
+.pf-chart { position: relative; }
+.pf-avgline { position: absolute; left: 0; right: 0; border-top: 2px dashed rgba(245, 185, 66, .75); pointer-events: none; }
+.pf-cols { display: flex; gap: 6px; }
+.pf-barzone { flex: 1; height: 62px; display: flex; align-items: flex-end; justify-content: center; }
+.pf-bar { display: block; width: 68%; max-width: 44px; border-radius: 7px 7px 3px 3px; background: #3adbe3; }
+.pf-bar.dim { background: #526888; }
+.pf-labs { display: flex; gap: 6px; margin-top: .3rem; }
+.pf-lab { flex: 1; text-align: center; font-size: .72rem; color: var(--muted); }
+.pf-dd { display: flex; gap: 6px; margin-top: .35rem; }
+.pf-chip { flex: 1; text-align: center; font-size: .85rem; font-weight: 800; padding: .34rem 0; border-radius: 8px; }
+.pf-chip.hit { background: rgba(58, 219, 227, .16); color: #3adbe3; border: 1px solid rgba(58, 219, 227, .45); }
+.pf-chip.miss { background: rgba(255, 255, 255, .05); color: var(--muted); border: 1px solid rgba(255, 255, 255, .12); }
+.pf-hint { text-align: center; font-size: .72rem; color: var(--muted); margin-top: .6rem; }
 /* ---------------- chemistry ---------------- */
 .ch-sec-t { font-size: .72rem; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); margin: .8rem 0 .45rem; }
 .ch-split { display: flex; height: 34px; border-radius: 9px; overflow: hidden; font-size: .8rem; font-weight: 800; }
@@ -471,6 +492,7 @@ body.sport-glass .pc-overlay,body.sport-glass .gm-overlay{background:rgba(2,5,10
         <option value="assists">Assists</option>
         <option value="threes">Projected 3s</option>
         <option value="pra">PRA</option>
+        <option value="ra">Reb + Ast</option>
       </select>
       <div class="tp-strip" id="nbaTpStrip"><p class="muted">Pricing tonight's slate…</p></div>
     </div>
@@ -513,6 +535,8 @@ body.sport-glass .pc-overlay,body.sport-glass .gm-overlay{background:rgba(2,5,10
       <button class="fb-mkt-pill" data-mkt="assists" type="button">Assists</button>
       <button class="fb-mkt-pill" data-mkt="threes" type="button">Threes</button>
       <button class="fb-mkt-pill" data-mkt="pra" type="button">P+R+A</button>
+      <button class="fb-mkt-pill" data-mkt="ra" type="button">R+A</button>
+      <button class="fb-mkt-pill" data-mkt="dd" type="button">Double-Double</button>
     </div>
     <div class="table-wrap"><table class="fb-mkt-table">
       <thead><tr><th>Player</th><th class="num">MIN</th><th class="num">Proj</th><th class="num">Fair line</th><th class="num">Over</th><th class="num">Hit %</th><th class="num">Under</th></tr></thead>
@@ -614,10 +638,10 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
     el.textContent = now.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
   });
 
-  const MKT_KEYS = ['points', 'rebounds', 'assists', 'threes', 'pra'];
-  const MKT_LABEL = { points: 'Points', rebounds: 'Rebounds', assists: 'Assists', threes: 'Threes', pra: 'P + R + A' };
-  const MKT_UNIT = { points: 'PTS', rebounds: 'REB', assists: 'AST', threes: '3PM', pra: 'PRA' };
-  const LADDERS = { points: [10, 15, 20, 25, 30, 35, 40], rebounds: [4, 6, 8, 10, 12, 15], assists: [3, 5, 7, 10, 12], threes: [1, 2, 3, 4, 5, 6], pra: [25, 30, 35, 40, 45, 50, 55, 60] };
+  const MKT_KEYS = ['points', 'rebounds', 'assists', 'threes', 'pra', 'ra'];
+  const MKT_LABEL = { points: 'Points', rebounds: 'Rebounds', assists: 'Assists', threes: 'Threes', pra: 'P + R + A', ra: 'Rebounds + Assists' };
+  const MKT_UNIT = { points: 'PTS', rebounds: 'REB', assists: 'AST', threes: '3PM', pra: 'PRA', ra: 'RA' };
+  const LADDERS = { points: [10, 15, 20, 25, 30, 35, 40], rebounds: [4, 6, 8, 10, 12, 15], assists: [3, 5, 7, 10, 12], threes: [1, 2, 3, 4, 5, 6], pra: [25, 30, 35, 40, 45, 50, 55, 60], ra: [10, 15, 20, 25, 30, 35] };
 
   let tonightGames = [];   // {id, state, detail, start, venue, home:{id,abbr,name,score,record}, away:{...}}
   let standingsByTeamId = {}; // id -> {pa} from completed-season standings
@@ -1391,10 +1415,13 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
       if (!season || !season.minutes) return null;
       const priced = nbaPricePlayer(season, { recentGames: job.recentGames, oppDefRtg: job.oppDefRtg, paceAdj: job.paceAdj });
       const praMd = nbaPraMarket(priced.markets);
+      const raMd = nbaRaMarket(priced.markets);
+      const ddMd = nbaDoubleDouble(priced.markets);
       const raw = {
         points: priced.markets.points, rebounds: priced.markets.rebounds,
         assists: priced.markets.assists, threes: priced.markets.threes,
         pra: { mean: praMd.mean, medianLine: nbaMedianLine(praMd.dist), dist: praMd.dist },
+        ra: { mean: raMd.mean, medianLine: nbaMedianLine(raMd.dist), dist: raMd.dist },
       };
       const mk = {};
       for (const key of MKT_KEYS) {
@@ -1428,6 +1455,7 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
         gameId: job.gameId, oppAbbr: job.oppAbbr, oppName: job.oppName, home: job.home,
         min: Math.round(priced.minutes), markets: mk,
         seasonAvgs, recentLines: job.recentLines, factors,
+        dd: { p: ddMd.p, td: ddMd.td, expCats: Math.round(ddMd.expCats * 10) / 10 },
         chem: job.chem, chemNames: job.chemNames, chemGames: job.chemGames,
       };
     });
@@ -1476,6 +1504,7 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
               points: pts, rebounds: reb, assists: ast,
               threes: parseInt(tpt, 10) || 0,
               pra: pts + reb + ast,
+              ra: reb + ast,
             };
           }
         }
@@ -1508,9 +1537,14 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
       mktBody.innerHTML = '<tr><td colspan="7" class="muted">No prices yet — check back closer to tip-off.</td></tr>';
       return;
     }
-    const rows = [...mktRows].sort((a, b) => b.markets[mktCurrent].mean - a.markets[mktCurrent].mean).slice(0, 30);
+    const mktOf = (r) => mktCurrent === 'dd'
+      ? { mean: r.dd ? r.dd.expCats : 0, line: 1.5, over: nbaFairOdds(r.dd ? r.dd.p : 0), under: nbaFairOdds(1 - (r.dd ? r.dd.p : 0)), pOver: r.dd ? r.dd.p : 0 }
+      : r.markets[mktCurrent];
+    const rows = [...mktRows].sort((a, b) => mktCurrent === 'dd'
+      ? (b.dd ? b.dd.p : 0) - (a.dd ? a.dd.p : 0)
+      : b.markets[mktCurrent].mean - a.markets[mktCurrent].mean).slice(0, 30);
     mktBody.innerHTML = rows.map((r) => {
-      const m = r.markets[mktCurrent];
+      const m = mktOf(r);
       return '<tr class="fb-prow" data-pid="' + r.id + '"><td><span class="fb-bplayer"><img class="hs" src="' + headshot(r.id) + '" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">' +
         '<span class="bn">' + esc(r.name) + '</span><img class="tl" src="' + logoUrl(r.team) + '" alt=""></span></td>' +
         '<td class="num">' + r.min + '</td>' +
@@ -1657,10 +1691,10 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
     return { team, game };
   }
   function pbStbWording(label) {
-    const m = String(label).match(/^(.+?) (\d+)\+ (PTS|REB|AST|3PM|PRA)$/);
+    const m = String(label).match(/^(.+?) (\d+)\+ (PTS|REB|AST|3PM|PRA|RA)$/);
     if (!m) return label; // unparseable leg: send verbatim rather than dropping it
     const line = (parseFloat(m[2]) - 0.5);
-    const map = { PTS: 'Points', REB: 'Rebounds', AST: 'Assists', '3PM': 'Threes', PRA: 'Points + Rebounds + Assists' };
+    const map = { PTS: 'Points', REB: 'Rebounds', AST: 'Assists', '3PM': 'Threes', PRA: 'Points + Rebounds + Assists', RA: 'Rebounds + Assists' };
     return 'Over ' + line + ' ' + map[m[3]];
   }
   function pbStbTicket() {
@@ -1669,7 +1703,7 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
     // stay visible in the ticket area on screen and the book-price
     // checklist stays in the chooser — neither is pasted to the bot.
     return parlayLegs.map((l) => {
-      const m = String(l.label).match(/^(.+?) (\d+)\+ (PTS|REB|AST|3PM|PRA)$/);
+      const m = String(l.label).match(/^(.+?) (\d+)\+ (PTS|REB|AST|3PM|PRA|RA)$/);
       const name = m ? m[1] : l.label;
       return name + ' — ' + pbStbWording(l.label);
     }).join('\n');
@@ -1985,6 +2019,7 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
     if (!games.length) return '<p class="muted small">No recent games on file yet.</p>';
     const cols = '64px repeat(' + games.length + ', 1fr)';
     const actual = (g, key) => key === 'pra' ? g.pts + g.reb + g.ast
+      : key === 'ra' ? g.reb + g.ast
       : key === 'points' ? g.pts : key === 'rebounds' ? g.reb : key === 'assists' ? g.ast : g.tpm;
     let h = '<div class="fm-grid" style="grid-template-columns:' + cols + '"><div></div>' +
       games.map((g) => '<div class="fm-head">' + esc(g.opp) + '<br><span>' + esc(g.date) + '</span></div>').join('') + '</div>';
@@ -2120,6 +2155,36 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
     return h;
   }
 
+  function perfHtml(row) {
+    const games = (row.recentLines || []).slice(0, 6).reverse(); // oldest -> newest
+    if (!games.length) return '<p class="muted small">No recent games on file yet.</p>';
+    const blocks = [
+      ['Points', (g) => g.pts], ['Rebounds', (g) => g.reb], ['Assists', (g) => g.ast],
+      ['Threes', (g) => g.tpm], ['P+R+A', (g) => g.pts + g.reb + g.ast], ['Reb + Ast', (g) => g.reb + g.ast],
+    ];
+    let h = '';
+    for (const [label, fn] of blocks) {
+      const vals = games.map(fn);
+      const avg = vals.reduce((a, b) => a + b, 0) / vals.length;
+      const scale = (Math.max(...vals) * 1.18) || 1;
+      const avgPct = Math.min(100, (avg / scale) * 100);
+      h += '<div class="pf-block"><div class="pf-head"><span class="pf-label">' + label + '</span>' +
+        '<span class="pf-avg">L' + games.length + ' avg ' + (Math.round(avg * 10) / 10) + '</span></div>' +
+        '<div class="pf-vals">' + vals.map((v) => '<span class="pf-val">' + v + '</span>').join('') + '</div>' +
+        '<div class="pf-chart"><div class="pf-avgline" style="bottom:' + avgPct.toFixed(1) + '%"></div>' +
+        '<div class="pf-cols">' + vals.map((v) => '<span class="pf-barzone"><span class="pf-bar' + (v >= avg ? '' : ' dim') + '" style="height:' + Math.max(7, (v / scale) * 100).toFixed(1) + '%"></span></span>').join('') + '</div></div>' +
+        '<div class="pf-labs">' + games.map((g) => '<span class="pf-lab">' + esc(g.homeAway + g.opp) + '</span>').join('') + '</div></div>';
+    }
+    const ddFlags = games.map((g) => ((g.pts >= 10) + (g.reb >= 10) + (g.ast >= 10)) >= 2);
+    const ddHits = ddFlags.filter(Boolean).length;
+    h += '<div class="pf-block"><div class="pf-head"><span class="pf-label">Double-Double</span>' +
+      '<span class="pf-avg">' + ddHits + ' of last ' + games.length + '</span></div>' +
+      '<div class="pf-dd">' + ddFlags.map((hit) => '<span class="pf-chip ' + (hit ? 'hit' : 'miss') + '">' + (hit ? '✓' : '✘') + '</span>').join('') + '</div>' +
+      '<div class="pf-labs">' + games.map((g) => '<span class="pf-lab">' + esc(g.homeAway + g.opp) + '</span>').join('') + '</div></div>';
+    h += '<p class="pf-hint">Teal = at or above his last-' + games.length + ' average · dashed line = the average</p>';
+    return h;
+  }
+
   function renderCard(pid, preserve) {
     if (!cardSheet) return;
     const openSecs = {};
@@ -2156,20 +2221,30 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
       return;
     }
     // Tonight's fair lines (open by default)
-    const linesHtml = MKT_KEYS.map((key) => {
+    let linesHtml = MKT_KEYS.map((key) => {
       const m = row.markets[key];
-      return '<div class="pc-price-row' + (key === 'pra' ? ' combo' : '') + '">' +
+      return '<div class="pc-price-row' + (key === 'pra' || key === 'ra' ? ' combo' : '') + '">' +
         '<span class="pc-pr-label">' + MKT_LABEL[key] + '</span>' +
         '<span class="pc-pr-line">' + m.line + '</span>' +
         '<span class="pc-pr-hit">' + Math.round(m.pOver * 100) + '% hit</span>' +
         '<span class="pc-pr-odds">O ' + m.over + ' · U ' + m.under + '</span></div>';
     }).join('');
+    if (row.dd) {
+      linesHtml += '<div class="pc-price-row combo">' +
+        '<span class="pc-pr-label">Double-Double</span>' +
+        '<span class="pc-pr-line">10+ ×2</span>' +
+        '<span class="pc-pr-hit">' + Math.round(row.dd.p * 100) + '% hit</span>' +
+        '<span class="pc-pr-odds">Fair ' + nbaFairOdds(row.dd.p) + '</span></div>';
+    }
     h += sec('lines', "Tonight's fair lines", linesHtml, true);
     // Minutes · last 6 (open by default — the on/off visual)
     const minGames = (row.recentLines || []).slice(0, 6);
     if (minGames.length) h += sec('minutes', 'Minutes · last ' + minGames.length, minutesHtml(row), true);
     // Chemistry (open by default)
     if (row.chem && row.chem.fgm >= 5) h += sec('chem', 'Chemistry · last ' + (row.chemGames || minGames.length), chemHtml(row), true);
+    // Performance bars · last 6 (open by default)
+    const perfGames = (row.recentLines || []).slice(0, 6);
+    if (perfGames.length >= 3) h += sec('perf', 'Performance · last ' + perfGames.length, perfHtml(row), true);
     // Milestones
     const ladHtml = MKT_KEYS.map((key) => {
       const lad = row.markets[key].ladder || [];
