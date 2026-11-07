@@ -413,6 +413,141 @@ function logoImg(abbr, cls){ return '<img class="'+(cls||"game-logo")+'" src="ht
 function slug(key){ return key.replace("@","-").toLowerCase(); }
 function fmtKick(iso){ try { return new Date(iso).toLocaleString("en-US",{weekday:"short",hour:"numeric",minute:"2-digit",timeZone:"America/Phoenix"}).toUpperCase(); } catch(e){ return ""; } }
 function fmtDay(iso){ try { return new Date(iso).toLocaleString("en-US",{weekday:"short",month:"short",day:"numeric",timeZone:"America/Phoenix"}); } catch(e){ return ""; } }
+/* ---------- weather strip (display-only; Open-Meteo, keyless; no model numbers change) ---------- */
+var STADIUMS = {
+ARI:{n:"State Farm Stadium",c:"Glendale",roof:"retractable",lat:33.5276,lon:-112.2626},
+ATL:{n:"Mercedes-Benz Stadium",c:"Atlanta",roof:"retractable",lat:33.7554,lon:-84.4008},
+BAL:{n:"M&T Bank Stadium",c:"Baltimore",roof:"open",lat:39.2780,lon:-76.6227},
+BUF:{n:"Highmark Stadium",c:"Orchard Park",roof:"open",lat:42.7738,lon:-78.7870},
+CAR:{n:"Bank of America Stadium",c:"Charlotte",roof:"open",lat:35.2258,lon:-80.8528},
+CHI:{n:"Soldier Field",c:"Chicago",roof:"open",lat:41.8623,lon:-87.6167},
+CIN:{n:"Paycor Stadium",c:"Cincinnati",roof:"open",lat:39.0955,lon:-84.5161},
+CLE:{n:"Huntington Bank Field",c:"Cleveland",roof:"open",lat:41.5061,lon:-81.6995},
+DAL:{n:"AT&T Stadium",c:"Arlington",roof:"retractable",lat:32.7473,lon:-97.0945},
+DEN:{n:"Empower Field at Mile High",c:"Denver",roof:"open",lat:39.7439,lon:-105.0201},
+DET:{n:"Ford Field",c:"Detroit",roof:"dome",lat:42.3400,lon:-83.0456},
+GB:{n:"Lambeau Field",c:"Green Bay",roof:"open",lat:44.5013,lon:-88.0622},
+HOU:{n:"NRG Stadium",c:"Houston",roof:"retractable",lat:29.6847,lon:-95.4107},
+IND:{n:"Lucas Oil Stadium",c:"Indianapolis",roof:"retractable",lat:39.7601,lon:-86.1639},
+JAX:{n:"EverBank Stadium",c:"Jacksonville",roof:"open",lat:30.3239,lon:-81.6373},
+KC:{n:"GEHA Field at Arrowhead Stadium",c:"Kansas City",roof:"open",lat:39.0489,lon:-94.4839},
+LAC:{n:"SoFi Stadium",c:"Inglewood",roof:"dome",lat:33.9535,lon:-118.3392},
+LAR:{n:"SoFi Stadium",c:"Inglewood",roof:"dome",lat:33.9535,lon:-118.3392},
+LV:{n:"Allegiant Stadium",c:"Las Vegas",roof:"dome",lat:36.0909,lon:-115.1833},
+MIA:{n:"Hard Rock Stadium",c:"Miami Gardens",roof:"open",lat:25.9580,lon:-80.2389},
+MIN:{n:"U.S. Bank Stadium",c:"Minneapolis",roof:"dome",lat:44.9736,lon:-93.2575},
+NE:{n:"Gillette Stadium",c:"Foxborough",roof:"open",lat:42.0909,lon:-71.2643},
+NO:{n:"Caesars Superdome",c:"New Orleans",roof:"dome",lat:29.9511,lon:-90.0812},
+NYG:{n:"MetLife Stadium",c:"East Rutherford",roof:"open",lat:40.8135,lon:-74.0745},
+NYJ:{n:"MetLife Stadium",c:"East Rutherford",roof:"open",lat:40.8135,lon:-74.0745},
+PHI:{n:"Lincoln Financial Field",c:"Philadelphia",roof:"open",lat:39.9008,lon:-75.1675},
+PIT:{n:"Acrisure Stadium",c:"Pittsburgh",roof:"open",lat:40.4468,lon:-79.9877},
+SEA:{n:"Lumen Field",c:"Seattle",roof:"open",lat:47.5952,lon:-122.3316},
+SF:{n:"Levi's Stadium",c:"Santa Clara",roof:"open",lat:37.4030,lon:-121.9700},
+TB:{n:"Raymond James Stadium",c:"Tampa",roof:"open",lat:27.9759,lon:-82.5033},
+TEN:{n:"Nissan Stadium",c:"Nashville",roof:"open",lat:36.1665,lon:-86.7713},
+WSH:{n:"Northwest Stadium",c:"Landover",roof:"open",lat:38.9077,lon:-76.8645}
+};
+var WX = {};
+(function(){
+  var st = document.createElement("style");
+  st.textContent = ".wx{margin-top:10px;border-top:1px solid rgba(165,195,255,.18);padding-top:10px}"
+  + ".wx-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}"
+  + ".wx-stad{font-weight:700;font-size:13px;color:#eef3fb}"
+  + ".wx-chip{font-size:9.5px;font-weight:800;letter-spacing:.06em;padding:3px 8px;border-radius:999px;border:1px solid rgba(143,208,255,.55);color:#8fd0ff;background:rgba(10,20,40,.55);white-space:nowrap}"
+  + ".wx-chip.dome{border-color:rgba(232,182,76,.6);color:#e8b64c}"
+  + ".wx-nums{display:flex;gap:20px;margin-top:9px;align-items:flex-end;flex-wrap:wrap}"
+  + ".wx-nums label{display:block;font-size:9.5px;font-weight:800;letter-spacing:.07em;color:var(--mut);margin-bottom:2px}"
+  + ".wx-windb{font-size:21px;font-weight:800;color:#60c8fa;line-height:1}"
+  + ".wx-gust{font-size:11px;color:var(--mut);font-weight:600;margin-left:5px}"
+  + ".wx-numb{font-size:16px;font-weight:700;color:#eef3fb;line-height:1.15}"
+  + ".wx-gauge{position:relative;margin-top:11px}"
+  + ".wx-bar{display:flex;height:8px;border-radius:5px;overflow:hidden}"
+  + ".wx-seg.s1{background:#2e543c;width:32%}"
+  + ".wx-seg.s2{background:#788237;width:16%}"
+  + ".wx-seg.s3{background:#966828;width:16%}"
+  + ".wx-seg.s4{background:#96462f;width:36%}"
+  + ".wx-mark{position:absolute;top:10px;width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:8px solid #eef3fb;transform:translateX(-6px)}"
+  + ".wx-scale{display:flex;justify-content:space-between;font-size:9.5px;color:var(--mut);margin-top:15px}"
+  + ".wx-read{font-weight:700;font-size:13px;margin-top:5px;line-height:1.4}"
+  + ".wx-read.red{color:#f0685e}.wx-read.gold{color:#e8b64c}.wx-read.green{color:#3ecf6f}"
+  + ".wx-sub{font-size:11px;color:var(--mut);margin-top:2px;line-height:1.45}"
+  + ".wx.mut .wx-nums,.wx.mut .wx-gauge,.wx.mut .wx-scale{opacity:.45}";
+  document.head.appendChild(st);
+})();
+function wxRead(wind){
+  if(wind>=20) return ["red","Wind "+wind+" mph — passing haircut territory","Team pass Y/A \u2248 \u22129% or worse at 20+ mph winds (HeatRadar)"];
+  if(wind>=16) return ["red","Wind "+wind+" mph — passing haircut territory","Team pass Y/A runs \u2248 \u22129% at 16\u201319 mph (HeatRadar)"];
+  if(wind>=12) return ["gold","Wind "+wind+" mph — real passing drag","Team pass Y/A runs \u2248 \u22124% at 12\u201315 mph (HeatRadar)"];
+  if(wind>=8) return ["gold","Wind "+wind+" mph — light passing drag","Team pass Y/A runs \u2248 \u22123.6% at 8\u201311 mph (HeatRadar)"];
+  return ["green","Calm — clean conditions for both passing games","Under 8 mph: no measurable wind effect in the study"];
+}
+function wxStrip(st, w, muted, readOverride){
+  var chip = st.roof==="retractable" ? "RETRACTABLE" : "OPEN AIR";
+  var rd = readOverride || wxRead(Math.round(w.wind));
+  if(!readOverride && w.rain!=null && w.rain>=50) rd = [rd[0], rd[1], rd[2]+" · Rain likely too ("+Math.round(w.rain)+"% at kickoff) — wet-ball game."];
+  var h = '<div class="wx'+(muted?" mut":"")+'"><div class="wx-top"><span class="wx-stad">'+st.n+' · '+st.c+'</span><span class="wx-chip">'+chip+'</span></div>';
+  h += '<div class="wx-nums"><div><label>WIND</label><span class="wx-windb">'+Math.round(w.wind)+' mph</span>'+(w.gust!=null? '<span class="wx-gust">gusts '+Math.round(w.gust)+'</span>' : '')+'</div>'
+     + '<div><label>KICKOFF</label><span class="wx-numb">'+Math.round(w.temp)+'°F</span></div>'
+     + '<div><label>RAIN</label><span class="wx-numb">'+(w.rain==null? "—" : Math.round(w.rain)+"%")+'</span></div></div>';
+  var pctLeft = Math.round(Math.max(0, Math.min(100, w.wind/25*100))*10)/10;
+  h += '<div class="wx-gauge"><div class="wx-bar"><span class="wx-seg s1"></span><span class="wx-seg s2"></span><span class="wx-seg s3"></span><span class="wx-seg s4"></span></div><span class="wx-mark" style="left:'+pctLeft+'%"></span></div>'
+     + '<div class="wx-scale"><span>0</span><span>25+ mph</span></div>';
+  h += '<div class="wx-read '+rd[0]+'">'+rd[1]+'</div><div class="wx-sub">'+rd[2]+'</div></div>';
+  return h;
+}
+function wxDomeLine(st, chipText, read){
+  return '<div class="wx"><div class="wx-top"><span class="wx-stad">'+st.n+' · '+st.c+'</span><span class="wx-chip dome">'+chipText+'</span></div>'
+    + '<div class="wx-nums"><div><label>INDOORS</label><span class="wx-numb">Climate-controlled</span></div></div>'
+    + '<div class="wx-read green">'+read+'</div><div class="wx-sub">Wind, rain and temp don\'t apply — roof closed all game.</div></div>';
+}
+function wxHtml(g){
+  var st = STADIUMS[g.home]; if(!st) return "";
+  var L = LIVE[g.espnId];
+  if(L && L.state!=="pre") return "";
+  if(st.roof==="dome") return wxDomeLine(st, "DOME", "Dome — weather's off the table. Model numbers stand as-is.");
+  var w = WX[g.key];
+  if(!w) return "";
+  if(st.roof==="retractable"){
+    var matters = w.wind>=12 || (w.rain!=null && w.rain>=40) || w.temp<=35 || w.temp>=90;
+    if(!matters) return wxDomeLine(st, "RETRACTABLE", "Retractable roof, mild outside — weather's off the table either way.");
+    return wxStrip(st, w, true, ["gold","Retractable roof — likely closed if it matters","Outside at kickoff, shown muted. If they open it, this is the passing weather."]);
+  }
+  return wxStrip(st, w, false, null);
+}
+function loadWeather(){
+  var byVenue = {};
+  B.games.forEach(function(g){
+    var st = STADIUMS[g.home];
+    if(!st || st.roof==="dome") return;
+    var L = LIVE[g.espnId]; if(L && L.state!=="pre") return;
+    if(!byVenue[g.home]) byVenue[g.home] = { st: st, games: [] };
+    byVenue[g.home].games.push(g);
+  });
+  Object.keys(byVenue).forEach(function(k){
+    var v = byVenue[k];
+    var url = "https://api.open-meteo.com/v1/forecast?latitude="+v.st.lat+"&longitude="+v.st.lon+"&hourly=temperature_2m,wind_speed_10m,wind_gusts_10m,precipitation_probability&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=auto&past_days=3&forecast_days=10";
+    fetch(url).then(function(r){ return r.json(); }).then(function(d){
+      var hr = d && d.hourly; if(!hr || !hr.time) return;
+      var off = (d.utc_offset_seconds||0)*1000;
+      v.games.forEach(function(g){
+        var lt = new Date(new Date(g.kickoff).getTime()+off);
+        var want = Date.UTC(lt.getUTCFullYear(), lt.getUTCMonth(), lt.getUTCDate(), lt.getUTCHours(), lt.getUTCMinutes());
+        var best = -1, bestDiff = Infinity;
+        for(var i=0;i<hr.time.length;i++){
+          var p = hr.time[i].split(/[-T:]/);
+          var t2 = Date.UTC(+p[0], +p[1]-1, +p[2], +p[3]||0, +p[4]||0);
+          var diff = Math.abs(t2-want);
+          if(diff<bestDiff){ bestDiff = diff; best = i; }
+        }
+        if(best<0) return;
+        WX[g.key] = { temp: hr.temperature_2m[best], wind: hr.wind_speed_10m[best], gust: hr.wind_gusts_10m ? hr.wind_gusts_10m[best] : null, rain: hr.precipitation_probability ? hr.precipitation_probability[best] : null };
+      });
+      renderSlate();
+      if(currentView==="view-game" && currentGame && v.games.filter(function(g){ return slug(g.key)===currentGame; }).length) renderGame(currentGame);
+    }).catch(function(){});
+  });
+}
 function show(id){
   document.querySelectorAll(".view").forEach(function(v){ v.classList.remove("on"); });
   $(id).classList.add("on");
@@ -634,7 +769,7 @@ function renderSlate(){
     } else {
       body += '<div class="proj"><div class="box"><b>'+Math.round(gm.awayPts)+' – '+Math.round(gm.homePts)+'</b><i>PROJECTED</i></div><div class="box"><b>'+(gm.awayWin>=gm.homeWin? g.away+" "+pct(gm.awayWin) : g.home+" "+pct(gm.homeWin))+'</b><i>WIN PROB</i></div><div class="box"><b>'+gm.total.toFixed(1)+'</b><i>TOTAL</i></div></div>';
     }
-    return '<div class="card'+(gi===0?" featured":"")+'" data-game="'+key+'" style="cursor:pointer">'+head+body+'</div>';
+    return '<div class="card'+(gi===0?" featured":"")+'" data-game="'+key+'" style="cursor:pointer">'+head+body+wxHtml(g)+'</div>';
   }).join("");
 }
 function renderStandings(){
@@ -696,7 +831,7 @@ function renderGame(key){
   if(L && L.state!=="pre") h += '<h2 class="sec">PREGAME MODEL <span>before kickoff</span></h2>';
   h += '<div class="card" style="margin-top:' + ((L && L.state!=="pre") ? "0" : "12px") + '"><div class="proj">' + g.model.map(function(b){ return '<div class="box"><b>'+b[0]+'</b><i>'+b[1]+'</i></div>'; }).join("") + '</div>';
   if(g.totals){ h += '<div class="proj" style="margin-top:8px">' + g.totals.map(function(b){ return '<div class="box"><b>'+b[0]+'</b><i>'+b[1]+'</i></div>'; }).join("") + '</div>'; }
-  h += '</div>';
+  h += wxHtml(raw) + '</div>';
   g.teams.forEach(function(t){ h += '<h2 class="sec">'+t.name+' <span>tap for the card</span></h2><div class="card">' + t.rows.map(pickRow).join("") + '</div>'; });
   if(g.kickers && g.kickers.length){ h += '<h2 class="sec">KICKERS <span>tap for the card</span></h2><div class="card">' + g.kickers.map(pickRow).join("") + '</div>'; }
   h += '<p class="note">' + ((L && L.state!=="pre") ? 'Live win % comes from the ESPN feed and stays separate from the pregame model. Live sections refresh every 60 seconds.' : 'First touchdown prices live on each player card; the full board for both teams is under The Playbook.') + '</p>';
@@ -817,6 +952,7 @@ fetch("data/nfl-2026-w10.json").then(function(r){ return r.json(); }).then(funct
   renderStandings();
   show("view-football");
   fetchESPN();
+  loadWeather();
   setInterval(fetchESPN, 60000);
 }).catch(function(){
   $("boardWrap").innerHTML = '<p class="note" style="margin:12px 2px">The Week 10 price bundle could not load. Refresh in a moment.</p>';
