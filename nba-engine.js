@@ -1,4 +1,4 @@
-/* Bueno Sports — NBA player-prop pricing engine (v2)
+/* Bueno Sports — NBA player-prop pricing engine (v2.1)
  *
  * Pure functions, browser-compatible (classic script, no imports), same
  * pattern as mlb-engine.js. The model, in one paragraph:
@@ -10,7 +10,9 @@
  *     points        ~ Normal(mean, SD = max(3.5, 0.40 * mean))
  *     rebounds      ~ NegativeBinomial(mean, k = 8)   (fatter than Poisson)
  *     assists       ~ NegativeBinomial(mean, k = 6)
- *     threes        ~ Binomial(projected attempts, regressed 3P%)
+ *     threes        ~ attempts ~ NegativeBinomial(mean = projected
+ *                     attempts, k = 11.2); makes | attempts ~
+ *                     Binomial(attempts, regressed 3P%)
  *   A market's fair line is its median; over/under fair odds come from the
  *   same distribution, so alt lines are just other points on the curve —
  *   exactly how DK builds their ladder.
@@ -28,6 +30,21 @@
  *   3. Game environment — opts.paceAdj now scales every market, and
  *      nbaEnvFactors() derives it keylessly from ESPN-style ratings
  *      (pace + offensive/defensive efficiency) instead of Vegas totals.
+ *
+ * v2.1 (2026-11-07) — threes wider-variance fix, the one change: attempts
+ *   are no longer treated as a fixed constant. The full-season 2025-26
+ *   proof (~/workspace/nba-model/PROOF-2025-26.md, Test 2) showed makes
+ *   given attempts are pure Binomial, but attempt volume is overdispersed
+ *   (mostly minutes-projection error), which left the old fixed-attempts
+ *   Binomial badly overconfident at the top (80–90% bin: priced 85.0%,
+ *   actual 75.5%). Attempts are now NegativeBinomial around the same
+ *   projected mean with dispersion k = threeAttK (11.2), moment-fit on
+ *   the full 2025-26 corpus — 18,318 priced player-games (the proof's
+ *   Oct–Dec-only fit was 15.1; attempts disperse more late-season, so
+ *   the full-season fit is smaller and wider). Proof gates, out-of-sample
+ *   Jan–Apr: log-loss 0.4416 -> 0.3736, top-bin calibration error
+ *   0.094 -> 0.015. The projected makes MEAN is unchanged (E[A] * p);
+ *   only the spread widens: top rungs come down, bottom rungs rise.
  */
 
 const NBA_PRIORS = {
@@ -39,6 +56,7 @@ const NBA_PRIORS = {
   astK: 6,             // negative-binomial dispersion, assists
   threePctPrior: 0.355,
   threePctK: 250,      // attempts of prior weight for 3P%
+  threeAttK: 11.2,     // negative-binomial dispersion of 3PA volume (v2.1; moment-fit on full 2025-26, see header)
   lgDefRtg: 115.6,     // league-average points allowed per 100 poss (2025-26 early)
   roleShiftBand: 0.20, // recent-vs-projection minutes gap that reads as a role change
   roleBlendBase: 0.40, // blend weight on recent minutes, no shift detected
@@ -234,6 +252,27 @@ function nbaBinomCdf(k, n, p) {
   return Math.min(1, total);
 }
 
+/* P(makes <= k) for the v2.1 threes distribution: attempts
+   A ~ NegativeBinomial(mean = mu, size = r), makes | A ~ Binomial(A, p).
+   The mixture is summed over the attempt distribution (terms past the
+   mean with weight < 1e-7 skipped) and renormalized over the weight
+   kept — exactly the computation the 2025-26 proof graded. */
+function nbaNbBinomCdf(k, mu, p, r) {
+  if (k < 0) return 0;
+  if (mu <= 0 || p <= 0) return 1;
+  if (p >= 1) return nbaNbCdf(k, mu, r);
+  const varA = mu + (mu * mu) / r;
+  const aMax = Math.min(45, Math.ceil(mu + 8 * Math.sqrt(varA)) + 4);
+  let wsum = 0, acc = 0;
+  for (let A = 0; A <= aMax; A++) {
+    const w = nbaNbPmf(A, mu, r);
+    if (w < 1e-7 && A > mu) continue;
+    wsum += w;
+    acc += w * nbaBinomCdf(k, A, p);
+  }
+  return Math.min(1, acc / (wsum || 1));
+}
+
 function nbaFairOdds(p) {
   if (!(p > 0.0005) || !(p < 0.9995)) return '–';
   if (p >= 0.5) return '−' + Math.round((100 * p) / (1 - p));
@@ -251,6 +290,9 @@ function nbaProbOver(dist, line) {
   }
   if (dist.kind === 'binom') {
     return 1 - nbaBinomCdf(L, dist.n, dist.p);
+  }
+  if (dist.kind === 'nbbinom') {
+    return 1 - nbaNbBinomCdf(L, dist.mu, dist.p, dist.k);
   }
   return 0.5;
 }
@@ -289,7 +331,7 @@ function nbaPricePlayer(season, opts) {
     points: { kind: 'normal', mean: ptsMean, sd: ptsSd },
     rebounds: { kind: 'nb', mean: rebMean, k: NBA_PRIORS.rebK },
     assists: { kind: 'nb', mean: astMean, k: NBA_PRIORS.astK },
-    threes: { kind: 'binom', n: att, p: threePct, mean: att * threePct },
+    threes: { kind: 'nbbinom', mu: att, n: att, p: threePct, k: NBA_PRIORS.threeAttK, mean: att * threePct },
   };
   const out = { minutes, markets: {} };
   for (const key of Object.keys(markets)) {
@@ -312,7 +354,7 @@ function nbaPricePlayer(season, opts) {
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     NBA_PRIORS, nbaRates, nbaProjectMinutes, nbaPricePlayer,
-    nbaProbOver, nbaMedianLine, nbaFairOdds, nbaNormCdf, nbaNbCdf, nbaBinomCdf,
+    nbaProbOver, nbaMedianLine, nbaFairOdds, nbaNormCdf, nbaNbCdf, nbaBinomCdf, nbaNbBinomCdf,
     nbaOppFactor, nbaEnvFactors, nbaPraMarket, nbaRaMarket, nbaDoubleDouble, nbaGameProjection,
   };
 }
