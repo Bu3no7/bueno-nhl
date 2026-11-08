@@ -1731,6 +1731,144 @@ function liveWinProb(g, pregameWp) {
   if (!last || last.period !== pt.period || last.clock !== pt.clock || last.home !== pt.home) hist.push(pt);
   return { a: 1 - home, b: home, mode };
 }
+/* ---------------- Live win % graph (game sheet) ----------------
+   Pure-string SVG path of the home win % through the game, drawn inside
+   matchupHtml under the win bar (the sheet re-renders wholesale per tick,
+   so no canvas and no separate updater). The path is the same honest
+   score & clock calculation as the live bar — never a projection. Series
+   source, in order: (a) this session's recorded liveWpHistory points,
+   (b) a reconstruction from the pbp goals, stepping the score+clock
+   formula at each goal. Goal dots mark each goal at its after-goal win %;
+   the biggest single-goal swing gets the callout under the chart. */
+function wpClockMin(str) {
+  const m = /^(\d+):(\d+)$/.exec(String(str || ''));
+  return m ? (+m[1]) + (+m[2]) / 60 : 0;
+}
+// History points store period + timeRemaining clock (like liveWpElapsed).
+function wpElapsedFromPeriodClock(period, clockStr) {
+  const rem = wpClockMin(clockStr);
+  if (!period) return 0;
+  if (period <= 3) return (period - 1) * 20 + Math.max(0, 20 - rem);
+  if (period === 4) return 60 + Math.max(0, 5 - rem);
+  return 65;
+}
+// extractGoals' time is timeInPeriod — ELAPSED in the period (the scorers
+// feed prints it as-is), unlike the live clock's timeRemaining.
+function wpGoalElapsed(gl) {
+  const t = wpClockMin(gl.time);
+  const p = gl.period || 0;
+  if (p >= 5) return 65;
+  if (p === 4) return 60 + t;
+  if (p >= 1) return (p - 1) * 20 + t;
+  return t;
+}
+function wpChartHtml(g, wp) {
+  const live = liveWinProb(g, wp);
+  if (live.mode !== 'live' && live.mode !== 'final') return '';
+  const H = g.home, A = g.away;
+  const pre = wp && typeof wp.b === 'number' ? wp.b : 0.5;
+  const wpAt = (diff, elapsed) => liveWpSigmoid(liveWpLogit(pre)
+    + diff * (LIVE_WP_SCORE_A + LIVE_WP_SCORE_B * Math.min(1, Math.max(0, elapsed / 60))));
+  const perLab = (gl) => (gl.periodType === 'OT' || gl.period === 4) ? 'OT' : `P${gl.period}`;
+  // Goals in chronological order (extractGoals returns newest first);
+  // shootout goals never move the score, so they are excluded.
+  const goals = extractGoals(g.pbp, g)
+    .filter((gl) => gl.periodType !== 'SO' && (gl.period || 0) >= 1 && (gl.period || 0) < 5)
+    .sort((a, b) => (a.order || 0) - (b.order || 0));
+  let runDiff = 0, biggest = null;
+  for (const gl of goals) {
+    gl._e = wpGoalElapsed(gl);
+    const hasScore = typeof gl.homeScore === 'number' && typeof gl.awayScore === 'number';
+    const diffAfter = hasScore ? gl.homeScore - gl.awayScore
+      : runDiff + (gl.team === H ? 1 : gl.team === A ? -1 : 0);
+    const diffBefore = hasScore ? diffAfter - (gl.team === H ? 1 : -1) : runDiff;
+    gl._wpBefore = wpAt(diffBefore, gl._e);
+    gl._wpAfter = wpAt(diffAfter, gl._e);
+    gl._delta = gl._wpAfter - gl._wpBefore;
+    runDiff = diffAfter;
+    if (!biggest || Math.abs(gl._delta) > Math.abs(biggest._delta)) biggest = gl;
+  }
+  const pbp = g.pbp || {};
+  const finalDiff = (pbp.homeTeam && typeof pbp.homeTeam.score === 'number'
+    && pbp.awayTeam && typeof pbp.awayTeam.score === 'number')
+    ? pbp.homeTeam.score - pbp.awayTeam.score : runDiff;
+  const elNow = liveWpElapsed(g);
+  let pts;
+  const hist = liveWpHistory[g.id] || [];
+  if (hist.length >= 2) {
+    pts = hist.map((pt) => [wpElapsedFromPeriodClock(pt.period, pt.clock),
+      Math.min(0.99, Math.max(0.01, (pt.home || 0) / 100))])
+      .sort((a, b) => a[0] - b[0]);
+    if (live.mode === 'final') {
+      if (pts[pts.length - 1][0] < 65) pts.push([65, wpAt(finalDiff, 65)]);
+    } else {
+      const last = pts[pts.length - 1];
+      if (Math.abs(last[0] - elNow.elapsed) > 0.01 || Math.abs(last[1] - live.b) > 0.001) {
+        pts.push([elNow.elapsed, live.b]);
+      }
+    }
+  } else {
+    pts = [[0, pre]];
+    const evts = [];
+    for (const gl of goals) evts.push({ e: gl._e, gl });
+    for (const pe of [20, 40, 60]) {
+      if (live.mode === 'final' || pe <= elNow.elapsed + 1e-9) evts.push({ e: pe, gl: null });
+    }
+    evts.sort((x, y) => (x.e - y.e) || ((x.gl ? 0 : 1) - (y.gl ? 0 : 1)));
+    let diff = 0;
+    for (const ev of evts) {
+      if (ev.gl) {
+        const hasScore = typeof ev.gl.homeScore === 'number' && typeof ev.gl.awayScore === 'number';
+        const after = hasScore ? ev.gl.homeScore - ev.gl.awayScore
+          : diff + (ev.gl.team === H ? 1 : ev.gl.team === A ? -1 : 0);
+        const before = hasScore ? after - (ev.gl.team === H ? 1 : -1) : diff;
+        pts.push([ev.e, wpAt(before, ev.e)], [ev.e, wpAt(after, ev.e)]);
+        diff = after;
+      } else {
+        pts.push([ev.e, wpAt(diff, ev.e)]);
+      }
+    }
+    // Endpoint: live = the current score & clock point; final = the
+    // score & clock formula at the final diff, stepped to 65 (a shootout
+    // game honestly ends at its pre-SO win %, not at 0/100).
+    if (live.mode === 'final') pts.push([65, wpAt(diff, 65)]);
+    else pts.push([elNow.elapsed, live.b]);
+  }
+  const series = [];
+  for (const p of pts) {
+    const l = series[series.length - 1];
+    if (!l || Math.abs(l[0] - p[0]) > 1e-9 || Math.abs(l[1] - p[1]) > 1e-9) series.push(p);
+  }
+  if (series.length < 2) return '';
+  const X = (e) => (Math.min(65, Math.max(0, e)) / 65) * 320;
+  const Y = (w) => 8 + (1 - Math.min(1, Math.max(0, w))) * 84;
+  const linePts = series.map(([e, w]) => `${X(e).toFixed(1)},${Y(w).toFixed(1)}`).join(' ');
+  const x0 = X(series[0][0]), x1 = X(series[series.length - 1][0]);
+  const cA = TEAM_COLORS[A] || '#888', cH = TEAM_COLORS[H] || '#888';
+  const dividers = [20, 40, 60].map((pe) =>
+    `<line x1="${X(pe).toFixed(1)}" y1="8" x2="${X(pe).toFixed(1)}" y2="92" stroke="rgba(255,255,255,.08)"/>`).join('');
+  const labels = [['P1', 10], ['P2', 30], ['P3', 50], ['OT', 62.5]].map(([t, c]) =>
+    `<text x="${X(c).toFixed(1)}" y="106" font-size="8" fill="#8b96ab" text-anchor="middle">${t}</text>`).join('');
+  const shade = (live.mode === 'live' && elNow.elapsed < 64.9)
+    ? `<rect x="${X(elNow.elapsed).toFixed(1)}" y="8" width="${(320 - X(elNow.elapsed)).toFixed(1)}" height="84" fill="rgba(255,255,255,.045)"/><text x="${Math.min(314, X(elNow.elapsed) + 5).toFixed(1)}" y="17" font-size="7.5" fill="#8b96ab">still to play</text>` : '';
+  const dots = goals.map((gl) =>
+    `<circle cx="${X(gl._e).toFixed(1)}" cy="${Y(gl._wpAfter).toFixed(1)}" r="3" fill="#f5b942" stroke="#0a101c" stroke-width="1"><title>${esc(gl.scorer)} · ${perLab(gl)} ${esc(gl.time)} · ${gl.awayScore}–${gl.homeScore}</title></circle>`).join('');
+  const svg = `<svg viewBox="0 0 320 118" style="display:block;width:100%;height:auto" role="img" aria-label="Win probability path">`
+    + `<polygon points="${linePts} ${x1.toFixed(1)},8 ${x0.toFixed(1)},8" fill="${cA}" opacity="0.10"/>`
+    + `<polygon points="${linePts} ${x1.toFixed(1)},92 ${x0.toFixed(1)},92" fill="${cH}" opacity="0.16"/>`
+    + dividers + shade
+    + `<line x1="0" y1="50" x2="320" y2="50" stroke="rgba(255,255,255,.35)" stroke-dasharray="4 4"/>`
+    + `<line x1="0" y1="92" x2="320" y2="92" stroke="rgba(255,255,255,.15)"/>`
+    + `<polyline points="${linePts}" fill="none" stroke="${cH}" stroke-width="2" stroke-linejoin="round"/>`
+    + dots + labels + `</svg>`;
+  let swing = '';
+  if (biggest) {
+    const toward = biggest.team === H ? biggest._delta : -biggest._delta;
+    swing = `<div class="gs-wp-swing">Biggest swing · ${esc(biggest.scorer)} · ${perLab(biggest)} ${esc(biggest.time)} · ${toward >= 0 ? '+' : '-'}${Math.round(Math.abs(toward) * 100)}% ${esc(biggest.team)}</div>`;
+  }
+  const note = live.mode === 'final' ? `<div class="gs-wp-note">Win % path · score &amp; clock</div>` : '';
+  return `<div class="gs-wp-chart">${svg}</div>${swing}${note}`;
+}
 function matchupHtml(g, lamA, lamB, wp, st) {
   const A = g.away, H = g.home;
   const sa = st ? st[A] : null, sh = st ? st[H] : null;
@@ -1779,6 +1917,7 @@ function matchupHtml(g, lamA, lamB, wp, st) {
   </div>
   <div class="split-labels"><span><strong style="color:${cA};text-shadow:0 0 10px ${cA}">${pctA}%</strong> ${esc(A)}</span><span>${esc(H)} <strong style="color:${cH};text-shadow:0 0 10px ${cH}">${pctH}%</strong></span></div>
   ${live.mode === 'live' ? `<div class="gs-wp-sub">from score &amp; clock so far</div>` : ''}
+  ${wpChartHtml(g, wp)}
   <div class="matchup-proj">Projected <strong>${esc(A)} ${lamA.toFixed(1)} – ${lamB.toFixed(1)} ${esc(H)}</strong></div>
   <details class="gs-sec" data-sec="scorers"${sheetSecOpen('scorers') ? ' open' : ''}><summary>Scorers feed</summary><div class="gs-sec-body">${sheetScorersHtml(g)}</div></details>
   <details class="gs-sec" data-sec="goalies"${sheetSecOpen('goalies') ? ' open' : ''}><summary>Goalie matchup</summary><div class="gs-sec-body">${sheetGoalieCardsHtml(g)}</div></details>
@@ -2978,6 +3117,78 @@ function heatMapSectionHtml(r, shots, title, sub, emptyText, opts) {
     <p class="small muted" style="margin:.55rem 0 0">${take} <span class="muted">(${total} attempts tracked)</span></p>
   </details>`;
 }
+/* ---------------- goalie workload (goalies sidecar) ----------------
+   data/goalies-<date>.json from data-builder/goalies-work.js: each
+   goalie's last 5 starts (shots faced, goals against, decision, save %).
+   DISPLAY ONLY. Loaded lazily on the first goalie-card open via a cached
+   promise (same slot pattern as minutes/chem/finish); a missing sidecar
+   or goalie hides the section silently. */
+let gworkSidecar = null, gworkPromise = null;
+function loadGworkSidecar() {
+  if (!gworkPromise) {
+    gworkPromise = fetch(`data/goalies-${state.date}.json`, { headers: { 'Accept': 'application/json' } })
+      .then((r) => { if (!r.ok) throw new Error('no sidecar'); return r.json(); })
+      .then((j) => { gworkSidecar = j; return j; })
+      .catch(() => { gworkSidecar = null; return null; });
+  }
+  return gworkPromise;
+}
+function pcGworkSlotHtml(pg) {
+  if (gworkSidecar) return pcGworkHtml(pg);
+  return `<div class="pc-min" data-gwork-slot="${esc(String(pg.id))}"><div class="pc-min-h"><span class="pc-min-t">Workload</span></div><p class="muted small" style="margin:.35rem 0 0">Loading workload…</p></div>`;
+}
+function gworkFmtSv(sv) {
+  const s = (sv || 0).toFixed(3);
+  return s.startsWith('0') ? s.slice(1) : s;
+}
+function pcGworkHtml(pg) {
+  const entry = (gworkSidecar && gworkSidecar.goalies && gworkSidecar.goalies[String(pg.id)]) || null;
+  const starts = (entry && entry.starts) || [];
+  if (!starts.length) return '';
+  const dayNum = (dstr) => Math.round(new Date(dstr + 'T12:00:00Z').getTime() / 86400000);
+  const last = starts[starts.length - 1];
+  const rest = dayNum(state.date) - dayNum(last.d);
+  const chips = [];
+  if (rest === 1) chips.push('<span class="gwork-chip amber">PLAYED LAST NIGHT · B2B IF HE GOES</span>');
+  else if (rest >= 4) chips.push(`<span class="gwork-chip teal">${rest} DAYS REST</span>`);
+  const inWin = starts.filter((s) => dayNum(s.d) >= dayNum(last.d) - 13);
+  if (inWin.length >= 4) {
+    const span = dayNum(last.d) - dayNum(inWin[0].d) + 1;
+    chips.push(`<span class="gwork-chip gold">${inWin.length} STARTS IN ${span} DAYS</span>`);
+  }
+  const cols = starts.map((s) => {
+    const barH = Math.max(6, (s.sa / 42) * 92); // 92px zone, SA scaled to 42
+    const tipH = s.sa > 0 ? Math.max(2, (s.ga / s.sa) * barH) : 0;
+    const lit = s.ga >= 4 || s.sv < 0.850;
+    return `<div class="gwork-col">
+      <span class="min-val">${s.sa}</span>
+      <span class="gwork-barzone"><span class="gwork-bar${lit ? ' lit' : ''}" style="height:${barH.toFixed(1)}px"><span class="gwork-tip" style="height:${tipH.toFixed(1)}px"></span></span></span>
+    </div>`;
+  }).join('');
+  const labs = starts.map((s) => `<span class="min-lab">${esc(s.hr === 'R' ? '@' + s.opp : s.opp)}</span>`).join('');
+  const subs = starts.map((s) => {
+    const lit = s.ga >= 4 || s.sv < 0.850;
+    const dec = s.dec === 'O' ? 'OTL' : (s.dec || '–');
+    return `<span class="min-lab gwork-dec${lit ? ' bad' : ''}">${esc(dec)} · ${gworkFmtSv(s.sv)}</span>`;
+  }).join('');
+  return `<div class="pc-min" data-gwork-root>
+    <div class="pc-min-h"><span class="pc-min-t">Workload</span><span class="gwork-last">last ${starts.length} starts</span></div>
+    ${chips.length ? `<div class="gwork-chips">${chips.slice(0, 3).join('')}</div>` : ''}
+    <div class="gwork-cols">${cols}</div>
+    <div class="min-labs">${labs}</div>
+    <div class="min-labs">${subs}</div>
+    <p class="gwork-foot">Bar = shots faced · gold tip = goals against</p>
+  </div>`;
+}
+async function ensureGoalieWork(pg) {
+  await loadGworkSidecar();
+  const body = $('modalBody');
+  if (!body) return;
+  const slot = body.querySelector(`[data-gwork-slot="${esc(String(pg.id))}"]`);
+  if (!slot) return;
+  const html = gworkSidecar ? pcGworkHtml(pg) : '';
+  if (html) slot.outerHTML = html; else slot.remove();
+}
 /* ---------------- goalie card ---------------- */
 async function openGoalie(goalieId, teamAbbrev, gameId) {
   const g = state.games.find((gg) => String(gg.id) === String(gameId));
@@ -3019,6 +3230,7 @@ async function openGoalie(goalieId, teamAbbrev, gameId) {
       <div style="margin-left:auto;text-align:right">${tag}</div>
     </div>
     ${statRow}
+    ${pcGworkSlotHtml(pg)}
     <h4 style="margin:.8rem 0 .2rem">Projections <span class="muted small">model</span></h4>
     ${goalieProjTableHtml(g, teamAbbrev, st)}
     <h4 style="margin:.8rem 0 .2rem">Weak zones <span class="muted small">save% by zone</span></h4>
@@ -3027,6 +3239,7 @@ async function openGoalie(goalieId, teamAbbrev, gameId) {
     ${map}`;
   $('playerModal').classList.remove('hidden');
   drawGoalieRinks();
+  ensureGoalieWork(pg);
 }
 /* ---------------- views & refresh ---------------- */
 /* Home + Top Shelf code lives in home.js */

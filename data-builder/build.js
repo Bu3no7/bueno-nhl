@@ -290,7 +290,7 @@ function slimStandings(d) {
    player landings already had). Final failures are counted per section and
    logged at the end; the health gate below decides whether the bundle is
    fit to publish at all. */
-const failCounts = { schedule: 0, pbp: 0, roster: 0, zonePbp: 0, landing: 0, clubSchedule: 0, seasonFinal: 0, standings: 0, minPbp: 0, shifts: 0, chemPbp: 0 };
+const failCounts = { schedule: 0, pbp: 0, roster: 0, zonePbp: 0, landing: 0, clubSchedule: 0, seasonFinal: 0, standings: 0, minPbp: 0, shifts: 0, chemPbp: 0, goalieWork: 0 };
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 async function fetchRetry(url, section, retries = 3) {
   let lastErr = null;
@@ -645,6 +645,15 @@ async function main() {
     console.log(`[data-builder] chemistry sidecar: ${res.players} players, ${res.gamesFetched} new finals cached (${res.gamesWanted} season finals)`);
   } catch (e) {
     console.error('[data-builder] chemistry sidecar failed (bundle unaffected):', e && e.message);
+  }
+
+  // 11. goalie workload sidecar (last-5 starts per goalie) — best effort.
+  try {
+    const GW = require('./goalies-work.js');
+    const res = await GW.buildGoalieWork({ dateStr, goalieIds, fetchRetry, counted });
+    console.log(`[data-builder] goalie workload sidecar: ${res.goalies}/${res.wanted} goalies with starts`);
+  } catch (e) {
+    console.error('[data-builder] goalie workload sidecar failed (bundle unaffected):', e && e.message);
   }
 }
 

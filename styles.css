@@ -1151,6 +1151,11 @@ tr.team-row:focus-visible { outline: 2px solid var(--teal); outline-offset: -2px
 .gs-wp-head { display: flex; justify-content: space-between; align-items: center; margin: .2rem 0 .4rem; font-size: .8rem; color: var(--muted); }
 .gs-wp-tag { font-weight: 700; color: var(--text); border: 1px solid var(--border); border-radius: 99px; padding: .1rem .55rem; font-size: .75rem; }
 .gs-wp-sub { text-align: center; font-size: .8rem; color: var(--muted); margin: -.3rem 0 .8rem; }
+/* Live win % graph (game sheet) */
+.gs-wp-chart { margin: .45rem 0 .1rem; }
+.gs-wp-chart svg { background: rgba(8, 14, 28, .45); border: 1px solid rgba(255, 255, 255, .10); border-radius: 12px; }
+.gs-wp-swing { margin: .45rem 0 .1rem; font-size: .82rem; font-weight: 700; color: var(--gold); background: rgba(245, 185, 66, .10); border: 1px solid rgba(245, 185, 66, .35); border-radius: 10px; padding: .45rem .6rem; }
+.gs-wp-note { text-align: center; font-size: .75rem; color: var(--muted); margin: .35rem 0 .1rem; }
 
 /* ---------------- player-card polish (approved draft v2) ---------------- */
 .pc-tonight { margin: 0 0 .8rem; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.1); border-radius: 12px; padding: .7rem .8rem; }
@@ -1249,6 +1254,22 @@ tr.team-row:focus-visible { outline: 2px solid var(--teal); outline-offset: -2px
 .fin-tick { position: absolute; left: 12%; right: 12%; height: 3px; border-radius: 2px; background: var(--gold); }
 .fin-cap { font-size: .72rem; color: var(--muted); margin: .35rem 0 0; }
 .fin-foot { font-size: .72rem; color: var(--muted); font-style: italic; margin: .55rem 0 0; border-top: 1px solid rgba(255, 255, 255, .09); padding-top: .5rem; }
+/* ---------------- goalie workload (goalies sidecar) ---------------- */
+.gwork-last { font-size: .8rem; font-weight: 700; color: var(--muted); }
+.gwork-chips { display: flex; flex-direction: column; align-items: flex-start; gap: .4rem; margin-top: .55rem; }
+.gwork-chip { font-size: .68rem; font-weight: 800; letter-spacing: .06em; padding: .32rem .6rem; border-radius: 999px; border: 1px solid var(--muted); color: var(--muted); }
+.gwork-chip.amber { color: var(--gold); border-color: rgba(245, 185, 66, .7); background: rgba(245, 185, 66, .10); }
+.gwork-chip.gold { color: var(--gold); border-color: rgba(245, 185, 66, .55); background: rgba(245, 185, 66, .06); }
+.gwork-chip.teal { color: var(--teal); border-color: rgba(58, 219, 227, .6); background: rgba(58, 219, 227, .08); }
+.gwork-cols { display: flex; gap: 6px; margin-top: .35rem; }
+.gwork-col { flex: 1; display: flex; flex-direction: column; align-items: center; }
+.gwork-barzone { height: 92px; display: flex; align-items: flex-end; justify-content: center; width: 100%; }
+.gwork-bar { display: block; position: relative; overflow: hidden; width: 68%; max-width: 44px; border-radius: 7px 7px 3px 3px; background: var(--teal); }
+.gwork-bar.lit { background: #e5484d; }
+.gwork-tip { position: absolute; top: 0; left: 0; right: 0; background: var(--gold); }
+.gwork-dec { font-size: .75rem; font-weight: 700; color: #c6d2e4; }
+.gwork-dec.bad { color: #ff7a72; }
+.gwork-foot { font-size: .72rem; color: var(--muted); margin: .45rem 0 0; }
 .pc-details { margin: 0 0 .8rem; font-size: .8rem; color: var(--muted); }
 .pc-details summary { cursor: pointer; list-style: none; }
 .pc-details summary::-webkit-details-marker { display: none; }
