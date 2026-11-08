@@ -454,6 +454,19 @@ details.pc-sec[open ] summary .chev { transform: rotate(90deg); }
 .dm-chip.earn { color:#f5b942; border-color:rgba(245,185,66,.55); background:rgba(245,185,66,.1); }
 .dm-chip.tough { color:#f0665e; border-color:rgba(240,102,94,.55); background:rgba(240,102,94,.1); }
 .dm-chip.cold { color:#8b96ab; border-color:rgba(139,150,171,.55); background:rgba(139,150,171,.1); }
+button.dm-chip { font-family:inherit; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+.dm-chip .dm-i { font-size:.58rem; opacity:.85; margin-left:.26rem; vertical-align:.08rem; }
+/* ---- verdict explainer sheet ---- */
+.dmv-sheet { top:auto; }
+.dmv-sub { color:var(--muted); font-size:.82rem; font-weight:600; margin:.1rem 2rem .7rem 0; }
+.dmv-stats { display:flex; gap:.55rem; margin:.2rem 0 .85rem; }
+.dmv-stat { flex:1 1 0; min-width:0; background:rgba(255,255,255,.04); border:1px solid var(--border); border-radius:12px; padding:.5rem .3rem; text-align:center; }
+.dmv-stat .v { display:block; font-weight:800; font-size:1.05rem; font-variant-numeric:tabular-nums; }
+.dmv-stat .v.ora { color:#FF7A1A; }
+.dmv-stat .k { display:block; color:var(--muted); font-size:.58rem; letter-spacing:.07em; text-transform:uppercase; margin-top:.18rem; }
+.dmv-text { font-size:.93rem; line-height:1.55; margin:0; }
+/* ---- top bar wordmark: far right, softened orange (this page only) ---- */
+.page-topbar .topbar-label { color:#d98a4e; font-weight:700; }
 /* ---- Shot zones (player card) ---- */
 .zn-court { background:#0a101d; border-radius:12px; padding:.3rem .15rem .05rem; }
 .zn-table { width:100%; border-collapse:collapse; font-variant-numeric:tabular-nums; margin-top:.55rem; }
@@ -578,7 +591,6 @@ body.sport-glass .pc-overlay,body.sport-glass .gm-overlay{background:rgba(2,5,10
 <div class="page-topbar">
   <button class="top-btn" type="button" data-sports-menu>☰ <span>Sports</span></button>
   <span class="topbar-label">Basketball</span>
-  <span style="width:44px"></span>
 </div>
 <div id="loadingBar" class="loading hidden"><span id="loadingText">Loading…</span></div>
 
@@ -615,7 +627,7 @@ body.sport-glass .pc-overlay,body.sport-glass .gm-overlay{background:rgba(2,5,10
     <div class="home-card" id="nbaDefMatchCard">
       <h3 class="fb-sec-title">Defensive Matchups <span class="sub">his form vs tonight's defense</span></h3>
       <div id="nbaDefMatchBody"><p class="muted">Pricing tonight's slate…</p></div>
-      <p class="muted small" style="margin-top:.35rem">DEF ALLOWS = points that defense gives up per game, last 10. Tap a row for his player card.</p>
+      <p class="muted small" style="margin-top:.35rem">DEF ALLOWS = points that defense gives up per game, last 10. Tap a pill to see why it got that read. Tap a row for his player card.</p>
     </div>
     <div class="home-card" id="nbaTopCard">
       <h3 class="fb-sec-title">Top performers <span class="sub">tonight</span></h3>
@@ -696,6 +708,8 @@ body.sport-glass .pc-overlay,body.sport-glass .gm-overlay{background:rgba(2,5,10
 <div class="gm-overlay" id="nbaGameOverlay"><div class="gm-sheet" id="nbaGameSheet"></div></div>
 <div class="gm-overlay" id="nbaTeamOverlay"><div class="gm-sheet" id="nbaTeamSheet"></div></div>
 <div class="fl-overlay" id="nbaFilterOverlay"><div class="fl-sheet" id="nbaFilterSheet"><button class="pc-close" id="flCloseBtn" type="button" aria-label="Close">✕</button><h3>Filter the board</h3><div class="fl-sec">Filter out a game</div><div class="fl-games" id="flGames"></div><p class="fl-note">Tap a game to hide the whole game. Tap again to bring it back.</p><div class="fl-sec">Filter out a team or player</div><div class="fl-hidebar"><input id="flHideInput" type="search" placeholder="Type a name to hide… e.g. Clingan, Lakers" autocomplete="off"><button id="flHideAdd" type="button">Hide</button></div><div class="mf-chips" id="flHideChips" style="margin-top:.45rem"></div><div class="fl-sec">Hide rows</div><label class="fl-tog"><input type="checkbox" id="flHideStarted"> Games already started</label><label class="fl-tog"><input type="checkbox" id="flHideInj"> Players OUT or questionable</label><label class="fl-tog"><input type="checkbox" id="flHideBench"> Bench — under 20 projected minutes</label><label class="fl-tog"><input type="checkbox" id="flStartersOnly"> Starters only</label><div class="fl-sec">Minimum hit % · <span id="flMinHitVal" style="color:#3adbe3">0%</span></div><input class="fl-slider" id="flMinHit" type="range" min="0" max="90" step="5" value="0"><div class="fl-foot"><button class="ghost" id="flClear" type="button">Clear all</button><button class="go" id="flDone" type="button">Show players</button></div></div></div>
+
+<div class="fl-overlay" id="nbaVerdictOverlay"><div class="fl-sheet dmv-sheet"><button class="pc-close" id="dmvCloseBtn" type="button" aria-label="Close">✕</button><h3 id="dmvTitle"></h3><p class="dmv-sub" id="dmvSub"></p><div class="dmv-stats"><span class="dmv-stat"><span class="v" id="dmvL5"></span><span class="k">Last 5</span></span><span class="dmv-stat"><span class="v" id="dmvL10"></span><span class="k">Last 10</span></span><span class="dmv-stat"><span class="v ora" id="dmvDef"></span><span class="k">Def allows</span></span></div><p class="dmv-text" id="dmvText"></p></div></div>
 
 <nav class="bottom-nav" aria-label="Main">
   <button class="bnav-btn active" data-bnav="home"><span class="bnav-ico">🏀</span><span>NBA</span></button>
@@ -1813,6 +1827,59 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
   }
 
   // ---- Defensive Matchups (home, Tonight view) ----
+  let dmWhyRows = [];
+  const dmSurname = (name) => {
+    const p = String(name || '').trim().split(/\s+/);
+    if (p.length >= 3 && /^(jr\.?|sr\.?|ii|iii|iv)$/i.test(p[p.length - 1])) return p[p.length - 2];
+    return p[p.length - 1] || name;
+  };
+  function dmWhyText(r, key, drawName, drawKind) {
+    const nm = r.name, sn = dmSurname(r.name), opp = r.oppName || r.oppAbbr;
+    const pl = /s$/i.test(opp); // plural team name (Suns, Blazers…) vs Heat/Magic/Jazz/Thunder
+    const isAre = pl ? 'are' : 'is', give = pl ? 'give' : 'gives', doesnt = pl ? 'don\'t' : 'doesn\'t';
+    const l5 = r.ptsL5.toFixed(1), l10 = r.ptsL10.toFixed(1), df = r.oppDefAllow.l10.toFixed(1);
+    let t = '';
+    if (key === 'atk') {
+      t = 'Everything lines up here. ' + nm + ' is putting up ' + l5 + ' a game over his last five, and ' + opp + ' ' + isAre + ' giving up ' + df + ' a night over their last ten, about as leaky as it gets. This is the kind of matchup you circle when you\'re hunting points.';
+    } else if (key === 'cold') {
+      t = 'Two things pulling in opposite directions. The defense is soft: ' + opp + ' ' + isAre + ' allowing ' + df + ' a game over their last ten, one of the friendliest marks on the slate. But ' + sn + ' hasn\'t been scoring much, just ' + l5 + ' a game over his last five' + (r.ptsL5 < r.ptsL10 - 0.05 ? ', down from ' + l10 + ' over his last ten' : '') + '. Great matchup, quiet player. Tread carefully.';
+    } else if (key === 'tough') {
+      if (r.oppDefAllow.l10 <= 107.5 && r.ptsL5 <= r.ptsL10 - 4) {
+        t = opp + ' ' + isAre + ' one of the stingier defenses going right now, allowing just ' + df + ' a game over their last ten, and ' + sn + ' has cooled off too, ' + l5 + ' a game over his last five against ' + l10 + ' over his last ten. Probably a spot to look elsewhere first.';
+      } else if (r.oppDefAllow.l10 <= 107.5) {
+        t = opp + ' ' + isAre + ' one of the stingier defenses going right now, allowing just ' + df + ' a game over their last ten. ' + sn + ' can score on anybody, but nights like this rarely come easy. Probably a spot to look elsewhere first.';
+      } else {
+        t = 'This one is more about his form than the defense. ' + nm + ' is at ' + l5 + ' a game over his last five, well down from ' + l10 + ' over his last ten. Until he heats back up, this is a tougher read than the name suggests.';
+      }
+    } else {
+      if (r.oppDefAllow.l10 >= 110) {
+        t = 'The defense is friendly enough, ' + opp + ' ' + give + ' up ' + df + ' a night. ' + sn + ' has just cooled a touch lately, ' + l5 + ' a game over his last five against ' + l10 + ' over his last ten. Still a workable spot, just not a perfect one.';
+      } else {
+        t = 'He\'s been scoring fine, ' + l5 + ' a game over his last five. ' + opp + ' just ' + doesnt + ' give much away, ' + df + ' a night over their last ten. He can still get his, he\'ll have to work for it though.';
+      }
+    }
+    if (drawName) {
+      t += drawKind === 'draws'
+        ? ' When these teams have met, he\'s mostly drawn ' + drawName + ', for what that\'s worth.'
+        : ' The guy who\'s guarded him most this season is ' + drawName + ', for what that\'s worth.';
+    }
+    return t;
+  }
+  function openVerdictInfo(w) {
+    if (!w) return;
+    $('dmvTitle').textContent = w.verdict;
+    $('dmvSub').textContent = w.name + ' · ' + w.team + ' vs ' + w.oppAbbr;
+    $('dmvL5').textContent = w.l5;
+    $('dmvL10').textContent = w.l10;
+    $('dmvDef').textContent = w.allow;
+    $('dmvText').textContent = w.text;
+    const ov = $('nbaVerdictOverlay');
+    if (ov) ov.classList.add('open');
+  }
+  function closeVerdictInfo() {
+    const ov = $('nbaVerdictOverlay');
+    if (ov) ov.classList.remove('open');
+  }
   function renderDefMatch() {
     const el = $('nbaDefMatchBody');
     if (!el) return;
@@ -1821,27 +1888,30 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
       .map((r) => ({ r, score: (r.oppDefAllow.l10 - 105) + (r.ptsL5 - r.ptsL10) + Math.min(r.ptsL5, 35) * 0.15 }))
       .sort((a, b) => b.score - a.score).slice(0, 8);
     if (!cands.length) { el.innerHTML = '<p class="muted">Matchups land once tonight\'s slate is priced.</p>'; return; }
+    dmWhyRows = [];
     el.innerHTML = '<div class="dm-head" style="display:flex;gap:.85rem;justify-content:flex-end;color:var(--muted);font-size:.6rem;letter-spacing:.07em;text-transform:uppercase;padding:.1rem 0 .2rem"><span style="width:2.6rem;text-align:center">Last 5</span><span style="width:2.6rem;text-align:center">Last 10</span><span style="width:3.4rem;text-align:center">Def allows</span><span style="width:3.2rem"></span></div>' +
       cands.map(({ r }, i) => {
         const allow = r.oppDefAllow.l10;
-        let verdict, cls;
-        if (allow >= 110 && r.ptsL5 < 20) { verdict = 'SOFT DEF, COLD'; cls = 'cold'; }
-        else if (allow >= 110 && r.ptsL5 >= r.ptsL10 - 1) { verdict = 'ATTACK'; cls = 'atk'; }
-        else if (allow <= 107.5 || r.ptsL5 <= r.ptsL10 - 4) { verdict = 'TOUGH'; cls = 'tough'; }
-        else { verdict = 'EARN IT'; cls = 'earn'; }
+        let verdict, cls, key;
+        if (allow >= 110 && r.ptsL5 < 20) { verdict = 'SOFT DEF, COLD'; cls = 'cold'; key = 'cold'; }
+        else if (allow >= 110 && r.ptsL5 >= r.ptsL10 - 1) { verdict = 'ATTACK'; cls = 'atk'; key = 'atk'; }
+        else if (allow <= 107.5 || r.ptsL5 <= r.ptsL10 - 4) { verdict = 'TOUGH'; cls = 'tough'; key = 'tough'; }
+        else { verdict = 'EARN IT'; cls = 'earn'; key = 'earn'; }
         const gd = (nbaGuardsSide && nbaGuardsSide.players) ? nbaGuardsSide.players[r.id] : null;
-        let drawHtml = '';
-        if (gd && gd.draws) drawHtml = '<span class="dm-draws">Draws: ' + esc(gd.draws.name) + (gd.draws.team ? ' (' + esc(gd.draws.team) + ')' : '') + '</span>';
-        else if (gd && gd.primary) drawHtml = '<span class="dm-draws">Usual draw: ' + esc(gd.primary.name) + (gd.primary.team ? ' (' + esc(gd.primary.team) + ')' : '') + '</span>';
+        let drawHtml = '', drawName = null, drawKind = null;
+        if (gd && gd.draws) { drawHtml = '<span class="dm-draws">Draws: ' + esc(gd.draws.name) + (gd.draws.team ? ' (' + esc(gd.draws.team) + ')' : '') + '</span>'; drawName = gd.draws.name; drawKind = 'draws'; }
+        else if (gd && gd.primary) { drawHtml = '<span class="dm-draws">Usual draw: ' + esc(gd.primary.name) + (gd.primary.team ? ' (' + esc(gd.primary.team) + ')' : '') + '</span>'; drawName = gd.primary.name; drawKind = 'primary'; }
+        dmWhyRows.push({ verdict, name: r.name, team: r.team, oppAbbr: r.oppAbbr, l5: r.ptsL5.toFixed(1), l10: r.ptsL10.toFixed(1), allow: allow.toFixed(1), text: dmWhyText(r, key, drawName, drawKind) });
         return '<div class="dm-row" data-pid="' + r.id + '" role="button" tabindex="0"><span class="dm-rank">' + (i + 1) + '</span>' +
           '<img class="hs" src="' + headshot(r.id) + '" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">' +
           '<span class="dm-info"><span class="dm-name">' + esc(r.name) + '</span><span class="dm-sub">' + esc(r.team) + ' vs ' + esc(r.oppAbbr) + ' · PTS per game</span>' + drawHtml + '</span>' +
           '<span class="dm-stats"><span class="dm-stat"><span class="v">' + r.ptsL5.toFixed(1) + '</span><span class="k">Last 5</span></span>' +
           '<span class="dm-stat"><span class="v" style="color:var(--muted)">' + r.ptsL10.toFixed(1) + '</span><span class="k">Last 10</span></span>' +
           '<span class="dm-stat"><span class="v ora">' + allow.toFixed(1) + '</span><span class="k">Def allows</span></span></span>' +
-          '<span class="dm-chip ' + cls + '">' + verdict + '</span></div>';
+          '<button type="button" class="dm-chip ' + cls + '" data-dmwhy="' + i + '" aria-label="Why this read: ' + verdict + '">' + verdict + '<span class="dm-i">ⓘ</span></button></div>';
       }).join('');
     el.querySelectorAll('.dm-row').forEach((row) => row.addEventListener('click', () => openPlayerCard(row.dataset.pid)));
+    el.querySelectorAll('[data-dmwhy]').forEach((b) => b.addEventListener('click', (e) => { e.stopPropagation(); openVerdictInfo(dmWhyRows[Number(b.dataset.dmwhy)]); }));
   }
 
   function renderMarkets() {
@@ -1902,6 +1972,10 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
   if (flClearBtn) flClearBtn.addEventListener('click', clearMktFilter);
   const flOverlay = $('nbaFilterOverlay');
   if (flOverlay) flOverlay.addEventListener('click', (e) => { if (e.target === flOverlay) closeFilterSheet(); });
+  const dmvClose = $('dmvCloseBtn');
+  if (dmvClose) dmvClose.addEventListener('click', closeVerdictInfo);
+  const dmvOverlay = $('nbaVerdictOverlay');
+  if (dmvOverlay) dmvOverlay.addEventListener('click', (e) => { if (e.target === dmvOverlay) closeVerdictInfo(); });
   const flHideAdd = () => {
     const inp = $('flHideInput');
     if (!inp) return;
