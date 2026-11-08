@@ -1496,3 +1496,12 @@ body.sport-glass .ls-card.heat-edge-cold, .ls-card.heat-edge-cold { border-color
 .l10-card-big.over { color: #57e389; } .l10-card-big.under { color: #ff8a80; }
 .l10-card-word { display: block; font-size: .6rem; letter-spacing: .1em; color: var(--muted); font-weight: 800; margin: .15rem 0 .35rem; }
 .l10-card-line { display: block; font-size: .74rem; color: #c9d4e6; line-height: 1.5; }
+
+/* ---- bubble-map containers (shot/goal map, heat maps, goalie maps) ---- */
+.rink-svg svg { width: 100%; height: auto; display: block; background: #0a1120; border-radius: 12px; border: 1px solid var(--border); margin-top: .55rem; box-shadow: var(--shadow-sm); }
+.grink-bubble svg { width: 100%; height: auto; display: block; background: #0a1120; border-radius: 10px; border: 1px solid var(--border); }
+.zchips-row { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .55rem; }
+.zchip2 { font-size: .72rem; color: var(--muted); background: rgba(130,170,255,.08); border: 1px solid rgba(165,195,255,.16); border-radius: 999px; padding: .28rem .6rem; }
+.zchip2 b { color: #e8eef7; }
+.zchip2.hot { border-color: rgba(245,185,66,.55); color: #f5b942; }
+.zchip2.hot b { color: #f5b942; }

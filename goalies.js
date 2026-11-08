@@ -319,7 +319,7 @@ function goaliePanelHtml(g, teamAbbrev, st) {
     ? `<span class="pos-leg"><i class="pos-dot pos-${k}"></i>${k} ${pc[k]}</span>` : '').join('');
   const sample = n < 10 ? `<div class="muted small">Small sample — ${n} goal${n === 1 ? '' : 's'} charted.</div>` : '';
   const map = goals.some((gl) => gl.x != null)
-    ? `<canvas class="grink" id="${canvasId}"></canvas>`
+    ? `<div class="grink-bubble" id="${canvasId}"></div>`
     : `<div class="muted small">No located goals charted.</div>`;
   return `<div class="goalie-panel">
     <div class="goalie-head goalie-open" data-goalie="${pg.id}" data-team="${esc(teamAbbrev)}" data-game="${g.id}" role="button" tabindex="0" title="Open ${esc(pg.name)} card"><strong>${esc(pg.name)}</strong>${tag}<span class="muted small">${esc(teamAbbrev)}</span></div>
@@ -399,10 +399,13 @@ async function ensureGoalieProj(g) {
   await Promise.all(ids.map((id) => getGoalieSvPct(id)));
 }
 function drawGoalieRinks() {
+  // Bubble-map look (Alex, 2026-11-08): goals against as gold dots on the
+  // shared half-rink SVG, same scale the goalie canvases always had.
   for (const d of pendingGoalieDraw) {
-    const cv = document.getElementById(d.canvasId);
-    if (!cv) continue;
-    drawRink(cv, d.goals.filter((gl) => gl.x != null).map((gl) => ({ x: gl.x, y: gl.y, goal: true })), '#d4a017');
+    const el = document.getElementById(d.canvasId);
+    if (!el) continue;
+    const att = d.goals.filter((gl) => gl.x != null).map((gl) => [gl.x, gl.y, 1]);
+    el.innerHTML = bubbleMapSvg(att, { size: 'full', emptyText: 'No located goals charted.' });
   }
   pendingGoalieDraw = [];
 }

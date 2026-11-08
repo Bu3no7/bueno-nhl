@@ -3005,7 +3005,38 @@ function l10Proj(r, n) {
 /* Bubble shot map on a half rink, Bueno style: teal rings = attempts,
    gold dots = goals, gold dashed line = home plate. att entries are
    [x, y, goal] in the display frame (attacking net at +x). */
-function bubbleMapSvg(att, mini) {
+function bubbleMapSvg(att, opts) {
+  const size = opts === true ? 'mini' : (opts && opts.size) || 'card';
+  const pts = (att || [])
+    .map((a) => (Array.isArray(a) ? { x: a[0], y: a[1], goal: !!a[2] } : { x: a.x, y: a.y, goal: !!a.goal }))
+    .filter((p) => p.x != null && p.y != null);
+  if (size === 'full') {
+    // 400x430 — the exact footprint of the old canvas/zone maps on player
+    // and goalie cards (Alex, 2026-11-08: bubble look, same scale).
+    const sx = (y) => 20 + ((Math.max(-42.5, Math.min(42.5, y)) + 42.5) / 85) * 360;
+    const sy = (x) => 16 + ((100 - Math.max(-3, Math.min(100, x))) / 103) * 398;
+    let h = '<svg viewBox="0 0 400 430" width="100%" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Shot map">';
+    h += '<path d="M20 414 L20 118 Q20 16 108 16 L292 16 Q380 16 380 118 L380 414 Z" fill="#0d1830" stroke="rgba(165,195,255,.4)" stroke-width="2"/>';
+    h += '<line x1="24" y1="58" x2="376" y2="58" stroke="rgba(240,102,94,.45)" stroke-width="3"/>';
+    h += '<path d="M174.5 58 A25.5 23 0 0 0 225.5 58 Z" fill="rgba(94,168,255,.20)" stroke="rgba(165,195,255,.45)"/>';
+    h += '<rect x="187" y="42" width="26" height="17" rx="2" fill="none" stroke="rgba(232,238,247,.75)" stroke-width="1.6"/>';
+    for (const cx of [107, 293]) {
+      h += `<ellipse cx="${cx}" cy="136" rx="64" ry="58" fill="none" stroke="rgba(165,195,255,.35)" stroke-width="2"/><circle cx="${cx}" cy="136" r="4" fill="rgba(165,195,255,.5)"/>`;
+    }
+    h += '<polygon points="107,194 180,58 220,58 293,194" fill="none" stroke="rgba(245,185,66,.55)" stroke-width="1.6" stroke-dasharray="6 5"/>';
+    pts.forEach((p, i) => {
+      const r = 7.5 + ((i * 37) % 10) / 10 * 3.6;
+      const cx = sx(p.y).toFixed(0), cy = sy(p.x).toFixed(0);
+      h += p.goal
+        ? `<circle cx="${cx}" cy="${cy}" r="${r.toFixed(1)}" fill="#f5b942" stroke="#ffd97a" stroke-width="1.4"/>`
+        : `<circle cx="${cx}" cy="${cy}" r="${r.toFixed(1)}" fill="rgba(58,219,227,.13)" stroke="rgba(58,219,227,.75)" stroke-width="1.5"/>`;
+    });
+    if (!pts.length && opts && opts.emptyText) {
+      h += `<text x="200" y="228" text-anchor="middle" fill="#8b98ab" font-size="15">${esc(opts.emptyText)}</text>`;
+    }
+    return h + '</svg>';
+  }
+  const mini = size === 'mini';
   const H = mini ? 250 : 300;
   const sx = (y) => 170 + (y / 42.5) * 150;
   const sy = (x) => Math.max(26, Math.min(H - 8, 52 + (89 - x) * ((H - 60) / 64)));
@@ -3018,10 +3049,10 @@ function bubbleMapSvg(att, mini) {
     h += `<circle cx="${cx}" cy="120" r="44" fill="none" stroke="rgba(165,195,255,.35)" stroke-width="1.4"/><circle cx="${cx}" cy="120" r="4" fill="rgba(165,195,255,.5)"/>`;
   }
   h += '<polygon points="95,164 148,60 192,60 245,164" fill="none" stroke="rgba(245,185,66,.55)" stroke-width="1.3" stroke-dasharray="5 4"/>';
-  (att || []).forEach((a, i) => {
+  pts.forEach((p, i) => {
     const r = (mini ? 5.4 : 6.5) + ((i * 37) % 10) / 10 * 4;
-    const cx = sx(a[1]).toFixed(0), cy = sy(a[0]).toFixed(0);
-    h += a[2]
+    const cx = sx(p.y).toFixed(0), cy = sy(p.x).toFixed(0);
+    h += p.goal
       ? `<circle cx="${cx}" cy="${cy}" r="${r.toFixed(1)}" fill="#f5b942" stroke="#ffd97a" stroke-width="1.2"/>`
       : `<circle cx="${cx}" cy="${cy}" r="${r.toFixed(1)}" fill="rgba(58,219,227,.13)" stroke="rgba(58,219,227,.75)" stroke-width="1.3"/>`;
   });
@@ -3036,7 +3067,7 @@ function pcLast10Html(r) {
   const over = diff >= 0;
   return `<div class="l10-block">
     <div class="l10-head"><span class="l10-title">Last ${d.n} vs proj</span><span class="l10-sub">shots on goal</span></div>
-    ${bubbleMapSvg(d.att, false)}
+    ${bubbleMapSvg(d.att, { size: 'full' })}
     <div class="l10-vsrow">
       <div class="l10-big ${over ? 'over' : 'under'}">${Math.abs(diff).toFixed(1)}<span class="l10-word">${over ? 'OVER PROJ' : 'UNDER PROJ'}</span></div>
       <div class="l10-lines"><div><strong>${d.sog} SOG</strong> in last ${d.n} GP</div><div class="muted">Proj <strong class="teal-num">${proj.toFixed(1)}</strong></div></div>
@@ -3193,10 +3224,10 @@ function openPlayer(pid, gameId) {
   const vsTitle = pgForTitle && pgForTitle.name ? `Vs ${pgForTitle.name.split(' ').slice(-1)[0]}` : 'Vs goalie';
   const seasonBody = `<div class="stat-inline"><span><strong>${r.goals}</strong> goals</span><span><strong>${r.assists}</strong> assists</span><span><strong>${r.points}</strong> points</span><span><strong>${r.gp}</strong> GP</span></div>${statBarsHtml(r)}`;
   const shotMapBody = `<div style="margin:.1rem 0 .4rem"><button class="pill on" id="rinkShots">Shots</button> <button class="pill" id="rinkGoals">Goals</button></div>
-      <canvas class="rink" id="rinkCanvas"></canvas>
-      <div class="legend"><span><span class="dot" style="background:#2f6fed"></span>attempt</span>
-        <span><span class="dot" style="background:#d4a017"></span>goal</span>
-      <span><span class="dot" style="background:#a06414"></span>slot</span> <span><span class="dot" style="background:#c42c1e"></span>low slot</span></div>${pcLast10SlotHtml(r)}`;
+      <div id="rinkSvg" class="rink-svg"></div>
+      <div class="legend"><span><span class="l10-sw shot"></span>attempt</span>
+        <span><span class="l10-sw goal"></span>goal</span>
+      <span><span class="l10-sw plate"></span>home plate</span></div>${pcLast10SlotHtml(r)}`;
   const whyBody = `<table class="factor-table">${factorRows}
         <tr><td>Expected goals (λ)</td><td>${r.lam.toFixed(3)}</td></tr>
         <tr><td>Opponent</td><td>${esc(r.oppAbbr)} goalie ${(r.oppSv * 100).toFixed(1)}% SV</td></tr>
@@ -3260,7 +3291,8 @@ function openPlayer(pid, gameId) {
     $('rinkTitle').textContent = rinkMode === 'goals' ? 'Goal map' : 'Shot map';
     $('rinkShots').classList.toggle('on', rinkMode === 'shots');
     $('rinkGoals').classList.toggle('on', rinkMode === 'goals');
-    drawRink($('rinkCanvas'), data, '#2f6fed');
+    const rinkEl = $('rinkSvg');
+    if (rinkEl) rinkEl.innerHTML = bubbleMapSvg(data, { size: 'full', emptyText: rinkMode === 'goals' ? 'No goals in recent games' : 'No located shots in recent games' });
   };
   $('rinkShots').addEventListener('click', () => { rinkMode = 'shots'; drawRinkMode(); });
   $('rinkGoals').addEventListener('click', () => { rinkMode = 'goals'; drawRinkMode(); });
@@ -3346,47 +3378,15 @@ function heatMapSectionHtml(r, shots, emptyText, opts) {
   const total = shots.length;
   const pct = (k) => Math.round((zs[k].att / total) * 100);
   const hot = ['lowSlot', 'slot', 'left', 'right', 'point'].reduce((a, b) => (zs[a].att >= zs[b].att ? a : b));
-  const zlabel = (k, name, left, top) => `<div class="zlabel" style="left:${left}%; top:${top}%"><div class="zname">${name}</div><div class="zbig${k === hot ? ' hot' : ''}">${pct(k)}%</div><div class="zchips"><span class="zchip"><b>${zs[k].att}</b> att</span>${showGoals ? `<span class="zchip g"><b>${zs[k].goals}</b> G</span>` : ''}</div></div>`;
   const slotShare = (zs.lowSlot.att + zs.slot.att) / total;
   const take = slotShare >= 0.5
     ? `Lives in the slot — ${Math.round(slotShare * 100)}% of his shots come from the home-plate area${(showGoals && zs.lowSlot.goals) ? ', and the low slot is where the goals are' : ''}.`
     : (zs.point.att / total >= 0.3
       ? 'Does his damage from distance — point shots and perimeter looks.'
       : 'Scores from all over the zone — no single home base.');
-  return `<div class="zonemap">
-      <svg viewBox="0 0 380 430" aria-hidden="true">
-        <defs>
-          <clipPath id="zmClip"><path d="M14 426 L14 120 A176 108 0 0 1 366 120 L366 426 Z"/></clipPath>
-          <radialGradient id="zmIce" cx="50%" cy="38%" r="80%">
-            <stop offset="0%" stop-color="#16233f"/><stop offset="60%" stop-color="#101b31"/><stop offset="100%" stop-color="#0a1120"/>
-          </radialGradient>
-        </defs>
-        <g clip-path="url(#zmClip)">
-          <rect x="0" y="0" width="380" height="430" fill="url(#zmIce)"/>
-          <rect x="0" y="300" width="380" height="130" fill="rgba(24,68,84,.55)"/>
-          <polygon points="14,26 190,26 190,300 14,300" fill="rgba(23,94,108,.45)"/>
-          <polygon points="190,26 366,26 366,300 190,300" fill="rgba(23,94,108,.45)"/>
-          <polygon points="190,96 128,168 108,300 272,300 252,168" fill="rgba(160,104,20,.5)"/>
-          <rect x="140" y="30" width="100" height="118" fill="rgba(196,44,30,.78)"/>
-          <circle cx="105" cy="215" r="58" fill="none" stroke="rgba(235,242,255,.35)" stroke-width="2"/>
-          <circle cx="275" cy="215" r="58" fill="none" stroke="rgba(235,242,255,.35)" stroke-width="2"/>
-          <circle cx="105" cy="215" r="4" fill="#e5484d"/>
-          <circle cx="275" cy="215" r="4" fill="#e5484d"/>
-          <line x1="14" y1="86" x2="366" y2="86" stroke="#e5484d" stroke-width="2.5"/>
-          <line x1="14" y1="300" x2="366" y2="300" stroke="#3b82f6" stroke-width="3.5"/>
-          <path d="M158 86 A32 32 0 0 0 222 86 Z" fill="rgba(94,200,248,.35)"/>
-          <rect x="172" y="18" width="36" height="16" fill="#0d1524" stroke="rgba(255,255,255,.45)"/>
-          <line x1="128" y1="168" x2="105" y2="215" stroke="rgba(232,161,61,.65)" stroke-width="2"/>
-          <line x1="252" y1="168" x2="275" y2="215" stroke="rgba(232,161,61,.65)" stroke-width="2"/>
-        </g>
-        <path d="M14 426 L14 120 A176 108 0 0 1 366 120 L366 426" fill="none" stroke="rgba(235,242,255,.55)" stroke-width="3"/>
-      </svg>
-      ${zlabel('lowSlot', 'LOW SLOT', 50, 24)}
-      ${zlabel('slot', 'SLOT', 50, 56)}
-      ${zlabel('left', 'LEFT SIDE', 19, 40)}
-      ${zlabel('right', 'RIGHT SIDE', 81, 40)}
-      ${zlabel('point', 'POINT', 50, 85)}
-    </div>
+  const zchip = (k, name) => `<span class="zchip2${k === hot ? ' hot' : ''}">${name} <b>${pct(k)}%</b> · ${zs[k].att} att${showGoals ? ` · ${zs[k].goals} G` : ''}</span>`;
+  return `<div class="rink-svg">${bubbleMapSvg(shots, { size: 'full' })}</div>
+    <div class="zchips-row">${zchip('lowSlot', 'LOW SLOT')}${zchip('slot', 'SLOT')}${zchip('left', 'LEFT SIDE')}${zchip('right', 'RIGHT SIDE')}${zchip('point', 'POINT')}</div>
     <div class="outside-strip">OUTSIDE THE ZONE: ${zs.outside.att} ATT · ${pct('outside')}%${showGoals ? ` · ${zs.outside.goals} G` : ''}</div>
     <p class="small muted" style="margin:.55rem 0 0">${take} <span class="muted">(${total} attempts tracked)</span></p>`;
 }
@@ -3487,7 +3487,7 @@ async function openGoalie(goalieId, teamAbbrev, gameId) {
   const canvasId = `gcard-rink-${pg.id}`;
   pendingGoalieDraw.push({ canvasId, goals });
   const map = goals.some((gl) => gl.x != null)
-    ? `<canvas class="grink" id="${canvasId}" style="max-width:100%"></canvas>`
+    ? `<div class="grink-bubble" id="${canvasId}"></div>`
     : `<div class="muted small">No located goals charted.</div>`;
   // ensure save% + standings for the projection table
   await getGoalieSvPct(pg.id);
