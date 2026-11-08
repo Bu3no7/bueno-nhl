@@ -1408,3 +1408,32 @@ body.sport-glass .ls-card.heat-edge-cold, .ls-card.heat-edge-cold { border-color
 .addbtn:active { transform: scale(.94); }
 .addbtn.added { background: var(--teal); border-color: var(--teal); color: #062a2e; box-shadow: 0 0 10px rgba(58, 219, 227, .45); }
 .ls-add { display: flex; align-items: center; margin-left: .55rem; }
+
+/* ---------------- player card: NBA-style folded sections (2026-11-07) ----------------
+   The Hockey player card now mirrors the Basketball card's structure:
+   a stack of full-width collapsible rows — teal accent bar at left,
+   all-caps letter-spaced muted title, chevron at right — under a header
+   with the name stacked beside the headshot and a hero stat box.
+   Scoped to #modalBody (the shared player/goalie modal); only the
+   player card emits .pcacc markup, the goalie card is untouched. */
+#modalBody details.pcacc { border-top: 1px solid rgba(255, 255, 255, .07); margin-top: .85rem; }
+#modalBody details.pcacc > summary { list-style: none; cursor: pointer; padding: .6rem 0 .2rem; font-size: .74rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: .5rem; }
+#modalBody details.pcacc > summary::-webkit-details-marker { display: none; }
+#modalBody details.pcacc > summary::before { content: ''; width: 4px; height: 14px; border-radius: 2px; background: var(--teal); flex: none; }
+#modalBody details.pcacc > summary .chev { margin-left: auto; color: var(--teal); letter-spacing: 0; transition: transform .15s ease; }
+#modalBody details.pcacc[open] > summary .chev { transform: rotate(90deg); }
+#modalBody .pcacc-body { padding: .3rem 0 .4rem; }
+#modalBody .pcacc-hint { text-transform: none; letter-spacing: 0; font-weight: 600; font-size: .74rem; color: var(--muted); }
+/* header composition (NBA pattern) */
+.pc-head-main { min-width: 0; }
+.pc-teamline { display: flex; align-items: center; gap: .4rem; font-weight: 600; font-size: .93rem; color: var(--text); }
+.pc-teamline img.tlogo { width: 22px; height: 22px; margin: 0; }
+.pc-matchline { color: var(--muted); font-size: .86rem; margin-top: .18rem; }
+.pc-hero { margin-left: auto; flex: none; text-align: center; background: rgba(255, 255, 255, .04); border: 1px solid rgba(255, 255, 255, .09); border-radius: 14px; padding: .5rem .85rem; }
+/* Tonight's lines: goal-line rows above the Poisson groups */
+.pc-lines { display: flex; flex-direction: column; }
+.pc-line-row { display: flex; align-items: baseline; gap: .6rem; padding: .45rem 0; border-bottom: 1px solid rgba(255, 255, 255, .05); }
+.pc-line-row:last-child { border-bottom: 0; }
+.pc-line-lab { font-weight: 700; }
+.pc-line-pct { margin-left: auto; font-weight: 800; color: var(--teal); font-variant-numeric: tabular-nums; }
+.pc-line-fair { color: var(--gold); font-weight: 700; font-variant-numeric: tabular-nums; }

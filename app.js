@@ -2712,13 +2712,23 @@ function wireMinutes(r) {
     if (root) { root.outerHTML = pcMinutesHtml(r); wireMinutes(r); }
   }));
 }
+/* Accordion helper (NBA-style folded card): when a lazy sidecar section
+   resolves to no content, drop the whole folded section rather than
+   stranding a "Loading…" placeholder inside it. */
+function dropAccSlot(slot) {
+  const sec = slot.closest('details.pcacc');
+  if (sec) sec.remove(); else slot.remove();
+}
 async function ensureMinutes(r) {
   await loadMinSidecar();
-  if (minSidecarState !== 'ok') return;
   const body = $('modalBody');
   if (!body) return;
   const slot = body.querySelector(`[data-min-slot="${esc(String(r.pid))}"]`);
-  if (slot) { slot.outerHTML = pcMinutesHtml(r); wireMinutes(r); }
+  if (!slot) return;
+  const html = minSidecarState === 'ok' ? pcMinutesHtml(r) : '';
+  if (!html) { dropAccSlot(slot); return; }
+  slot.outerHTML = html;
+  wireMinutes(r);
 }
 /* ---------------- chemistry (chem sidecar) ----------------
    data/chem-<date>.json from data-builder/chem.js: season goal
@@ -2772,11 +2782,13 @@ function pcChemHtml(r) {
 }
 async function ensureChem(r) {
   await loadChemSidecar();
-  if (chemSidecarState !== 'ok') return;
   const body = $('modalBody');
   if (!body) return;
   const slot = body.querySelector(`[data-chem-slot="${esc(String(r.pid))}"]`);
-  if (slot) slot.outerHTML = pcChemHtml(r);
+  if (!slot) return;
+  const html = chemSidecarState === 'ok' ? pcChemHtml(r) : '';
+  if (!html) { dropAccSlot(slot); return; }
+  slot.outerHTML = html;
 }
 /* ---------------- finishing vs shot quality (finish sidecar) ----------------
    data/finish-<date>.json is exported LOCALLY by
@@ -2845,11 +2857,21 @@ function pcFinHtml(r) {
 }
 async function ensureFinish(r) {
   await loadFinSidecar();
-  if (finSidecarState !== 'ok') return;
   const body = $('modalBody');
   if (!body) return;
   const slot = body.querySelector(`[data-fin-slot="${esc(String(r.pid))}"]`);
-  if (slot) slot.outerHTML = pcFinHtml(r);
+  if (!slot) return;
+  const html = finSidecarState === 'ok' ? pcFinHtml(r) : '';
+  if (!html) { dropAccSlot(slot); return; }
+  slot.outerHTML = html;
+}
+/* NBA-style folded card section (Alex, 2026-11-07 restructure): a
+   full-width row — teal accent bar, caps title, chevron — that toggles
+   open. Mirrors the Basketball card's sec() helper. Returns '' when the
+   body is empty so sections with no data vanish instead of folding air. */
+function pcAccSec(key, titleHtml, bodyHtml, open) {
+  if (!bodyHtml) return '';
+  return `<details class="pcacc" data-sec="${key}"${open ? ' open' : ''}><summary>${titleHtml}<span class="chev">▸</span></summary><div class="pcacc-body">${bodyHtml}</div></details>`;
 }
 function openPlayer(pid, gameId) {
   const r = state.skaters.find((s) => String(s.pid) === String(pid) && String(s.gameId) === String(gameId));
@@ -2912,65 +2934,91 @@ function openPlayer(pid, gameId) {
   const jnumChip = r.bio && r.bio.number != null
     ? `<span class="pc-jnum">#${esc(String(r.bio.number))}</span>`
     : `<span class="pc-jnum" data-jnum-loading="${esc(String(r.pid))}" hidden></span>`;
+  // ---- NBA-style card composition (2026-11-07 restructure) ----
+  // Header mirrors the Basketball card: circular headshot, name stack,
+  // team line (logo + full name), matchup line, hero stat box at right.
+  // The body is a stack of folded pcAccSec rows — only Tonight's lines
+  // open by default. Every block from the old flat card survives inside
+  // a fold; the lazy sidecars (minutes/chem/finish) now load on first
+  // open of their folded section instead of at card open.
+  const teamFull = CI_TEAM_FULL[r.team] || r.team;
+  const oppAbbr = g ? (r.team === g.home ? g.away : g.home) : r.oppAbbr;
+  const oppFull = CI_TEAM_FULL[oppAbbr] || oppAbbr || '';
+  const matchLine = g ? `${r.team === g.home ? 'vs' : '@'} ${oppFull} · tonight` : '';
+  // Goal lines for Tonight's lines: anytime (the hero price) plus brace
+  // and first goal from the same λ math the Markets views use.
+  const lamPos = Math.max(r.lam, 0);
+  const gameLam = state.skaters
+    .filter((s) => String(s.gameId) === String(r.gameId))
+    .reduce((a, s) => a + Math.max(s.lam, 0), 0);
+  const tpP = 1 - Math.exp(-lamPos) * (1 + lamPos);
+  const fgP = gameLam > 0 ? lamPos / gameLam : 0;
+  const lineRow = (label, p, fair) => `<div class="pc-line-row"><span class="pc-line-lab">${label}</span><span class="pc-line-pct">${pct1(p)}</span><span class="pc-line-fair">${fair} fair</span></div>`;
+  const linesBody = `<div class="pc-lines">${lineRow('Anytime goal', r.p, r.fair)}${lineRow('Brace · 2+ goals', tpP, fairOddsSafe(tpP))}${lineRow('First goal', fgP, fairOddsSafe(fgP))}</div>`
+    + `<div class="sec-title" style="margin-top:.7rem">Poisson over/under</div>${marketsHtml}`;
+  const minN = minSidecarState === 'ok' ? minGamesFor(r).length : 0;
+  const chemEnt = (chemSidecarState === 'ok' && chemSidecar && chemSidecar.players) ? chemSidecar.players[String(r.pid)] : null;
+  const vsBody = `${vsGoalieEdgeHtml(r, g)}${vsGoalieHtml(r, g)}`;
+  const pgForTitle = g ? panelGoalie(g, r.oppAbbr) : null;
+  const vsTitle = pgForTitle && pgForTitle.name ? `Vs ${pgForTitle.name.split(' ').slice(-1)[0]}` : 'Vs goalie';
+  const seasonBody = `<div class="stat-inline"><span><strong>${r.goals}</strong> goals</span><span><strong>${r.assists}</strong> assists</span><span><strong>${r.points}</strong> points</span><span><strong>${r.gp}</strong> GP</span></div>${statBarsHtml(r)}`;
+  const shotMapBody = `<div style="margin:.1rem 0 .4rem"><button class="pill on" id="rinkShots">Shots</button> <button class="pill" id="rinkGoals">Goals</button></div>
+      <canvas class="rink" id="rinkCanvas"></canvas>
+      <div class="legend"><span><span class="dot" style="background:#2f6fed"></span>attempt</span>
+        <span><span class="dot" style="background:#d4a017"></span>goal</span>
+      <span><span class="dot" style="background:#a06414"></span>slot</span> <span><span class="dot" style="background:#c42c1e"></span>low slot</span></div>`;
+  const whyBody = `<table class="factor-table">${factorRows}
+        <tr><td>Expected goals (λ)</td><td>${r.lam.toFixed(3)}</td></tr>
+        <tr><td>Opponent</td><td>${esc(r.oppAbbr)} goalie ${(r.oppSv * 100).toFixed(1)}% SV</td></tr>
+      </table>`;
+  const parlayBody = `<div class="parlay-add">
+      <select id="parlayLegSelect" aria-label="Choose a parlay leg">${legOpts.join('')}</select>
+      <button class="btn" id="parlayAddBtn">Add to parlay</button>
+    </div>`;
   $('modalBody').innerHTML = `
     <div class="pc-head hero-card-head" style="--pc-tc:${tc}">
       <img class="headshot" src="${esc(r.headshot)}" alt="" ${imgFallback} style="border-color:${tc};box-shadow:0 0 22px ${tc}">
-      <div>
+      <div class="pc-head-main">
         <h3 class="pc-name">${jnumChip}${esc(r.name)}</h3>
-        <div><img class="tlogo" src="${teamLogoUrl(r.team)}" alt="" ${imgFallback}>
-          <span class="muted">${esc(r.team)} · ${esc(r.pos)} · ${g ? esc(g.away + ' @ ' + g.home) : ''}</span></div>
+        <div class="pc-teamline"><img class="tlogo" src="${teamLogoUrl(r.team)}" alt="" ${imgFallback}><span>${esc(teamFull)} · ${esc(r.pos)}</span></div>
+        ${matchLine ? `<div class="pc-matchline">${esc(matchLine)}</div>` : ''}
       </div>
-      <div style="margin-left:auto;text-align:center">
+      <div class="pc-hero">
         <div class="hero-card-num" style="color:${lightenHex(tc, 0.55)};text-shadow:0 0 16px ${tc}">${Math.round(r.p * 100)}<small>%</small></div>
         <div class="hero-card-label">Anytime Goal</div>
-        <div class="pc-fair">${r.fair} fair</div>
       </div>
     </div>
     <div class="pc-status">${lineBadge}${statusPill}</div>
     ${pcTonightHtml(r, g)}
-    <div class="stat-inline"><span><strong>${r.goals}</strong> goals</span><span><strong>${r.assists}</strong> assists</span><span><strong>${r.points}</strong> points</span><span><strong>${r.gp}</strong> GP</span></div>
-    ${vsGoalieEdgeHtml(r, g)}
-    ${formHtml}
-    ${pcMinSlotHtml(r)}
-    ${pcChemSlotHtml(r)}
-    ${pcFinSlotHtml(r)}
-    ${pcLastGameHtml(l5)}
-    ${zoneNote}
-    <div class="section-div"></div>
-    ${linematesHtml(r)}
-    ${pcDetailsHtml(r)}
-    <div class="section-div"></div>
-    ${vsGoalieHtml(r, g)}
-    <h4 style="margin:.8rem 0 .2rem">Markets <span class="muted small">Poisson over/under</span></h4>
-    ${marketsHtml}
-    <div class="sec-title">vs League Average</div>
-    ${statBarsHtml(r)}
-    <details class="rink-details" open>
-      <summary class="sec-title" style="cursor:pointer"><span id="rinkTitle" style="color:var(--gold)">Shot map</span> <span class="muted small">recent games, attacking ↑</span></summary>
-      <div style="margin:.4rem 0"><button class="pill on" id="rinkShots">Shots</button> <button class="pill" id="rinkGoals">Goals</button></div>
-      <canvas class="rink" id="rinkCanvas"></canvas>
-      <div class="legend"><span><span class="dot" style="background:#2f6fed"></span>attempt</span>
-        <span><span class="dot" style="background:#d4a017"></span>goal</span>
-      <span><span class="dot" style="background:#a06414"></span>slot</span> <span><span class="dot" style="background:#c42c1e"></span>low slot</span></div>
-    </details>
-    ${heatMapSectionHtml(r, matchupHeatShots(r), 'Match-up heat map', 'recent games')}
-    ${seasonHeatMapHtml(r)}
-    <details class="factors-details">
-      <summary class="sec-title" style="cursor:pointer">Factors <span style="color:var(--gold)">how we got here</span></summary>
-      <table class="factor-table">${factorRows}
-        <tr><td>Expected goals (λ)</td><td>${r.lam.toFixed(3)}</td></tr>
-        <tr><td>Opponent</td><td>${esc(r.oppAbbr)} goalie ${(r.oppSv * 100).toFixed(1)}% SV</td></tr>
-      </table>
-    </details>
-    <div class="parlay-add">
-      <select id="parlayLegSelect" aria-label="Choose a parlay leg">${legOpts.join('')}</select>
-      <button class="btn" id="parlayAddBtn">Add to parlay</button>
-    </div>`;
+    ${pcAccSec('lines', "Tonight's lines", linesBody, true)}
+    ${pcAccSec('ice', `Ice time${minN ? ` · last ${minN}` : ''}`, pcMinSlotHtml(r), false)}
+    ${pcAccSec('chem', `Chemistry${chemEnt && chemEnt.sharedGames ? ` · last ${chemEnt.sharedGames}` : ''}`, pcChemSlotHtml(r), false)}
+    ${pcAccSec('fin', 'Finishing', pcFinSlotHtml(r), false)}
+    ${pcAccSec('form', 'Form', `${formHtml}${pcLastGameHtml(l5)}${zoneNote}`, false)}
+    ${pcAccSec('vs', vsTitle, vsBody, false)}
+    ${pcAccSec('shotmap', '<span id="rinkTitle">Shot map</span> <span class="pcacc-hint">recent games, attacking ↑</span>', shotMapBody, false)}
+    ${pcAccSec('muheat', 'Match-up heat map <span class="pcacc-hint">recent games</span>', heatMapSectionHtml(r, matchupHeatShots(r)), false)}
+    ${pcAccSec('seasheat', 'Season heat map <span class="pcacc-hint">where his shots come from this season</span>', seasonHeatMapHtml(r), false)}
+    ${pcAccSec('why', 'Why this price', whyBody, false)}
+    ${pcAccSec('season', 'Season averages', seasonBody, false)}
+    ${pcAccSec('mates', 'Linemates', linematesHtml(r), false)}
+    ${pcAccSec('details', 'Details', pcDetailsHtml(r), false)}
+    ${pcAccSec('parlay', 'Add to parlay', parlayBody, false)}`;
   $('playerModal').classList.remove('hidden');
   wireMinutes(r);
-  ensureMinutes(r);
-  ensureChem(r);
-  ensureFinish(r);
+  // Lazy sidecars (minutes/chem/finish): their sections start folded, so
+  // the fetch fires on the section's first open rather than at card open.
+  // If a card is re-opened with the sidecar already cached, the slot html
+  // rendered inline above and there is nothing left to load.
+  const lazySec = (key, fn) => {
+    const d = $('modalBody').querySelector(`details.pcacc[data-sec="${key}"]`);
+    if (!d) return;
+    if (d.open) { fn(); return; }
+    d.addEventListener('toggle', () => { if (d.open) fn(); }, { once: true });
+  };
+  lazySec('ice', () => ensureMinutes(r));
+  lazySec('chem', () => ensureChem(r));
+  lazySec('fin', () => ensureFinish(r));
   ensurePlayerBio(r);
   // map follows the Markets dropdown on open; pills let you switch without closing
   const mk = state.marketKind;
@@ -3025,12 +3073,9 @@ function matchupHeatShots(r) {
 }
 function seasonHeatMapHtml(r) {
   if (!r.seasonShots || !r.seasonShots.length) {
-    return `<details class="rink-details heat-details">
-      <summary class="sec-title" style="cursor:pointer"><span style="color:var(--gold)">Season heat map</span> <span class="muted small">where his shots come from this season</span></summary>
-      <p class="muted small" style="margin:.5rem 0 0">Season map arrives with the next slate build.</p>
-    </details>`;
+    return `<p class="muted small" style="margin:.5rem 0 0">Season map arrives with the next slate build.</p>`;
   }
-  return heatMapSectionHtml(r, heatMapShots(r), 'Season heat map', 'where his shots come from this season', null, { showGoals: false, minShots: 1 });
+  return heatMapSectionHtml(r, heatMapShots(r), null, { showGoals: false, minShots: 1 });
 }
 const HOME_PLATE = [[89, -9], [69, -22], [54, -22], [54, 22], [69, 22], [89, 9]];
 function inHomePlate(x, y) {
@@ -3053,7 +3098,10 @@ function zoneStats(shots) {
   for (const s of shots) { const k = zoneOf(s.x, s.y); z[k].att++; if (s.goal) z[k].goals++; }
   return z;
 }
-function heatMapSectionHtml(r, shots, title, sub, emptyText, opts) {
+function heatMapSectionHtml(r, shots, emptyText, opts) {
+  // Body-only markup since the 2026-11-07 accordion restructure: the
+  // folded-section summary carries the title/subtitle now, this returns
+  // just the map (or the empty-state line) for the section body.
   // Season map renders percentages-only (no per-zone goal counts) with a
   // 1-shot floor so depth guys show too; Match-up keeps goals + the 5-shot
   // floor by default. Season goal totals already live in the card's
@@ -3061,10 +3109,7 @@ function heatMapSectionHtml(r, shots, title, sub, emptyText, opts) {
   const showGoals = !opts || opts.showGoals !== false;
   const minShots = (opts && opts.minShots) || 5;
   if (!shots || shots.length < minShots) {
-    return `<details class="rink-details heat-details">
-      <summary class="sec-title" style="cursor:pointer"><span style="color:var(--gold)">${title}</span> <span class="muted small">${sub}</span></summary>
-      <p class="muted small" style="margin:.5rem 0 0">${emptyText || 'Not enough shot data yet — the map fills in as games are played.'}</p>
-    </details>`;
+    return `<p class="muted small" style="margin:.5rem 0 0">${emptyText || 'Not enough shot data yet — the map fills in as games are played.'}</p>`;
   }
   const zs = zoneStats(shots);
   const total = shots.length;
@@ -3077,9 +3122,7 @@ function heatMapSectionHtml(r, shots, title, sub, emptyText, opts) {
     : (zs.point.att / total >= 0.3
       ? 'Does his damage from distance — point shots and perimeter looks.'
       : 'Scores from all over the zone — no single home base.');
-  return `<details class="rink-details heat-details">
-    <summary class="sec-title" style="cursor:pointer"><span style="color:var(--gold)">${title}</span> <span class="muted small">${sub}</span></summary>
-    <div class="zonemap">
+  return `<div class="zonemap">
       <svg viewBox="0 0 380 430" aria-hidden="true">
         <defs>
           <clipPath id="zmClip"><path d="M14 426 L14 120 A176 108 0 0 1 366 120 L366 426 Z"/></clipPath>
@@ -3114,8 +3157,7 @@ function heatMapSectionHtml(r, shots, title, sub, emptyText, opts) {
       ${zlabel('point', 'POINT', 50, 85)}
     </div>
     <div class="outside-strip">OUTSIDE THE ZONE: ${zs.outside.att} ATT · ${pct('outside')}%${showGoals ? ` · ${zs.outside.goals} G` : ''}</div>
-    <p class="small muted" style="margin:.55rem 0 0">${take} <span class="muted">(${total} attempts tracked)</span></p>
-  </details>`;
+    <p class="small muted" style="margin:.55rem 0 0">${take} <span class="muted">(${total} attempts tracked)</span></p>`;
 }
 /* ---------------- goalie workload (goalies sidecar) ----------------
    data/goalies-<date>.json from data-builder/goalies-work.js: each
