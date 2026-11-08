@@ -655,6 +655,22 @@ async function main() {
   } catch (e) {
     console.error('[data-builder] goalie workload sidecar failed (bundle unaffected):', e && e.message);
   }
+
+  // 12. last-10 shots sidecar (SOG + attempt locations vs projection) — best effort.
+  try {
+    const L10 = require('./last10.js');
+    const pidTeam = {};
+    for (const [t, r] of Object.entries(out.rosters || {})) {
+      for (const e of [...(r.forwards || []), ...(r.defensemen || [])]) {
+        const id = e && typeof e === 'object' ? e.id : e;
+        if (id != null) pidTeam[String(id)] = t;
+      }
+    }
+    const res = await L10.buildLast10({ dateStr, pidSet, pidTeam, finalsByTeam: seasonFinalsByTeam, fetchRetry, counted });
+    console.log(`[data-builder] last-10 sidecar: ${res.players} players, ${res.fetched} new finals cached (${res.wanted} wanted)`);
+  } catch (e) {
+    console.error('[data-builder] last-10 sidecar failed (bundle unaffected):', e && e.message);
+  }
 }
 
 function write(out) {

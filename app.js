@@ -1567,6 +1567,7 @@ function renderMatchupBody(g, lamA, lamB, wp, st) {
   $('matchupBody').innerHTML = matchupHtml(g, lamA, lamB, wp, st);
   drawGoalieRinks();
   sheetBindToggles();
+  sheetBindLast10();
 }
 // Sheet scorers feed: newest-first goals from this game's pbp. Each row
 // replays the existing goal animation (goal-anim.js) — no new animation code.
@@ -1921,6 +1922,7 @@ function matchupHtml(g, lamA, lamB, wp, st) {
   ${live.mode === 'live' ? `<div class="gs-wp-sub">from score &amp; clock so far</div>` : ''}
   ${wpChartHtml(g, wp)}
   <div class="matchup-proj">Projected <strong>${esc(A)} ${lamA.toFixed(1)} – ${lamB.toFixed(1)} ${esc(H)}</strong></div>
+  ${sheetLast10StripHtml(g)}
   <details class="gs-sec" data-sec="scorers"${sheetSecOpen('scorers') ? ' open' : ''}><summary>Scorers feed</summary><div class="gs-sec-body">${sheetScorersHtml(g)}</div></details>
   <details class="gs-sec" data-sec="goalies"${sheetSecOpen('goalies') ? ' open' : ''}><summary>Goalie matchup</summary><div class="gs-sec-body">${sheetGoalieCardsHtml(g)}</div></details>
   <details class="gs-sec" data-sec="preview"${sheetSecOpen('preview') ? ' open' : ''}><summary>Game preview</summary><div class="gs-sec-body">
@@ -1947,6 +1949,7 @@ async function openMatchup(gameId) {
   // show win prob + projection immediately; fill in standings when they arrive
   renderMatchupBody(g, lamA, lamB, wp, null);
   $('matchupModal').classList.remove('hidden');
+  loadL10Sidecar().then(() => { if (l10SidecarState === 'ok') refreshOpenSheet(); });
   const st = await getStandings();
   await ensureGoalieProj(g);
   if (!$('matchupModal').classList.contains('hidden')) {
@@ -2972,6 +2975,126 @@ async function ensureFinish(r) {
   if (!html) { dropAccSlot(slot); return; }
   slot.outerHTML = html;
 }
+/* ---------------- last-10 shots vs projection (last10 sidecar) ----------------
+   data/last10-<date>.json comes from data-builder/last10.js (build step
+   12): per skater, SOG + attempt locations over his last 10 played games.
+   DISPLAY ONLY — feeds no price. The player-card block joins the Shot Map
+   section (Alex, 2026-11-08) under the existing rink canvas; the game
+   sheet shows a strip of that game's own top shooters. Loaded lazily;
+   a missing sidecar or thin sample hides the blocks silently. */
+let l10Sidecar = null, l10SidecarState = 'idle'; // idle | loading | ok | fail
+async function loadL10Sidecar() {
+  if (l10SidecarState === 'loading' || l10SidecarState === 'ok') return;
+  l10SidecarState = 'loading';
+  try {
+    const r = await fetch(`data/last10-${state.date}.json`, { headers: { 'Accept': 'application/json' } });
+    if (!r.ok) throw new Error('no sidecar');
+    l10Sidecar = await r.json();
+    l10SidecarState = 'ok';
+  } catch (e) { l10SidecarState = 'fail'; }
+}
+function l10For(r) {
+  const d = (l10Sidecar && l10Sidecar.players && l10Sidecar.players[String(r.pid)]) || null;
+  return d && typeof d.n === 'number' && typeof d.sog === 'number' && Array.isArray(d.att) ? d : null;
+}
+function l10Proj(r, n) {
+  const mk = r.markets && r.markets.shots;
+  const lam = Array.isArray(mk) ? (mk[0] && mk[0].lam) : (mk && mk.lam);
+  return typeof lam === 'number' ? lam * n : null;
+}
+/* Bubble shot map on a half rink, Bueno style: teal rings = attempts,
+   gold dots = goals, gold dashed line = home plate. att entries are
+   [x, y, goal] in the display frame (attacking net at +x). */
+function bubbleMapSvg(att, mini) {
+  const H = mini ? 250 : 300;
+  const sx = (y) => 170 + (y / 42.5) * 150;
+  const sy = (x) => Math.max(26, Math.min(H - 8, 52 + (89 - x) * ((H - 60) / 64)));
+  let h = `<svg viewBox="0 0 340 ${H}" width="100%" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Shot map, last games">`;
+  h += `<rect x="10" y="8" width="320" height="${H - 16}" rx="46" fill="rgba(130,170,255,.05)" stroke="rgba(165,195,255,.4)" stroke-width="1.6"/>`;
+  h += '<line x1="14" y1="52" x2="326" y2="52" stroke="rgba(240,102,94,.45)" stroke-width="2"/>';
+  h += '<path d="M146 52 a24 15 0 0 0 48 0 z" fill="rgba(94,168,255,.20)" stroke="rgba(165,195,255,.45)"/>';
+  h += '<rect x="158" y="34" width="24" height="13" rx="2" fill="none" stroke="rgba(232,238,247,.75)" stroke-width="1.6"/>';
+  for (const cx of [95, 245]) {
+    h += `<circle cx="${cx}" cy="120" r="44" fill="none" stroke="rgba(165,195,255,.35)" stroke-width="1.4"/><circle cx="${cx}" cy="120" r="4" fill="rgba(165,195,255,.5)"/>`;
+  }
+  h += '<polygon points="95,164 148,60 192,60 245,164" fill="none" stroke="rgba(245,185,66,.55)" stroke-width="1.3" stroke-dasharray="5 4"/>';
+  (att || []).forEach((a, i) => {
+    const r = (mini ? 5.4 : 6.5) + ((i * 37) % 10) / 10 * 4;
+    const cx = sx(a[1]).toFixed(0), cy = sy(a[0]).toFixed(0);
+    h += a[2]
+      ? `<circle cx="${cx}" cy="${cy}" r="${r.toFixed(1)}" fill="#f5b942" stroke="#ffd97a" stroke-width="1.2"/>`
+      : `<circle cx="${cx}" cy="${cy}" r="${r.toFixed(1)}" fill="rgba(58,219,227,.13)" stroke="rgba(58,219,227,.75)" stroke-width="1.3"/>`;
+  });
+  return h + '</svg>';
+}
+function pcLast10Html(r) {
+  const d = l10For(r);
+  if (!d) return '';
+  const proj = l10Proj(r, d.n);
+  if (proj == null) return '';
+  const diff = d.sog - proj;
+  const over = diff >= 0;
+  return `<div class="l10-block">
+    <div class="l10-head"><span class="l10-title">Last ${d.n} vs proj</span><span class="l10-sub">shots on goal</span></div>
+    ${bubbleMapSvg(d.att, false)}
+    <div class="l10-vsrow">
+      <div class="l10-big ${over ? 'over' : 'under'}">${Math.abs(diff).toFixed(1)}<span class="l10-word">${over ? 'OVER PROJ' : 'UNDER PROJ'}</span></div>
+      <div class="l10-lines"><div><strong>${d.sog} SOG</strong> in last ${d.n} GP</div><div class="muted">Proj <strong class="teal-num">${proj.toFixed(1)}</strong></div></div>
+    </div>
+    <div class="l10-legend"><span><span class="l10-sw shot"></span>attempt</span><span><span class="l10-sw goal"></span>goal</span><span><span class="l10-sw plate"></span>home plate</span><span class="muted">map: last ${d.n} games</span></div>
+  </div>`;
+}
+function pcLast10SlotHtml(r) {
+  if (l10SidecarState === 'ok') return pcLast10Html(r);
+  if (l10SidecarState === 'fail') return '';
+  return `<div data-l10-slot="${esc(String(r.pid))}"><p class="muted small" style="margin:.5rem 0 0">Loading last 10…</p></div>`;
+}
+async function ensureLast10(r) {
+  await loadL10Sidecar();
+  const body = $('modalBody');
+  if (!body) return;
+  const slot = body.querySelector(`[data-l10-slot="${esc(String(r.pid))}"]`);
+  if (!slot) return;
+  const html = l10SidecarState === 'ok' ? pcLast10Html(r) : '';
+  if (!html) { slot.remove(); return; }
+  slot.outerHTML = html;
+}
+/* Game sheet strip: this game's own top shooters by last-10 SOG volume
+   (needs at least 5 counted games), each card opening the player card. */
+function sheetLast10StripHtml(g) {
+  if (l10SidecarState !== 'ok' || !l10Sidecar) return '';
+  const rows = state.skaters
+    .filter((sk) => String(sk.gameId) === String(g.id))
+    .map((sk) => {
+      const d = l10For(sk);
+      if (!d || d.n < 5) return null;
+      const proj = l10Proj(sk, d.n);
+      if (proj == null) return null;
+      return { sk, d, proj, diff: d.sog - proj };
+    })
+    .filter(Boolean)
+    .sort((a, b) => b.d.sog - a.d.sog)
+    .slice(0, 3);
+  if (rows.length < 2) return '';
+  const cards = rows.map(({ sk, d, proj, diff }) => {
+    const over = diff >= 0;
+    const step = Math.max(1, Math.floor(d.att.length / 26));
+    const att = d.att.filter((_, i) => i % step === 0);
+    return `<button class="l10-card" data-l10-open="${esc(String(sk.pid))}" data-l10-gid="${esc(String(sk.gameId))}">
+      <span class="l10-card-name"><img src="${teamLogoUrl(sk.team)}" alt="" ${imgFallback}> ${esc(sk.name.toUpperCase())}</span>
+      ${bubbleMapSvg(att, true)}
+      <span class="l10-card-big ${over ? 'over' : 'under'}">${Math.abs(diff).toFixed(1)}</span>
+      <span class="l10-card-word">${over ? 'OVER PROJ' : 'UNDER PROJ'}</span>
+      <span class="l10-card-line">${d.sog} SOG in ${d.n} GP</span>
+      <span class="l10-card-line muted">Proj <strong>${proj.toFixed(1)}</strong></span>
+    </button>`;
+  }).join('');
+  return `<div class="l10-strip-wrap"><div class="l10-strip-head"><span class="l10-bar">▎</span> Last 10 vs proj <span class="muted small">shots on goal · this game's shooters</span></div><div class="l10-strip">${cards}</div></div>`;
+}
+function sheetBindLast10() {
+  document.querySelectorAll('#matchupBody [data-l10-open]').forEach((b) =>
+    b.addEventListener('click', () => openPlayer(b.dataset.l10Open, b.dataset.l10Gid)));
+}
 /* NBA-style folded card section (Alex, 2026-11-07 restructure): a
    full-width row — teal accent bar, caps title, chevron — that toggles
    open. Mirrors the Basketball card's sec() helper. Returns '' when the
@@ -3073,7 +3196,7 @@ function openPlayer(pid, gameId) {
       <canvas class="rink" id="rinkCanvas"></canvas>
       <div class="legend"><span><span class="dot" style="background:#2f6fed"></span>attempt</span>
         <span><span class="dot" style="background:#d4a017"></span>goal</span>
-      <span><span class="dot" style="background:#a06414"></span>slot</span> <span><span class="dot" style="background:#c42c1e"></span>low slot</span></div>`;
+      <span><span class="dot" style="background:#a06414"></span>slot</span> <span><span class="dot" style="background:#c42c1e"></span>low slot</span></div>${pcLast10SlotHtml(r)}`;
   const whyBody = `<table class="factor-table">${factorRows}
         <tr><td>Expected goals (λ)</td><td>${r.lam.toFixed(3)}</td></tr>
         <tr><td>Opponent</td><td>${esc(r.oppAbbr)} goalie ${(r.oppSv * 100).toFixed(1)}% SV</td></tr>
@@ -3126,6 +3249,7 @@ function openPlayer(pid, gameId) {
   lazySec('ice', () => ensureMinutes(r));
   lazySec('chem', () => ensureChem(r));
   lazySec('fin', () => ensureFinish(r));
+  lazySec('shotmap', () => ensureLast10(r));
   ensurePlayerBio(r);
   // map follows the Markets dropdown on open; pills let you switch without closing
   const mk = state.marketKind;
