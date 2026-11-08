@@ -30,7 +30,13 @@ jobs:
       # ~220 player landings, standings) and writes data/<date>.json.
       # Hits the public NHL API directly; Node has no CORS issue.
       - name: Build slate data
-        run: node data-builder/build.js
+        run: |
+         for i in 1 2 3; do
+         if node data-builder/build.js; then exit 0; fi
+         echo "build attempt $i failed — retrying in 60s"
+         sleep 60
+         done
+         exit 1
 
       # Idempotent: commit + push only when data/ actually changed.
       - name: Commit and push data if changed
