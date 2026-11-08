@@ -2134,8 +2134,11 @@ function renderBoard() {
       lastGame = r.gameId;
       const g = state.games.find((x) => x.id === r.gameId);
       if (g) {
-        const t = g.startTimeUTC ? new Date(g.startTimeUTC).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) : '';
-        html += `<tr class="board-game-row"><td colspan="12">${esc(g.awayTeam.abbrev)} @ ${esc(g.homeTeam.abbrev)}${t ? ' · ' + esc(t) : ''}</td></tr>`;
+        const aAb = (g.awayTeam && g.awayTeam.abbrev) || g.away || '';
+        const hAb = (g.homeTeam && g.homeTeam.abbrev) || g.home || '';
+        const stUtc = g.startTimeUTC || g.startUTC;
+        const t = stUtc ? new Date(stUtc).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) : '';
+        html += `<tr class="board-game-row"><td colspan="12">${esc(aAb)} @ ${esc(hAb)}${t ? ' · ' + esc(t) : ''}</td></tr>`;
       }
     }
     const ng = (scorerByGame[r.gameId] || {})[r.pid] || 0;
