@@ -2048,8 +2048,8 @@ const BOARD_HEADS = {
 };
 function boardBand(v, hi, mid) { return v >= hi ? 'g' : v >= mid ? 'y' : 'r'; }
 function boardMult(m) { return { text: '×' + (m || 1).toFixed(2), band: (m || 1) >= 1.10 ? 'g' : (m || 1) >= 0.95 ? 'y' : 'r' }; }
-function boardMarketInfo() {
-  const kind = state.boardMarket;
+function boardMarketInfo(kindArg) {
+  const kind = kindArg || state.boardMarket;
   const map = new Map();
   if (kind === 'brace') { for (const r of twoPlusProbs()) map.set(r.pid, { p: r.tpP, fair: r.tpFair }); }
   else if (kind === 'first') { for (const r of firstGoalProbs()) map.set(r.pid, { p: r.fgP, fair: r.fgFair }); }

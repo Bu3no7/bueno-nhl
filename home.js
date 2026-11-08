@@ -133,20 +133,39 @@ function renderHomeGoalies() {
     });
   }
 }
-/* ---- Home: top picks ---- */
+/* ---- Home: top picks (per market, mirrors Basketball's Top Picks) ---- */
+let homeTpMarket = 'anytime';
+const HOME_TP_META = {
+  anytime: (r) => `${r.goals}G`,
+  brace: (r) => `${r.goals}G`,
+  first: (r) => `${r.goals}G`,
+  shots: (r) => `${(r.sogpg || 0).toFixed(1)} SOG/gm`,
+  assists: (r) => `${r.assists}A`,
+  points: (r) => `${r.points} PTS`,
+};
 function renderHomePicks() {
   const el = $('homePicksBody');
   if (!el) return;
-  const skaters = (state.skaters || []).filter((s) => s.pos !== 'G' && s.p > 0);
+  const skaters = (state.skaters || []).filter((s) => s.pos !== 'G');
   if (!skaters.length) {
     el.innerHTML = `<p class="muted">Loading…</p>`;
     return;
   }
-  const top = [...skaters].sort((a, b) => b.p - a.p).slice(0, 5);
-  el.innerHTML = `<div class="pick-cards">` + top.map((r) => {
+  const info = boardMarketInfo(homeTpMarket);
+  const metaFn = HOME_TP_META[homeTpMarket] || HOME_TP_META.anytime;
+  const top = skaters
+    .map((r) => ({ r, m: info.get(r.pid) }))
+    .filter((x) => x.m && x.m.p > 0)
+    .sort((a, b) => b.m.p - a.m.p)
+    .slice(0, 5);
+  if (!top.length) {
+    el.innerHTML = `<p class="muted">No picks for this market yet.</p>`;
+    return;
+  }
+  el.innerHTML = `<div class="pick-cards">` + top.map(({ r, m }) => {
     const g = state.games.find((gg) => String(gg.id) === String(r.gameId));
     const matchup = g ? `${g.away} @ ${g.home}` : esc(r.team);
-    const pct = Math.round(r.p * 100);
+    const pct = Math.round(m.p * 100);
     // Team-color glow, same sizes as the player-card header (22px ring,
     // 16px number shadow, lightened fill). No team color → no inline
     // style, so the card keeps its existing generic teal.
@@ -157,12 +176,14 @@ function renderHomePicks() {
       <img class="pick-card-head" src="${esc(r.headshot || '')}" alt="" ${imgFallback}${headStyle}>
       <div class="pick-card-name">${esc(r.name)}</div>
       <div class="pick-card-team"><img src="${teamLogoUrl(r.team)}" alt="">${esc(r.team)}</div>
-      <div class="pick-card-meta">${esc(matchup)} · ${r.goals}G</div>
+      <div class="pick-card-meta">${esc(matchup)} · ${esc(metaFn(r))}</div>
       <div class="pick-card-num"${numStyle}>${pct}<small>%</small></div>
-      <div class="pick-fair">${r.fair} fair</div>
+      <div class="pick-fair">${m.fair} fair</div>
     </div>`;
   }).join('') + `</div>`;
 }
+const homeTpSel = $('homeTpSelect');
+if (homeTpSel) homeTpSel.addEventListener('change', () => { homeTpMarket = homeTpSel.value; renderHomePicks(); });
 /* ---- Home: yesterday's results ---- */
 async function renderHomeResults() {
   const el = $('homeResultsBody');

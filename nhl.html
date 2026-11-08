@@ -71,6 +71,7 @@ body.sport-glass .board-filters-panel select{border-color:rgba(165,195,255,.25)}
 body.sport-glass #boardTable th:first-child,body.sport-glass #boardTable td:first-child{background:linear-gradient(155deg,rgba(26,44,80,.82),rgba(7,11,18,.88));backdrop-filter:blur(14px) saturate(1.35);-webkit-backdrop-filter:blur(14px) saturate(1.35)}
 body.sport-glass #boardTable tr.scored td:first-child{background:linear-gradient(155deg,rgba(18,74,84,.85),rgba(7,20,24,.9))}
 .page-topbar .topbar-label{color:#4fb3b8;font-weight:700}
+#homeTpSelect{width:100%;margin:.5rem 0 .8rem;padding:.6rem .7rem;font-size:.95rem;background:#101a2c;border:1px solid var(--border);border-radius:10px;color:inherit;outline:none}
 </style>
 </head>
 <body class="sport-glass">
@@ -170,7 +171,15 @@ body.sport-glass #boardTable tr.scored td:first-child{background:linear-gradient
         <div id="homeTonightBody"><p class="muted">Loading…</p></div>
       </div>
       <div class="home-card" id="homePicksCard">
-        <h3>Top Goal Scorer Picks <span class="muted small">tap for player card</span></h3>
+        <h3>Top Picks <span class="muted small">tap for player card</span></h3>
+        <select id="homeTpSelect" aria-label="Choose a market">
+          <option value="anytime">Anytime goal</option>
+          <option value="brace">Brace · 2+ goals</option>
+          <option value="first">First goal</option>
+          <option value="shots">Shots · o2.5</option>
+          <option value="assists">Assists · o0.5</option>
+          <option value="points">Points · o1.5</option>
+        </select>
         <div id="homePicksBody"><p class="muted">Loading…</p></div>
       </div>
       <div class="home-card" id="homeGoaliesCard">
