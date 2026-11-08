@@ -236,6 +236,26 @@
   .usg-track{height:8px;border-radius:4px;background:rgba(10,20,40,.6);border:1px solid rgba(165,195,255,.14);overflow:hidden}
   .usg-fill{height:100%;background:#e8b64c}
   .usg-rolepct{font-size:10px;font-weight:700;color:#e8b64c;margin-top:2px}
+  /* player card: NBA-style hero header + accordion sections (gold = Football accent) */
+  #view-player .phead .face{width:84px;height:84px;font-size:26px}
+  .phead-main{min-width:0}
+  .pteam{display:flex;align-items:center;gap:6px;color:var(--mut);font-size:13px;margin-top:3px}
+  .pteam img{width:20px;height:20px;object-fit:contain;flex:none}
+  .ppos{color:var(--mut);opacity:.7;font-weight:700;letter-spacing:.06em;font-size:11px}
+  #view-player .pmatch{font-size:11px;color:var(--mut);letter-spacing:.08em;margin-top:3px}
+  .phero{margin-left:auto;text-align:center;background:linear-gradient(155deg,rgba(130,170,255,.13),rgba(6,12,26,.42));border:1px solid rgba(165,195,255,.2);border-radius:12px;padding:7px 12px 6px;flex:none;box-shadow:inset 0 1px 0 rgba(255,255,255,.13)}
+  .phero b{display:block;font-size:23px;line-height:1.05;color:var(--gold)}
+  .phero span{font-size:9px;letter-spacing:.13em;color:var(--mut);font-weight:700}
+  details.nfl-sec{border-top:1px solid rgba(165,195,255,.16);margin-top:12px}
+  details.nfl-sec:first-child{border-top:none;margin-top:0}
+  details.nfl-sec summary{list-style:none;cursor:pointer;padding:8px 0 3px;font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--mut);display:flex;align-items:center;gap:8px}
+  details.nfl-sec summary::-webkit-details-marker{display:none}
+  details.nfl-sec summary::before{content:'';width:4px;height:14px;border-radius:2px;background:var(--gold);flex:none}
+  details.nfl-sec summary .chev{margin-left:auto;color:var(--gold);letter-spacing:0}
+  details.nfl-sec[open ] summary .chev{transform:rotate(90deg)}
+  .nfl-sec-body{padding:5px 0 4px}
+  .nfl-sec-body .ladder,.nfl-sec-body .metrics,.nfl-sec-body .tdrow,.nfl-sec-body .field,.nfl-sec-body .usg{margin-top:0}
+  .usg-subline{font-size:9px;font-weight:700;letter-spacing:.08em;color:#9db1d8;margin-bottom:2px}
 </style>
 </head>
 <body>
@@ -381,9 +401,15 @@
   <div class="backbar"><span class="backbtn" id="backBtn">‹ Back</span></div>
   <div class="phead">
     <div class="face gold" id="pFace"></div>
-    <div><h3 id="pName">Derrick Henry</h3><p id="pMeta">RB · BALTIMORE RAVENS · AT JACKSONVILLE · THU 6:15 PM</p></div>
+    <div class="phead-main"><h3 id="pName">Derrick Henry</h3><div class="pteam"><img id="pTeamLogo" alt="" onerror="this.style.visibility='hidden'"><span id="pTeam">Baltimore Ravens</span><span class="ppos" id="pPos"></span></div><p class="pmatch" id="pMatch">AT JACKSONVILLE JAGUARS · THU 6:15 PM</p></div>
+    <div class="phero" id="pHero"><b id="pHeroNum">41%</b><span>ANYTIME TD</span></div>
   </div>
   <div class="card" style="margin-top:12px">
+    <details class="nfl-sec" id="pLinesSec" open><summary><span class="nfl-sec-t">TONIGHT'S LINES</span><span class="chev">▸</span></summary><div class="nfl-sec-body"><div class="ladder" id="pLadder"></div></div></details>
+    <details class="nfl-sec" id="pUsageSec"><summary><span class="nfl-sec-t" id="pUsageTitle">USAGE · LAST 5</span><span class="chev">▸</span></summary><div class="nfl-sec-body"><div id="pUsage"></div></div></details>
+    <details class="nfl-sec" id="pMetricsSec"><summary><span class="nfl-sec-t">KEY METRICS</span><span class="chev">▸</span></summary><div class="nfl-sec-body"><div class="metrics" id="pMetrics"></div></div></details>
+    <details class="nfl-sec" id="pTdSec"><summary><span class="nfl-sec-t">TOUCHDOWNS</span><span class="chev">▸</span></summary><div class="nfl-sec-body"><div class="tdrow" id="pTd"></div></div></details>
+    <details class="nfl-sec" id="pDistSec"><summary><span class="nfl-sec-t">DISTRIBUTION</span><span class="chev">▸</span></summary><div class="nfl-sec-body">
     <div class="field">
       <h4 id="pDistTitle">RUSHING YARDS · THE FIELD VIEW</h4>
       <p id="pDistNote">His game logs, drawn like a drive. Most games land between the 25 and the 114.</p>
@@ -398,11 +424,7 @@
         <text x="24" y="95" fill="#9db1d8" font-size="8">0</text><text x="92" y="95" fill="#9db1d8" font-size="8">50</text><text x="160" y="95" fill="#9db1d8" font-size="8">100</text><text x="230" y="95" fill="#9db1d8" font-size="8">150</text>
       </svg>
     </div>
-    <div class="ladder" id="pLadder"></div>
-    <div class="metrics" id="pMetrics"></div>
-    <div id="pUsage"></div>
-    <div class="tdrow" id="pTd"></div>
-    
+    </div></details>
   </div>
 </section>
 
@@ -597,7 +619,7 @@ function metaFor(team, game){
 function buildObjects(){
   B.players.forEach(function(pl){
     FACES[pl.key] = pl.espnId; TEAMCOLOR[pl.key] = TEAMCOLOR32[pl.team]; BYID[pl.espnId] = pl.key;
-    var g = gameOf(pl.game), d = { name: pl.name, face: ini(pl.name), meta: pl.pos+" · "+TEAMNAME[pl.team].toUpperCase()+" · "+metaFor(pl.team, g), metrics: pl.metrics||[], td: [], ladder: [], raw: pl };
+    var g = gameOf(pl.game), d = { name: pl.name, face: ini(pl.name), meta: pl.pos+" · "+TEAMNAME[pl.team].toUpperCase()+" · "+metaFor(pl.team, g), teamName: TEAMNAME[pl.team], teamAbbr: pl.team, pos: pl.pos, matchLine: metaFor(pl.team, g), heroP: (pl.td && pl.td.any!=null) ? pl.td.any : null, metrics: pl.metrics||[], td: [], ladder: [], raw: pl };
     var mk = null;
     if(pl.pos==="QB" && pl.pass) mk = ["PASSING", pl.pass];
     else if(pl.pos==="RB" && pl.scr) mk = ["RUSHING+RECEIVING", pl.scr];
@@ -701,7 +723,11 @@ function openPlayer(key){
   pf.innerHTML = (FACES[key] ? '<img src="https://a.espncdn.com/i/headshots/nfl/players/full/'+FACES[key]+'.png" alt="" onerror="this.remove()">' : '');
   pf.style.borderColor = TEAMCOLOR[key] || "#e8b64c";
   pf.style.boxShadow = "0 0 22px " + (TEAMCOLOR[key] || "#e8b64c") + "90, 0 0 6px " + (TEAMCOLOR[key] || "#e8b64c");
-  $("pName").textContent = d.name; $("pMeta").textContent = d.meta;
+  $("pName").textContent = d.name;
+  $("pTeam").textContent = d.teamName; $("pPos").textContent = "· " + d.pos;
+  var lg = $("pTeamLogo"); lg.style.visibility = ""; lg.src = "https://a.espncdn.com/i/teamlogos/nfl/500/" + String(d.teamAbbr).toLowerCase() + ".png";
+  $("pMatch").textContent = d.matchLine;
+  $("pHeroNum").textContent = d.heroP!=null ? pct(d.heroP) : "—";
   if(d.q){
     $("pDistTitle").textContent = d.market + " YARDS · THE FIELD VIEW";
     $("pDistNote").textContent = "His game logs, drawn like a drive. Most games land between the " + d.q[0] + " and the " + d.q[4] + ".";
@@ -720,15 +746,21 @@ function openPlayer(key){
       return '<div class="rung'+(r.hot?" hot":"")+'"><b>'+r.line+'+</b><span class="o">over '+pct(r.p)+' · '+fmtOdds(r.p)+'</span> <span class="u">under '+pct(1-r.p)+' · '+fmtOdds(1-r.p)+'</span></div>';
     }).join("");
   }
+  $("pLinesSec").style.display = d.q ? "" : "none";
+  $("pDistSec").style.display = d.q ? "" : "none";
+  if(!d.q){ $("pLadder").innerHTML = ""; }
   $("pMetrics").innerHTML = d.metrics.map(function(m){ return '<div class="metric"><b>'+m[0]+'</b><span>'+m[1]+'</span></div>'; }).join("");
+  $("pMetricsSec").style.display = d.metrics.length ? "" : "none";
   (function(){
     var pu = $("pUsage");
     var u = d.raw && d.raw.usage;
-    if(!u || !u.games || u.games.length < 2){ pu.innerHTML = ""; return; }
+    if(!u || !u.games || u.games.length < 2){ pu.innerHTML = ""; $("pUsageSec").style.display = "none"; return; }
+    $("pUsageSec").style.display = "";
+    $("pUsageTitle").textContent = "USAGE · LAST " + u.games.length;
     var pos = d.raw.pos || "";
     var shareName = (pos==="RB" || pos==="FB") ? "CARRY SHARE" : ((pos==="WR" || pos==="TE") ? "TARGET SHARE" : "");
     var sub = shareName ? "SNAP SHARE · " + shareName : "SNAP SHARE";
-    var h = '<div class="usg"><div class="usg-head"><span class="usg-title">USAGE · LAST ' + u.games.length + '</span><span class="usg-sub">' + sub + '</span></div>';
+    var h = '<div class="usg"><div class="usg-subline">' + sub + '</div>';
     h += '<div class="usg-chart"><div class="usg-avg" style="bottom:' + (25 + Math.round(u.avg*64)) + 'px"><span>AVG ' + Math.round(u.avg*100) + '%</span></div><div class="usg-cols">';
     u.games.forEach(function(g){
       h += '<div class="usg-col"><div class="usg-pct">' + Math.round(g.snap*100) + '%</div><div class="usg-barzone"><div class="usg-bar' + (g.snap>=u.avg ? " hi" : "") + '" style="height:' + Math.max(3, Math.round(g.snap*64)) + 'px"></div></div><div class="usg-opp">' + g.opp + '</div><div class="usg-wk">WK ' + g.wk + '</div></div>';
@@ -746,6 +778,7 @@ function openPlayer(key){
     pu.innerHTML = h;
   })();
   $("pTd").innerHTML = d.td.map(function(t){ return '<div class="tdbox'+(t[3]?" hot":"")+'"><span>'+t[0]+'</span><b>'+t[1]+'</b><i>'+t[2]+'</i></div>'; }).join("");
+  $("pTdSec").style.display = d.td.length ? "" : "none";
   show("view-player");
 }
 function openKicker(key){
