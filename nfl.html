@@ -214,6 +214,28 @@
   .sports-name{font-weight:700;font-size:1.02rem;flex:1}
   .sports-tag{color:#3adbe3;font-size:.8rem;font-weight:700}
   .sports-arrow{color:#8b96ab;font-size:1.25rem}
+  /* usage · last 5 (display-only player-card section) */
+  .usg{margin-top:10px;background:linear-gradient(155deg,rgba(130,170,255,.13),rgba(6,12,26,.42));border:1px solid rgba(165,195,255,.2);border-radius:12px;padding:10px 10px 8px;box-shadow:inset 0 1px 0 rgba(255,255,255,.13)}
+  .usg-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+  .usg-title{font-size:12px;font-weight:800;letter-spacing:.14em;color:#eef3fb}
+  .usg-sub{font-size:9px;font-weight:700;letter-spacing:.08em;color:#9db1d8;text-align:right}
+  .usg-chart{position:relative;margin-top:6px}
+  .usg-avg{position:absolute;left:0;right:0;border-top:2px dashed #e8b64c;z-index:2;pointer-events:none}
+  .usg-avg span{position:absolute;right:0;top:-14px;font-size:8.5px;font-weight:700;letter-spacing:.06em;color:#e8b64c}
+  .usg-cols{display:flex;gap:6px}
+  .usg-col{flex:1;text-align:center;min-width:0}
+  .usg-pct{font-size:12px;font-weight:800;color:#eef3fb;height:15px;line-height:15px}
+  .usg-barzone{height:64px;display:flex;align-items:flex-end;justify-content:center}
+  .usg-bar{width:70%;max-width:44px;border-radius:5px 5px 2px 2px;background:#5b6b8c}
+  .usg-bar.hi{background:#3adbe3}
+  .usg-opp{font-size:11px;font-weight:700;color:#cfe0ff;height:14px;line-height:14px}
+  .usg-wk{font-size:9px;color:#9db1d8;height:11px;line-height:11px;letter-spacing:.06em}
+  .usg-rolelabel{margin-top:9px;font-size:9px;font-weight:800;letter-spacing:.1em;color:#9db1d8}
+  .usg-roles{display:flex;gap:6px;margin-top:4px}
+  .usg-role{flex:1;text-align:center;min-width:0}
+  .usg-track{height:8px;border-radius:4px;background:rgba(10,20,40,.6);border:1px solid rgba(165,195,255,.14);overflow:hidden}
+  .usg-fill{height:100%;background:#e8b64c}
+  .usg-rolepct{font-size:10px;font-weight:700;color:#e8b64c;margin-top:2px}
 </style>
 </head>
 <body>
@@ -378,6 +400,7 @@
     </div>
     <div class="ladder" id="pLadder"></div>
     <div class="metrics" id="pMetrics"></div>
+    <div id="pUsage"></div>
     <div class="tdrow" id="pTd"></div>
     
   </div>
@@ -698,6 +721,30 @@ function openPlayer(key){
     }).join("");
   }
   $("pMetrics").innerHTML = d.metrics.map(function(m){ return '<div class="metric"><b>'+m[0]+'</b><span>'+m[1]+'</span></div>'; }).join("");
+  (function(){
+    var pu = $("pUsage");
+    var u = d.raw && d.raw.usage;
+    if(!u || !u.games || u.games.length < 2){ pu.innerHTML = ""; return; }
+    var pos = d.raw.pos || "";
+    var shareName = (pos==="RB" || pos==="FB") ? "CARRY SHARE" : ((pos==="WR" || pos==="TE") ? "TARGET SHARE" : "");
+    var sub = shareName ? "SNAP SHARE · " + shareName : "SNAP SHARE";
+    var h = '<div class="usg"><div class="usg-head"><span class="usg-title">USAGE · LAST ' + u.games.length + '</span><span class="usg-sub">' + sub + '</span></div>';
+    h += '<div class="usg-chart"><div class="usg-avg" style="bottom:' + (25 + Math.round(u.avg*64)) + 'px"><span>AVG ' + Math.round(u.avg*100) + '%</span></div><div class="usg-cols">';
+    u.games.forEach(function(g){
+      h += '<div class="usg-col"><div class="usg-pct">' + Math.round(g.snap*100) + '%</div><div class="usg-barzone"><div class="usg-bar' + (g.snap>=u.avg ? " hi" : "") + '" style="height:' + Math.max(3, Math.round(g.snap*64)) + 'px"></div></div><div class="usg-opp">' + g.opp + '</div><div class="usg-wk">WK ' + g.wk + '</div></div>';
+    });
+    h += '</div></div>';
+    if(shareName){
+      h += '<div class="usg-rolelabel">' + shareName + '</div><div class="usg-roles">';
+      u.games.forEach(function(g){
+        var rp = g.role==null ? null : Math.round(g.role*100);
+        h += '<div class="usg-role"><div class="usg-track"><div class="usg-fill" style="width:' + (rp==null ? 0 : rp) + '%"></div></div><div class="usg-rolepct">' + (rp==null ? "—" : rp + "%") + '</div></div>';
+      });
+      h += '</div>';
+    }
+    h += '</div>';
+    pu.innerHTML = h;
+  })();
   $("pTd").innerHTML = d.td.map(function(t){ return '<div class="tdbox'+(t[3]?" hot":"")+'"><span>'+t[0]+'</span><b>'+t[1]+'</b><i>'+t[2]+'</i></div>'; }).join("");
   show("view-player");
 }
