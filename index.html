@@ -15,6 +15,21 @@
 <meta name="description" content="Bueno Sports: model-priced probabilities across sports — NHL anytime goals, MLB home runs, NBA player props. Fair no-vig odds from live data, graded nightly.">
 <link rel="stylesheet" href="styles.css">
 <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&display=swap" rel="stylesheet">
+<style id="labs-pill-css">
+.labs-wrap { margin-top: .9rem; }
+.labs-pill { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: .8rem;
+  background: linear-gradient(180deg, #101a2c, #0a0f19); border: 1px solid #1f2c44; border-radius: 999px;
+  padding: .8rem 1.15rem; color: var(--text); font-family: inherit; cursor: pointer; text-align: left;
+  transition: border-color .15s ease, box-shadow .15s ease; }
+.labs-pill:hover { border-color: var(--teal); box-shadow: 0 6px 22px rgba(58,219,227,.12); }
+.labs-pill:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+.labs-pill-main { display: flex; flex-direction: column; gap: .12rem; }
+.labs-pill-name { font-size: 1.05rem; font-weight: 800; letter-spacing: -.01em; }
+.labs-pill-sub { color: var(--muted); font-size: .8rem; font-weight: 600; }
+.labs-pill-chev { color: var(--teal); font-size: 1.15rem; font-weight: 800; transition: transform .2s ease; }
+.labs-pill.open .labs-pill-chev { transform: rotate(180deg); }
+.labs-grid { margin-top: .8rem; }
+</style>
 </head>
 <body class="no-bnav">
 <div class="page-topbar">
@@ -44,6 +59,50 @@
       <p>The models run on free, public data (the NHL's own API, ESPN, the MLB Stats API) and weigh what actually moves a prop: form, ice time and line deployment, the matchup, the goalie or pitcher, and where a player does his damage on the ice. Two engines check each other — an exact analytical model and a correlated Monte Carlo simulation — so a number has to survive both before it makes the board.</p>
       <p>The house rule is simple: <strong>backtest first, keep what wins.</strong> Every model is graded against real results, every night. Ideas that don't beat the version already live get dropped, however good they sound — and when the model is wrong, the miss stays on the record.</p>
       <p class="muted small">Bueno Sports is a probabilities project, not betting advice. A fair price tells you what a prop is worth, not what will happen.</p>
+    </div>
+    <div class="labs-wrap">
+      <button class="labs-pill" id="labsPill" type="button" aria-expanded="false" aria-controls="labsGrid">
+        <span class="labs-pill-main"><span class="labs-pill-name">🧪 Bueno Sports Labs</span><span class="labs-pill-sub">Hockey · Basketball · Baseball · Football · UFC · Soccer</span></span>
+        <span class="labs-pill-chev" aria-hidden="true">▾</span>
+      </button>
+        <div class="sport-grid labs-grid" id="labsGrid" hidden>
+        <a class="sport-card" href="/nhl.html">
+          <span class="sport-card-ico"><img class="sport-card-logo" src="https://assets.nhle.com/logos/nhl/svg/NHL_light.svg" alt="" onerror="this.parentNode.textContent='🏒'"></span>
+          <span class="sport-card-name">Hockey</span>
+          <span class="sport-card-line" id="landNhlLine">Loading tonight's slate…</span>
+          <span class="sport-card-cta">Enter Center Ice →</span>
+        </a>
+        <a class="sport-card" href="/nba.html">
+          <span class="sport-card-ico"><img class="sport-card-logo" src="https://a.espncdn.com/i/teamlogos/leagues/500/nba.png" alt="" onerror="this.parentNode.textContent='🏀'"></span>
+          <span class="sport-card-name">Basketball</span>
+          <span class="sport-card-line" id="landNbaLine">Live scores, board &amp; standings</span>
+          <span class="sport-card-cta">Open Basketball →</span>
+        </a>
+        <a class="sport-card" href="/mlb.html">
+          <span class="sport-card-ico"><img class="sport-card-logo" src="https://a.espncdn.com/i/teamlogos/leagues/500/mlb.png" alt="" onerror="this.parentNode.textContent='⚾'"></span>
+          <span class="sport-card-name">Baseball</span>
+          <span class="sport-card-line" id="landMlbLine">Home-run probabilities</span>
+          <span class="sport-card-cta">Open Baseball →</span>
+        </a>
+        <a class="sport-card" href="/nfl.html">
+          <span class="sport-card-ico"><img class="sport-card-logo" src="https://a.espncdn.com/i/teamlogos/leagues/500/nfl.png" alt="" onerror="this.parentNode.textContent='🏈'"></span>
+          <span class="sport-card-name">Football</span>
+          <span class="sport-card-line" id="landNflLine">Scores &amp; standings</span>
+          <span class="sport-card-cta">Open Football →</span>
+        </a>
+        <a class="sport-card" href="/ufc.html">
+          <span class="sport-card-ico"><img class="sport-card-logo logo-invert" src="https://a.espncdn.com/i/teamlogos/leagues/500/ufc.png" alt="" onerror="this.parentNode.textContent='🥊'"></span>
+          <span class="sport-card-name">UFC</span>
+          <span class="sport-card-line">Coming soon</span>
+          <span class="sport-card-cta">Peek →</span>
+        </a>
+        <a class="sport-card" href="/soccer.html">
+          <span class="sport-card-ico"><img class="sport-card-logo" src="https://a.espncdn.com/i/teamlogos/leagues/500/mls.png" alt="" onerror="this.parentNode.textContent='⚽'"></span>
+          <span class="sport-card-name">Soccer</span>
+          <span class="sport-card-line">Coming soon</span>
+          <span class="sport-card-cta">Peek →</span>
+        </a>
+      </div>
     </div>
     <div class="home-card quicklinks-card">
       <h3>Quick links</h3>
@@ -76,44 +135,6 @@
       </div>
       <p class="ql-tap-note">Subscribe, hit the bell 🔔, for more</p>
     </div>
-    <div class="sport-grid">
-      <a class="sport-card" href="/nhl.html">
-        <span class="sport-card-ico"><img class="sport-card-logo" src="https://assets.nhle.com/logos/nhl/svg/NHL_light.svg" alt="" onerror="this.parentNode.textContent='🏒'"></span>
-        <span class="sport-card-name">Hockey</span>
-        <span class="sport-card-line" id="landNhlLine">Loading tonight's slate…</span>
-        <span class="sport-card-cta">Enter Center Ice →</span>
-      </a>
-      <a class="sport-card" href="/nba.html">
-        <span class="sport-card-ico"><img class="sport-card-logo" src="https://a.espncdn.com/i/teamlogos/leagues/500/nba.png" alt="" onerror="this.parentNode.textContent='🏀'"></span>
-        <span class="sport-card-name">Basketball</span>
-        <span class="sport-card-line" id="landNbaLine">Live scores, board &amp; standings</span>
-        <span class="sport-card-cta">Open Basketball →</span>
-      </a>
-      <a class="sport-card" href="/mlb.html">
-        <span class="sport-card-ico"><img class="sport-card-logo" src="https://a.espncdn.com/i/teamlogos/leagues/500/mlb.png" alt="" onerror="this.parentNode.textContent='⚾'"></span>
-        <span class="sport-card-name">Baseball</span>
-        <span class="sport-card-line" id="landMlbLine">Home-run probabilities</span>
-        <span class="sport-card-cta">Open Baseball →</span>
-      </a>
-      <a class="sport-card" href="/nfl.html">
-        <span class="sport-card-ico"><img class="sport-card-logo" src="https://a.espncdn.com/i/teamlogos/leagues/500/nfl.png" alt="" onerror="this.parentNode.textContent='🏈'"></span>
-        <span class="sport-card-name">Football</span>
-        <span class="sport-card-line" id="landNflLine">Scores &amp; standings</span>
-        <span class="sport-card-cta">Open Football →</span>
-      </a>
-      <a class="sport-card" href="/ufc.html">
-        <span class="sport-card-ico"><img class="sport-card-logo logo-invert" src="https://a.espncdn.com/i/teamlogos/leagues/500/ufc.png" alt="" onerror="this.parentNode.textContent='🥊'"></span>
-        <span class="sport-card-name">UFC</span>
-        <span class="sport-card-line">Coming soon</span>
-        <span class="sport-card-cta">Peek →</span>
-      </a>
-      <a class="sport-card" href="/soccer.html">
-        <span class="sport-card-ico"><img class="sport-card-logo" src="https://a.espncdn.com/i/teamlogos/leagues/500/mls.png" alt="" onerror="this.parentNode.textContent='⚽'"></span>
-        <span class="sport-card-name">Soccer</span>
-        <span class="sport-card-line">Coming soon</span>
-        <span class="sport-card-cta">Peek →</span>
-      </a>
-    </div>
     <div class="home-card contact-card" id="contactCard">
       <h3>Contact Us</h3>
       <p>Questions, feedback, or a market you want us to price next? The Bueno Sports inbox is open.</p>
@@ -143,5 +164,14 @@
 <script src="landing.js"></script>
 <script src="home-search.js"></script>
 <script src="sports-menu.js"></script>
+<script>
+document.getElementById('labsPill').addEventListener('click', function () {
+  var g = document.getElementById('labsGrid');
+  var open = g.hidden;
+  g.hidden = !open;
+  this.setAttribute('aria-expanded', open ? 'true' : 'false');
+  this.classList.toggle('open', open);
+});
+</script>
 </body>
 </html>
