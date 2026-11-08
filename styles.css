@@ -1437,3 +1437,33 @@ body.sport-glass .ls-card.heat-edge-cold, .ls-card.heat-edge-cold { border-color
 .pc-line-lab { font-weight: 700; }
 .pc-line-pct { margin-left: auto; font-weight: 800; color: var(--teal); font-variant-numeric: tabular-nums; }
 .pc-line-fair { color: var(--gold); font-weight: 700; font-variant-numeric: tabular-nums; }
+
+/* ---------- board: projection table (search, filters pill, factor columns) ---------- */
+.board-search-row { display: flex; gap: .6rem; margin-bottom: .8rem; }
+#boardSearch { flex: 1; min-width: 0; background: #101a2c; border: 1px solid var(--border); border-radius: 999px; color: var(--text); padding: .55rem 1rem; font: inherit; font-size: .95rem; }
+#boardSearch:focus { outline: 2px solid var(--teal); outline-offset: 1px; }
+.filters-pill { flex: none; background: #101a2c; border: 1px solid var(--border); border-radius: 999px; color: var(--text); font: inherit; font-size: .95rem; font-weight: 700; padding: .55rem 1rem; cursor: pointer; }
+.filters-pill:hover { border-color: var(--teal); }
+.filters-pill .fp-chev { color: var(--teal); display: inline-block; transition: transform .2s ease; }
+.filters-pill.open .fp-chev { transform: rotate(180deg); }
+.board-filters-panel { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: .9rem 1rem .2rem; margin-bottom: 1rem; }
+.board-filters-panel[hidden] { display: none; }
+.board-filters-panel .board-controls { padding-top: 0; margin-bottom: .8rem; }
+.board-filters-panel .finder { margin-bottom: .8rem; }
+#boardTable th:first-child, #boardTable td:first-child {
+  position: sticky; left: 0; z-index: 2; background: #0d1524;
+  width: var(--bnw, 190px); min-width: var(--bnw, 190px); max-width: var(--bnw, 190px);
+  box-shadow: 10px 0 14px -8px rgba(0,0,0,.85); overflow: hidden;
+}
+#boardTable th:first-child { z-index: 3; }
+#boardTable tr.scored td:first-child { background: #0e2a33; }
+#boardTable td.board-wide { width: auto; min-width: 0; max-width: none; position: static; box-shadow: none; }
+#boardTable .board-game-row td {
+  position: sticky; left: 0; width: auto; min-width: 0; max-width: none;
+  background: #131e33; color: var(--gold); font-weight: 800; font-size: .78rem; letter-spacing: .06em;
+}
+#boardTable .team-cell img { width: 24px; height: 24px; }
+#boardTable td.fac { font-weight: 700; }
+#boardTable td.fac.g { color: #57e389; }
+#boardTable td.fac.y { color: var(--gold); }
+#boardTable td.fac.r { color: #ff8a80; }

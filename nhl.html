@@ -43,18 +43,6 @@
   .table-wrap th, .table-wrap td { padding: .4rem .22rem; font-size: .78rem; }
   td .pname img.pavatar { width: 26px; height: 26px; }
   .prob-bar { min-width: 36px; }
-  /* Board: secondary rate columns live on the player card instead */
-  #boardTable th:nth-child(3), #boardTable td:nth-child(3),
-  #boardTable th:nth-child(6), #boardTable td:nth-child(6),
-  #boardTable th:nth-child(7), #boardTable td:nth-child(7) { display: none; }
-}
-@media (max-width: 540px) {
-  /* Zone is the widest luxury column — drop it before it forces a scroll */
-  #boardTable th:nth-child(9), #boardTable td:nth-child(9) { display: none; }
-}
-@media (max-width: 420px) {
-  /* Small phones: essentials only — Skater / Team / Prob / Fair */
-  #boardTable th:nth-child(8), #boardTable td:nth-child(8) { display: none; }
 }
 /* ---- Collapsible home cards (Yesterday's results, Standings): closed by default ---- */
 .card-collapse { padding: 0; }
@@ -264,6 +252,12 @@ body.sport-glass .header-toggle{width:auto;height:auto;padding:.5rem 1.05rem;bor
         <h2>Projection board</h2>
         <p class="view-sub muted">Every dressed skater, priced by the factor model.</p>
       </div>
+    </div>
+    <div class="board-search-row">
+      <input id="boardSearch" type="search" placeholder="🔍 Search players…" aria-label="Search players">
+      <button class="filters-pill" id="boardFiltersPill" type="button" aria-expanded="false" aria-controls="boardFiltersPanel">Filters <span class="fp-chev">▾</span></button>
+    </div>
+    <div class="board-filters-panel" id="boardFiltersPanel" hidden>
       <div class="board-controls">
         <label class="small muted">Sort
           <select id="sortSelect">
@@ -271,13 +265,23 @@ body.sport-glass .header-toggle{width:auto;height:auto;padding:.5rem 1.05rem;bor
             <option value="name">Name</option>
             <option value="team">Team</option>
             <option value="zone">Zone score</option>
+            <option value="game">Game</option>
+          </select>
+        </label>
+        <label class="small muted">Market
+          <select id="boardMarket">
+            <option value="anytime">Anytime goal</option>
+            <option value="brace">Brace</option>
+            <option value="first">First goal</option>
+            <option value="shots">Shots · o2.5</option>
+            <option value="assists">Assists · o0.5</option>
+            <option value="points">Points · o1.5</option>
           </select>
         </label>
         <label class="small muted">Team
           <select id="teamFilter"><option value="">All teams</option></select>
         </label>
       </div>
-    </div>
     <details class="finder" id="boardFinder">
       <summary class="finder-toggle">Find players <span class="muted small">filter by what matters</span></summary>
       <div class="finder-body">
@@ -307,18 +311,20 @@ body.sport-glass .header-toggle{width:auto;height:auto;padding:.5rem 1.05rem;bor
         </div>
       </div>
     </details>
+    </div>
     <div class="table-wrap">
       <table id="boardTable">
-        <thead><tr>
-          <th data-sort="name">Skater</th><th>Team</th><th>Pos</th>
-          <th data-sort="prob" class="num">Prob</th><th class="num">Fair</th>
-          <th class="num">G/GP</th><th class="num">SOG/GP</th>
-          <th class="num">TOI</th><th data-sort="zone" class="num">Zone</th>
+        <thead><tr id="boardHead">
+          <th>Skater</th><th>Team</th>
+          <th class="num">Prob</th><th class="num">Fair</th>
+          <th class="num">FORM<br>G/GP</th><th class="num">SHOTS<br>/GAME</th>
+          <th class="num">TALENT<br>×</th><th class="num">ICE TIME<br>×</th>
+          <th class="num">POWER PLAY<br>×</th><th class="num">VS GOALIE<br>×</th><th class="num">ZONE<br>×</th>
         </tr></thead>
         <tbody id="boardBody"></tbody>
       </table>
     </div>
-    <p class="muted small">Probabilities are model anytime-goal estimates..</p>
+    <p class="muted small">Projections only — headline probability, fair price, and the factors behind it. Line prices and probability ladders live in Markets.</p>
   </section>
 
   <section id="view-longshots" class="view">

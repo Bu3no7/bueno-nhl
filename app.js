@@ -68,6 +68,8 @@ const state = {
   bookOdds: {},       // pid -> raw book-odds input string (Ice Breaker)
   sortBy: 'prob',
   teamFilter: '',
+  boardMarket: 'anytime',
+  boardQuery: '',
   refreshTimer: null,
   parlay: [],         // {key, name, team, label, prob, fair}
 };
@@ -2026,35 +2028,137 @@ function initFinder() {
     renderBoard();
   });
 }
+/* ---------------- board: projection table for the markets ----------------
+   One table, every market. The Market dropdown switches the projection and
+   its factor breakdown (colored numbers; Prob keeps the teal heat bands);
+   Sort keeps its old job, plus Game grouping. Projections only — line
+   prices and probability ladders stay in Markets. */
+const BOARD_TIERS = { anytime: [30, 22, 15, 10], brace: [15, 11, 7, 4], first: [9, 7, 5, 3.5], shots: [62, 58, 54, 50], assists: [55, 50, 45, 40], points: [28, 24, 20, 16] };
+const BOARD_HEADLINE = { shots: 2.5, assists: 0.5, points: 1.5 };
+const BOARD_HEADS = {
+  anytime: ['FORM<br>G/GP', 'SHOTS<br>/GAME', 'TALENT<br>×', 'ICE TIME<br>×', 'POWER PLAY<br>×', 'VS GOALIE<br>×', 'ZONE<br>×'],
+  brace: ['FORM<br>G/GP', 'SHOTS<br>/GAME', 'TALENT<br>×', 'ICE TIME<br>×', 'POWER PLAY<br>×', 'VS GOALIE<br>×', 'ZONE<br>×'],
+  first: ['HIS λ<br>GOAL RATE', 'GAME λ<br>TOTAL', 'ANYTIME<br>%'],
+  shots: ['RATE<br>SOG/GM', 'LAST 5<br>SHOTS', 'ICE TIME<br>AVG'],
+  assists: ['RATE<br>AST/GM', 'LAST 5<br>ASSISTS', 'ICE TIME<br>AVG'],
+  points: ['RATE<br>PTS/GM', 'LAST 5<br>POINTS', 'ICE TIME<br>AVG'],
+};
+function boardBand(v, hi, mid) { return v >= hi ? 'g' : v >= mid ? 'y' : 'r'; }
+function boardMult(m) { return { text: '×' + (m || 1).toFixed(2), band: (m || 1) >= 1.10 ? 'g' : (m || 1) >= 0.95 ? 'y' : 'r' }; }
+function boardMarketInfo() {
+  const kind = state.boardMarket;
+  const map = new Map();
+  if (kind === 'brace') { for (const r of twoPlusProbs()) map.set(r.pid, { p: r.tpP, fair: r.tpFair }); }
+  else if (kind === 'first') { for (const r of firstGoalProbs()) map.set(r.pid, { p: r.fgP, fair: r.fgFair }); }
+  else if (BOARD_HEADLINE[kind]) {
+    for (const r of state.skaters) {
+      const e = (r.markets[kind] || []).find((x) => x.line === BOARD_HEADLINE[kind]);
+      if (e) map.set(r.pid, { p: e.over, fair: e.overFair, lam: e.lam });
+    }
+  } else { for (const r of state.skaters) map.set(r.pid, { p: r.p, fair: r.fair }); }
+  return map;
+}
+function boardCells(r, info, gameLamTotal) {
+  const kind = state.boardMarket;
+  const fac = (label) => r.factors.find((f) => f.label === label) || { mult: 1, value: '' };
+  if (kind === 'anytime' || kind === 'brace') {
+    const gpg = r.goals / Math.max(r.gp, 1);
+    const shotsReg = parseFloat(fac('Shot volume').value) || 0;
+    return [
+      { text: gpg.toFixed(2), band: boardBand(gpg, 0.55, 0.35) },
+      { text: shotsReg.toFixed(1), band: boardBand(shotsReg, 3.0, 2.2) },
+      boardMult(fac('Shooting talent').mult),
+      boardMult(fac('Ice time').mult),
+      boardMult(fac('Power play').mult),
+      boardMult(fac('Opponent goalie').mult),
+      boardMult(fac('Zone score').mult),
+    ];
+  }
+  if (kind === 'first') {
+    return [
+      { text: r.lam.toFixed(2), band: boardBand(r.lam, 0.55, 0.38) },
+      { text: gameLamTotal.toFixed(1), band: boardBand(gameLamTotal, 6.4, 5.8) },
+      { text: Math.round(r.p * 100) + '%', band: boardBand(r.p * 100, 35, 25) },
+    ];
+  }
+  const l5avg = (k) => { const l5 = r.last5 || []; return l5.length ? l5.reduce((a, x) => a + (x[k] || 0), 0) / l5.length : 0; };
+  const toi = { text: fmtToi(r.toiMin), band: boardBand(r.toiMin, 20, 17) };
+  const lam = (info.get(r.pid) || {}).lam || 0;
+  if (kind === 'shots') return [
+    { text: lam.toFixed(1), band: boardBand(lam, 3.2, 2.4) },
+    { text: l5avg('shots').toFixed(1), band: boardBand(l5avg('shots'), 3.5, 2.5) }, toi];
+  if (kind === 'assists') return [
+    { text: lam.toFixed(2), band: boardBand(lam, 0.55, 0.38) },
+    { text: l5avg('assists').toFixed(1), band: boardBand(l5avg('assists'), 0.8, 0.4) }, toi];
+  return [
+    { text: lam.toFixed(2), band: boardBand(lam, 0.95, 0.65) },
+    { text: l5avg('points').toFixed(1), band: boardBand(l5avg('points'), 1.2, 0.6) }, toi];
+}
 function renderBoard() {
   initFinder();
   const tb = $('boardBody');
+  const head = $('boardHead');
+  const kind = state.boardMarket;
+  const tiers = BOARD_TIERS[kind] || BOARD_TIERS.anytime;
+  const info = boardMarketInfo();
+  const gameLam = {};
+  for (const r of state.skaters) gameLam[r.gameId] = (gameLam[r.gameId] || 0) + Math.max(r.lam, 0);
+  const gameOrder = {};
+  state.games.forEach((g, i) => { gameOrder[g.id] = i; });
   const scorerByGame = {};
   for (const g of state.games) scorerByGame[g.id] = scorerCounts(g);
-  tb.innerHTML = sortedSkaters().map((r) => {
+
+  let rows = sortedSkaters();
+  if (state.boardQuery) rows = rows.filter((r) => r.name.toLowerCase().includes(state.boardQuery));
+  const bp = (r) => (info.get(r.pid) || { p: 0 }).p || 0;
+  if (state.sortBy === 'prob') rows.sort((a, b) => bp(b) - bp(a));
+  if (state.sortBy === 'game') rows.sort((a, b) => ((gameOrder[a.gameId] ?? 99) - (gameOrder[b.gameId] ?? 99)) || (bp(b) - bp(a)));
+
+  if (head) head.innerHTML = '<th>Skater</th><th>Team</th><th class="num">Prob</th><th class="num">Fair</th>' +
+    (BOARD_HEADS[kind] || BOARD_HEADS.anytime).map((h) => `<th class="num">${h}</th>`).join('');
+
+  const tbl = $('boardTable');
+  if (tbl && state.skaters.length) {
+    const longest = Math.max(...state.skaters.map((r) => r.name.length));
+    tbl.style.setProperty('--bnw', (30 + 8 + 20 + Math.ceil(longest * 7.9) + 26) + 'px');
+  }
+
+  if (!rows.length) {
+    tb.innerHTML = '<tr><td colspan="12" class="board-wide muted">No skaters match.</td></tr>';
+    return;
+  }
+  let html = '';
+  let lastGame = null;
+  for (const r of rows) {
+    if (state.sortBy === 'game' && r.gameId !== lastGame) {
+      lastGame = r.gameId;
+      const g = state.games.find((x) => x.id === r.gameId);
+      if (g) {
+        const t = g.startTimeUTC ? new Date(g.startTimeUTC).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) : '';
+        html += `<tr class="board-game-row"><td colspan="12">${esc(g.awayTeam.abbrev)} @ ${esc(g.homeTeam.abbrev)}${t ? ' · ' + esc(t) : ''}</td></tr>`;
+      }
+    }
     const ng = (scorerByGame[r.gameId] || {})[r.pid] || 0;
     const badge = ng ? `<span class="goal-badge">${ng > 1 ? ng + 'G' : 'GOAL'}</span>` : '';
-    const pct = r.p * 100;
-    const heat = pct >= 30 ? 'h5' : pct >= 22 ? 'h4' : pct >= 15 ? 'h3' : pct >= 10 ? 'h2' : 'h1';
     const fitBadge = state.sortBy === 'fit' && r._fit != null ? `<span class="fit-badge">${Math.round(r._fit * 100)}</span>` : '';
-    // hot/cold: goals in last 5 games
     const l5g = (r.last5 || []).slice(0, 5).reduce((a, x) => a + (x.goals || 0), 0);
     const streak = l5g >= 3 ? `<span class="streak hot" title="${l5g} goals in last 5">🔥</span>`
       : l5g <= 1 && (r.last5 || []).length >= 3 ? `<span class="streak cold" title="${l5g} goals in last 5">❄️</span>` : '';
-    return `
+    const p = bp(r);
+    const fair = (info.get(r.pid) || {}).fair || '–';
+    const pct = p * 100;
+    const heat = pct >= tiers[0] ? 'h5' : pct >= tiers[1] ? 'h4' : pct >= tiers[2] ? 'h3' : pct >= tiers[3] ? 'h2' : 'h1';
+    const cells = boardCells(r, info, gameLam[r.gameId] || 0).map((c) => `<td class="num fac ${c.band}">${c.text}</td>`).join('');
+    html += `
     <tr${ng ? ' class="scored"' : ''}>
-      <td>${pnameBtn(r)}${badge}${fitBadge}${streak}
-        <div class="prob-bar"><i style="width:${Math.min(100, r.p * 100 * 2.5)}%"></i></div></td>
-      <td><span class="team-cell"><img src="${teamLogoUrl(r.team)}" alt="" ${imgFallback}>${esc(r.team)}</span></td>
-      <td>${esc(r.pos)}</td>
-      <td class="num heat ${heat}"><strong>${pct1(r.p)}</strong></td>
-      <td class="num">${r.fair}</td>
-      <td class="num">${(r.goals / Math.max(r.gp, 1)).toFixed(2)}</td>
-      <td class="num">${r.gp ? r.sogpg.toFixed(1) : '–'}</td>
-      <td class="num">${fmtToi(r.toiMin)}</td>
-      <td class="num">${Math.round(r.zone.share * 100)}${r.zone.lowSample ? '*' : ''}</td>
+      <td>${pnameBtn(r)}${badge}${fitBadge}${streak}</td>
+      <td><span class="team-cell"><img src="${teamLogoUrl(r.team)}" alt="${esc(r.team)}" ${imgFallback}></span></td>
+      <td class="num heat ${heat}"><strong>${pct1(p)}</strong></td>
+      <td class="num">${fair}</td>
+      ${cells}
     </tr>`;
-  }).join('');
+  }
+  tb.innerHTML = html;
   tb.querySelectorAll('.pname').forEach((b) =>
     b.addEventListener('click', () => openPlayer(b.dataset.pid, b.dataset.gid)));
 }
@@ -3595,6 +3699,15 @@ document.addEventListener('keydown', (e) => {
 // Center Ice is the default section on boot (site home lives on index.html)
 state.section = 'home';
 $('sortSelect').addEventListener('change', (e) => { state.sortBy = e.target.value; renderBoard(); });
+if ($('boardMarket')) $('boardMarket').addEventListener('change', (e) => { state.boardMarket = e.target.value; renderBoard(); });
+if ($('boardSearch')) $('boardSearch').addEventListener('input', (e) => { state.boardQuery = e.target.value.trim().toLowerCase(); renderBoard(); });
+if ($('boardFiltersPill')) $('boardFiltersPill').addEventListener('click', () => {
+  const panel = $('boardFiltersPanel');
+  const open = panel.hidden;
+  panel.hidden = !open;
+  $('boardFiltersPill').setAttribute('aria-expanded', open ? 'true' : 'false');
+  $('boardFiltersPill').classList.toggle('open', open);
+});
 // Markets goal filters: live search + game dropdown (persist across market switches)
 const goalSearchInput = $('goalSearchInput');
 if (goalSearchInput) goalSearchInput.addEventListener('input', (e) => { state.goalSearch = e.target.value; renderGoalProbs(); });
