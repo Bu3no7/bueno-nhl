@@ -976,6 +976,7 @@ function fetchESPN(){
   fetch("https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?week=9&seasontype=2&dates=2026").then(function(r){ return r.json(); }).then(function(d){
     parseScoreboard(d);
     renderSlate(); renderLiveNow();
+    stkRender();
     var inGames = B.games.filter(function(g){ return LIVE[g.espnId] && LIVE[g.espnId].state!=="pre"; });
     inGames.forEach(function(g){
       fetch("https://site.api.espn.com/apis/site/v2/sports/football/nfl/summary?event="+g.espnId).then(function(r){ return r.json(); }).then(function(sd){
@@ -1023,6 +1024,175 @@ document.addEventListener("click", function(e){
   var gEl = e.target.closest("[data-game]");
   if(gEl){ renderGame(gEl.getAttribute("data-game")); }
 });
+
+/* ---------- score ticker: top row of the bottom nav. Scores from LIVE +
+   the bundle, slate from the bundle, leaders + injuries from ESPN.
+   Game chips carry data-game, so the page's own click router opens them. */
+var STK = { leaders: null, injuries: null, lastHtml: "" };
+var STK_NAMES = { ARI:"Arizona", ATL:"Atlanta", BAL:"Baltimore", BUF:"Buffalo", CAR:"Carolina", CHI:"Chicago", CIN:"Cincinnati", CLE:"Cleveland", DAL:"Dallas", DEN:"Denver", DET:"Detroit", GB:"Green Bay", HOU:"Houston", IND:"Indianapolis", JAX:"Jacksonville", KC:"Kansas City", LAC:"LA Chargers", LAR:"LA Rams", LV:"Las Vegas", MIA:"Miami", MIN:"Minnesota", NE:"New England", NO:"New Orleans", NYG:"NY Giants", NYJ:"NY Jets", PHI:"Philadelphia", PIT:"Pittsburgh", SEA:"Seattle", SF:"San Francisco", TB:"Tampa Bay", TEN:"Tennessee", WSH:"Washington" };
+function stkEsc(s){ return String(s == null ? "" : s).replace(/[&<>"]/g, function(c){ return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+function stkLogo(abbr, cls){ return '<img class="stk-logo ' + (cls || "") + '" src="https://a.espncdn.com/i/teamlogos/nfl/500/' + logoFile(abbr) + '.png" alt="">'; }
+function stkLast(name){ return String(name || "").split(" ").pop(); }
+(function(){
+  var css = "nav.bottom{flex-wrap:wrap}"
+    + ".stk-ticker{flex:0 0 100%;overflow:hidden;white-space:nowrap;position:relative;background:linear-gradient(180deg,rgba(10,20,40,.88),rgba(5,9,18,.94));border-bottom:1px solid rgba(165,195,255,.14);margin:-8px -6px 6px;padding:0 6px}"
+    + ".stk-track{display:inline-flex;align-items:center;padding:.42rem 0;animation:stk-scroll 40s linear infinite;will-change:transform}"
+    + ".stk-ticker.stk-paused .stk-track{animation-play-state:paused}"
+    + "@keyframes stk-scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}"
+    + "@media (prefers-reduced-motion: reduce){.stk-track{animation:none}.stk-ticker{overflow-x:auto}}"
+    + ".stk-seg{font-size:.6rem;font-weight:800;letter-spacing:.16em;color:#e8b64c;padding:0 .55rem 0 .8rem;text-transform:uppercase}"
+    + ".stk-seg.inj{color:#f0665e}.stk-seg.news{color:#9fc2ff}"
+    + ".stk-chip{display:inline-flex;align-items:center;gap:.34rem;font-size:.82rem;font-weight:600;padding:0 .8rem;border:none;border-right:1px solid rgba(165,195,255,.14);color:#eef3f9;background:none;font-family:inherit;cursor:pointer}"
+    + "span.stk-chip{cursor:default}"
+    + ".stk-logo{width:19px;height:19px;object-fit:contain}.stk-logo.sm{width:15px;height:15px}"
+    + ".stk-sc{font-weight:800;font-variant-numeric:tabular-nums;margin-right:.18rem}"
+    + ".stk-vs{color:#8b96ab;font-size:.7rem;font-weight:700}"
+    + ".stk-st{font-size:.62rem;font-weight:700;letter-spacing:.08em;color:#8b96ab;text-transform:uppercase;margin-left:.25rem}"
+    + ".stk-clock{color:#3adbe3;font-size:.68rem;font-weight:700;font-variant-numeric:tabular-nums;margin-left:.25rem}"
+    + ".stk-stat{color:#3adbe3;font-weight:800}.stk-who{color:#e8effa;font-weight:700}"
+    + ".stk-time{color:#8b96ab;font-size:.72rem;font-weight:700;margin-left:.25rem}"
+    + ".stk-dot{width:7px;height:7px;border-radius:50%;background:#f0665e;box-shadow:0 0 8px #f0665e;animation:stk-pulse 1.4s ease-in-out infinite}"
+    + "@keyframes stk-pulse{0%,100%{opacity:1}50%{opacity:.35}}"
+    + ".stk-cross{color:#fff;background:#f0665e;border-radius:4px;font-size:.62rem;font-weight:900;width:14px;height:14px;display:inline-flex;align-items:center;justify-content:center;line-height:1}"
+    + ".stk-tag{font-size:.62rem;font-weight:800;letter-spacing:.06em;padding:.08rem .34rem;border-radius:5px;text-transform:uppercase}"
+    + ".stk-tag.out{color:#ffb3ad;background:rgba(240,102,94,.18);border:1px solid rgba(240,102,94,.45)}"
+    + ".stk-tag.q{color:#ffd9a3;background:rgba(255,180,84,.14);border:1px solid rgba(255,180,84,.4)}"
+    + ".stk-headline{font-weight:600;color:#d9e6f7;font-size:.8rem}.stk-headline b{color:#fff}";
+  var st = document.createElement("style"); st.textContent = css; document.head.appendChild(st);
+})();
+function stkGameChip(g){
+  var lv = LIVE[g.espnId];
+  var state = lv ? lv.state : "pre";
+  var btn = function(inner){ return '<button class="stk-chip" data-game="' + slug(g.key) + '" type="button">' + inner + '</button>'; };
+  if (state === "in") {
+    return btn('<span class="stk-dot"></span>' + stkLogo(g.away) + '<span class="stk-sc">' + lv.awayScore + '</span><span class="stk-vs">@</span>' + stkLogo(g.home) + '<span class="stk-sc">' + lv.homeScore + '</span><span class="stk-clock">' + stkEsc(lv.clock || lv.statusText || "") + '</span>');
+  }
+  if (state === "post") {
+    return btn(stkLogo(g.away) + '<span class="stk-sc">' + lv.awayScore + '</span><span class="stk-vs">@</span>' + stkLogo(g.home) + '<span class="stk-sc">' + lv.homeScore + '</span><span class="stk-st">' + stkEsc(lv.statusText || "Final") + '</span>');
+  }
+  return btn(stkLogo(g.away) + '<span class="stk-vs">@</span>' + stkLogo(g.home) + '<span class="stk-time">' + stkEsc(fmtKick(g.kickoff)) + '</span>');
+}
+function stkNews(){
+  var out = [];
+  (B.games || []).forEach(function(g){
+    var lv = LIVE[g.espnId];
+    if (!lv || lv.state !== "post") return;
+    var w = lv.awayScore > lv.homeScore ? g.away : g.home;
+    var l = lv.awayScore > lv.homeScore ? g.home : g.away;
+    var ws = Math.max(lv.awayScore, lv.homeScore), ls = Math.min(lv.awayScore, lv.homeScore);
+    if (/OT/i.test(lv.statusText || "")) out.push("<b>" + stkEsc(STK_NAMES[w] || w) + "</b> edge " + stkEsc(STK_NAMES[l] || l) + " " + ws + "\u2013" + ls + " in overtime");
+    else if (ws - ls >= 17) out.push("<b>" + stkEsc(STK_NAMES[w] || w) + "</b> rout " + stkEsc(STK_NAMES[l] || l) + " " + ws + "\u2013" + ls);
+  });
+  if (STK.leaders && STK.leaders.pass) {
+    out.push("<b>" + stkEsc(stkLast(STK.leaders.pass.name)) + "</b> leads the NFL with " + stkEsc(STK.leaders.pass.value) + " passing yards");
+  }
+  return out.slice(0, 4);
+}
+function stkBuildHtml(){
+  if (!B || !B.games) return "";
+  var h = "";
+  var games = B.games.slice().sort(function(a, b){ return String(a.kickoff) < String(b.kickoff) ? -1 : 1; });
+  var played = games.filter(function(g){ var lv = LIVE[g.espnId]; return lv && lv.state !== "pre"; });
+  var liveFirst = played.filter(function(g){ return LIVE[g.espnId].state === "in"; })
+    .concat(played.filter(function(g){ return LIVE[g.espnId].state === "post"; }));
+  var upcoming = games.filter(function(g){ var lv = LIVE[g.espnId]; return !lv || lv.state === "pre"; });
+  if (liveFirst.length) h += '<span class="stk-seg">Scores</span>' + liveFirst.map(stkGameChip).join("");
+  if (upcoming.length) h += '<span class="stk-seg">Slate</span>' + upcoming.map(stkGameChip).join("");
+  if (STK.leaders) {
+    var chips = [];
+    [["pass", "PASS YDS"], ["rush", "RUSH YDS"], ["rec", "REC YDS"]].forEach(function(pair){
+      var p = STK.leaders[pair[0]];
+      if (!p || !p.name) return;
+      chips.push('<span class="stk-chip">' + (p.abbr ? stkLogo(p.abbr, "sm") : "") + '<span class="stk-who">' + stkEsc(stkLast(p.name)) + '</span><span class="stk-stat">' + stkEsc(p.value) + " " + pair[1] + "</span></span>");
+    });
+    if (chips.length) h += '<span class="stk-seg">Leaders</span>' + chips.join("");
+  }
+  if (STK.injuries && STK.injuries.length) {
+    h += '<span class="stk-seg inj">Injuries</span>' + STK.injuries.map(function(p){
+      var isOut = /out|injured reserve/i.test(p.status);
+      return '<span class="stk-chip"><span class="stk-cross">+</span>' + (p.abbr ? stkLogo(p.abbr, "sm") : "") + '<span class="stk-who">' + stkEsc(stkLast(p.name)) + '</span><span class="stk-tag ' + (isOut ? "out" : "q") + '">' + (isOut ? "Out" : "Quest") + "</span></span>";
+    }).join("");
+  }
+  var news = stkNews();
+  if (news.length) h += '<span class="stk-seg news">News</span>' + news.map(function(n){ return '<span class="stk-chip stk-headline">' + n + "</span>"; }).join("");
+  return h;
+}
+function stkRender(){
+  var nav = document.querySelector("nav.bottom");
+  if (!nav) return;
+  var tk = document.getElementById("stkTicker");
+  if (!tk) {
+    tk = document.createElement("div");
+    tk.className = "stk-ticker"; tk.id = "stkTicker";
+    nav.insertBefore(tk, nav.firstChild);
+    tk.addEventListener("touchstart", function(){ tk.classList.add("stk-paused"); setTimeout(function(){ tk.classList.remove("stk-paused"); }, 4000); }, { passive: true });
+    document.body.style.paddingBottom = (parseFloat(getComputedStyle(document.body).paddingBottom || 0) + 38) + "px";
+  }
+  var half0 = stkBuildHtml();
+  if (!half0) { tk.style.display = "none"; return; }
+  tk.style.display = "";
+  if (half0 === STK.lastHtml) return;
+  STK.lastHtml = half0;
+  tk.innerHTML = '<div class="stk-track">' + half0 + "</div>";
+  var track = tk.firstElementChild;
+  var reps = 1;
+  while (track.scrollWidth < window.innerWidth * 2 && reps < 6) { track.innerHTML += half0; reps++; }
+  var half = track.innerHTML;
+  track.innerHTML = half + half;
+  var w = track.scrollWidth / 2;
+  track.style.animationDuration = Math.max(18, Math.round(w / 55)) + "s";
+}
+function stkLoadExtras(){
+  var CORE = "https://sports.core.api.espn.com/v2/sports/football/leagues/nfl";
+  var SITE = "https://site.api.espn.com/apis/site/v2/sports/football/nfl";
+  var getJ = function(u){ return fetch(u).then(function(r){ if (!r.ok) throw new Error(r.status); return r.json(); }); };
+  var teamAbbr = {};
+  getJ(SITE + "/teams").then(function(d){
+    var arr = (d.sports && d.sports[0] && d.sports[0].leagues && d.sports[0].leagues[0].teams) || d.teams || [];
+    arr.forEach(function(t){ var tm = t.team || t; if (tm.id) teamAbbr[String(tm.id)] = tm.abbreviation; });
+  }).catch(function(){}).then(function(){
+    return getJ(CORE + "/seasons/2026/types/2/leaders?lang=en&region=us").then(function(d){
+      var cats = d.categories || [];
+      var out = {};
+      [["passingYards", "pass"], ["rushingYards", "rush"], ["receivingYards", "rec"]].forEach(function(pair){
+        var c = null;
+        cats.forEach(function(x){ if (x.name === pair[0]) c = x; });
+        var L = c && c.leaders && c.leaders[0];
+        if (L) out[pair[1]] = { value: L.displayValue, ref: String((L.athlete || {}).$ref || "").replace("http://", "https://"), name: "", abbr: "" };
+      });
+      var jobs = Object.keys(out).map(function(k){
+        if (!out[k].ref) return Promise.resolve();
+        return getJ(out[k].ref).then(function(a){
+          out[k].name = a.displayName || "";
+          var tref = a.team && a.team.$ref ? String(a.team.$ref).split("/").pop().split("?")[0] : "";
+          out[k].abbr = teamAbbr[String(tref)] || "";
+        }).catch(function(){});
+      });
+      return Promise.all(jobs).then(function(){ STK.leaders = out; stkRender(); });
+    }).catch(function(){ STK.leaders = {}; });
+  });
+  getJ(SITE + "/injuries").then(function(d){
+    var relAbbr = {};
+    (B.games || []).forEach(function(g){ relAbbr[g.away] = 1; relAbbr[g.home] = 1; });
+    var out = [];
+    (d.injuries || []).forEach(function(t){
+      if (out.length >= 6) return;
+      var city = String(t.displayName || "");
+      var abbr = "";
+      Object.keys(STK_NAMES).forEach(function(k){ if (city.indexOf(STK_NAMES[k]) === 0) abbr = abbr ? "?" : k; });
+      if (!abbr || abbr === "?" || !relAbbr[abbr]) return;
+      (t.injuries || []).forEach(function(inj){
+        if (out.length >= 6) return;
+        var st = String(inj.status || "");
+        if (!/out|questionable|doubtful|injured reserve/i.test(st)) return;
+        var nm = (inj.athlete || {}).displayName || "";
+        if (nm) out.push({ name: nm, status: st, abbr: abbr === "?" ? "" : abbr });
+      });
+    });
+    STK.injuries = out;
+    stkRender();
+  }).catch(function(){ STK.injuries = []; });
+}
 fetch("data/nfl-2026-w10.json").then(function(r){ return r.json(); }).then(function(bundle){
   B = bundle;
   buildObjects();
@@ -1031,6 +1201,7 @@ fetch("data/nfl-2026-w10.json").then(function(r){ return r.json(); }).then(funct
   renderSlate();
   renderStandings();
   show("view-football");
+  stkRender(); stkLoadExtras();
   fetchESPN();
   loadWeather();
   setInterval(fetchESPN, 60000);

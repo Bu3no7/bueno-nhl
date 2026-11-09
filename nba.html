@@ -608,10 +608,6 @@ body.sport-glass .pc-overlay,body.sport-glass .gm-overlay{background:rgba(2,5,10
     <div class="ci-results" id="nbaSearchResults"></div>
   </div>
   <div class="home-grid">
-    <details class="home-card fb-collapse" id="nbaGamesCard">
-      <summary class="fb-sec-title">Tonight <span class="sub" id="nbaDateLabel"></span> <span class="sub" id="nbaTonightHint"></span></summary>
-      <div id="nbaGamesBody"><p class="muted">Loading…</p></div>
-    </details>
     <div class="home-card" id="nbaTopPicksCard">
       <h3 class="fb-sec-title">Top Picks <span class="sub">tonight's projections</span></h3>
       <select id="nbaTpSelect" aria-label="Choose a stat">
@@ -883,6 +879,7 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
         hintEl.textContent = '· ' + tonightGames.length + ' games' + (live ? ' · ' + live + ' live' : '') + (fin ? ' · ' + fin + ' final' : '');
       }
     }
+    if (!gamesEl) { try { stkRender(); } catch (e) {} return; }
     if (!tonightGames.length) { empty(gamesEl, 'No NBA games today.'); return; }
     const gteam = (t, right) =>
       '<div class="fb-gteam' + (right ? ' right' : '') + '">' +
@@ -2079,6 +2076,174 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
       injuryByPid = out;
     } catch (e) { /* filter toggle simply has nothing to hide */ }
   }
+
+  /* ---- Score ticker: pinned as the top row of the bottom nav; replaces
+     the old Tonight board. Scores from tonightGames, next slate + leaders +
+     injuries from ESPN. Game chips open the game sheet. ---- */
+  var stk = { tomorrow: null, leaders: null, injuries: null, teamAbbr: {}, lastHtml: '' };
+  function stkLogo(abbr, cls) {
+    return '<img class="stk-logo ' + (cls || '') + '" src="' + logoUrl(abbr) + '" alt="" onerror="this.style.display=\'none\'">';
+  }
+  function stkLast(name) { return String(name || '').split(' ').pop(); }
+  function stkGameChip(g) {
+    const played = g.state !== 'pre';
+    const logos = stkLogo(g.away.abbr) + '<span class="stk-sc">' + (played ? esc(g.away.score || '0') : '') + '</span><span class="stk-vs">@</span>' +
+      stkLogo(g.home.abbr) + '<span class="stk-sc">' + (played ? esc(g.home.score || '0') : '') + '</span>';
+    if (g.state === 'in') return '<button class="stk-chip" data-gid="' + g.id + '" type="button"><span class="stk-dot"></span>' + logos + '<span class="stk-clock">' + esc(g.detail) + '</span></button>';
+    if (g.state === 'post') return '<button class="stk-chip" data-gid="' + g.id + '" type="button">' + logos + '<span class="stk-st">' + esc(g.detail || 'Final') + '</span></button>';
+    const t = new Date(g.start).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+    return '<button class="stk-chip" data-gid="' + g.id + '" type="button">' + stkLogo(g.away.abbr) + '<span class="stk-vs">@</span>' + stkLogo(g.home.abbr) + '<span class="stk-time">' + esc(t) + '</span></button>';
+  }
+  function stkNews() {
+    const out = [];
+    for (const g of tonightGames) {
+      if (g.state !== 'post') continue;
+      const as = +g.away.score, hs = +g.home.score;
+      if (!as && !hs) continue;
+      const w = as > hs ? g.away : g.home, l = as > hs ? g.home : g.away;
+      const ws = Math.max(as, hs), ls = Math.min(as, hs);
+      if (/OT/i.test(g.detail || '')) out.push('<b>' + esc(w.name) + '</b> edge ' + esc(l.name) + ' ' + ws + '\u2013' + ls + ' in overtime');
+      else if (ws - ls >= 20) out.push('<b>' + esc(w.name) + '</b> rout ' + esc(l.name) + ' ' + ws + '\u2013' + ls);
+      else if (ws - ls <= 3) out.push('<b>' + esc(w.name) + '</b> hold off ' + esc(l.name) + ' ' + ws + '\u2013' + ls);
+    }
+    if (stk.leaders && stk.leaders[0] && stk.leaders[0].name) {
+      out.push('<b>' + esc(stkLast(stk.leaders[0].name)) + '</b> leads the NBA at ' + esc(stk.leaders[0].value) + ' points per game');
+    }
+    return out.slice(0, 4);
+  }
+  function stkBuildHtml() {
+    let h = '';
+    const live = [], fin = [], pre = [];
+    for (const g of tonightGames) {
+      if (g.state === 'in') live.push(g);
+      else if (g.state === 'post') fin.push(g);
+      else pre.push(g);
+    }
+    const ordered = [...live, ...fin, ...pre];
+    if (ordered.length) h += '<span class="stk-seg">Scores</span>' + ordered.map(stkGameChip).join('');
+    if (stk.tomorrow && stk.tomorrow.length) {
+      h += '<span class="stk-seg">Tomorrow</span>' + stk.tomorrow.map((g) => {
+        const t = new Date(g.start).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+        return '<span class="stk-chip">' + stkLogo(g.away.abbr) + '<span class="stk-vs">@</span>' + stkLogo(g.home.abbr) + '<span class="stk-time">' + esc(t) + '</span></span>';
+      }).join('');
+    }
+    if (stk.leaders && stk.leaders.length) {
+      h += '<span class="stk-seg">Leaders</span>' + stk.leaders.map((p) =>
+        '<span class="stk-chip">' + (p.abbr ? stkLogo(p.abbr, 'sm') : '') + '<span class="stk-who">' + esc(stkLast(p.name)) + '</span><span class="stk-stat">' + esc(p.value) + ' ' + p.unit + '</span></span>').join('');
+    }
+    if (stk.injuries && stk.injuries.length) {
+      h += '<span class="stk-seg inj">Injuries</span>' + stk.injuries.map((p) => {
+        const isOut = /out/i.test(p.status);
+        return '<span class="stk-chip"><span class="stk-cross">+</span>' + (p.abbr ? stkLogo(p.abbr, 'sm') : '') + '<span class="stk-who">' + esc(stkLast(p.name)) + '</span><span class="stk-tag ' + (isOut ? 'out' : 'q') + '">' + (isOut ? 'Out' : 'Quest') + '</span></span>';
+      }).join('');
+    }
+    const news = stkNews();
+    if (news.length) h += '<span class="stk-seg news">News</span>' + news.map((n) => '<span class="stk-chip stk-headline">' + n + '</span>').join('');
+    return h;
+  }
+  function stkRender() {
+    const nav = document.querySelector('.bottom-nav');
+    if (!nav) return;
+    let tk = document.getElementById('stkTicker');
+    if (!tk) {
+      tk = document.createElement('div');
+      tk.className = 'stk-ticker';
+      tk.id = 'stkTicker';
+      nav.insertBefore(tk, nav.firstChild);
+      tk.addEventListener('click', (e) => {
+        const b = e.target.closest('[data-gid]');
+        if (b) openGame(b.dataset.gid);
+      });
+      tk.addEventListener('touchstart', () => {
+        tk.classList.add('stk-paused');
+        setTimeout(() => tk.classList.remove('stk-paused'), 4000);
+      }, { passive: true });
+      document.body.style.paddingBottom = (parseFloat(getComputedStyle(document.body).paddingBottom || 0) + 38) + 'px';
+    }
+    const half0 = stkBuildHtml();
+    if (!half0) { tk.style.display = 'none'; return; }
+    tk.style.display = '';
+    if (half0 === stk.lastHtml) return;
+    stk.lastHtml = half0;
+    tk.innerHTML = '<div class="stk-track">' + half0 + '</div>';
+    const track = tk.firstElementChild;
+    let reps = 1;
+    while (track.scrollWidth < window.innerWidth * 2 && reps < 6) { track.innerHTML += half0; reps++; }
+    const half = track.innerHTML;
+    track.innerHTML = half + half;
+    const w = track.scrollWidth / 2;
+    track.style.animationDuration = Math.max(18, Math.round(w / 55)) + 's';
+  }
+  async function stkLoadExtras() {
+    try {
+      const teams = await getJSON(API + '/teams');
+      for (const t of teams.sports ? (teams.sports[0].leagues[0].teams || []) : (teams.teams || [])) {
+        const tm = t.team || t;
+        if (tm.id) stk.teamAbbr[String(tm.id)] = tm.abbreviation;
+      }
+    } catch (e) { /* leader logos simply hide */ }
+    try {
+      const t = new Date(Date.now() + 864e5);
+      const ymd2 = '' + t.getFullYear() + String(t.getMonth() + 1).padStart(2, '0') + String(t.getDate()).padStart(2, '0');
+      const sb = await getJSON(API + '/scoreboard?dates=' + ymd2);
+      stk.tomorrow = (sb.events || []).map((ev) => {
+        const comp = (ev.competitions || [])[0] || {};
+        const cs = comp.competitors || [];
+        const by = (ha) => { const c = cs.find((x) => x.homeAway === ha) || {}; const tm = c.team || {}; return { abbr: tm.abbreviation, name: tm.displayName }; };
+        return { start: ev.date, away: by('away'), home: by('home') };
+      });
+    } catch (e) { stk.tomorrow = []; }
+    try {
+      const now = new Date();
+      const yr = now.getMonth() >= 9 ? now.getFullYear() + 1 : now.getFullYear();
+      const d = await getJSON(CORE + '/seasons/' + yr + '/types/2/leaders?lang=en&region=us');
+      const cats = d.categories || [];
+      const out = [];
+      for (const [cn, unit] of [['pointsPerGame', 'PPG'], ['reboundsPerGame', 'RPG'], ['assistsPerGame', 'APG']]) {
+        const c = cats.find((x) => x.name === cn);
+        const L = c && c.leaders && c.leaders[0];
+        if (!L) continue;
+        let name = '', abbr = '';
+        try {
+          const ref = String((L.athlete || {}).$ref || '').replace('http://', 'https://');
+          if (ref) {
+            const a = await getJSON(ref);
+            name = a.displayName || '';
+            const tref = a.team && a.team.$ref ? String(a.team.$ref).split('/').pop().split('?')[0] : '';
+            abbr = stk.teamAbbr[String(tref)] || '';
+          }
+        } catch (e) { /* name falls back to blank; chip hides below */ }
+        if (name) out.push({ name, value: L.displayValue, unit, abbr });
+      }
+      stk.leaders = out;
+    } catch (e) { stk.leaders = []; }
+    try {
+      const d = await getJSON(API + '/injuries');
+      const rel = new Set();
+      for (const g of tonightGames) { rel.add(g.home.name); rel.add(g.away.name); }
+      if (stk.tomorrow) for (const g of stk.tomorrow) { rel.add(g.home.name); rel.add(g.away.name); }
+      const abbrByName = {};
+      for (const g of tonightGames) { abbrByName[g.home.name] = g.home.abbr; abbrByName[g.away.name] = g.away.abbr; }
+      if (stk.tomorrow) for (const g of stk.tomorrow) { abbrByName[g.home.name] = g.home.abbr; abbrByName[g.away.name] = g.away.abbr; }
+      const out = [];
+      for (const t of d.injuries || []) {
+        if (rel.size && !rel.has(t.displayName)) continue;
+        for (const inj of t.injuries || []) {
+          const st = String(inj.status || '');
+          if (!/out|questionable|doubtful/i.test(st)) continue;
+          const nm = (inj.athlete || {}).displayName || '';
+          if (!nm) continue;
+          out.push({ name: nm, status: st, abbr: abbrByName[t.displayName] || '' });
+          if (out.length >= 6) break;
+        }
+        if (out.length >= 6) break;
+      }
+      stk.injuries = out;
+    } catch (e) { stk.injuries = []; }
+    stkRender();
+  }
+  stkRender();
+  stkLoadExtras();
 
   /* ================= Parlay builder ================= */
   let parlayLegs = (() => {

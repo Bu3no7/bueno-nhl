@@ -164,5 +164,138 @@ document.querySelectorAll('#view-lab .tab').forEach(t => t.addEventListener('cli
 })();
 </script>
 <script src="sports-menu.js"></script>
+<script>
+/* ---- Score ticker: top row of the bottom nav (Baseball has no Tonight
+   board to replace — the ticker is an addition). Scores + slate from the
+   MLB Stats API, leaders from the same API. Off-season it shows leaders
+   only; with no data at all it hides. ---- */
+(function () {
+  var API = 'https://statsapi.mlb.com/api/v1';
+  var stk = { games: [], tomorrow: null, leaders: null, lastHtml: '' };
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function logo(id, cls) { return '<img class="stk-logo ' + (cls || '') + '" src="https://www.mlbstatic.com/team-logos/' + id + '.svg" alt="" onerror="this.style.display=\'none\'">'; }
+  function last(name) { return String(name || '').split(' ').pop(); }
+  function getJ(u) { return fetch(u).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }); }
+  function fmtDate(d) { return (d.getMonth() + 1) + '/' + d.getDate() + '/' + d.getFullYear(); }
+  function parseGames(d) {
+    var dates = (d && d.dates) || [];
+    var games = (dates[0] && dates[0].games) || [];
+    return games.map(function (g) {
+      var st = g.status || {};
+      var ls = g.linescore || {};
+      return {
+        state: st.abstractGameState || 'Preview',
+        detail: st.detailedState || '',
+        start: g.gameDate,
+        away: { id: (g.teams.away.team || {}).id, name: (g.teams.away.team || {}).name || '', score: g.teams.away.score },
+        home: { id: (g.teams.home.team || {}).id, name: (g.teams.home.team || {}).name || '', score: g.teams.home.score },
+        inning: ls.currentInningOrdinal ? ((ls.inningState || '') + ' ' + ls.currentInningOrdinal) : '',
+        innings: (ls.innings || []).length,
+      };
+    });
+  }
+  function chip(g) {
+    var played = g.state !== 'Preview';
+    var logos = logo(g.away.id) + '<span class="stk-sc">' + (played && g.away.score != null ? g.away.score : '') + '</span><span class="stk-vs">@</span>' +
+      logo(g.home.id) + '<span class="stk-sc">' + (played && g.home.score != null ? g.home.score : '') + '</span>';
+    if (g.state === 'Live') return '<span class="stk-chip"><span class="stk-dot"></span>' + logos + '<span class="stk-clock">' + esc(g.inning || g.detail) + '</span></span>';
+    if (g.state === 'Final') return '<span class="stk-chip">' + logos + '<span class="stk-st">Final' + (g.innings > 9 ? ' · ' + g.innings : '') + '</span></span>';
+    var t = new Date(g.start).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+    return '<span class="stk-chip">' + logo(g.away.id) + '<span class="stk-vs">@</span>' + logo(g.home.id) + '<span class="stk-time">' + esc(t) + '</span></span>';
+  }
+  function news() {
+    var out = [];
+    stk.games.forEach(function (g) {
+      if (g.state !== 'Final' || g.away.score == null || g.home.score == null) return;
+      var w = g.away.score > g.home.score ? g.away : g.home;
+      var l = g.away.score > g.home.score ? g.home : g.away;
+      var ws = Math.max(g.away.score, g.home.score), ls = Math.min(g.away.score, g.home.score);
+      if (ls === 0) out.push('<b>' + esc(w.name) + '</b> blank ' + esc(l.name) + ' ' + ws + '\u20130');
+      else if (g.innings > 9) out.push('<b>' + esc(w.name) + '</b> edge ' + esc(l.name) + ' ' + ws + '\u2013' + ls + ' in ' + g.innings + ' innings');
+      else if (ws - ls >= 6) out.push('<b>' + esc(w.name) + '</b> rout ' + esc(l.name) + ' ' + ws + '\u2013' + ls);
+    });
+    return out.slice(0, 4);
+  }
+  function buildHtml() {
+    var h = '';
+    var live = stk.games.filter(function (g) { return g.state === 'Live'; });
+    var fin = stk.games.filter(function (g) { return g.state === 'Final'; });
+    var pre = stk.games.filter(function (g) { return g.state === 'Preview'; });
+    var ordered = live.concat(fin, pre);
+    if (ordered.length) h += '<span class="stk-seg">Scores</span>' + ordered.map(chip).join('');
+    if (stk.tomorrow && stk.tomorrow.length) {
+      h += '<span class="stk-seg">Tomorrow</span>' + stk.tomorrow.map(chip).join('');
+    }
+    if (stk.leaders && stk.leaders.length) {
+      h += '<span class="stk-seg">Leaders</span>' + stk.leaders.map(function (p) {
+        return '<span class="stk-chip">' + logo(p.teamId, 'sm') + '<span class="stk-who">' + esc(last(p.name)) + '</span><span class="stk-stat">' + esc(p.value) + ' ' + p.unit + '</span></span>';
+      }).join('');
+    }
+    var n = news();
+    if (n.length) h += '<span class="stk-seg news">News</span>' + n.map(function (x) { return '<span class="stk-chip stk-headline">' + x + '</span>'; }).join('');
+    return h;
+  }
+  function render() {
+    var nav = document.querySelector('.bottom-nav');
+    if (!nav) return;
+    var tk = document.getElementById('stkTicker');
+    if (!tk) {
+      tk = document.createElement('div');
+      tk.className = 'stk-ticker';
+      tk.id = 'stkTicker';
+      nav.insertBefore(tk, nav.firstChild);
+      tk.addEventListener('touchstart', function () {
+        tk.classList.add('stk-paused');
+        setTimeout(function () { tk.classList.remove('stk-paused'); }, 4000);
+      }, { passive: true });
+      document.body.style.paddingBottom = (parseFloat(getComputedStyle(document.body).paddingBottom || 0) + 38) + 'px';
+    }
+    var half0 = buildHtml();
+    if (!half0) { tk.style.display = 'none'; return; }
+    tk.style.display = '';
+    if (half0 === stk.lastHtml) return;
+    stk.lastHtml = half0;
+    tk.innerHTML = '<div class="stk-track">' + half0 + '</div>';
+    var track = tk.firstElementChild;
+    var reps = 1;
+    while (track.scrollWidth < window.innerWidth * 2 && reps < 6) { track.innerHTML += half0; reps++; }
+    var half = track.innerHTML;
+    track.innerHTML = half + half;
+    var w = track.scrollWidth / 2;
+    track.style.animationDuration = Math.max(18, Math.round(w / 55)) + 's';
+  }
+  function loadScores() {
+    var today = new Date();
+    getJ(API + '/schedule?sportId=1&hydrate=linescore&date=' + fmtDate(today)).then(function (d) {
+      stk.games = parseGames(d);
+      render();
+    }).catch(function () {});
+    var tmr = new Date(Date.now() + 864e5);
+    getJ(API + '/schedule?sportId=1&date=' + fmtDate(tmr)).then(function (d) {
+      stk.tomorrow = parseGames(d);
+      render();
+    }).catch(function () { stk.tomorrow = []; });
+  }
+  function loadLeaders() {
+    var now = new Date();
+    var season = now.getMonth() >= 2 ? now.getFullYear() : now.getFullYear() - 1;
+    getJ(API + '/stats/leaders?leaderCategories=homeRuns,battingAverage,runsBattedIn&season=' + season + '&statGroup=hitting&limit=1').then(function (d) {
+      var units = { homeRuns: 'HR', battingAverage: 'AVG', runsBattedIn: 'RBI' };
+      var out = [];
+      (d.leagueLeaders || []).forEach(function (cat) {
+        var L = (cat.leaders || [])[0];
+        if (!L) return;
+        out.push({ name: (L.person || {}).fullName || '', value: L.value, unit: units[cat.leaderCategory] || '', teamId: (L.team || {}).id });
+      });
+      stk.leaders = out;
+      render();
+    }).catch(function () { stk.leaders = []; });
+  }
+  render();
+  loadScores();
+  loadLeaders();
+  setInterval(loadScores, 60000);
+})();
+</script>
 </body>
 </html>

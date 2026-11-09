@@ -1505,3 +1505,47 @@ body.sport-glass .ls-card.heat-edge-cold, .ls-card.heat-edge-cold { border-color
 .zchip2 b { color: #e8eef7; }
 .zchip2.hot { border-color: rgba(245,185,66,.55); color: #f5b942; }
 .zchip2.hot b { color: #f5b942; }
+
+/* ---- score ticker (sport pages): pinned as the top row of the bottom nav.
+   Segments: scores / next slate / leaders / injuries / news. Chips with
+   data-gid open that game's sheet (handled per page). ---- */
+.bottom-nav { flex-wrap: wrap; }
+.stk-ticker { flex: 0 0 100%; overflow: hidden; white-space: nowrap; position: relative;
+  background: linear-gradient(180deg, rgba(10,20,40,.88), rgba(5,9,18,.94));
+  border-bottom: 1px solid rgba(165,195,255,.14); }
+.stk-track { display: inline-flex; align-items: center; padding: .42rem 0;
+  animation: stk-scroll 40s linear infinite; will-change: transform; }
+.stk-ticker.stk-paused .stk-track { animation-play-state: paused; }
+@media (hover:hover) { .stk-ticker:hover .stk-track { animation-play-state: paused; } }
+@keyframes stk-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) { .stk-track { animation: none; } .stk-ticker { overflow-x: auto; } }
+.stk-seg { font-size: .6rem; font-weight: 800; letter-spacing: .16em; color: var(--gold);
+  padding: 0 .55rem 0 .8rem; text-transform: uppercase; }
+.stk-seg.inj { color: var(--danger); }
+.stk-seg.news { color: #9fc2ff; }
+.stk-chip { display: inline-flex; align-items: center; gap: .34rem; font-size: .82rem; font-weight: 600;
+  padding: 0 .8rem; border-right: 1px solid rgba(165,195,255,.14); color: var(--text);
+  background: none; border-top: none; border-bottom: none; border-left: none; font-family: inherit; }
+button.stk-chip { cursor: pointer; }
+.stk-logo { width: 19px; height: 19px; object-fit: contain; }
+.stk-logo.sm { width: 15px; height: 15px; }
+.stk-sc { font-weight: 800; font-variant-numeric: tabular-nums; margin-right: .18rem; }
+.stk-vs { color: var(--muted); font-size: .7rem; font-weight: 700; }
+.stk-st { font-size: .62rem; font-weight: 700; letter-spacing: .08em; color: var(--muted);
+  text-transform: uppercase; margin-left: .25rem; }
+.stk-clock { color: var(--teal); font-size: .68rem; font-weight: 700; font-variant-numeric: tabular-nums; margin-left: .25rem; }
+.stk-stat { color: var(--teal); font-weight: 800; }
+.stk-who { color: #e8effa; font-weight: 700; }
+.stk-time { color: var(--muted); font-size: .72rem; font-weight: 700; margin-left: .25rem; }
+.stk-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--danger);
+  box-shadow: 0 0 8px var(--danger); animation: stk-pulse 1.4s ease-in-out infinite; }
+@keyframes stk-pulse { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
+.stk-cross { color: #fff; background: var(--danger); border-radius: 4px; font-size: .62rem; font-weight: 900;
+  width: 14px; height: 14px; display: inline-flex; align-items: center; justify-content: center; line-height: 1; }
+.stk-tag { font-size: .62rem; font-weight: 800; letter-spacing: .06em; padding: .08rem .34rem;
+  border-radius: 5px; text-transform: uppercase; }
+.stk-tag.out { color: #ffb3ad; background: rgba(240,102,94,.18); border: 1px solid rgba(240,102,94,.45); }
+.stk-tag.q { color: #ffd9a3; background: rgba(255,180,84,.14); border: 1px solid rgba(255,180,84,.4); }
+.stk-why { color: var(--muted); font-size: .72rem; font-weight: 600; }
+.stk-headline { font-weight: 600; color: #d9e6f7; font-size: .8rem; }
+.stk-headline b { color: #fff; }

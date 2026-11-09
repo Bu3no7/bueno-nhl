@@ -45,44 +45,146 @@ function setSection(sec) {
   }
 }
 /* ---- Home: tonight strip (tap a game for the sheet) ---- */
-function renderHomeTonight() {
-  const el = $('homeTonightBody');
-  if (!el) return;
-  const games = state.games || [];
-  if (!games.length) {
-    el.innerHTML = `<p class="muted">Loading…</p>`;
-    return;
-  }
-  el.innerHTML = `<div class="ci-tonight-strip">` + games.map((g) => {
-    const pbp = g.pbp;
-    const as = pbp ? pbp.awayTeam.score : 0;
-    const hs = pbp ? pbp.homeTeam.score : 0;
-    const isLive = g.state === 'LIVE' || g.state === 'CRIT';
-    const isFinal = g.state === 'OFF' || g.state === 'FINAL';
-    let timeHtml, scoreHtml = '';
-    if (isLive) {
-      const n = pbp && pbp.periodDescriptor ? pbp.periodDescriptor.number : '';
-      const label = n > 3 ? (n === 4 ? 'OT' : 'SO') : `P${n}`;
-      const clock = pbp && pbp.clock ? pbp.clock.timeRemaining || '' : '';
-      timeHtml = `<span class="ci-live">● LIVE ${label} · ${esc(clock)}</span>`;
-      scoreHtml = `<div class="ci-score">${as}–${hs}</div>`;
-    } else if (isFinal) {
-      timeHtml = `<span class="muted">Final</span>`;
-      scoreHtml = `<div class="ci-score">${as}–${hs}</div>`;
-    } else {
-      const dt = new Date(g.startUTC);
-      timeHtml = `<span>${esc(dt.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }))}</span>`;
-    }
-    return `<button class="ci-tonight-game" data-gid="${g.id}" type="button" title="Open game sheet">
-      <span class="ci-time">${timeHtml}</span>
-      <span class="ci-match"><img src="${teamLogoUrl(g.away)}" alt="" ${imgFallback}><b>${esc(g.away)}</b><span class="muted">@</span><img src="${teamLogoUrl(g.home)}" alt="" ${imgFallback}><b>${esc(g.home)}</b></span>
-      ${scoreHtml}
-      <span class="ci-tap">Open sheet ▸</span>
-    </button>`;
-  }).join('') + `</div>`;
-  el.querySelectorAll('.ci-tonight-game').forEach((b) =>
-    b.addEventListener('click', () => openMatchup(b.dataset.gid)));
+/* ---- Score ticker: pinned as the top row of the bottom nav; replaces the
+   old Tonight board. Scores + slate from state.games and the NHL schedule,
+   leaders from loadSeasonLeaders, news generated from tonight's finals.
+   Game chips open the game sheet. ---- */
+const stkState = { tomorrow: null, leaders: null, lastHtml: '' };
+function stkLogo(abbr, cls) {
+  return `<img class="stk-logo ${cls || ''}" src="${teamLogoUrl(abbr)}" alt="" ${imgFallback}>`;
 }
+function stkGameChip(g) {
+  const pbp = g.pbp;
+  const as = pbp && pbp.awayTeam ? pbp.awayTeam.score : 0;
+  const hs = pbp && pbp.homeTeam ? pbp.homeTeam.score : 0;
+  const isLive = g.state === 'LIVE' || g.state === 'CRIT';
+  const isFinal = g.state === 'OFF' || g.state === 'FINAL';
+  const logos = `${stkLogo(g.away)}<span class="stk-sc">${isLive || isFinal ? as : ''}</span><span class="stk-vs">@</span>${stkLogo(g.home)}<span class="stk-sc">${isLive || isFinal ? hs : ''}</span>`;
+  if (isLive) {
+    const n = pbp && pbp.periodDescriptor ? pbp.periodDescriptor.number : '';
+    const label = n > 3 ? (n === 4 ? 'OT' : 'SO') : `P${n}`;
+    const clock = pbp && pbp.clock ? pbp.clock.timeRemaining || '' : '';
+    return `<button class="stk-chip" data-gid="${g.id}" type="button"><span class="stk-dot"></span>${logos}<span class="stk-clock">${label} · ${esc(clock)}</span></button>`;
+  }
+  if (isFinal) {
+    const n = pbp && pbp.periodDescriptor ? pbp.periodDescriptor.number : 3;
+    const suf = n === 4 ? ' · OT' : n > 4 ? ' · SO' : '';
+    return `<button class="stk-chip" data-gid="${g.id}" type="button">${logos}<span class="stk-st">Final${suf}</span></button>`;
+  }
+  const t = new Date(g.startUTC).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+  return `<button class="stk-chip" data-gid="${g.id}" type="button">${stkLogo(g.away)}<span class="stk-vs">@</span>${stkLogo(g.home)}<span class="stk-time">${esc(t)}</span></button>`;
+}
+function stkTeamName(t) {
+  if (!t) return '';
+  if (t.placeName && t.commonName) return `${t.placeName} ${t.commonName}`;
+  return t.name || t.abbrev || '';
+}
+function stkNews() {
+  const out = [];
+  const finals = (state.games || []).filter((g) => (g.state === 'OFF' || g.state === 'FINAL') && g.pbp && g.pbp.awayTeam && g.pbp.homeTeam);
+  for (const g of finals) {
+    const as = g.pbp.awayTeam.score, hs = g.pbp.homeTeam.score;
+    if (as === hs) continue;
+    const wT = as > hs ? g.pbp.awayTeam : g.pbp.homeTeam;
+    const lT = as > hs ? g.pbp.homeTeam : g.pbp.awayTeam;
+    const ws = Math.max(as, hs), ls = Math.min(as, hs);
+    const per = g.pbp.periodDescriptor ? g.pbp.periodDescriptor.number : 3;
+    if (ls === 0) out.push(`<b>${esc(stkTeamName(wT))}</b> blank ${esc(stkTeamName(lT))} ${ws}–0`);
+    else if (per === 4) out.push(`<b>${esc(stkTeamName(wT))}</b> edge ${esc(stkTeamName(lT))} ${ws}–${ls} in overtime`);
+    else if (per > 4) out.push(`<b>${esc(stkTeamName(wT))}</b> top ${esc(stkTeamName(lT))} ${ws}–${ls} in a shootout`);
+    else if (ws - ls >= 4) out.push(`<b>${esc(stkTeamName(wT))}</b> rout ${esc(stkTeamName(lT))} ${ws}–${ls}`);
+  }
+  const L = stkState.leaders;
+  if (L && L.points && L.points[0]) {
+    const p = L.points[0];
+    const last = String(p.name || '').split(' ').pop();
+    out.push(`<b>${esc(last)}</b> leads the league with ${p.value} points`);
+  }
+  return out.slice(0, 4);
+}
+function stkBuildHtml() {
+  let h = '';
+  const games = state.games || [];
+  const live = [], fin = [], pre = [];
+  for (const g of games) {
+    if (g.state === 'LIVE' || g.state === 'CRIT') live.push(g);
+    else if (g.state === 'OFF' || g.state === 'FINAL') fin.push(g);
+    else pre.push(g);
+  }
+  const ordered = [...live, ...fin, ...pre];
+  if (ordered.length) h += `<span class="stk-seg">Scores</span>` + ordered.map(stkGameChip).join('');
+  if (stkState.tomorrow && stkState.tomorrow.length) {
+    h += `<span class="stk-seg">Tomorrow</span>` + stkState.tomorrow.map((g) => {
+      const t = new Date(g.start).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+      return `<span class="stk-chip">${stkLogo(g.away)}<span class="stk-vs">@</span>${stkLogo(g.home)}<span class="stk-time">${esc(t)}</span></span>`;
+    }).join('');
+  }
+  const L = stkState.leaders;
+  if (L) {
+    const chips = [];
+    const add = (item, unit) => {
+      if (!item) return;
+      const last = String(item.name || '').split(' ').pop();
+      chips.push(`<span class="stk-chip">${stkLogo(item.team, 'sm')}<span class="stk-who">${esc(last)}</span><span class="stk-stat">${item.value} ${unit}</span></span>`);
+    };
+    add(L.points && L.points[0], 'PTS');
+    add(L.goals && L.goals[0], 'G');
+    add(L.assists && L.assists[0], 'A');
+    add(L.points && L.points[1], 'PTS');
+    if (chips.length) h += `<span class="stk-seg">Leaders</span>` + chips.join('');
+  }
+  const news = stkNews();
+  if (news.length) h += `<span class="stk-seg news">News</span>` + news.map((n) => `<span class="stk-chip stk-headline">${n}</span>`).join('');
+  return h;
+}
+function renderTicker() {
+  const nav = document.querySelector('.bottom-nav');
+  if (!nav) return;
+  let tk = document.getElementById('stkTicker');
+  if (!tk) {
+    tk = document.createElement('div');
+    tk.className = 'stk-ticker';
+    tk.id = 'stkTicker';
+    nav.insertBefore(tk, nav.firstChild);
+    tk.addEventListener('click', (e) => {
+      const b = e.target.closest('[data-gid]');
+      if (b) openMatchup(b.dataset.gid);
+    });
+    tk.addEventListener('touchstart', () => {
+      tk.classList.add('stk-paused');
+      setTimeout(() => tk.classList.remove('stk-paused'), 4000);
+    }, { passive: true });
+    document.body.style.paddingBottom = (parseFloat(getComputedStyle(document.body).paddingBottom || 0) + 38) + 'px';
+  }
+  const half0 = stkBuildHtml();
+  if (!half0) { tk.style.display = 'none'; return; }
+  tk.style.display = '';
+  if (half0 === stkState.lastHtml) return;
+  stkState.lastHtml = half0;
+  tk.innerHTML = `<div class="stk-track">${half0}</div>`;
+  const track = tk.firstElementChild;
+  let reps = 1;
+  while (track.scrollWidth < window.innerWidth * 2 && reps < 6) { track.innerHTML += half0; reps++; }
+  const half = track.innerHTML;
+  track.innerHTML = half + half;
+  const w = track.scrollWidth / 2;
+  track.style.animationDuration = Math.max(18, Math.round(w / 55)) + 's';
+}
+async function stkLoadExtras() {
+  try {
+    const td = new Date(Date.now() + 864e5);
+    const ds = `${td.getFullYear()}-${String(td.getMonth() + 1).padStart(2, '0')}-${String(td.getDate()).padStart(2, '0')}`;
+    const d = await fetchJSON(`${API}/schedule/${ds}`);
+    const gw = (d.gameWeek || []).find((x) => x.date === ds);
+    stkState.tomorrow = gw ? gw.games.map((g) => ({ away: g.awayTeam.abbrev, home: g.homeTeam.abbrev, start: g.startTimeUTC })) : [];
+  } catch (e) { stkState.tomorrow = []; }
+  try { stkState.leaders = await loadSeasonLeaders(); } catch (e) { /* leaders segment hides */ }
+  renderTicker();
+}
+/* The old Tonight board is gone; its refresh callers now drive the ticker. */
+function renderHomeTonight() { renderTicker(); }
+renderTicker();
+stkLoadExtras();
 /* ---- Home: tonight's goalies strip (tap for the full goalie card) ---- */
 function renderHomeGoalies() {
   const el = $('homeGoaliesBody');
