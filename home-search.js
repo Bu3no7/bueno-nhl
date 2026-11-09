@@ -49,7 +49,7 @@
     for (const offset of [0, -1]) {
       try {
         const day = new Date(Date.now() + offset * 86400000);
-        const r = await fetch(`data/${isoDay(day)}.json`, { cache: 'no-store' });
+        const r = await dataFetch(`data/${isoDay(day)}.json`, { cache: 'no-store' });
         if (!r.ok) continue;
         const d = await r.json();
         const gameByTeam = {};

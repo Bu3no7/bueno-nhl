@@ -1,3 +1,11 @@
+# Data delivery moved to the GitHub CDN (jsDelivr) on 2026-11-09.
+# Skip Netlify builds for commits that only touch generated data, so the
+# 3x-daily data builds and 2x-daily sims commits stop burning build credits.
+# Exit 0 = skip the build (nothing outside the excluded paths changed).
+# Missing refs (first build / cleared cache) always build.
+[build]
+  ignore = "if [ -z \"$CACHED_COMMIT_REF\" ] || [ -z \"$COMMIT_REF\" ]; then exit 1; fi; git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- . ':(exclude)data/*' ':(exclude)sims/*' ':(exclude)data-builder/cache/*'"
+
 # Netlify deploy config for the NHL Goal Model static site.
 #
 # The NHL API (api-web.nhle.com) does not send CORS headers, so browsers

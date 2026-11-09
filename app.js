@@ -303,7 +303,7 @@ async function getPlayer(pid) {
 async function ctxFromPrecomputed(dateStr) {
   let pre = null;
   try {
-    const r = await fetch(`data/${dateStr}.json`, { headers: { 'Accept': 'application/json' } });
+    const r = await dataFetch(`data/${dateStr}.json`, { headers: { 'Accept': 'application/json' } });
     if (!r.ok) return null;
     const d = await r.json();
     if (!d || d.date !== dateStr || !Array.isArray(d.games)) return null;
@@ -2742,7 +2742,7 @@ async function loadMinSidecar() {
   if (minSidecarState === 'loading' || minSidecarState === 'ok') return;
   minSidecarState = 'loading';
   try {
-    const r = await fetch(`data/min-${state.date}.json`, { headers: { 'Accept': 'application/json' } });
+    const r = await dataFetch(`data/min-${state.date}.json`, { headers: { 'Accept': 'application/json' } });
     if (!r.ok) throw new Error('no sidecar');
     minSidecar = await r.json();
     minSidecarState = 'ok';
@@ -2848,7 +2848,7 @@ async function loadChemSidecar() {
   if (chemSidecarState === 'loading' || chemSidecarState === 'ok') return;
   chemSidecarState = 'loading';
   try {
-    const r = await fetch(`data/chem-${state.date}.json`, { headers: { 'Accept': 'application/json' } });
+    const r = await dataFetch(`data/chem-${state.date}.json`, { headers: { 'Accept': 'application/json' } });
     if (!r.ok) throw new Error('no sidecar');
     chemSidecar = await r.json();
     chemSidecarState = 'ok';
@@ -2915,7 +2915,7 @@ async function loadFinSidecar() {
   if (finSidecarState === 'loading' || finSidecarState === 'ok') return;
   finSidecarState = 'loading';
   try {
-    const r = await fetch(`data/finish-${state.date}.json`, { headers: { 'Accept': 'application/json' } });
+    const r = await dataFetch(`data/finish-${state.date}.json`, { headers: { 'Accept': 'application/json' } });
     if (!r.ok) throw new Error('no sidecar');
     finSidecar = await r.json();
     finSidecarState = 'ok';
@@ -2987,7 +2987,7 @@ async function loadL10Sidecar() {
   if (l10SidecarState === 'loading' || l10SidecarState === 'ok') return;
   l10SidecarState = 'loading';
   try {
-    const r = await fetch(`data/last10-${state.date}.json`, { headers: { 'Accept': 'application/json' } });
+    const r = await dataFetch(`data/last10-${state.date}.json`, { headers: { 'Accept': 'application/json' } });
     if (!r.ok) throw new Error('no sidecar');
     l10Sidecar = await r.json();
     l10SidecarState = 'ok';
@@ -3399,7 +3399,7 @@ function heatMapSectionHtml(r, shots, emptyText, opts) {
 let gworkSidecar = null, gworkPromise = null;
 function loadGworkSidecar() {
   if (!gworkPromise) {
-    gworkPromise = fetch(`data/goalies-${state.date}.json`, { headers: { 'Accept': 'application/json' } })
+    gworkPromise = dataFetch(`data/goalies-${state.date}.json`, { headers: { 'Accept': 'application/json' } })
       .then((r) => { if (!r.ok) throw new Error('no sidecar'); return r.json(); })
       .then((j) => { gworkSidecar = j; return j; })
       .catch(() => { gworkSidecar = null; return null; });
@@ -3588,7 +3588,7 @@ async function tryLiveFileTick() {
   const utcDate = new Date().toISOString().slice(0, 10);
   let data;
   try {
-    const r = await fetch(`live/${utcDate}.json`, { headers: { 'Accept': 'application/json' } });
+    const r = await dataFetch(`live/${utcDate}.json`, { headers: { 'Accept': 'application/json' } });
     if (!r.ok) return false;
     data = await r.json();
   } catch (e) { return false; }

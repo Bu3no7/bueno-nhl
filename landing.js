@@ -15,7 +15,7 @@
   (async () => {
     let n = 0;
     try {
-      const r = await fetch(`data/${isoDay(today)}.json`, { cache: 'no-store' });
+      const r = await dataFetch(`data/${isoDay(today)}.json`, { cache: 'no-store' });
       if (r.ok) { const d = await r.json(); n = (d.games || []).length; }
     } catch (e) { /* fall through */ }
     if (!n) {

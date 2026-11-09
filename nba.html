@@ -713,6 +713,7 @@ body.sport-glass .pc-overlay,body.sport-glass .gm-overlay{background:rgba(2,5,10
 </nav>
 
 <script src="nba-engine.js"></script>
+<script src="data-cdn.js"></script>
 <script>
 // Bottom nav (home <-> lab). The Fast Break's own views are switched
 // from the hamburger sheet inside the main script below.
@@ -751,7 +752,7 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
     return rgb;
   }
   const rgbCss = (rgb, a) => rgb ? 'rgba(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ',' + (a == null ? 1 : a) + ')' : null;
-  const getJSON = async (url) => { const r = await fetch(url); if (!r.ok) throw new Error(r.status); return r.json(); };
+  const getJSON = async (url) => { const r = await dataFetch(url); if (!r.ok) throw new Error(r.status); return r.json(); };
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const round1 = (x) => Math.round(x * 10) / 10;
   async function pool(items, n, fn) {
