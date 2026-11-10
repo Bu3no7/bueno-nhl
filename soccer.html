@@ -109,6 +109,9 @@ body.soccer-page{
   border:1px solid rgba(185,227,86,0.35);font-size:19px;overflow:hidden;
 }
 .crest img{width:34px;height:34px;object-fit:contain}
+.crest.sm{width:30px;height:30px;border-radius:9px}
+.crest.sm img{width:24px;height:24px}
+.lg-head .crest img{width:38px;height:38px}
 .tile .t-main{flex:1;min-width:0}
 .tile .t-name{font-weight:700;font-size:15.5px}
 .tile .t-sub{color:var(--muted);font-size:12px;margin-top:2px;display:block}
@@ -364,7 +367,7 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
 
     <div class="sec-label">PHASE 2 — CUPS &amp; EUROPE</div>
     <button class="soc-panel tile" type="button" data-phase2>
-      <span class="crest">⭐</span>
+      <span class="crest"><img src="https://a.espncdn.com/i/leaguelogos/soccer/500-dark/2.png" alt=""></span>
       <span class="t-main"><span class="t-name">Champions League</span>
       <span class="t-sub">UEFA · League phase</span></span>
       <span class="phase-chip">PHASE 2</span>
@@ -395,7 +398,7 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
   <div class="soc-wrap">
     <button class="back-btn" type="button" id="lgBack">‹ Hub</button>
     <div class="lg-head">
-      <span class="crest" id="lgCrest">⚽</span>
+      <span class="crest" id="lgCrest"></span>
       <div><h2 id="lgName">League</h2><div class="sub" id="lgSub"></div></div>
     </div>
     <div class="subnav" id="lgTabs">
@@ -464,15 +467,21 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
   var SITE2 = 'https://site.api.espn.com/apis/v2/sports/soccer/';
   var CORE = 'https://sports.core.api.espn.com/v2/sports/soccer/leagues/';
   var LEAGUES = [
-    { slug: 'eng.1', name: 'Premier League', country: 'England', tag: 'EPL', crest: '🏴' },
-    { slug: 'esp.1', name: 'La Liga', country: 'Spain', tag: 'ESP', crest: '🇪🇸' },
-    { slug: 'ita.1', name: 'Serie A', country: 'Italy', tag: 'ITA', crest: '🇮🇹' },
-    { slug: 'ger.1', name: 'Bundesliga', country: 'Germany', tag: 'GER', crest: '🇩🇪' },
-    { slug: 'fra.1', name: 'Ligue 1', country: 'France', tag: 'FRA', crest: '🇫🇷' },
-    { slug: 'usa.1', name: 'MLS', country: 'USA · Feb–Nov season', tag: 'MLS', crest: '🇺🇸' },
-    { slug: 'mex.1', name: 'Liga MX', country: 'Mexico · Apertura / Clausura', tag: 'MEX', crest: '🇲🇽' }
+    { slug: 'eng.1', name: 'Premier League', country: 'England', tag: 'EPL', logo: 'https://a.espncdn.com/i/leaguelogos/soccer/500-dark/23.png' },
+    { slug: 'esp.1', name: 'La Liga', country: 'Spain', tag: 'ESP', logo: 'https://a.espncdn.com/i/leaguelogos/soccer/500-dark/15.png' },
+    { slug: 'ita.1', name: 'Serie A', country: 'Italy', tag: 'ITA', logo: 'https://a.espncdn.com/i/leaguelogos/soccer/500-dark/12.png' },
+    { slug: 'ger.1', name: 'Bundesliga', country: 'Germany', tag: 'GER', logo: 'https://a.espncdn.com/i/leaguelogos/soccer/500-dark/10.png' },
+    { slug: 'fra.1', name: 'Ligue 1', country: 'France', tag: 'FRA', logo: 'https://a.espncdn.com/i/leaguelogos/soccer/500-dark/9.png' },
+    { slug: 'usa.1', name: 'MLS', country: 'USA · Feb–Nov season', tag: 'MLS', logo: 'https://a.espncdn.com/i/leaguelogos/soccer/500-dark/19.png' },
+    { slug: 'mex.1', name: 'Liga MX', country: 'Mexico · Apertura / Clausura', tag: 'MEX', logo: 'https://a.espncdn.com/i/leaguelogos/soccer/500-dark/22.png' }
   ];
-  var CUPS = [['FA Cup', 'England'], ['Copa del Rey', 'Spain'], ['Coppa Italia', 'Italy'], ['DFB-Pokal', 'Germany'], ['Coupe de France', 'France']];
+  var CUPS = [
+    ['FA Cup', 'England', 'https://a.espncdn.com/i/leaguelogos/soccer/500-dark/40.png'],
+    ['Copa del Rey', 'Spain', 'https://a.espncdn.com/i/leaguelogos/soccer/500-dark/80.png'],
+    ['Coppa Italia', 'Italy', 'https://a.espncdn.com/i/leaguelogos/soccer/500/2192.png'],
+    ['DFB-Pokal', 'Germany', 'https://a.espncdn.com/i/leaguelogos/soccer/500-dark/2061.png'],
+    ['Coupe de France', 'France', 'https://a.espncdn.com/i/leaguelogos/soccer/500-dark/182.png']
+  ];
   var MARKETS = [
     ['anytime', 'Anytime'], ['first', 'First scorer'], ['twoPlus', '2+ goals'], ['hatTrick', 'Hat trick'],
     ['shots', 'Shots'], ['sot', 'Shots on target'], ['assist', 'Assists'], ['goalOrAssist', 'Goal or assist'], ['carded', 'To be carded']
@@ -728,13 +737,13 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
   function renderTiles() {
     $('leagueTiles').innerHTML = LEAGUES.map(function (L) {
       return '<button class="soc-panel tile" type="button" data-act="league" data-slug="' + L.slug + '">' +
-        '<span class="crest">' + L.crest + '</span>' +
+        '<span class="crest"><img src="' + L.logo + '" alt="" loading="lazy" onerror="this.style.display=\'none\'"></span>' +
         '<span class="t-main"><span class="t-name">' + L.name + '</span>' +
         '<span class="t-sub" id="tileSub-' + L.slug + '">' + esc(L.country) + '</span></span>' +
         '<span class="chev">›</span></button>';
     }).join('');
     $('cupList').innerHTML = CUPS.map(function (c) {
-      return '<div class="soc-row" data-act="phase2"><span class="r-main"><span class="r-name" style="font-size:14px">' + c[0] + '</span>' +
+      return '<div class="soc-row" data-act="phase2"><span class="crest sm"><img src="' + c[2] + '" alt="" loading="lazy" onerror="this.style.display=\'none\'"></span><span class="r-main"><span class="r-name" style="font-size:14px">' + c[0] + '</span>' +
         '<span class="r-sub">' + c[1] + '</span></span><span class="chev" style="color:var(--muted)">›</span></div>';
     }).join('');
   }
@@ -822,7 +831,7 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
   function openLeague(slug, tab) {
     S.curLeague = slug;
     var L = leagueOf(slug);
-    $('lgCrest').textContent = L.crest;
+    $('lgCrest').innerHTML = '<img src="' + L.logo + '" alt="" onerror="this.style.display=\'none\'">';
     $('lgName').textContent = L.name;
     $('lgSub').textContent = L.country;
     showView('league');
@@ -1289,7 +1298,7 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
     var out = [];
     LEAGUES.forEach(function (L) {
       if (fold(L.name).indexOf(q) >= 0 || fold(L.country).indexOf(q) >= 0) {
-        out.push('<div class="soc-row" data-act="league" data-slug="' + L.slug + '"><span class="crest" style="width:30px;height:30px;font-size:14px;border-radius:9px">' + L.crest + '</span><span class="r-main"><span class="r-name" style="font-size:14px">' + L.name + '</span><span class="r-sub">' + esc(L.country) + ' · League</span></span><span style="color:var(--muted)">›</span></div>');
+        out.push('<div class="soc-row" data-act="league" data-slug="' + L.slug + '"><span class="crest sm"><img src="' + L.logo + '" alt="" loading="lazy" onerror="this.style.display=\'none\'"></span><span class="r-main"><span class="r-name" style="font-size:14px">' + L.name + '</span><span class="r-sub">' + esc(L.country) + ' · League</span></span><span style="color:var(--muted)">›</span></div>');
       }
       var teams = S.teams[L.slug] || {};
       Object.keys(teams).forEach(function (id) {
