@@ -208,11 +208,12 @@ table.tbl td.pos .zonebar{position:absolute;left:0;top:20%;height:60%;width:3px;
 .soc-modal-card .modal-close{top:.4rem;right:.6rem;z-index:3}
 .pc-head{display:flex;gap:13px;padding:16px 16px 13px;align-items:flex-start}
 .face{
-  width:62px;height:62px;border-radius:50%;flex:0 0 auto;overflow:hidden;
-  display:flex;align-items:center;justify-content:center;font-weight:800;font-size:19px;color:#0B1730;
-  background:linear-gradient(150deg,#CFE8FF,#7FB2F0);border:2px solid rgba(185,227,86,0.65);
+  width:62px;height:62px;border-radius:50%;flex:0 0 auto;overflow:hidden;position:relative;
+  display:flex;align-items:center;justify-content:center;font-weight:800;font-size:19px;color:var(--volt);
+  background:linear-gradient(150deg, rgba(185,227,86,0.30), rgba(6,12,26,0.55));
+  border:2px solid rgba(185,227,86,0.65);box-shadow:inset 0 1px 0 rgba(255,255,255,0.18);
 }
-.face img{width:100%;height:100%;object-fit:cover}
+.face img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .pc-head .who{flex:1;min-width:0}
 .pc-head .nm{font-size:21px;font-weight:800;line-height:1.12}
 .pc-head .tm{color:var(--muted);font-size:12.5px;margin-top:4px;line-height:1.45}
@@ -736,6 +737,12 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
     if (!tm) return '';
     var src = tm.logo || teamLogoUrl(tm.id);
     return src ? imgFb(src, tm.id, 'tlogo ' + (cls || '')) : '';
+  }
+  function headshotUrl(id) { return id ? 'https://a.espncdn.com/i/headshots/soccer/players/full/' + String(id) + '.png' : ''; }
+  function faceHtml(id, name) {
+    var hs = headshotUrl(id);
+    return '<div class="face"><span>' + esc(initials(name).toUpperCase()) + '</span>' +
+      (hs ? '<img src="' + esc(hs) + '" alt="" loading="lazy" onerror="this.remove()">' : '') + '</div>';
   }
   function goalBadges(ev) {
     if (!ev.scorers.length) return '';
@@ -1287,7 +1294,7 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
       secs += acc('ADD TO PARLAY', '<button class="parlay-add" type="button" data-act="cardparlay" data-slug="' + slug + '" data-pid="' + esc(p.id) + '">+ ADD ANYTIME SCORER · ' + pct(p.anytime) + '</button>', false);
     }
     $('socPlayerBody').innerHTML =
-      '<div class="pc-head"><div class="face">' + esc(initials(p.name).toUpperCase()) + '</div>' +
+      '<div class="pc-head">' + faceHtml(p.id, p.name) +
       '<div class="who"><div class="nm">' + stackedName(p.name) + '</div>' +
       '<div class="tm"><b>' + esc(p.team || '') + '</b>' + (p.pos ? ' · ' + esc(p.pos) : '') + '<br>' + esc(p.fixtureLabel || L.name) + '</div></div>' +
       (p.anytime != null ? '<div class="hero-stat"><div class="hv">' + pct(p.anytime) + '</div><div class="hl">ANYTIME</div></div>' : '') +
@@ -1307,7 +1314,7 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
     if (r.matches != null) rows += '<div class="fx-row"><span class="k">Appearances</span><span class="v">' + r.matches + '</span></div>';
     if (r.pos) rows += '<div class="fx-row"><span class="k">Position</span><span class="v">' + esc(r.pos) + '</span></div>';
     $('socPlayerBody').innerHTML =
-      '<div class="pc-head"><div class="face">' + esc(initials(r.name).toUpperCase()) + '</div>' +
+      '<div class="pc-head">' + faceHtml(r.id, r.name) +
       '<div class="who"><div class="nm">' + stackedName(r.name) + '</div>' +
       '<div class="tm"><b>' + esc(r.team || '') + '</b>' + (r.pos ? ' · ' + esc(r.pos) : '') + '<br>' + esc(leagueOf(slug).name) + '</div></div>' +
       (gRow ? '<div class="hero-stat"><div class="hv">' + gRow.value + '</div><div class="hl">GOALS</div></div>' : '') +
