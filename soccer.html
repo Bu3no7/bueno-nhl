@@ -129,22 +129,22 @@ button.mkt{appearance:none}
 .subnav .mkt{font-size:12px;padding:7px 13px}
 /* fixtures */
 .fx-day{padding:10px 16px 4px;font-size:10.5px;font-weight:700;letter-spacing:.16em;color:var(--muted)}
-.fx{display:flex;align-items:center;gap:10px;padding:9px 16px;border-top:1px solid rgba(165,195,255,0.07);font-size:13.5px;cursor:pointer}
+.fx{display:flex;align-items:center;gap:10px;padding:10px 16px;border-top:1px solid rgba(165,195,255,0.07);font-size:13.5px;cursor:pointer}
 .fx:first-of-type{border-top:none}
-.fx .fx-teams{flex:1;min-width:0}
-.fx .fx-teams b{font-weight:600}
-.fx .fx-teams .vs{color:var(--muted);font-size:11px;margin:0 4px}
-.fx .fx-score{font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
-.fx .fx-time{color:var(--muted);font-size:11px;background:rgba(6,12,26,0.35);border:1px solid var(--edge);border-radius:999px;padding:4px 9px;white-space:nowrap}
+.fx .fx-time{color:var(--muted);font-size:11px;background:rgba(6,12,26,0.35);border:1px solid var(--edge);border-radius:999px;padding:4px 9px;white-space:nowrap;flex:0 0 auto}
 .fx .fx-time.live{color:#F0665E;border-color:rgba(240,102,94,0.4)}
-.fx .lg-tag{font-size:9px;font-weight:800;letter-spacing:.1em;color:var(--volt);flex:0 0 auto;border:1px solid rgba(185,227,86,0.45);border-radius:6px;padding:2.5px 5px;min-width:44px;text-align:center}
-.fx .top-price{font-size:12px;color:var(--muted);white-space:nowrap}
-.fx .top-price b{color:var(--volt);font-size:13px}
-.scorers-line{display:block;color:var(--muted);font-size:11.5px;margin-top:3px;line-height:1.55}
+.fx-lg{width:26px;flex:0 0 auto;display:flex;align-items:center;justify-content:center}
+.fx-lg img{width:24px;height:24px;object-fit:contain}
+.fx-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px}
+.fx-trow{display:flex;align-items:center;gap:9px;min-width:0}
+.fx-tinfo{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.fx-tname{font-weight:600;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fx-scorers{color:var(--muted);font-size:11px;line-height:1.5}
+.fx-scorers .psc{color:var(--volt);font-weight:600;cursor:pointer;text-decoration:underline dotted rgba(185,227,86,.55);text-underline-offset:3px}
+.fx-sc{font-weight:800;font-size:14.5px;font-variant-numeric:tabular-nums;min-width:16px;text-align:right;flex:0 0 auto}
+.fx-top{font-size:11px;color:var(--muted)}
+.fx-top b{color:var(--volt);font-size:11.5px}
 .live-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#F0665E;box-shadow:0 0 7px rgba(240,102,94,0.9);margin-right:5px;vertical-align:1px}
-.goals-line{display:block;margin-top:2px}
-.goalscorer-name{color:#e8effa;font-weight:600}
-.goalscorer-name.priced{color:var(--ink);text-decoration:underline dotted rgba(185,227,86,.6);text-underline-offset:3px;cursor:pointer}
 .goalscorer-name .goalbadge{font-size:9px;font-weight:800;letter-spacing:.08em;color:#0B1730;background:var(--gold);border-radius:999px;padding:2px 7px;margin-left:5px;vertical-align:1px;text-decoration:none;display:inline-block}
 .goalscorer-name.priced .goalbadge{text-decoration:none}
 /* table */
@@ -744,41 +744,40 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
     return '<div class="face"><span>' + esc(initials(name).toUpperCase()) + '</span>' +
       (hs ? '<img src="' + esc(hs) + '" alt="" loading="lazy" onerror="this.remove()">' : '') + '</div>';
   }
-  function goalBadges(ev) {
-    if (!ev.scorers.length) return '';
-    var parts = ev.scorers.map(function (sc) {
+  function teamScorersHtml(ev, tm) {
+    var mine = ev.scorers.filter(function (sc) { return String(sc.teamId) === String(tm.id); });
+    if (!mine.length) return '';
+    var parts = mine.map(function (sc) {
       var p = pricedScorer(ev, sc);
-      var badge = '<span class="goalbadge">GOAL' + (p ? ' · ' + pct(p.anytime) : '') + '</span>';
       var tags = (sc.pen ? ' (pen)' : '') + (sc.og ? ' (og)' : '');
-      return '<span class="goalscorer-name' + (p ? ' priced' : '') + '"' +
-        (p ? ' data-act="bplayer" data-slug="' + ev.slug + '" data-pid="' + esc(p.id) + '"' : '') + '>' +
-        esc(lastName(sc.name)) + ' ' + esc(sc.clock) + tags + badge + '</span>';
+      var txt = esc(lastName(sc.name)) + ' ' + esc(sc.clock) + tags;
+      if (p) return '<span class="psc" data-act="bplayer" data-slug="' + ev.slug + '" data-pid="' + esc(p.id) + '">' + txt + ' · ' + pct(p.anytime) + '</span>';
+      return txt;
     });
-    return '<span class="goals-line">' + parts.join(' · ') + '</span>';
+    return '<span class="fx-scorers">' + parts.join(' · ') + '</span>';
   }
   function fxRowHtml(ev, showTag) {
     var L = leagueOf(ev.slug);
     var live = ev.state === 'in', post = ev.state === 'post';
-    var right, title;
-    if (live) {
-      title = '<b>' + esc(ev.away.short) + ' ' + (ev.away.score != null ? ev.away.score : 0) + '–' + (ev.home.score != null ? ev.home.score : 0) + ' ' + esc(ev.home.short) + '</b>';
-      right = '<span class="fx-time live"><span class="live-dot"></span>' + esc(ev.clock || ev.detail || 'LIVE') + '</span>';
-    } else if (post) {
-      title = '<b>' + esc(ev.away.short) + ' ' + ev.away.score + '–' + ev.home.score + ' ' + esc(ev.home.short) + '</b>';
-      right = '<span class="fx-time">FT</span>';
-    } else {
-      title = '<b>' + esc(ev.away.name) + '</b><span class="vs">vs</span><b>' + esc(ev.home.name) + '</b>';
-      right = '<span class="fx-time">' + esc(fmtTime(ev.date)) + '</span>';
+    var chip;
+    if (live) chip = '<span class="fx-time live"><span class="live-dot"></span>' + esc(ev.clock || ev.detail || 'LIVE') + '</span>';
+    else if (post) chip = '<span class="fx-time">FT</span>';
+    else chip = '<span class="fx-time">' + esc(fmtTime(ev.date)) + '</span>';
+    function trow(tm) {
+      var sc = (live || post) && tm.score != null ? '<span class="fx-sc">' + tm.score + '</span>' : '';
+      return '<div class="fx-trow">' + logoImg(tm) +
+        '<span class="fx-tinfo"><span class="fx-tname">' + esc(tm.name) + '</span>' + teamScorersHtml(ev, tm) + '</span>' +
+        sc + '</div>';
     }
     var top = '';
     var b = S.bundles[ev.slug];
     if (b && b.slateTop && b.slateTop[ev.id]) {
-      top = '<span class="top-price">' + esc(lastName(b.slateTop[ev.id].name)) + ' <b>' + pct(b.slateTop[ev.id].p) + '</b></span>';
+      top = '<div class="fx-top">Top scorer: ' + esc(lastName(b.slateTop[ev.id].name)) + ' <b>' + pct(b.slateTop[ev.id].p) + '</b></div>';
     }
     return '<div class="fx" data-act="fixture" data-slug="' + ev.slug + '" data-eid="' + ev.id + '">' +
-      (showTag ? '<span class="lg-tag">' + L.tag + '</span>' : '') +
-      '<span class="fx-teams">' + (live ? '<span class="live-dot"></span>' : '') + title + goalBadges(ev) + '</span>' +
-      top + right + '</div>';
+      (showTag ? '<span class="fx-lg"><img src="' + L.logo + '" alt="" loading="lazy" onerror="this.style.display=\'none\'"></span>' : '') +
+      '<span class="fx-main">' + trow(ev.away) + trow(ev.home) + top + '</span>' +
+      chip + '</div>';
   }
 
   /* ---------- hub: tiles + slate ---------- */
