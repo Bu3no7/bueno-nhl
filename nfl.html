@@ -255,6 +255,12 @@
   details.nfl-sec[open ] summary .chev{transform:rotate(90deg)}
   .nfl-sec-body{padding:5px 0 4px}
   .nfl-sec-body .ladder,.nfl-sec-body .metrics,.nfl-sec-body .tdrow,.nfl-sec-body .field,.nfl-sec-body .usg{margin-top:0}
+  /* milestones ladder (NBA chip pattern, Football gold accent) */
+  .ms-ladder{display:flex;flex-wrap:wrap;gap:6px;margin:2px 0 8px}
+  .ms-chip{background:linear-gradient(155deg,rgba(130,170,255,.14),rgba(6,12,26,.5));border:1px solid rgba(165,195,255,.24);border-radius:999px;padding:4px 10px;font-size:12px;font-weight:600;color:var(--mut)}
+  .ms-chip b{color:#f2f5f9}
+  .ms-chip .p{color:var(--gold);font-weight:800}
+  .ms-ladder-label{font-size:11px;font-weight:700;color:var(--mut);margin-top:6px}
   .usg-subline{font-size:9px;font-weight:700;letter-spacing:.08em;color:#9db1d8;margin-bottom:2px}
 </style>
 </head>
@@ -406,6 +412,7 @@
   </div>
   <div class="card" style="margin-top:12px">
     <details class="nfl-sec" id="pLinesSec" open><summary><span class="nfl-sec-t">TONIGHT'S LINES</span><span class="chev">▸</span></summary><div class="nfl-sec-body"><div class="ladder" id="pLadder"></div></div></details>
+    <details class="nfl-sec" id="pMilesSec"><summary><span class="nfl-sec-t">MILESTONES</span><span class="chev">▸</span></summary><div class="nfl-sec-body"><div id="pMiles"></div></div></details>
     <details class="nfl-sec" id="pUsageSec"><summary><span class="nfl-sec-t" id="pUsageTitle">USAGE · LAST 5</span><span class="chev">▸</span></summary><div class="nfl-sec-body"><div id="pUsage"></div></div></details>
     <details class="nfl-sec" id="pMetricsSec"><summary><span class="nfl-sec-t">KEY METRICS</span><span class="chev">▸</span></summary><div class="nfl-sec-body"><div class="metrics" id="pMetrics"></div></div></details>
     <details class="nfl-sec" id="pTdSec"><summary><span class="nfl-sec-t">TOUCHDOWNS</span><span class="chev">▸</span></summary><div class="nfl-sec-body"><div class="tdrow" id="pTd"></div></div></details>
@@ -806,6 +813,26 @@ function openPlayer(key){
   })();
   $("pTd").innerHTML = d.td.map(function(t){ return '<div class="tdbox'+(t[3]?" hot":"")+'"><span>'+t[0]+'</span><b>'+t[1]+'</b><i>'+t[2]+'</i></div>'; }).join("");
   $("pTdSec").style.display = d.td.length ? "" : "none";
+  // Milestones ladder (NBA chip pattern; display-only). Every rung is a
+  // probability the bundle already ships — td.any/td.two and the p200/
+  // p300/p400, p50/p75/p100, p75/p100/p125 threshold fields the yardage
+  // lines are built from. Nothing is re-derived here; rungs that would
+  // print as 0% drop out, and the section hides if no group survives.
+  (function(){
+    var raw = d.raw || {}, groups = [];
+    function chip(t, unit, p){ return '<span class="ms-chip"><b>'+t+'+</b> '+unit+' · <span class="p">'+Math.round(p*100)+'%</span></span>'; }
+    function group(label, rungs){
+      var cs = rungs.filter(function(r){ return r[2] != null && isFinite(r[2]) && r[2] >= 0.005; }).map(function(r){ return chip(r[0], r[1], r[2]); });
+      if(cs.length) groups.push('<div class="ms-ladder-label">'+label+'</div><div class="ms-ladder">'+cs.join("")+'</div>');
+    }
+    if(raw.td) group("Touchdowns", [[1,"TD",raw.td.any],[2,"TD",raw.td.two]]);
+    if(raw.pass) group("Passing", [[200,"YDS",raw.pass.p200],[300,"YDS",raw.pass.p300],[400,"YDS",raw.pass.p400]]);
+    if(raw.rush) group("Rushing", [[50,"YDS",raw.rush.p50],[75,"YDS",raw.rush.p75],[100,"YDS",raw.rush.p100]]);
+    if(raw.rec) group("Receiving", [[50,"YDS",raw.rec.p50],[75,"YDS",raw.rec.p75],[100,"YDS",raw.rec.p100]]);
+    if(raw.scr) group("Scrimmage", [[75,"YDS",raw.scr.p75],[100,"YDS",raw.scr.p100],[125,"YDS",raw.scr.p125]]);
+    $("pMiles").innerHTML = groups.join("");
+    $("pMilesSec").style.display = groups.length ? "" : "none";
+  })();
   show("view-player");
 }
 function openKicker(key){

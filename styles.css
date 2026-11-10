@@ -1423,6 +1423,12 @@ body.sport-glass .ls-card.heat-edge-cold, .ls-card.heat-edge-cold { border-color
 #modalBody details.pcacc > summary .chev { margin-left: auto; color: var(--teal); letter-spacing: 0; transition: transform .15s ease; }
 #modalBody details.pcacc[open] > summary .chev { transform: rotate(90deg); }
 #modalBody .pcacc-body { padding: .3rem 0 .4rem; }
+/* milestones ladder (NBA chip pattern, NHL teal accent) — player card only */
+#modalBody .ms-ladder { display: flex; flex-wrap: wrap; gap: .35rem; margin: .3rem 0 .55rem; }
+#modalBody .ms-chip { background: linear-gradient(155deg, rgba(130,170,255,.16), rgba(6,12,26,.5)); border: 1px solid rgba(165,195,255,.28); border-radius: 999px; padding: .26rem .6rem; font-size: .76rem; font-weight: 600; color: var(--muted); }
+#modalBody .ms-chip b { color: var(--text); }
+#modalBody .ms-chip .p { color: var(--teal); font-weight: 800; }
+#modalBody .ms-ladder-label { font-size: .77rem; font-weight: 700; color: var(--muted); margin-top: .35rem; }
 #modalBody .pcacc-hint { text-transform: none; letter-spacing: 0; font-weight: 600; font-size: .74rem; color: var(--muted); }
 /* header composition (NBA pattern) */
 .pc-head-main { min-width: 0; }

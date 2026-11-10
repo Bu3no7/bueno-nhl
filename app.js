@@ -3217,6 +3217,33 @@ function openPlayer(pid, gameId) {
   const lineRow = (label, p, fair) => `<div class="pc-line-row"><span class="pc-line-lab">${label}</span><span class="pc-line-pct">${pct1(p)}</span><span class="pc-line-fair">${fair} fair</span></div>`;
   const linesBody = `<div class="pc-lines">${lineRow('Anytime goal', r.p, r.fair)}${lineRow('Brace · 2+ goals', tpP, fairOddsSafe(tpP))}${lineRow('First goal', fgP, fairOddsSafe(fgP))}</div>`
     + `<div class="sec-title" style="margin-top:.7rem">Poisson over/under</div>${marketsHtml}`;
+  // Milestones ladder (NBA chip pattern; display-only). Rungs come from
+  // the SAME lambdas as Tonight's lines: goals from r.lam (1+ is the
+  // anytime price itself, 2+ the brace math above), shots / assists /
+  // points from the computeMarkets lambdas through the same pOverLine
+  // Poisson survival. Rungs that would print as 0% are dropped; a group
+  // with no rungs hides, and pcAccSec hides the section if all are gone.
+  const msChip = (t, unit, p) => `<span class="ms-chip"><b>${t}+</b> ${unit} · <span class="p">${Math.round(p * 100)}%</span></span>`;
+  const msGroup = (label, chips) => chips.length ? `<div class="ms-ladder-label">${label}</div><div class="ms-ladder">${chips.join('')}</div>` : '';
+  const msFromLam = (lam, unit, thresholds) => {
+    if (!(lam > 0)) return [];
+    return thresholds
+      .map((t) => ({ t, p: pOverLine(lam, t - 1) }))
+      .filter((x) => x.p >= 0.005)
+      .map((x) => msChip(x.t, unit, x.p));
+  };
+  const msLam = (kind) => (r.markets && r.markets[kind] && r.markets[kind][0]) ? r.markets[kind][0].lam : null;
+  const goalChips = [
+    ...(r.p >= 0.005 ? [msChip(1, 'G', r.p)] : []),
+    ...(tpP >= 0.005 ? [msChip(2, 'G', tpP)] : []),
+    ...msFromLam(lamPos, 'G', [3]),
+  ];
+  const milesBody = [
+    msGroup('Goals', goalChips),
+    msGroup(MARKET_META.shots.label, msFromLam(msLam('shots'), 'SOG', [2, 3, 4, 5, 6])),
+    msGroup(MARKET_META.assists.label, msFromLam(msLam('assists'), 'A', [1, 2, 3])),
+    msGroup(MARKET_META.points.label, msFromLam(msLam('points'), 'PTS', [2, 3, 4])),
+  ].join('');
   const minN = minSidecarState === 'ok' ? minGamesFor(r).length : 0;
   const chemEnt = (chemSidecarState === 'ok' && chemSidecar && chemSidecar.players) ? chemSidecar.players[String(r.pid)] : null;
   const vsBody = `${vsGoalieEdgeHtml(r, g)}${vsGoalieHtml(r, g)}`;
@@ -3252,6 +3279,7 @@ function openPlayer(pid, gameId) {
     <div class="pc-status">${lineBadge}${statusPill}</div>
     ${pcTonightHtml(r, g)}
     ${pcAccSec('lines', "Tonight's lines", linesBody, true)}
+    ${pcAccSec('miles', 'Milestones', milesBody, false)}
     ${pcAccSec('ice', `Ice time${minN ? ` · last ${minN}` : ''}`, pcMinSlotHtml(r), false)}
     ${pcAccSec('chem', `Chemistry${chemEnt && chemEnt.sharedGames ? ` · last ${chemEnt.sharedGames}` : ''}`, pcChemSlotHtml(r), false)}
     ${pcAccSec('fin', 'Finishing', pcFinSlotHtml(r), false)}
