@@ -24,7 +24,8 @@ body.soccer-page{
   --pill:linear-gradient(155deg, rgba(130,170,255,0.16), rgba(6,12,26,0.50));
   --edge:rgba(165,195,255,0.22); --edge2:rgba(165,195,255,0.28);
   --teal:var(--volt);
-  background:linear-gradient(180deg,#070D1B 0%, #0B1730 55%, #10203A 100%);
+  background-color:#060d1f;
+  background-image:linear-gradient(180deg,#070D1B 0%, #0B1730 55%, #10203A 100%);
   color:var(--ink);
 }
 .sportbg{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
@@ -732,7 +733,7 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
       extra = ' data-cdn="' + esc(fb) + '"';
       err = 'if(this.dataset.cdn){this.src=this.dataset.cdn;this.removeAttribute(\'data-cdn\')}else{this.style.display=\'none\'}';
     }
-    return '<img' + (cls ? ' class="' + cls + '"' : '') + ' src="' + esc(src) + '"' + extra + ' alt="" loading="lazy" onerror="' + err + '">';
+    return '<img' + (cls ? ' class="' + cls + '"' : '') + ' src="' + esc(src) + '"' + extra + ' alt="" onerror="' + err + '">';
   }
   function logoImg(tm, cls) {
     if (!tm) return '';
@@ -776,7 +777,7 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
       top = '<div class="fx-top">Top scorer: ' + esc(lastName(b.slateTop[ev.id].name)) + ' <b>' + pct(b.slateTop[ev.id].p) + '</b></div>';
     }
     return '<div class="fx" data-act="fixture" data-slug="' + ev.slug + '" data-eid="' + ev.id + '">' +
-      (showTag ? '<span class="fx-lg"><img src="' + L.logo + '" alt="" loading="lazy" onerror="this.style.display=\'none\'"></span>' : '') +
+      (showTag ? '<span class="fx-lg"><img src="' + L.logo + '" alt="" onerror="this.style.display=\'none\'"></span>' : '') +
       '<span class="fx-main">' + trow(ev.away) + trow(ev.home) + top + '</span>' +
       chip + '</div>';
   }
