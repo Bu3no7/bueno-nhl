@@ -43,6 +43,7 @@ jobs:
             git add sims/
             if ! git diff --cached --quiet; then
               git commit -m "sims: publish ${PHX_DATE}"
+              git pull --rebase origin main
               git push
             else
               echo "sims unchanged — nothing to commit"
