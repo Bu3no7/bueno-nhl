@@ -31,7 +31,7 @@
     { name: 'Baseball — The Dugout', sub: 'Home-run probabilities', href: 'mlb.html', keys: 'baseball mlb dugout home runs' },
     { name: 'Football', sub: 'Scores & standings', href: 'nfl.html', keys: 'football nfl scores standings' },
     { name: 'UFC', sub: 'Coming soon', href: 'ufc.html', keys: 'ufc mma fights' },
-    { name: 'Soccer', sub: 'Coming soon', href: 'soccer.html', keys: 'soccer mls football' },
+    { name: 'Soccer', sub: 'Seven leagues — live fixtures, tables & leaders', href: 'soccer.html', keys: 'soccer mls football premier league la liga serie a bundesliga ligue 1 liga mx' },
   ];
   const norm = (n) => (n || '').normalize('NFD').replace(/[̀-ͯ]/g, '')
     .toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
