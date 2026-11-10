@@ -116,7 +116,6 @@ body.soccer-page{
 .tile .t-name{font-weight:700;font-size:15.5px}
 .tile .t-sub{color:var(--muted);font-size:12px;margin-top:2px;display:block}
 .tile .chev{color:var(--muted);font-size:18px}
-.phase-chip{font-size:9.5px;font-weight:800;letter-spacing:.14em;color:#0B1730;background:var(--gold);border-radius:999px;padding:3px 8px;flex:0 0 auto}
 /* pills */
 .mkt-pills{display:flex;gap:7px;padding:0 16px 10px;flex-wrap:wrap}
 .mkt{
@@ -395,19 +394,18 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
     <div class="sec-label">LEAGUES</div>
     <div id="leagueTiles"></div>
 
-    <div class="sec-label">PHASE 2 — CUPS &amp; EUROPE</div>
-    <button class="soc-panel tile" type="button" data-phase2>
-      <span class="crest"><img src="https://a.espncdn.com/i/leaguelogos/soccer/500-dark/2.png" alt=""></span>
+    <div class="sec-label">TOURNAMENTS / CUPS</div>
+    <button class="soc-panel tile" type="button" data-act="league" data-slug="uefa.champions">
+      <span class="crest"><img src="https://a.espncdn.com/i/leaguelogos/soccer/500-dark/2.png" alt="" loading="lazy" onerror="this.style.display='none'"></span>
       <span class="t-main"><span class="t-name">Champions League</span>
-      <span class="t-sub">UEFA · League phase</span></span>
-      <span class="phase-chip">PHASE 2</span>
+      <span class="t-sub" id="tileSub-uefa.champions">UEFA · League phase</span></span>
+      <span class="chev">›</span>
     </button>
     <div class="soc-panel" style="padding:6px 0 4px">
       <div class="board-head">
         <span class="b-title">🏆 Domestic Cups</span>
-        <span class="phase-chip">PHASE 2</span>
       </div>
-      <p style="color:var(--muted);font-size:11.5px;padding:0 16px 8px">Each cup opens to its own scorer board, stats and tables.</p>
+      <p style="color:var(--muted);font-size:11.5px;padding:0 16px 8px">Each cup opens to its own fixtures, results and scorer leaders.</p>
       <div id="cupList"></div>
     </div>
 
@@ -506,13 +504,16 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
     { slug: 'usa.1', name: 'MLS', country: 'USA · Feb–Nov season', tag: 'MLS', logo: 'https://a.espncdn.com/i/leaguelogos/soccer/500-dark/19.png' },
     { slug: 'mex.1', name: 'Liga MX', country: 'Mexico · Apertura / Clausura', tag: 'MEX', logo: 'https://a.espncdn.com/i/leaguelogos/soccer/500-dark/22.png' }
   ];
+  var UCL = { slug: 'uefa.champions', name: 'Champions League', country: 'UEFA · League phase', tag: 'UCL', logo: 'https://a.espncdn.com/i/leaguelogos/soccer/500-dark/2.png', table: true, wideFx: true };
   var CUPS = [
-    ['FA Cup', 'England', 'https://a.espncdn.com/i/leaguelogos/soccer/500-dark/40.png'],
-    ['Copa del Rey', 'Spain', 'https://a.espncdn.com/i/leaguelogos/soccer/500-dark/80.png'],
-    ['Coppa Italia', 'Italy', 'https://a.espncdn.com/i/leaguelogos/soccer/500/2192.png'],
-    ['DFB-Pokal', 'Germany', 'https://a.espncdn.com/i/leaguelogos/soccer/500-dark/2061.png'],
-    ['Coupe de France', 'France', 'https://a.espncdn.com/i/leaguelogos/soccer/500-dark/182.png']
+    { slug: 'eng.fa', name: 'FA Cup', country: 'England', tag: 'FAC', logo: 'https://a.espncdn.com/i/leaguelogos/soccer/500-dark/40.png', cup: true, table: false, wideFx: true },
+    { slug: 'esp.copa_del_rey', name: 'Copa del Rey', country: 'Spain', tag: 'CDR', logo: 'https://a.espncdn.com/i/leaguelogos/soccer/500-dark/80.png', cup: true, table: false, wideFx: true },
+    { slug: 'ita.coppa_italia', name: 'Coppa Italia', country: 'Italy', tag: 'CIT', logo: 'https://a.espncdn.com/i/leaguelogos/soccer/500/2192.png', cup: true, table: false, wideFx: true },
+    { slug: 'ger.dfb_pokal', name: 'DFB-Pokal', country: 'Germany', tag: 'DFB', logo: 'https://a.espncdn.com/i/leaguelogos/soccer/500-dark/2061.png', cup: true, table: false, wideFx: true },
+    { slug: 'fra.coupe_de_france', name: 'Coupe de France', country: 'France', tag: 'CDF', logo: 'https://a.espncdn.com/i/leaguelogos/soccer/500-dark/182.png', cup: true, table: false, wideFx: true }
   ];
+  var COMPS = LEAGUES.concat([UCL], CUPS);
+  var TOURNAMENTS = [UCL].concat(CUPS);
   var MARKETS = [
     ['anytime', 'Anytime'], ['first', 'First scorer'], ['twoPlus', '2+ goals'], ['hatTrick', 'Hat trick'],
     ['shots', 'Shots'], ['sot', 'Shots on target'], ['assist', 'Assists'], ['goalOrAssist', 'Goal or assist'], ['carded', 'To be carded']
@@ -555,7 +556,7 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
     var t = $('socToast'); t.textContent = msg; t.classList.add('show');
     clearTimeout(t._h); t._h = setTimeout(function () { t.classList.remove('show'); }, 2200);
   }
-  function leagueOf(slug) { return LEAGUES.filter(function (L) { return L.slug === slug; })[0]; }
+  function leagueOf(slug) { return COMPS.filter(function (L) { return L.slug === slug; })[0]; }
 
   /* ---------- ESPN parsing ---------- */
   function parseTeam(comp) {
@@ -790,8 +791,8 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
         '<span class="chev">›</span></button>';
     }).join('');
     $('cupList').innerHTML = CUPS.map(function (c) {
-      return '<div class="soc-row" data-act="phase2"><span class="crest sm"><img src="' + c[2] + '" alt="" loading="lazy" onerror="this.style.display=\'none\'"></span><span class="r-main"><span class="r-name" style="font-size:14px">' + c[0] + '</span>' +
-        '<span class="r-sub">' + c[1] + '</span></span><span class="chev" style="color:var(--muted)">›</span></div>';
+      return '<div class="soc-row" data-act="league" data-slug="' + c.slug + '"><span class="crest sm"><img src="' + c.logo + '" alt="" loading="lazy" onerror="this.style.display=\'none\'"></span><span class="r-main"><span class="r-name" style="font-size:14px">' + c.name + '</span>' +
+        '<span class="r-sub" id="tileSub-' + c.slug + '">' + esc(c.country) + '</span></span><span class="chev" style="color:var(--muted)">›</span></div>';
     }).join('');
   }
   function updateTileSub(slug) {
@@ -807,6 +808,11 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
     var next = evs.filter(function (e) { return e.state === 'pre'; }).sort(function (a, b) { return a.date - b.date; })[0];
     if (next) {
       el.textContent = L.country + ' · Next: ' + next.away.short + ' vs ' + next.home.short + ' · ' + dayLabel(next.date) + ' ' + fmtTime(next.date);
+      return;
+    }
+    var lastEv = evs.filter(function (e) { return e.state === 'post'; }).sort(function (a, b) { return b.date - a.date; })[0];
+    if (lastEv) {
+      el.textContent = L.country + ' · ' + lastEv.away.short + ' ' + lastEv.away.score + '–' + lastEv.home.score + ' ' + lastEv.home.short + ' · FT';
       return;
     }
     var st = S.standings[slug];
@@ -881,11 +887,15 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
     $('lgCrest').innerHTML = '<img src="' + L.logo + '" alt="" onerror="this.style.display=\'none\'">';
     $('lgName').textContent = L.name;
     $('lgSub').textContent = L.country;
+    var tblBtn = document.querySelector('#lgTabs .mkt[data-tab="table"]');
+    if (tblBtn) tblBtn.style.display = L.table === false ? 'none' : '';
+    if (tab === 'table' && L.table === false) tab = 'fixtures';
     showView('league');
     setTab(tab || 'markets');
     loadBundle(slug).then(function () { if (S.curLeague === slug && S.curTab === 'markets') renderMarkets(); });
   }
   function setTab(tab) {
+    if (tab === 'table' && S.curLeague && (leagueOf(S.curLeague) || {}).table === false) tab = 'fixtures';
     S.curTab = tab;
     document.querySelectorAll('#lgTabs .mkt').forEach(function (b) { b.classList.toggle('on', b.dataset.tab === tab); });
     ['markets', 'fixtures', 'table', 'leaders'].forEach(function (t) { $('lgPane-' + t).hidden = t !== tab; });
@@ -959,8 +969,10 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
   function ensureFixtures(slug) {
     if (S.fx[slug] || S.fxLoading[slug]) return;
     S.fxLoading[slug] = true;
+    var comp = leagueOf(slug) || {};
+    var lo = comp.wideFx ? -30 : -4, hi = comp.wideFx ? 42 : 9;
     var days = [];
-    for (var off = -4; off <= 9; off++) days.push(new Date(Date.now() + off * 864e5));
+    for (var off = lo; off <= hi; off++) days.push(new Date(Date.now() + off * 864e5));
     Promise.all(days.map(function (d) {
       return getJ(SITE + slug + '/scoreboard?dates=' + ymd(d)).then(function (j) {
         return (j.events || []).map(function (e) { return parseEvent(e, slug); });
@@ -1657,7 +1669,6 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
       renderParlay();
       if (S.curLeague && S.curTab === 'markets') renderMarkets();
     }
-    else if (act === 'phase2') toast('Cups & Europe land in Phase 2');
   });
   /* ---------- wiring + boot ---------- */
   document.querySelectorAll('#lgTabs .mkt').forEach(function (b) {
@@ -1681,10 +1692,20 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
     loadStandings(L.slug).then(function () { updateTileSub(L.slug); });
     loadTickerLeader(L.slug);
   });
+  TOURNAMENTS.forEach(function (L) {
+    loadScoreboard(L.slug).then(function () { updateTileSub(L.slug); });
+    if (L.table) loadStandings(L.slug).then(function () { updateTileSub(L.slug); });
+  });
   setInterval(function () {
     LEAGUES.forEach(function (L) {
       loadScoreboard(L.slug).then(function () {
         renderSlate(); updateTileSub(L.slug); renderTicker();
+        if (S.curLeague === L.slug && S.curTab === 'fixtures' && $('view-league').classList.contains('active')) renderFixtures();
+      });
+    });
+    TOURNAMENTS.forEach(function (L) {
+      loadScoreboard(L.slug).then(function () {
+        updateTileSub(L.slug);
         if (S.curLeague === L.slug && S.curTab === 'fixtures' && $('view-league').classList.contains('active')) renderFixtures();
       });
     });
