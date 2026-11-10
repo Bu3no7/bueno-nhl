@@ -47,7 +47,8 @@ jobs:
           if [ -d data ] && [ -n "$(ls -A data 2>/dev/null)" ]; then
            git add data/ data-builder/cache/
             if ! git diff --cached --quiet; then
-              git commit -m "data: build ${PHX_DATE}"
+              git commit -m "data: build ${PHX_DATE}"              git commit -m "data: build ${PHX_DATE}"
+              git pull --rebase origin main
               git push
             else
               echo "data unchanged — nothing to commit"
