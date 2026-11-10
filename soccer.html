@@ -261,6 +261,22 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
 .fxc-meta{color:var(--muted);font-size:12px;margin-top:3px}
 .fxc-score{font-size:30px;font-weight:800;letter-spacing:.04em;margin-top:6px}
 .fxc-score .st{font-size:12px;color:var(--muted);font-weight:700;letter-spacing:.12em;display:block;margin-top:2px}
+/* lineups */
+.lu-team{margin-top:12px}
+.lu-team:first-child{margin-top:2px}
+.lu-head{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+.lu-head .tn{font-weight:700;font-size:13.5px;color:var(--ink)}
+.form-chip{font-size:10px;font-weight:800;letter-spacing:.08em;color:var(--volt);border:1px solid rgba(185,227,86,0.45);border-radius:999px;padding:2.5px 8px}
+.lu-row{display:flex;align-items:center;gap:9px;font-size:13px;padding:4.5px 0;border-bottom:1px solid rgba(165,195,255,0.05)}
+.lu-row:last-of-type{border-bottom:none}
+.lu-no{color:var(--muted);font-size:11.5px;min-width:20px;text-align:right;font-variant-numeric:tabular-nums}
+.lu-nm{flex:1;font-weight:600;color:var(--ink)}
+.lu-pos{color:var(--muted);font-size:11px;letter-spacing:.04em}
+.lu-sub{color:var(--volt);font-size:11px;font-weight:700;white-space:nowrap}
+.lu-label{font-size:10px;letter-spacing:.16em;color:var(--muted);font-weight:700;margin:9px 0 3px}
+.lu-bench{font-size:12.5px;color:var(--muted);line-height:1.65}
+.lu-bench .bn{color:#d7dee9}
+.lu-nm[data-act],.lu-bench .bn[data-act]{cursor:pointer;text-decoration:underline dotted rgba(185,227,86,.55);text-underline-offset:3px}
 .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:12px 16px 4px}
 .stat{background:rgba(6,12,26,0.4);border:1px solid rgba(165,195,255,0.14);border-radius:12px;padding:9px 4px;text-align:center}
 .stat .sv{font-weight:800;font-size:16px;color:var(--volt)}
@@ -441,7 +457,7 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
 <script>
 /* ================= SOCCER — live ESPN data + model bundle surfaces =================
    LIVE NOW (ESPN keyless): fixtures/scoreboards (site v2), standings (v2),
-   scoring leaders (core API), teams/logos.
+   scoring leaders (core API), teams/logos, fixture lineups (summary rosters).
    MODEL-PRICED surfaces (markets, player-card prices, slate top scorer,
    penalty takers, fixture match markets) read data/soccer-<slug>.json via
    data-cdn.js. Until a league's bundle exists they render the pre-launch
@@ -1235,7 +1251,7 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
       return '<div class="fx-row"><span class="k" style="color:var(--ink);font-weight:600">' + esc(tm.name) + esc(posOf(tm.id)) + '</span><span>' + formChips(tm.form) + '</span></div>';
     }).join('');
     secs += acc('FORM &amp; STANDING', fsh, false);
-    secs += acc('PROJECTED XI', '<p class="kv">Lands about an hour before kickoff, like the NHL rosters. Prices re-run on the confirmed teams.</p>', false);
+    secs += acc('LINEUPS', '<div id="fxLineups"><p class="kv">Lineups land about an hour before kickoff — the confirmed XIs will appear here.</p></div>', false);
     var scoreHtml = '';
     if (ev.state !== 'pre') {
       scoreHtml = '<div class="fxc-score">' + (ev.home.score != null ? ev.home.score : 0) + ' – ' + (ev.away.score != null ? ev.away.score : 0) +
@@ -1250,6 +1266,71 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
       scoreHtml + '</div>' + secs;
     openModal('socFixtureModal');
     if (!S.standings[slug]) loadStandings(slug);
+    loadLineups(slug, ev, ++fxSeq);
+  }
+  /* ---------- fixture lineups (ESPN summary rosters) ---------- */
+  var fxSeq = 0;
+  function lineupTap(slug, ev, ath) {
+    var nm = ath.displayName || ath.fullName || ath.shortName || '';
+    var bp = bundlePlayerFor(slug, ath.id, nm);
+    if (bp && String(bp.eventId) === String(ev.id)) return ' data-act="bplayer" data-slug="' + slug + '" data-pid="' + esc(bp.id) + '"';
+    var ld = S.leaders[slug];
+    if (ld && ath.id && ld.goals.concat(ld.assists).some(function (x) { return String(x.id) === String(ath.id); })) {
+      return ' data-act="eplayer" data-slug="' + slug + '" data-pid="' + esc(ath.id) + '"';
+    }
+    return '';
+  }
+  function lineupsHtml(slug, ev, rosters) {
+    var teams = (rosters || []).filter(function (t) {
+      return t && t.roster && t.roster.some(function (p) { return p.starter; });
+    });
+    if (!teams.length) return '';
+    teams.sort(function (a, b) { return (a.homeAway === 'home' ? 0 : 1) - (b.homeAway === 'home' ? 0 : 1); });
+    return teams.map(function (t) {
+      var xi = t.roster.filter(function (p) { return p.starter; });
+      var bench = t.roster.filter(function (p) { return !p.starter; });
+      xi.sort(function (a, b) {
+        var fa = parseFloat(a.formationPlace), fb = parseFloat(b.formationPlace);
+        return (isNaN(fa) ? 99 : fa) - (isNaN(fb) ? 99 : fb);
+      });
+      var h = '<div class="lu-team"><div class="lu-head"><span class="tn">' + esc((t.team || {}).displayName || '') + '</span>' +
+        (t.formation ? '<span class="form-chip">' + esc(t.formation) + '</span>' : '') + '</div>';
+      h += xi.map(function (p) {
+        var ath = p.athlete || {};
+        return '<div class="lu-row"><span class="lu-no">' + esc(p.jersey || '') + '</span>' +
+          '<span class="lu-nm"' + lineupTap(slug, ev, ath) + '>' + esc(ath.displayName || ath.shortName || '') + '</span>' +
+          (p.subbedOut ? '<span class="lu-sub">↓ off</span>' : '') +
+          '<span class="lu-pos">' + esc(((p.position || {}).abbreviation) || '') + '</span></div>';
+      }).join('');
+      if (bench.length) {
+        h += '<div class="lu-label">BENCH</div><div class="lu-bench">' + bench.map(function (p) {
+          var ath = p.athlete || {};
+          return '<span class="bn"' + lineupTap(slug, ev, ath) + '>' + esc(ath.shortName || ath.displayName || '') + '</span>' +
+            (p.jersey ? ' <span style="opacity:.65">#' + esc(p.jersey) + '</span>' : '') +
+            (p.subbedIn ? ' <span class="lu-sub">↑ on</span>' : '');
+        }).join(' · ') + '</div>';
+      }
+      return h + '</div>';
+    }).join('');
+  }
+  function renderLineups(slug, ev, rosters) {
+    var box = $('fxLineups');
+    if (!box) return;
+    var html = lineupsHtml(slug, ev, rosters);
+    if (html) box.innerHTML = html;
+  }
+  function loadLineups(slug, ev, seq) {
+    var key = slug + ':' + ev.id;
+    if (S.fxRosters && S.fxRosters.key === key) { renderLineups(slug, ev, S.fxRosters.rosters); return; }
+    getJ(SITE + slug + '/summary?event=' + ev.id).then(function (j) {
+      var rosters = (j && j.rosters) || null;
+      if (!rosters || !lineupsHtml(slug, ev, rosters)) return; /* not published yet — keep the note */
+      S.fxRosters = { key: key, rosters: rosters };
+      if (seq !== fxSeq) return;
+      renderLineups(slug, ev, rosters);
+      /* leaders may still be loading — re-render once they land so matched names turn tappable */
+      loadLeaders(slug).then(function () { if (seq === fxSeq) renderLineups(slug, ev, rosters); }, function () {});
+    }).catch(function () { /* summary unavailable — keep the note */ });
   }
   /* ---------- parlay ---------- */
   function addParlay(leg) {
