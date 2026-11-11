@@ -214,6 +214,10 @@ table.tbl td.pos .zonebar{position:absolute;left:0;top:20%;height:60%;width:3px;
   border:2px solid rgba(185,227,86,0.65);box-shadow:inset 0 1px 0 rgba(255,255,255,0.18);
 }
 .face img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.face.sm{width:35px;height:35px;font-size:12.5px;border-width:1.5px}
+.face.md{width:30px;height:30px;font-size:11px;border-width:1.5px}
+.face.xs{width:24px;height:24px;font-size:9.5px;border-width:1px}
+.face.mini{width:18px;height:18px;font-size:7.5px;border-width:1px;display:inline-flex;vertical-align:-4px;margin-right:4px}
 .pc-head .who{flex:1;min-width:0}
 .pc-head .nm{font-size:21px;font-weight:800;line-height:1.12}
 .pc-head .tm{color:var(--muted);font-size:12.5px;margin-top:4px;line-height:1.45}
@@ -260,7 +264,7 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
 .brk-card.champ .c-sub { color:var(--muted);font-size:10px }
 .brk-card.champ .tlogo { width:26px;height:26px }
 
-.ln{display:flex;align-items:center;padding:7px 0;border-bottom:1px solid rgba(165,195,255,0.06);font-size:13.5px}
+.ln{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid rgba(165,195,255,0.06);font-size:13.5px}
 .ln:last-child{border-bottom:none}
 .ln .k{flex:1;color:var(--muted)}
 .ln .k b{color:var(--ink);font-weight:600}
@@ -330,8 +334,8 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
 .fm-flag{margin:10px 16px 0;padding:9px 12px;border-radius:11px;background:rgba(240,102,94,.12);border:1px solid rgba(240,102,94,.42);color:#ffb3ae;font-size:12.5px;font-weight:700}
 .fm-out{color:#f0665e;font-weight:700;font-size:12px;text-align:right}
 .fm-src{font-size:9.5px;font-weight:800;letter-spacing:.14em;color:var(--muted);border:1px solid rgba(165,195,255,.22);padding:2.5px 7px;border-radius:99px;flex:none}
-.fm-face{width:32px;height:32px;border-radius:50%;overflow:hidden;flex:none;background:rgba(185,227,86,.10);border:1px solid rgba(185,227,86,.35)}
-.fm-face img{width:100%;height:100%;object-fit:cover;display:block}
+.fm-face{width:32px;height:32px;border-radius:50%;overflow:hidden;flex:none;position:relative;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--volt);background:linear-gradient(150deg, rgba(185,227,86,0.30), rgba(6,12,26,0.55));border:1px solid rgba(185,227,86,.35)}
+.fm-face img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 .soc-row.fm-plain{cursor:default}
 .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:12px 16px 4px}
 .stat{background:rgba(6,12,26,0.4);border:1px solid rgba(165,195,255,0.14);border-radius:12px;padding:9px 4px;text-align:center}
@@ -343,7 +347,7 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
 .ts-row{display:flex;gap:10px}
 .ts-col{flex:1;min-width:0}
 .ts-col .tc-h{font-size:10px;letter-spacing:.14em;color:var(--muted);font-weight:700;margin:6px 0 4px}
-.ts{display:flex;font-size:13px;padding:5px 0;border-bottom:1px solid rgba(165,195,255,0.06);cursor:pointer}
+.ts{display:flex;align-items:center;gap:8px;font-size:13px;padding:5px 0;border-bottom:1px solid rgba(165,195,255,0.06);cursor:pointer}
 .ts:last-child{border-bottom:none}
 .ts .n{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ts .p{font-weight:800;color:var(--volt)}
@@ -965,7 +969,7 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
     }).catch(function () { S.faces = {}; return S.faces; });
     return S.facesLoading;
   }
-  function faceHtml(id, name) {
+  function faceHtml(id, name, cls) {
     var fm = fotmobUrl(id), hs = headshotUrl(id), img = '';
     if (fm) {
       img = '<img src="' + esc(fm) + '" alt="" onerror="' +
@@ -973,7 +977,7 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
     } else if (hs) {
       img = '<img src="' + esc(hs) + '" alt="" onerror="this.remove()">';
     }
-    return '<div class="face"><span>' + esc(initials(name).toUpperCase()) + '</span>' + img + '</div>';
+    return '<div class="face' + (cls ? ' ' + cls : '') + '"><span>' + esc(initials(name).toUpperCase()) + '</span>' + img + '</div>';
   }
   /* ---------- FotMob (display only — never feeds a price) ---------- */
   var FM_API = 'https://www.fotmob.com/api/data/';
@@ -1097,7 +1101,8 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
     });
     if (!out.length) return '';
     return out.map(function (u) {
-      return '<div class="ln"><span class="k"><b>' + esc(u.name) + '</b> · ' + esc(u.team) + '</span>' +
+      var ubp = bundlePlayerFor(ev.slug, null, u.name);
+      return '<div class="ln">' + faceHtml(ubp ? ubp.id : null, u.name, 'xs') + '<span class="k"><b>' + esc(u.name) + '</b> · ' + esc(u.team) + '</span>' +
         '<span class="fm-out">' + (u.type === 'suspension' ? 'Suspended' : 'Injured') + (u.ret ? ' · back ' + esc(u.ret) : '') + '</span></div>';
     }).join('');
   }
@@ -1330,7 +1335,7 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
   function fmBoardRow(slug, b, r) {
     var fmId = r.ParticiantId;
     var espnId = fmId != null ? fmRevMap()[String(fmId)] : null;
-    var face = fmId != null ? '<span class="fm-face"><img src="https://images.fotmob.com/image_resources/playerimages/' + fmId + '.png" alt="" onerror="this.remove()"></span>' : '';
+    var face = fmId != null ? '<span class="fm-face"><span>' + esc(initials(r.ParticipantName).toUpperCase()) + '</span><img src="https://images.fotmob.com/image_resources/playerimages/' + fmId + '.png" alt="" onerror="this.remove()"></span>' : '';
     var inner = face + '<span class="r-main"><span class="r-name">' + esc(r.ParticipantName) + '</span>' +
       '<span class="r-sub">' + esc(r.TeamName || '') + (r.MatchesPlayed != null ? ' · ' + r.MatchesPlayed + ' apps' : '') + '</span></span>' +
       '<span class="r-prob"><span class="p">' + b.fmt(r.StatValue) + '</span><span class="f">' + b.unit + '</span></span>';
@@ -1390,7 +1395,7 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
       var p = pricedScorer(ev, sc);
       var tags = (sc.pen ? ' (pen)' : '') + (sc.og ? ' (og)' : '');
       var txt = esc(lastName(sc.name)) + ' ' + esc(sc.clock) + tags;
-      if (p) return '<span class="psc" data-act="bplayer" data-slug="' + ev.slug + '" data-pid="' + esc(p.id) + '">' + txt + ' · ' + pct(p.anytime) + '</span>';
+      if (p) return '<span class="psc" data-act="bplayer" data-slug="' + ev.slug + '" data-pid="' + esc(p.id) + '">' + faceHtml(p.id, sc.name, 'mini') + txt + ' · ' + pct(p.anytime) + '</span>';
       return txt;
     });
     return '<span class="fx-scorers">' + parts.join(' · ') + '</span>';
@@ -1415,7 +1420,14 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
     var top = '';
     var b = S.bundles[ev.slug];
     if (b && b.slateTop && b.slateTop[ev.id]) {
-      top = '<div class="fx-top">Top scorer: ' + esc(lastName(b.slateTop[ev.id].name)) + ' <b>' + pct(b.slateTop[ev.id].p) + '</b></div>';
+      var stp = b.slateTop[ev.id];
+      var tpp = null;
+      (b.players || []).some(function (cand) {
+        if (String(cand.eventId) === String(ev.id) && fold(cand.name) === fold(stp.name)) { tpp = cand; return true; }
+        return false;
+      });
+      var tface = tpp ? faceHtml(tpp.id, stp.name, 'mini') : '';
+      top = '<div class="fx-top">Top scorer: ' + tface + esc(lastName(stp.name)) + ' <b>' + pct(stp.p) + '</b></div>';
     }
     return '<div class="fx" data-act="fixture" data-slug="' + ev.slug + '" data-eid="' + ev.id + '">' +
       (showTag ? '<span class="fx-lg"><img src="' + L.logo + '" alt="" onerror="this.style.display=\'none\'"></span>' : '') +
@@ -1634,6 +1646,7 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
       var key = slug + '|' + p.id + '|' + S.curMarket;
       return '<div class="soc-row" data-act="bplayer" data-slug="' + slug + '" data-pid="' + esc(p.id) + '">' +
         '<span class="heat ' + heatClass(v.p) + '"></span>' +
+        faceHtml(p.id, p.name, 'sm') +
         '<span class="r-main"><span class="r-name">' + esc(p.name) + '</span>' +
         '<span class="r-sub">' + esc(p.team || '') + (p.fixtureLabel ? ' · ' + esc(p.fixtureLabel) : '') + '</span></span>' +
         '<span class="r-prob"><span class="p">' + pct(v.p) + '</span><span class="f">' + (v.line ? esc(v.line) : 'fair ' + fair(v.p)) + '</span></span>' +
@@ -2236,14 +2249,15 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
       if (String(x.teamId) === String(teamId) && !seen[x.id]) { seen[x.id] = 1; mine.push(x); }
     });
     box.innerHTML = mine.length
-      ? '<p class="muted-note" style="padding:10px 16px 2px">The full squad feed is unavailable for this club — its listed scorers &amp; creators:</p>' + mine.map(function (r) { return leaderRow(slug, r, ''); }).join('')
+      ? '<p class="muted-note" style="padding:10px 16px 2px">The full squad feed is unavailable for this club — its listed scorers &amp; creators:</p>' + mine.map(function (r) { return leaderRow(slug, r, '', true); }).join('')
       : '<p class="muted-note" style="padding:12px 16px">Squad unavailable for this club right now.</p>';
   }
   /* ---------- leaders ---------- */
-  function leaderRow(slug, r, unit) {
+  function leaderRow(slug, r, unit, bare) {
     var bp = bundlePlayerFor(slug, r.id, r.name);
     return '<div class="soc-row" data-act="' + (bp ? 'bplayer' : 'eplayer') + '" data-slug="' + slug + '" data-pid="' + esc(bp ? bp.id : r.id) + '">' +
       logoImg({ logo: r.logo, id: r.teamId }) +
+      (bare ? '' : faceHtml(bp ? bp.id : r.id, r.name, 'sm')) +
       '<span class="r-main"><span class="r-name">' + esc(r.name) + '</span>' +
       '<span class="r-sub">' + esc(r.team || '') + (r.matches != null ? ' · ' + r.matches + ' apps' : '') + '</span></span>' +
       '<span class="r-prob"><span class="p">' + r.value + '</span><span class="f">' + unit + '</span></span></div>';
@@ -2267,7 +2281,8 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
       var pens;
       if (b && b.penaltyTakers && b.penaltyTakers.length) {
         pens = b.penaltyTakers.map(function (t) {
-          return '<div class="ln" style="padding-left:16px;padding-right:16px"><span class="k"><b>' + esc(t.player) + '</b> · ' + esc(t.team || '') +
+          var tbp = bundlePlayerFor(slug, null, t.player);
+          return '<div class="ln" style="padding-left:16px;padding-right:16px">' + faceHtml(tbp ? tbp.id : null, t.player, 'xs') + '<span class="k"><b>' + esc(t.player) + '</b> · ' + esc(t.team || '') +
             (t.note ? '<br><span style="font-size:11.5px">' + esc(t.note) + '</span>' : '') +
             '</span><span class="p" style="min-width:auto">' + (t.taken ? t.scored + '/' + t.taken : '—') + '</span></div>';
         }).join('');
@@ -2492,7 +2507,7 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
     if (m && m.topScorers) {
       var col = function (title, list) {
         return '<div class="ts-col"><div class="tc-h">' + esc(String(title).toUpperCase()) + '</div>' + (list || []).map(function (t) {
-          return '<div class="ts" data-act="bplayer" data-slug="' + slug + '" data-pid="' + esc(t.id || '') + '"><span class="n">' + esc(lastName(t.name)) + '</span><span class="p">' + pct(t.p) + '</span></div>';
+          return '<div class="ts" data-act="bplayer" data-slug="' + slug + '" data-pid="' + esc(t.id || '') + '">' + faceHtml(t.id || null, t.name, 'xs') + '<span class="n">' + esc(lastName(t.name)) + '</span><span class="p">' + pct(t.p) + '</span></div>';
         }).join('') + '</div>';
       };
       secs += acc('TOP SCORER PRICES', '<div class="ts-row">' + col(ev.home.name, m.topScorers.home) + col(ev.away.name, m.topScorers.away) + '</div>', false);
@@ -2501,7 +2516,7 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
       var gh = ev.scorers.map(function (sc) {
         var p = pricedScorer(ev, sc);
         var tm = sc.teamId === ev.home.id ? ev.home : ev.away;
-        return '<div class="ln"><span class="k"><b' + (p ? ' data-act="bplayer" data-slug="' + slug + '" data-pid="' + esc(p.id) + '" style="cursor:pointer"' : '') + '>' + esc(sc.name) + '</b> · ' + esc(tm.short) + (sc.pen ? ' · pen' : '') + (sc.og ? ' · og' : '') + '</span><span style="color:var(--muted);font-size:12px">' + esc(sc.clock) + '</span><span class="goalbadge" style="margin-left:8px">GOAL' + (p ? ' · ' + pct(p.anytime) : '') + '</span></div>';
+        return '<div class="ln">' + faceHtml(p ? p.id : (sc.athleteId || null), sc.name, 'xs') + '<span class="k"><b' + (p ? ' data-act="bplayer" data-slug="' + slug + '" data-pid="' + esc(p.id) + '" style="cursor:pointer"' : '') + '>' + esc(sc.name) + '</b> · ' + esc(tm.short) + (sc.pen ? ' · pen' : '') + (sc.og ? ' · og' : '') + '</span><span style="color:var(--muted);font-size:12px">' + esc(sc.clock) + '</span><span class="goalbadge" style="margin-left:8px">GOAL' + (p ? ' · ' + pct(p.anytime) : '') + '</span></div>';
       }).join('');
       secs += acc('GOALS', gh, !m);
     }
@@ -2567,6 +2582,7 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
         var ath = p.athlete || {};
         var rt = fmRatingFor(slug, ev, ath);
         return '<div class="lu-row"><span class="lu-no">' + esc(p.jersey || '') + '</span>' +
+          faceHtml(ath.id, ath.displayName || ath.shortName || '', 'xs') +
           '<span class="lu-nm"' + lineupTap(slug, ev, ath) + '>' + esc(ath.displayName || ath.shortName || '') + '</span>' +
           (p.subbedOut ? '<span class="lu-sub">↓ off</span>' : '') +
           (rt != null ? fmChip(rt) : '') +
@@ -2576,7 +2592,7 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
         h += '<div class="lu-label">BENCH</div><div class="lu-bench">' + bench.map(function (p) {
           var ath = p.athlete || {};
           var rt = fmRatingFor(slug, ev, ath);
-          return '<span class="bn"' + lineupTap(slug, ev, ath) + '>' + esc(ath.shortName || ath.displayName || '') + '</span>' +
+          return '<span class="bn"' + lineupTap(slug, ev, ath) + '>' + faceHtml(ath.id, ath.displayName || ath.shortName || '', 'mini') + esc(ath.shortName || ath.displayName || '') + '</span>' +
             (p.jersey ? ' <span style="opacity:.65">#' + esc(p.jersey) + '</span>' : '') +
             (p.subbedIn ? ' <span class="lu-sub">↑ on</span>' : '') +
             (rt != null ? ' ' + fmChip(rt) : '');
@@ -2620,7 +2636,9 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
       return;
     }
     body.innerHTML = S.parlay.map(function (l) {
-      return '<div class="leg"><span>' + esc(l.label) + ' <span style="color:var(--muted)">' + esc(l.detail || '') + '</span></span><span class="lp">' + pct(l.p) + '</span><button class="x" type="button" data-act="legx" data-key="' + esc(l.key) + '" aria-label="Remove leg">×</button></div>';
+      var lpid = l.pid || String(l.key || '').split('|')[1] || null;
+      var lnm = String(l.label || '').split(' — ')[0];
+      return '<div class="leg">' + faceHtml(lpid, lnm, 'md') + '<span>' + esc(l.label) + ' <span style="color:var(--muted)">' + esc(l.detail || '') + '</span></span><span class="lp">' + pct(l.p) + '</span><button class="x" type="button" data-act="legx" data-key="' + esc(l.key) + '" aria-label="Remove leg">×</button></div>';
     }).join('');
     var jp = S.parlay.reduce(function (s, l) { return s * l.p; }, 1);
     joint.innerHTML = '<b>' + S.parlay.length + ' legs · ' + pct(jp) + '</b> to hit · fair <b>' + fair(jp) + '</b>';
@@ -2668,14 +2686,14 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
           if (seen[r.id] || fold(r.name).indexOf(q) < 0) return;
           seen[r.id] = 1;
           var bp = bundlePlayerFor(L.slug, r.id, r.name);
-          out.push('<div class="soc-row" data-act="' + (bp ? 'bplayer' : 'eplayer') + '" data-slug="' + L.slug + '" data-pid="' + esc(bp ? bp.id : r.id) + '">' + logoImg({ logo: r.logo, id: r.teamId }) + '<span class="r-main"><span class="r-name" style="font-size:14px">' + esc(r.name) + '</span><span class="r-sub">' + esc(r.team || '') + ' · ' + L.name + '</span></span><span style="color:var(--muted)">›</span></div>');
+          out.push('<div class="soc-row" data-act="' + (bp ? 'bplayer' : 'eplayer') + '" data-slug="' + L.slug + '" data-pid="' + esc(bp ? bp.id : r.id) + '">' + logoImg({ logo: r.logo, id: r.teamId }) + faceHtml(bp ? bp.id : r.id, r.name, 'sm') + '<span class="r-main"><span class="r-name" style="font-size:14px">' + esc(r.name) + '</span><span class="r-sub">' + esc(r.team || '') + ' · ' + L.name + '</span></span><span style="color:var(--muted)">›</span></div>');
         });
       }
       var b = S.bundles[L.slug];
       if (b && b.players) {
         b.players.forEach(function (p) {
           if (fold(p.name).indexOf(q) >= 0) {
-            out.push('<div class="soc-row" data-act="bplayer" data-slug="' + L.slug + '" data-pid="' + esc(p.id) + '"><span class="r-main"><span class="r-name" style="font-size:14px">' + esc(p.name) + '</span><span class="r-sub">' + esc(p.team || '') + ' · ' + L.name + '</span></span>' + (p.anytime != null ? '<span class="r-prob"><span class="p">' + pct(p.anytime) + '</span></span>' : '') + '</div>');
+            out.push('<div class="soc-row" data-act="bplayer" data-slug="' + L.slug + '" data-pid="' + esc(p.id) + '">' + faceHtml(p.id, p.name, 'sm') + '<span class="r-main"><span class="r-name" style="font-size:14px">' + esc(p.name) + '</span><span class="r-sub">' + esc(p.team || '') + ' · ' + L.name + '</span></span>' + (p.anytime != null ? '<span class="r-prob"><span class="p">' + pct(p.anytime) + '</span></span>' : '') + '</div>');
           }
         });
       }
@@ -2787,13 +2805,13 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
     else if (act === 'qadd') {
       var slug = t.dataset.slug, p = (S.bundlePlayers[slug] || {})[t.dataset.pid];
       var v = p && marketVal(p, t.dataset.mk);
-      if (p && v) addParlay({ key: t.dataset.key, label: p.name + ' — ' + marketLabel(t.dataset.mk) + (v.line ? ' ' + v.line : ''), detail: (p.team || '') + ' · ' + leagueOf(slug).name, p: v.p });
+      if (p && v) addParlay({ key: t.dataset.key, pid: p.id, label: p.name + ' — ' + marketLabel(t.dataset.mk) + (v.line ? ' ' + v.line : ''), detail: (p.team || '') + ' · ' + leagueOf(slug).name, p: v.p });
     }
     else if (act === 'cardparlay') {
       var slug2 = t.dataset.slug, p2 = (S.bundlePlayers[slug2] || {})[t.dataset.pid];
       if (p2 && p2.anytime != null) {
         var key = slug2 + '|' + p2.id + '|anytime';
-        addParlay({ key: key, label: p2.name + ' — Anytime scorer', detail: (p2.team || '') + ' · ' + leagueOf(slug2).name, p: p2.anytime });
+        addParlay({ key: key, pid: p2.id, label: p2.name + ' — Anytime scorer', detail: (p2.team || '') + ' · ' + leagueOf(slug2).name, p: p2.anytime });
         toast(inParlay(key) ? 'Anytime leg added to the parlay' : 'Anytime leg removed');
       }
     }
