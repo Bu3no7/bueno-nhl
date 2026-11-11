@@ -522,7 +522,7 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
   var PRELAUNCH = '<b>Model pricing lands with the backtest proof</b> — fixtures, tables and leaders are live.';
   var S = {
     sb: {}, bundles: {}, bundlePlayers: {}, standings: {}, teams: {}, leaders: {}, rosters: {},
-    leadersLoading: {}, fx: {}, fxLoading: {}, athletes: {},
+    leadersLoading: {}, fx: {}, fxLoading: {}, athletes: {}, faces: null, facesLoading: null,
     parlay: [], curLeague: null, curTab: 'markets', curMarket: 'anytime', slateSort: 'kickoff',
     searchPrimed: false
   };
@@ -645,7 +645,7 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
         rows.sort(function (a, b) { return a.rank - b.rank; });
         return { name: ch.name || '', rows: rows };
       });
-      S.standings[slug] = { year: (j.season || {}).year || new Date().getFullYear(), groups: groups };
+      S.standings[slug] = { year: (j.season || {}).year || new Date().getFullYear(), future: !!((j.season || {}).startDate && new Date(j.season.startDate) > new Date()), groups: groups };
       return S.standings[slug];
     }).catch(function () { S.standings[slug] = { year: new Date().getFullYear(), groups: [] }; return S.standings[slug]; });
   }
@@ -665,40 +665,59 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
     if (S.leaders[slug]) return Promise.resolve(S.leaders[slug]);
     if (S.leadersLoading[slug]) return S.leadersLoading[slug];
     S.leadersLoading[slug] = Promise.all([loadStandings(slug), loadTeams(slug)]).then(function (res) {
-      var year = res[0].year;
-      var tries = [1, 0].map(function (t) { return CORE + slug + '/seasons/' + year + '/types/' + t + '/leaders'; });
-      var fetchCats = function (i) {
-        if (i >= tries.length) return Promise.resolve(null);
-        return getJ(tries[i]).then(function (j) { return j.categories || null; }).catch(function () { return fetchCats(i + 1); });
-      };
-      return fetchCats(0).then(function (cats) {
-        if (!cats) { S.leaders[slug] = { goals: [], assists: [], year: year }; return S.leaders[slug]; }
-        var pick = function (names) {
-          for (var i = 0; i < names.length; i++) {
-            var c = cats.filter(function (x) { return x.name === names[i]; })[0];
-            if (c) return c.leaders || [];
-          }
-          return [];
+      var nameByTeam = {};
+      (res[0].groups || []).forEach(function (g) { (g.rows || []).forEach(function (r) { if (r.teamId && r.name) nameByTeam[r.teamId] = r.name; }); });
+      var attempt = function (yr) {
+        var tries = [1, 0].map(function (t) { return CORE + slug + '/seasons/' + yr + '/types/' + t + '/leaders'; });
+        var fetchCats = function (i) {
+          if (i >= tries.length) return Promise.resolve(null);
+          return getJ(tries[i]).then(function (j) { return j.categories || null; }).catch(function () { return fetchCats(i + 1); });
         };
-        var resolve = function (list) {
-          return Promise.all(list.slice(0, 10).map(function (ld) {
-            var ref = ((ld.athlete || {}).$ref) || '';
-            var id = (ref.match(/athletes\/(\d+)/) || [])[1] || '';
-            var m = /Matches:\s*(\d+)/.exec(ld.displayValue || '');
-            return loadAthlete(slug, year, id).then(function (ath) {
-              var tm = (S.teams[slug] || {})[ath.teamId] || {};
-              return {
-                id: id, name: ath.name || 'Player', pos: ath.pos, teamId: ath.teamId,
-                team: tm.name || '', logo: tm.logo || '', value: ld.value,
-                matches: m ? Number(m[1]) : null
-              };
-            });
-          }));
-        };
-        return Promise.all([resolve(pick(['goalsLeaders', 'goals'])), resolve(pick(['assistsLeaders', 'assists']))]).then(function (r) {
-          S.leaders[slug] = { goals: r[0], assists: r[1], year: year };
-          return S.leaders[slug];
+        return fetchCats(0).then(function (cats) {
+          if (!cats || !cats.length) return null;
+          var pick = function (names) {
+            for (var i = 0; i < names.length; i++) {
+              var c = cats.filter(function (x) { return x.name === names[i]; })[0];
+              if (c) return c.leaders || [];
+            }
+            return [];
+          };
+          var resolve = function (list) {
+            return Promise.all(list.slice(0, 10).map(function (ld) {
+              var ref = ((ld.athlete || {}).$ref) || '';
+              var id = (ref.match(/athletes\/(\d+)/) || [])[1] || '';
+              var tref = ((ld.team || {}).$ref) || '';
+              var ldTeamId = (tref.match(/teams\/(\d+)/) || [])[1] || '';
+              var m = /Matches:\s*(\d+)/.exec(ld.displayValue || '');
+              return loadAthlete(slug, yr, id).then(function (ath) {
+                var teamId = ldTeamId || ath.teamId || '';
+                var tm = (S.teams[slug] || {})[teamId] || {};
+                return {
+                  id: id, name: ath.name || 'Player', pos: ath.pos, teamId: teamId,
+                  team: tm.name || nameByTeam[teamId] || '', logo: tm.logo || '', value: ld.value,
+                  matches: m ? Number(m[1]) : null
+                };
+              });
+            }));
+          };
+          return Promise.all([resolve(pick(['goalsLeaders', 'goals'])), resolve(pick(['assistsLeaders', 'assists']))]).then(function (r) {
+            return { goals: r[0], assists: r[1], year: yr };
+          });
         });
+      };
+      /* ESPN sometimes pre-creates next season's standings (MLS rolled to 2027
+         in Nov 2026) — its leaders are empty while the live season is the
+         previous one. Only then, step back a year. */
+      return attempt(res[0].year).then(function (out) {
+        if (out) { S.leaders[slug] = out; return out; }
+        if (res[0].future) {
+          return attempt(res[0].year - 1).then(function (out2) {
+            S.leaders[slug] = out2 || { goals: [], assists: [], year: res[0].year };
+            return S.leaders[slug];
+          });
+        }
+        S.leaders[slug] = { goals: [], assists: [], year: res[0].year };
+        return S.leaders[slug];
       });
     });
     return S.leadersLoading[slug];
@@ -741,10 +760,28 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
     return src ? imgFb(src, tm.id, 'tlogo ' + (cls || '')) : '';
   }
   function headshotUrl(id) { return id ? 'https://a.espncdn.com/i/headshots/soccer/players/full/' + String(id) + '.png' : ''; }
+  function fotmobUrl(id) {
+    var f = S.faces && id ? S.faces[String(id)] : null;
+    return f ? 'https://images.fotmob.com/image_resources/playerimages/' + f + '.png' : '';
+  }
+  function loadFaces() {
+    if (S.facesLoading) return S.facesLoading;
+    var df = window.dataFetch ? window.dataFetch('data/soccer-faces.json') : fetch('data/soccer-faces.json');
+    S.facesLoading = df.then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
+      S.faces = (j && j.byId) || {};
+      return S.faces;
+    }).catch(function () { S.faces = {}; return S.faces; });
+    return S.facesLoading;
+  }
   function faceHtml(id, name) {
-    var hs = headshotUrl(id);
-    return '<div class="face"><span>' + esc(initials(name).toUpperCase()) + '</span>' +
-      (hs ? '<img src="' + esc(hs) + '" alt="" loading="lazy" onerror="this.remove()">' : '') + '</div>';
+    var fm = fotmobUrl(id), hs = headshotUrl(id), img = '';
+    if (fm) {
+      img = '<img src="' + esc(fm) + '" alt="" onerror="' +
+        (hs ? 'if(this.dataset.fb){this.remove()}else{this.dataset.fb=1;this.src=\'' + esc(hs) + '\'}' : 'this.remove()') + '">';
+    } else if (hs) {
+      img = '<img src="' + esc(hs) + '" alt="" onerror="this.remove()">';
+    }
+    return '<div class="face"><span>' + esc(initials(name).toUpperCase()) + '</span>' + img + '</div>';
   }
   function teamScorersHtml(ev, tm) {
     var mine = ev.scorers.filter(function (sc) { return String(sc.teamId) === String(tm.id); });
@@ -1130,7 +1167,8 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
   }
   /* ---------- leaders ---------- */
   function leaderRow(slug, r, unit) {
-    return '<div class="soc-row" data-act="eplayer" data-slug="' + slug + '" data-pid="' + esc(r.id) + '">' +
+    var bp = bundlePlayerFor(slug, r.id, r.name);
+    return '<div class="soc-row" data-act="' + (bp ? 'bplayer' : 'eplayer') + '" data-slug="' + slug + '" data-pid="' + esc(bp ? bp.id : r.id) + '">' +
       logoImg({ logo: r.logo, id: r.teamId }) +
       '<span class="r-main"><span class="r-name">' + esc(r.name) + '</span>' +
       '<span class="r-sub">' + esc(r.team || '') + (r.matches != null ? ' · ' + r.matches + ' apps' : '') + '</span></span>' +
@@ -1177,7 +1215,8 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
         '<div class="soc-panel" style="padding:6px 0 4px" id="gl-' + L.slug + '"><p class="muted-note" style="padding:10px 16px">Loading…</p></div>';
     }).join('');
     LEAGUES.forEach(function (L) {
-      loadLeaders(L.slug).then(function (ld) {
+      Promise.all([loadLeaders(L.slug), loadBundle(L.slug)]).then(function (res) {
+        var ld = res[0];
         var box = $('gl-' + L.slug);
         if (!box) return;
         if (!ld.goals.length) { box.innerHTML = '<p class="muted-note" style="padding:10px 16px">Leaders unavailable right now.</p>'; return; }
@@ -1198,6 +1237,12 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeModals(); });
   function acc(title, body, open) {
     return '<details class="acc"' + (open ? ' open' : '') + '><summary>' + title + '<span class="chev">›</span></summary><div class="acc-body">' + body + '</div></details>';
+  }
+  function teamPosHtml(team, pos) {
+    var bits = [];
+    if (team) bits.push('<b>' + esc(team) + '</b>');
+    if (pos) bits.push(esc(pos));
+    return bits.join(' · ');
   }
   function stackedName(name) {
     var parts = String(name || '').split(' ');
@@ -1308,7 +1353,7 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
     $('socPlayerBody').innerHTML =
       '<div class="pc-head">' + faceHtml(p.id, p.name) +
       '<div class="who"><div class="nm">' + stackedName(p.name) + '</div>' +
-      '<div class="tm"><b>' + esc(p.team || '') + '</b>' + (p.pos ? ' · ' + esc(p.pos) : '') + '<br>' + esc(p.fixtureLabel || L.name) + '</div></div>' +
+      '<div class="tm">' + teamPosHtml(p.team, p.pos) + '<br>' + esc(p.fixtureLabel || L.name) + '</div></div>' +
       (p.anytime != null ? '<div class="hero-stat"><div class="hv">' + pct(p.anytime) + '</div><div class="hl">ANYTIME</div></div>' : '') +
       '</div>' + secs;
     openModal('socPlayerModal');
@@ -1328,7 +1373,7 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
     $('socPlayerBody').innerHTML =
       '<div class="pc-head">' + faceHtml(r.id, r.name) +
       '<div class="who"><div class="nm">' + stackedName(r.name) + '</div>' +
-      '<div class="tm"><b>' + esc(r.team || '') + '</b>' + (r.pos ? ' · ' + esc(r.pos) : '') + '<br>' + esc(leagueOf(slug).name) + '</div></div>' +
+      '<div class="tm">' + teamPosHtml(r.team, r.pos) + '<br>' + esc(leagueOf(slug).name) + '</div></div>' +
       (gRow ? '<div class="hero-stat"><div class="hv">' + gRow.value + '</div><div class="hl">GOALS</div></div>' : '') +
       '</div>' +
       acc('MATCH LINES', '<div class="prelaunch" style="margin:0 0 4px">' + PRELAUNCH + '</div>', true) +
@@ -1685,6 +1730,7 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
   $('slateSortProb').addEventListener('click', function () {
     S.slateSort = 'prob'; this.classList.add('on'); $('slateSortKick').classList.remove('on'); renderSlate();
   });
+  loadFaces();
   renderTiles();
   renderParlay();
   LEAGUES.forEach(function (L) {
