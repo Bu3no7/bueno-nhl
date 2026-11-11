@@ -489,7 +489,7 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
    Bundle schema (all fields optional; sections hide when absent):
    { league, players: [{ id(espn athlete id), name, team, teamId, pos,
        eventId, fixtureLabel, anytime, first, twoPlus, hatTrick,
-       shotsLine:{line,p}, sotLine:{line,p}, assist, goalOrAssist, carded,
+       shotsLine:{line,p}, sotLine:{line,p}, assist, goalOrAssist,
        lam, expMin,
        milestones:{goals:[[n,p]],shots:[[n,p]],sot:[[n,p]],assists:[[n,p]],ga:[[n,p]]},
        minutesL6:[{min,opp,sub}], minutesNote,
@@ -527,7 +527,7 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
   var TOURNAMENTS = [UCL].concat(CUPS);
   var MARKETS = [
     ['anytime', 'Anytime'], ['first', 'First scorer'], ['twoPlus', '2+ goals'], ['hatTrick', 'Hat trick'],
-    ['shots', 'Shots'], ['sot', 'Shots on target'], ['assist', 'Assists'], ['goalOrAssist', 'Goal or assist'], ['carded', 'To be carded']
+    ['shots', 'Shots'], ['sot', 'Shots on target'], ['assist', 'Assists'], ['goalOrAssist', 'Goal or assist']
   ];
   var PRELAUNCH = '<b>Model pricing lands with the backtest proof</b> — fixtures, tables and leaders are live.';
   var S = {
@@ -1361,18 +1361,18 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
       case 'sot': return p.sotLine ? { p: p.sotLine.p, line: 'o' + p.sotLine.line } : null;
       case 'assist': return p.assist != null ? { p: p.assist } : null;
       case 'goalOrAssist': return p.goalOrAssist != null ? { p: p.goalOrAssist } : null;
-      case 'carded': return p.carded != null ? { p: p.carded } : null;
     }
     return null;
   }
   function marketLabel(key) { return (MARKETS.filter(function (m) { return m[0] === key; })[0] || [])[1] || key; }
   function marketTitle(key) {
-    return { anytime: 'Anytime scorer', first: 'First scorer', twoPlus: '2+ goals', hatTrick: 'Hat trick', shots: 'Shots', sot: 'Shots on target', assist: 'Assists', goalOrAssist: 'Goal or assist', carded: 'To be carded' }[key] || 'Anytime scorer';
+    return { anytime: 'Anytime scorer', first: 'First scorer', twoPlus: '2+ goals', hatTrick: 'Hat trick', shots: 'Shots', sot: 'Shots on target', assist: 'Assists', goalOrAssist: 'Goal or assist' }[key] || 'Anytime scorer';
   }
   function heatClass(p) { return p >= 0.45 ? 'h-hot' : p >= 0.22 ? 'h-mid' : 'h-cool'; }
   function inParlay(key) { return S.parlay.some(function (l) { return l.key === key; }); }
   function renderMarkets() {
     var slug = S.curLeague, el = $('lgPane-markets');
+    if (!MARKETS.some(function (m) { return m[0] === S.curMarket; })) S.curMarket = 'anytime';
     var b = S.bundles[slug];
     var pills = '<div class="mkt-pills" style="padding-left:0;padding-right:0">' + MARKETS.map(function (m) {
       return '<button class="mkt' + (S.curMarket === m[0] ? ' on' : '') + '" type="button" data-act="market" data-mk="' + m[0] + '">' + m[1] + '</button>';
@@ -1665,7 +1665,7 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
       ['Anytime scorer', p.anytime, null, true], ['First scorer', p.first, null, false], ['2+ goals', p.twoPlus, null, false], ['Hat trick', p.hatTrick, null, false],
       ['Shots', p.shotsLine ? p.shotsLine.p : null, p.shotsLine ? 'o' + p.shotsLine.line : null, false],
       ['Shots on target', p.sotLine ? p.sotLine.p : null, p.sotLine ? 'o' + p.sotLine.line : null, false],
-      ['Assist', p.assist, null, false], ['Goal or assist', p.goalOrAssist, null, false], ['To be carded', p.carded, null, false]
+      ['Assist', p.assist, null, false], ['Goal or assist', p.goalOrAssist, null, false]
     ];
     var lines = lineDefs.filter(function (d) { return d[1] != null; }).map(function (d) {
       return '<div class="ln"><span class="k">' + (d[3] ? '<b>' + d[0] + '</b>' : d[0]) + (d[2] ? ' <b>' + esc(d[2]) + '</b>' : '') + '</span><span class="p">' + pct(d[1]) + '</span><span class="f">' + fair(d[1]) + '</span></div>';
