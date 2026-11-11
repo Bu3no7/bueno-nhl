@@ -419,6 +419,16 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
       <p style="color:var(--muted);font-size:11.5px;padding:0 16px 8px">Each cup opens to its own fixtures, results and scorer leaders.</p>
       <div id="cupList"></div>
     </div>
+    <div class="soc-panel" style="padding:6px 0 4px;margin-top:12px">
+      <div class="board-head">
+        <span class="b-title"><img src="https://a.espncdn.com/i/leaguelogos/soccer/500-dark/22.png" alt="" style="width:20px;height:20px;vertical-align:-5px;margin-right:6px" onerror="this.style.display='none'">Liga MX — Tournaments</span>
+      </div>
+      <p style="color:var(--muted);font-size:11.5px;padding:0 16px 8px">Same 18 clubs, two championships a year — each torneo opens to its own fixtures, table and leaders.</p>
+      <div class="soc-row" data-act="league" data-slug="mex.apertura"><span class="crest sm"><img src="https://a.espncdn.com/i/leaguelogos/soccer/500-dark/22.png" alt="" onerror="this.style.display='none'"></span><span class="r-main"><span class="r-name" style="font-size:14px">Liga MX Apertura</span>
+      <span class="r-sub" id="tileSub-mex.apertura">Mexico · Torneo Apertura</span></span><span class="chev" style="color:var(--muted)">›</span></div>
+      <div class="soc-row" data-act="league" data-slug="mex.clausura"><span class="crest sm"><img src="https://a.espncdn.com/i/leaguelogos/soccer/500-dark/22.png" alt="" onerror="this.style.display='none'"></span><span class="r-main"><span class="r-name" style="font-size:14px">Liga MX Clausura</span>
+      <span class="r-sub" id="tileSub-mex.clausura">Mexico · Torneo Clausura</span></span><span class="chev" style="color:var(--muted)">›</span></div>
+    </div>
 
     <div class="sec-label">PARLAY BUILDER</div>
     <div class="soc-panel" style="padding:4px 0 0" id="parlayPanel">
@@ -523,7 +533,11 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
     { slug: 'ger.dfb_pokal', name: 'DFB-Pokal', country: 'Germany', tag: 'DFB', logo: 'https://a.espncdn.com/i/leaguelogos/soccer/500-dark/2061.png', cup: true, table: false, wideFx: true },
     { slug: 'fra.coupe_de_france', name: 'Coupe de France', country: 'France', tag: 'CDF', logo: 'https://a.espncdn.com/i/leaguelogos/soccer/500-dark/182.png', cup: true, table: false, wideFx: true }
   ];
-  var COMPS = LEAGUES.concat([UCL], CUPS);
+  var TORNEOS = [
+    { slug: 'mex.apertura', name: 'Liga MX Apertura', short: 'Apertura', country: 'Mexico · Torneo Apertura', tag: 'MEX', logo: 'https://a.espncdn.com/i/leaguelogos/soccer/500-dark/22.png', torneo: 'apertura', base: 'mex.1', table: true },
+    { slug: 'mex.clausura', name: 'Liga MX Clausura', short: 'Clausura', country: 'Mexico · Torneo Clausura', tag: 'MEX', logo: 'https://a.espncdn.com/i/leaguelogos/soccer/500-dark/22.png', torneo: 'clausura', base: 'mex.1', table: true }
+  ];
+  var COMPS = LEAGUES.concat([UCL], CUPS, TORNEOS);
   var TOURNAMENTS = [UCL].concat(CUPS);
   var MARKETS = [
     ['anytime', 'Anytime'], ['first', 'First scorer'], ['twoPlus', '2+ goals'], ['hatTrick', 'Hat trick'],
@@ -534,6 +548,7 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
     sb: {}, bundles: {}, bundlePlayers: {}, standings: {}, teams: {}, leaders: {}, rosters: {},
     leadersLoading: {}, fx: {}, fxLoading: {}, athletes: {}, faces: null, facesLoading: null,
     fmFx: {}, fmFxP: {}, fmRes: {}, fmResP: {}, fmPd: {}, fmPdP: {}, fmBoards: {}, fmBoardUrls: {}, fmRev: null,
+    torneoFm: {}, torneoFmP: {}, torneoType: {},
     parlay: [], curLeague: null, curTab: 'markets', curMarket: 'anytime', slateSort: 'kickoff',
     searchPrimed: false
   };
@@ -569,6 +584,39 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
     clearTimeout(t._h); t._h = setTimeout(function () { t.classList.remove('show'); }, 2200);
   }
   function leagueOf(slug) { return COMPS.filter(function (L) { return L.slug === slug; })[0]; }
+  function baseSlug(slug) { var L = leagueOf(slug); return (L && L.base) || slug; }
+  function isTorneo(slug) { var L = leagueOf(slug); return !!(L && L.torneo); }
+  /* Dynamic torneo edition, resolved from today's date (never hard-coded): Apertura
+     runs Jul–Dec of its start year; Clausura runs Jan–May of its calendar year and is
+     filed under the previous ESPN season. Both roll over untouched each Jan and Jul. */
+  function torneoEdition(L) {
+    var now = new Date(), Y = now.getFullYear();
+    if (L.torneo === 'apertura') {
+      var ay = now.getMonth() >= 6 ? Y : Y - 1;
+      return { espnSeason: ay, fmInstance: ay + '/' + (ay + 1) + ' - Apertura', typeSlug: 'torneo-apertura', winStart: new Date(ay, 6, 1), winEnd: new Date(ay, 11, 31, 23, 59, 59) };
+    }
+    return { espnSeason: Y - 1, fmInstance: (Y - 1) + '/' + Y + ' - Clausura', typeSlug: 'torneo-clausura', winStart: new Date(Y, 0, 1), winEnd: new Date(Y, 5, 30, 23, 59, 59) };
+  }
+  function loadTorneoFm(slug) {
+    if (S.torneoFmP[slug]) return S.torneoFmP[slug];
+    var L = leagueOf(slug), ed = torneoEdition(L);
+    S.torneoFmP[slug] = fetch(FM_API + 'leagues?id=' + FM_LEAGUE[L.base] + '&season=' + encodeURIComponent(ed.fmInstance))
+      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function (j) { S.torneoFm[slug] = j; return j; })
+      .catch(function () { S.torneoFm[slug] = null; return null; });
+    return S.torneoFmP[slug];
+  }
+  /* ESPN season-type id for this torneo, resolved by slug from the season doc
+     (ids and numeric codes differ per season; slugs are stable). */
+  function torneoTypeId(slug) {
+    if (S.torneoType[slug]) return Promise.resolve(S.torneoType[slug]);
+    var L = leagueOf(slug), ed = torneoEdition(L);
+    return getJ(CORE + L.base + '/seasons/' + ed.espnSeason).then(function (j) {
+      var items = ((j.types || {}).items) || [];
+      for (var i = 0; i < items.length; i++) if (items[i].slug === ed.typeSlug) { S.torneoType[slug] = items[i].id; return items[i].id; }
+      return null;
+    }).catch(function () { return null; });
+  }
 
   /* ---------- ESPN parsing ---------- */
   function parseTeam(comp) {
@@ -605,6 +653,7 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
     };
   }
   function loadScoreboard(slug) {
+    if (isTorneo(slug)) { S.sb[slug] = S.sb[slug] || []; return Promise.resolve(S.sb[slug]); }
     return getJ(SITE + slug + '/scoreboard').then(function (j) {
       var evs = (j.events || []).map(function (e) { return parseEvent(e, slug); });
       S.sb[slug] = evs;
@@ -618,7 +667,7 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
   }
   function loadTeams(slug) {
     if (S.teams[slug] && S.teams[slug].__full) return Promise.resolve(S.teams[slug]);
-    return getJ(SITE + slug + '/teams').then(function (j) {
+    return getJ(SITE + baseSlug(slug) + '/teams').then(function (j) {
       var list = (((j.sports || [])[0] || {}).leagues || [])[0];
       var map = S.teams[slug] || {};
       ((list || {}).teams || []).forEach(function (w) {
@@ -632,8 +681,51 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
       return map;
     }).catch(function () { S.teams[slug] = S.teams[slug] || {}; return S.teams[slug]; });
   }
+  /* Torneo table: ESPN core standings scoped by season-type — the site standings
+     endpoint cannot isolate a torneo (it returns whichever phase is current for the
+     season, and its type parameter matches nothing). Each core entry carries its
+     full record inline. Zone colours come from the torneo's FotMob legend. */
+  function loadTorneoStandings(slug) {
+    var L = leagueOf(slug), ed = torneoEdition(L);
+    var empty = { year: ed.espnSeason, future: false, groups: [] };
+    return Promise.all([torneoTypeId(slug), loadTeams(L.base), loadTorneoFm(slug)]).then(function (res) {
+      var tid = res[0];
+      if (!tid) { S.standings[slug] = empty; return empty; }
+      var base = CORE + L.base + '/seasons/' + ed.espnSeason + '/types/' + tid;
+      return getJ(base + '/groups').then(function (gj) {
+        var gid = '1', items = (gj && gj.items) || [];
+        if (items.length) { var m = /groups\/(\d+)/.exec((items[0] || {}).$ref || ''); if (m) gid = m[1]; }
+        return getJ(base + '/groups/' + gid + '/standings/0');
+      }).then(function (sj) {
+        var legend = [];
+        var fm = S.torneoFm[slug];
+        if (fm && fm.table && fm.table[0] && fm.table[0].data) legend = fm.table[0].data.legend || [];
+        var teams = S.teams[L.base] || {};
+        var rows = ((sj && sj.standings) || []).map(function (e, i) {
+          var tm = /teams\/(\d+)/.exec(((e.team || {}).$ref) || '');
+          var teamId = tm ? tm[1] : '';
+          var st = {};
+          (((e.records || [])[0] || {}).stats || []).forEach(function (s) { st[s.name] = s; });
+          var rank = st.rank ? Math.round(st.rank.value) : i + 1;
+          var note = null;
+          legend.forEach(function (lg) { if ((lg.indices || []).indexOf(rank - 1) >= 0) note = { color: lg.color, description: lg.title }; });
+          var t = teams[teamId] || {};
+          return {
+            rank: rank, teamId: teamId, name: t.name || '', logo: t.logo || (teamId ? teamLogoUrl(teamId) : ''),
+            p: st.gamesPlayed ? st.gamesPlayed.displayValue : '0', w: st.wins ? st.wins.displayValue : '0',
+            d: st.ties ? st.ties.displayValue : '0', l: st.losses ? st.losses.displayValue : '0',
+            gd: st.pointDifferential ? st.pointDifferential.displayValue : '0', pts: st.points ? st.points.displayValue : '0',
+            note: note
+          };
+        }).sort(function (a, b) { return a.rank - b.rank; });
+        S.standings[slug] = { year: ed.espnSeason, future: false, groups: rows.length ? [{ name: L.name, rows: rows }] : [] };
+        return S.standings[slug];
+      }).catch(function () { S.standings[slug] = empty; return empty; });
+    }).catch(function () { S.standings[slug] = empty; return empty; });
+  }
   function loadStandings(slug) {
     if (S.standings[slug]) return Promise.resolve(S.standings[slug]);
+    if (isTorneo(slug)) return loadTorneoStandings(slug);
     var parseSt = function (j) {
       var groups = (j.children || []).map(function (ch) {
         var rows = (((ch.standings || {}).entries) || []).map(function (en, i) {
@@ -687,9 +779,45 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
       S.athletes[k] = out; return out;
     }).catch(function () { var out = { id: id, name: '', pos: '', teamId: '' }; S.athletes[k] = out; return out; });
   }
+  /* Torneo leaders: ESPN core categories scoped by season-type (same category names
+     the league leaders use); athletes resolve on the base league + torneo season. */
+  function loadTorneoLeaders(slug) {
+    var L = leagueOf(slug), ed = torneoEdition(L);
+    var empty = { goals: [], assists: [], year: ed.espnSeason };
+    return Promise.all([torneoTypeId(slug), loadStandings(slug), loadTeams(L.base)]).then(function (res) {
+      var tid = res[0];
+      if (!tid) { S.leaders[slug] = empty; return empty; }
+      var nameByTeam = {};
+      (res[1].groups || []).forEach(function (g) { (g.rows || []).forEach(function (r) { if (r.teamId && r.name) nameByTeam[r.teamId] = r.name; }); });
+      var teams = S.teams[L.base] || {};
+      function teamName(tid2) { return nameByTeam[tid2] || (teams[tid2] || {}).name || ''; }
+      return getJ(CORE + L.base + '/seasons/' + ed.espnSeason + '/types/' + tid + '/leaders').then(function (j) {
+        function pickCat(names) { var cats = j.categories || []; for (var i = 0; i < cats.length; i++) if (names.indexOf(cats[i].name) >= 0) return cats[i]; return null; }
+        function mapCat(c) {
+          if (!c) return Promise.resolve([]);
+          return Promise.all((c.leaders || []).slice(0, 10).map(function (ld) {
+            var ref = ((ld.athlete || {}).$ref) || '';
+            var id = (ref.match(/athletes\/(\d+)/) || [])[1];
+            if (!id) return null;
+            return loadAthlete(L.base, ed.espnSeason, String(id)).then(function (a) {
+              if (!a) return null;
+              var tref = ((ld.team || {}).$ref) || ((a.team || {}).$ref) || '';
+              var atid = (tref.match(/teams\/(\d+)/) || [])[1] || a.teamId || '';
+              return { id: String(id), name: a.name, teamId: atid, team: teamName(atid), logo: atid ? teamLogoUrl(atid) : '', value: ld.displayValue != null ? ld.displayValue : '', matches: null };
+            });
+          })).then(function (rows) { return rows.filter(Boolean); });
+        }
+        return Promise.all([mapCat(pickCat(['goalsLeaders', 'goals'])), mapCat(pickCat(['assistsLeaders', 'assists']))]).then(function (rr) {
+          S.leaders[slug] = { goals: rr[0], assists: rr[1], year: ed.espnSeason };
+          return S.leaders[slug];
+        });
+      }).catch(function () { S.leaders[slug] = empty; return empty; });
+    }).catch(function () { S.leaders[slug] = empty; return empty; });
+  }
   function loadLeaders(slug) {
     if (S.leaders[slug]) return Promise.resolve(S.leaders[slug]);
     if (S.leadersLoading[slug]) return S.leadersLoading[slug];
+    if (isTorneo(slug)) { S.leadersLoading[slug] = loadTorneoLeaders(slug); return S.leadersLoading[slug]; }
     S.leadersLoading[slug] = Promise.all([loadStandings(slug), loadTeams(slug)]).then(function (res) {
       var nameByTeam = {};
       (res[0].groups || []).forEach(function (g) { (g.rows || []).forEach(function (r) { if (r.teamId && r.name) nameByTeam[r.teamId] = r.name; }); });
@@ -751,6 +879,7 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
   /* ---------- model bundles ---------- */
   function loadBundle(slug) {
     if (S.bundles[slug] !== undefined) return Promise.resolve(S.bundles[slug]);
+    if (isTorneo(slug)) { S.bundles[slug] = null; return Promise.resolve(null); }
     var df = window.dataFetch ? window.dataFetch('data/soccer-' + slug + '.json') : fetch('data/soccer-' + slug + '.json');
     return df.then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (j) {
       S.bundles[slug] = j || null;
@@ -842,7 +971,7 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
      Cached in-memory and in localStorage; any failure resolves null and the page
      behaves exactly as it did without FotMob. */
   function fmResolve(slug, ev) {
-    var fmL = FM_LEAGUE[slug];
+    var fmL = FM_LEAGUE[baseSlug(slug)];
     if (!fmL || !ev || !ev.home || !ev.away) return Promise.resolve(null);
     var key = slug + ':' + ev.id;
     if (S.fmRes[key] !== undefined) return Promise.resolve(S.fmRes[key]);
@@ -1100,8 +1229,35 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
     S.fmRev = rev;
     return rev;
   }
+  function fmExtractUrls(j) {
+    var players = (((j || {}).stats || {}).players) || [];
+    var urls = {};
+    FM_BOARDS.forEach(function (b) {
+      var hit = players.filter(function (x) { return (x.fetchAllUrl || '').split('/').pop() === b.file; })[0];
+      if (hit) urls[b.key] = hit.fetchAllUrl;
+    });
+    return urls;
+  }
+  /* Torneo boards come from the torneo's own FotMob season instance — its
+     stats.players fetchAllUrls are already scoped to that torneo. */
+  function fmTorneoBoardUrls(slug) {
+    if (S.fmBoardUrls[slug]) return Promise.resolve(S.fmBoardUrls[slug]);
+    var ck = 'fmboards:tor:' + slug;
+    try {
+      var raw = fmLsGet(ck);
+      if (raw) { var o = JSON.parse(raw); if (o && o.ts && Date.now() - o.ts < 864e5 && o.urls) { S.fmBoardUrls[slug] = o.urls; return Promise.resolve(o.urls); } }
+    } catch (e) {}
+    return loadTorneoFm(slug).then(function (j) {
+      var urls = fmExtractUrls(j);
+      if (!Object.keys(urls).length) return null;
+      S.fmBoardUrls[slug] = urls;
+      fmLsSet(ck, JSON.stringify({ ts: Date.now(), urls: urls }));
+      return urls;
+    }).catch(function () { return null; });
+  }
   function fmBoardUrls(slug) {
     var fmL = FM_LEAGUE[slug];
+    if (isTorneo(slug)) return fmTorneoBoardUrls(slug);
     if (!fmL) return Promise.resolve(null);
     if (S.fmBoardUrls[slug]) return Promise.resolve(S.fmBoardUrls[slug]);
     var ck = 'fmboards:' + fmL;
@@ -1243,6 +1399,23 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
   function updateTileSub(slug) {
     var el = $('tileSub-' + slug);
     if (!el) return;
+    var L0 = leagueOf(slug);
+    if (L0 && L0.torneo) {
+      loadTorneoFm(slug).then(function (pl) {
+        if (!pl) return;
+        var ms = ((pl.fixtures || {}).allMatches) || [], now = Date.now(), next = null, last = null;
+        ms.forEach(function (m) {
+          var st = m.status || {}, t = Date.parse(st.utcTime || '');
+          if (isNaN(t)) return;
+          if (st.finished) { if (!last || t > last.t) last = { m: m, t: t }; }
+          else if (!next || t < next.t) next = { m: m, t: t };
+        });
+        function nm(m, side) { return ((m[side] || {}).name) || ''; }
+        if (next && next.t > now - 3 * 36e5) el.textContent = 'Mexico · Next: ' + nm(next.m, 'home') + ' vs ' + nm(next.m, 'away') + ' · ' + dayLabel(new Date(next.t)) + ' ' + fmtTime(new Date(next.t));
+        else if (last) el.textContent = 'Mexico · ' + nm(last.m, 'home') + ' ' + String((last.m.status || {}).scoreStr || '').replace(/\s*-\s*/, '–') + ' ' + nm(last.m, 'away') + ' · FT';
+      });
+      return;
+    }
     var L = leagueOf(slug), evs = S.sb[slug] || [];
     var live = evs.filter(function (e) { return e.state === 'in'; })[0];
     if (live) {
@@ -1372,6 +1545,12 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
   function inParlay(key) { return S.parlay.some(function (l) { return l.key === key; }); }
   function renderMarkets() {
     var slug = S.curLeague, el = $('lgPane-markets');
+    if (isTorneo(slug)) {
+      el.innerHTML = '<div class="soc-panel prelaunch"><div class="pl-t">Prices live on the Liga MX page</div>' +
+        '<div class="pl-s">The model prices Liga MX at league level — fixtures, table and leaders in this view are split by tournament.</div></div>' +
+        '<div class="soc-row" data-act="league" data-slug="mex.1" data-tab="markets"><span class="r-main"><span class="r-name" style="color:var(--volt)">Open Liga MX Markets ›</span><span class="r-sub">Anytime scorer prices for the full league</span></span></div>';
+      return;
+    }
     if (!MARKETS.some(function (m) { return m[0] === S.curMarket; })) S.curMarket = 'anytime';
     var b = S.bundles[slug];
     var pills = '<div class="mkt-pills" style="padding-left:0;padding-right:0">' + MARKETS.map(function (m) {
@@ -1411,7 +1590,51 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
   function findEvent(slug, eid) {
     return leagueEvents(slug).filter(function (e) { return e.id === String(eid); })[0] || null;
   }
+  /* Torneo fixtures: ESPN events for exactly this torneo. The date set comes from
+     the torneo's FotMob season instance (±1 day for ESPN's date bucketing) and every
+     event is window-filtered (Apertura Jul–Dec, Clausura Jan–Jun), so the sibling
+     torneo can never leak into this interior. */
+  function ensureTorneoFixtures(slug) {
+    if (S.fx[slug] || S.fxLoading[slug]) return;
+    S.fxLoading[slug] = true;
+    var L = leagueOf(slug), ed = torneoEdition(L);
+    loadTorneoFm(slug).then(function (pl) {
+      var seen = {}, keys = [];
+      function addKey(k) { if (k && !seen[k]) { seen[k] = 1; keys.push(k); } }
+      if (pl) ((pl.fixtures || {}).allMatches || []).forEach(function (m) {
+        var u = (m.status || {}).utcTime || '';
+        var t = Date.parse(u);
+        if (isNaN(t)) return;
+        addKey(ymd(new Date(t - 864e5))); addKey(ymd(new Date(t))); addKey(ymd(new Date(t + 864e5)));
+      });
+      if (!keys.length) {
+        var a = Math.max(ed.winStart.getTime(), Date.now() - 50 * 864e5), b = Math.min(ed.winEnd.getTime(), Date.now() + 50 * 864e5);
+        for (var t2 = a; t2 <= b; t2 += 864e5) addKey(ymd(new Date(t2)));
+      }
+      keys.sort();
+      var out = [], i = 0;
+      function batch() {
+        if (i >= keys.length) return Promise.resolve();
+        var part = keys.slice(i, i + 10); i += 10;
+        return Promise.all(part.map(function (d) {
+          return getJ(SITE + L.base + '/scoreboard?dates=' + d).then(function (j) {
+            ((j && j.events) || []).forEach(function (e) {
+              var p = parseEvent(e, slug);
+              if (p && p.date >= ed.winStart && p.date <= ed.winEnd) out.push(p);
+            });
+          }).catch(function () {});
+        })).then(batch);
+      }
+      return batch().then(function () {
+        var byId = {};
+        out.forEach(function (p) { byId[p.id] = p; });
+        S.fx[slug] = Object.keys(byId).map(function (k) { return byId[k]; }).sort(function (x, y) { return x.date - y.date; });
+        if (S.curLeague === slug && S.curTab === 'fixtures') renderFixtures();
+      });
+    }).catch(function () { S.fx[slug] = S.fx[slug] || []; if (S.curLeague === slug && S.curTab === 'fixtures') renderFixtures(); });
+  }
   function ensureFixtures(slug) {
+    if (isTorneo(slug)) { ensureTorneoFixtures(slug); return; }
     if (S.fx[slug] || S.fxLoading[slug]) return;
     S.fxLoading[slug] = true;
     var comp = leagueOf(slug) || {};
@@ -1492,7 +1715,7 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
   function loadRoster(slug, teamId) {
     var k = slug + '/' + teamId;
     if (S.rosters[k]) return Promise.resolve(S.rosters[k]);
-    return getJ(SITE + slug + '/teams/' + teamId + '/roster').then(function (j) {
+    return getJ(SITE + baseSlug(slug) + '/teams/' + teamId + '/roster').then(function (j) {
       var list = ((j && j.athletes) || []).map(function (a) {
         var p = a.position || {};
         return {
@@ -1607,7 +1830,7 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
       } else {
         pens = '<div class="prelaunch">' + PRELAUNCH + '</div>';
       }
-      html += '<div class="soc-panel" style="padding:6px 0 4px"><div class="board-head"><span class="b-title">🎯 Penalty takers</span></div>' + pens + '</div>';
+      if (!isTorneo(slug)) html += '<div class="soc-panel" style="padding:6px 0 4px"><div class="board-head"><span class="b-title">🎯 Penalty takers</span></div>' + pens + '</div>';
       el.innerHTML = html + '<div id="lgFmBoards"></div>';
       renderFmBoards(slug);
     });
@@ -1927,7 +2150,7 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
   function loadLineups(slug, ev, seq) {
     var key = slug + ':' + ev.id;
     if (S.fxRosters && S.fxRosters.key === key) { renderLineups(slug, ev, S.fxRosters.rosters); return; }
-    getJ(SITE + slug + '/summary?event=' + ev.id).then(function (j) {
+    getJ(SITE + baseSlug(slug) + '/summary?event=' + ev.id).then(function (j) {
       var rosters = (j && j.rosters) || null;
       if (!rosters || !lineupsHtml(slug, ev, rosters)) return; /* not published yet — keep the note */
       S.fxRosters = { key: key, rosters: rosters };
@@ -2162,6 +2385,7 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
     loadScoreboard(L.slug).then(function () { updateTileSub(L.slug); });
     if (L.table) loadStandings(L.slug).then(function () { updateTileSub(L.slug); });
   });
+  TORNEOS.forEach(function (L) { updateTileSub(L.slug); });
   setInterval(function () {
     LEAGUES.forEach(function (L) {
       loadScoreboard(L.slug).then(function () {
