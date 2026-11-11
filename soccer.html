@@ -585,6 +585,7 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
   var S = {
     sb: {}, bundles: {}, bundlePlayers: {}, standings: {}, teams: {}, leaders: {}, rosters: {},
     leadersLoading: {}, fx: {}, fxLoading: {}, athletes: {}, faces: null, facesLoading: null,
+    maps: null, mapsLoading: null, smView: 'shots', smCtx: null,
     fmFx: {}, fmFxP: {}, fmRes: {}, fmResP: {}, fmPd: {}, fmPdP: {}, fmBoards: {}, fmBoardUrls: {}, fmRev: null,
     torneoFm: {}, torneoFmP: {}, torneoType: {},
     brk: {}, brkLoading: {}, brkEvents: {}, brkView: {}, cupFm: {}, cupFmP: {}, cupTypes: {}, cupTypesP: {},
@@ -968,6 +969,107 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
       return S.faces;
     }).catch(function () { S.faces = {}; return S.faces; });
     return S.facesLoading;
+  }
+  /* ---------- origin maps sidecar (goal origins + shots on target) ----------
+     data/soccer-maps.json: { slug: { espnAthleteId: { name, goals: [{x,y,xg,pen,sit}],
+     sot: [{x,y,xg,xgot}] } } }. Coordinates are normalised FotMob shotmap:
+     x in [0,1] with 1 = the goal line attacked (0.5 = halfway line of the
+     attacking half); y in [0,1] across the pitch width, 0.5 = centre. Loaded
+     lazily on the first player card, once, via the CDN data path; any failure
+     leaves the card exactly as it was (feature silently absent). */
+  function loadMaps() {
+    if (S.mapsLoading) return S.mapsLoading;
+    var df = window.dataFetch ? window.dataFetch('data/soccer-maps.json') : fetch('data/soccer-maps.json');
+    S.mapsLoading = df.then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
+      S.maps = j || null;
+      return S.maps;
+    }).catch(function () { S.maps = null; return null; });
+    return S.mapsLoading;
+  }
+  function mapsEntry(slug, pid) {
+    if (!S.maps || pid == null) return null;
+    var e = (S.maps[slug] || {})[String(pid)];
+    if (!e && baseSlug(slug) !== slug) e = (S.maps[baseSlug(slug)] || {})[String(pid)];
+    return e || null;
+  }
+  /* Sidecar point -> card half-pitch pixels (goal at the top, as the existing
+     shot map draws it): lateral = y across the width; depth from the goal =
+     (1 - x) of the full pitch = 2 * (1 - x) of the attacking half. */
+  function smXY(s) {
+    var cx = 10 + (s.y || 0) * 320, cy = 16 + (1 - (s.x || 0)) * 316;
+    cx = Math.max(13, Math.min(327, cx)); cy = Math.max(13, Math.min(177, cy));
+    return [cx.toFixed(1), cy.toFixed(1)];
+  }
+  function smPitch(inner) {
+    return '<div class="shotmap"><svg viewBox="0 0 340 190" style="display:block;width:100%">' +
+      '<rect x="0" y="0" width="340" height="190" fill="rgba(9,20,38,0.65)"/>' +
+      '<g fill="none" stroke="#BEDCFF" stroke-opacity="0.25" stroke-width="1.2"><rect x="10" y="10" width="320" height="170"/><rect x="80" y="10" width="180" height="62"/><rect x="132" y="10" width="76" height="26"/><line x1="152" y1="4" x2="188" y2="4" stroke-width="3"/></g>' +
+      inner + '</svg></div>';
+  }
+  function smShotsHtml(p) {
+    var dots = { g: '', t: '', o: '' };
+    p.shots.forEach(function (s) {
+      var cx = (10 + (s.x / 100) * 320).toFixed(1), cy = (16 + (s.y / 100) * 158).toFixed(1);
+      if (s.r === 'g') dots.g += '<circle cx="' + cx + '" cy="' + cy + '" r="5.5"/>';
+      else if (s.r === 't') dots.t += '<circle cx="' + cx + '" cy="' + cy + '" r="5"/>';
+      else dots.o += '<circle cx="' + cx + '" cy="' + cy + '" r="4"/>';
+    });
+    var goals = p.shots.filter(function (s) { return s.r === 'g'; }).length;
+    return smPitch('<g fill="none" stroke="#8B96AB" stroke-width="1.4" opacity="0.8">' + dots.o + '</g>' +
+      '<g fill="none" stroke="#B9E356" stroke-width="2">' + dots.t + '</g>' +
+      '<g fill="#F5B942">' + dots.g + '</g>') +
+      (p.zones ? '<div class="zchips"><span class="zchip">SIX-YARD <b>' + p.zones.six + '%</b></span><span class="zchip">PENALTY AREA <b>' + p.zones.box + '%</b></span><span class="zchip">OUTSIDE BOX <b>' + p.zones.out + '%</b></span></div>' : '') +
+      '<p class="legend"><b class="g">●</b> goal &nbsp;<b class="t">○</b> on target &nbsp;○ off target — ' + p.shots.length + ' shots, ' + goals + ' goals this season.</p>';
+  }
+  function smGoalsHtml(e) {
+    var pens = 0, xgSum = 0, dots = '', ring = '';
+    e.goals.forEach(function (s) {
+      var xy = smXY(s), r = (3 + Math.min(5, (s.xg || 0) * 7)).toFixed(1);
+      xgSum += s.xg || 0;
+      if (s.pen) { pens++; ring += '<circle cx="' + xy[0] + '" cy="' + xy[1] + '" r="' + r + '" fill="#F5B942" stroke="#B9E356" stroke-width="2"/>'; }
+      else dots += '<circle cx="' + xy[0] + '" cy="' + xy[1] + '" r="' + r + '"/>';
+    });
+    var n = e.goals.length;
+    var line = n + (n === 1 ? ' goal' : ' goals') + (pens ? ' · ' + pens + (pens === 1 ? ' from a penalty' : ' from penalties') : '') + ' · avg shot xG ' + (xgSum / n).toFixed(2);
+    return smPitch('<g fill="#F5B942">' + dots + '</g>' + ring) +
+      '<p class="legend"><b class="g">●</b> goal origin' + (pens ? ' · ringed = penalty' : '') + ' — ' + line + ' this season.</p>';
+  }
+  function smSotHtml(e) {
+    var dots = '';
+    e.sot.forEach(function (s) {
+      var xy = smXY(s), v = s.xgot != null ? s.xgot : s.xg, r = (3 + Math.min(5, (v || 0) * 7)).toFixed(1);
+      dots += '<circle cx="' + xy[0] + '" cy="' + xy[1] + '" r="' + r + '"/>';
+    });
+    return smPitch('<g fill="#3ADBE3">' + dots + '</g>') +
+      '<p class="legend"><b style="color:#3ADBE3">●</b> shot on target · dot size = xGOT — ' + e.sot.length + ' on target this season.</p>';
+  }
+  function smViews(slug, p) {
+    var e = mapsEntry(slug, p.id), views = [];
+    if (p.shots && p.shots.length) views.push('shots');
+    if (e && e.goals && e.goals.length) views.push('goals');
+    if (e && e.sot && e.sot.length) views.push('sot');
+    return { entry: e, views: views };
+  }
+  function smSectionInner(slug, p, open) {
+    var info = smViews(slug, p);
+    if (!info.views.length) return '';
+    var view = info.views.indexOf(S.smView) >= 0 ? S.smView : info.views[0];
+    var body = '';
+    if (info.views.length > 1) {
+      var labels = { shots: 'Shots', goals: 'Goals', sot: 'On target' };
+      body += '<div class="mkt-pills" style="padding:0 0 10px">' + info.views.map(function (v) {
+        return '<button class="mkt' + (v === view ? ' on' : '') + '" type="button" data-act="smview" data-v="' + v + '">' + labels[v] + '</button>';
+      }).join('') + '</div>';
+    }
+    body += view === 'goals' ? smGoalsHtml(info.entry) : view === 'sot' ? smSotHtml(info.entry) : smShotsHtml(p);
+    return acc('SHOT MAP · SEASON', body, open);
+  }
+  function refreshSmBox() {
+    var box = $('pcSmBox');
+    if (!box || !S.smCtx) return;
+    if (box.dataset.slug !== S.smCtx.slug || box.dataset.pid !== String(S.smCtx.p.id)) return;
+    var det = box.querySelector('details');
+    box.innerHTML = smSectionInner(S.smCtx.slug, S.smCtx.p, det ? det.open : false);
   }
   function faceHtml(id, name, cls) {
     var fm = fotmobUrl(id), hs = headshotUrl(id), img = '';
@@ -2342,6 +2444,7 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
     var p = (S.bundlePlayers[slug] || {})[String(pid)];
     if (!p) { toast('Player not in the current bundle'); return; }
     var L = leagueOf(slug);
+    S.smCtx = { slug: slug, p: p }; S.smView = 'shots';
     var secs = '';
     var lineDefs = [
       ['Anytime scorer', p.anytime, null, true], ['First scorer', p.first, null, false], ['2+ goals', p.twoPlus, null, false], ['Hat trick', p.hatTrick, null, false],
@@ -2384,25 +2487,7 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
       }).join('') + '</div>';
       secs += acc('FORM · LAST ' + p.formL6.length, fh, false);
     }
-    if (p.shots && p.shots.length) {
-      var dots = { g: '', t: '', o: '' };
-      p.shots.forEach(function (s) {
-        var cx = (10 + (s.x / 100) * 320).toFixed(1), cy = (16 + (s.y / 100) * 158).toFixed(1);
-        if (s.r === 'g') dots.g += '<circle cx="' + cx + '" cy="' + cy + '" r="5.5"/>';
-        else if (s.r === 't') dots.t += '<circle cx="' + cx + '" cy="' + cy + '" r="5"/>';
-        else dots.o += '<circle cx="' + cx + '" cy="' + cy + '" r="4"/>';
-      });
-      var goals = p.shots.filter(function (s) { return s.r === 'g'; }).length;
-      var sm = '<div class="shotmap"><svg viewBox="0 0 340 190" style="display:block;width:100%">' +
-        '<rect x="0" y="0" width="340" height="190" fill="rgba(9,20,38,0.65)"/>' +
-        '<g fill="none" stroke="#BEDCFF" stroke-opacity="0.25" stroke-width="1.2"><rect x="10" y="10" width="320" height="170"/><rect x="80" y="10" width="180" height="62"/><rect x="132" y="10" width="76" height="26"/><line x1="152" y1="4" x2="188" y2="4" stroke-width="3"/></g>' +
-        '<g fill="none" stroke="#8B96AB" stroke-width="1.4" opacity="0.8">' + dots.o + '</g>' +
-        '<g fill="none" stroke="#B9E356" stroke-width="2">' + dots.t + '</g>' +
-        '<g fill="#F5B942">' + dots.g + '</g></svg></div>' +
-        (p.zones ? '<div class="zchips"><span class="zchip">SIX-YARD <b>' + p.zones.six + '%</b></span><span class="zchip">PENALTY AREA <b>' + p.zones.box + '%</b></span><span class="zchip">OUTSIDE BOX <b>' + p.zones.out + '%</b></span></div>' : '') +
-        '<p class="legend"><b class="g">●</b> goal &nbsp;<b class="t">○</b> on target &nbsp;○ off target — ' + p.shots.length + ' shots, ' + goals + ' goals this season.</p>';
-      secs += acc('SHOT MAP · SEASON', sm, false);
-    }
+    secs += '<div id="pcSmBox" data-slug="' + esc(slug) + '" data-pid="' + esc(p.id) + '">' + smSectionInner(slug, p, false) + '</div>';
     if (p.pens || p.role) {
       var kv = '';
       if (p.pens) {
@@ -2448,6 +2533,7 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
       '</div><div id="pcFmFlag" data-pid="' + esc(p.id) + '"></div>' + secs;
     openModal('socPlayerModal');
     fmPlayerCard(slug, p.id, p);
+    loadMaps().then(function () { refreshSmBox(); });
   }
   function openEspnPlayer(slug, pid) {
     var ld = S.leaders[slug];
@@ -2802,6 +2888,7 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
     else if (act === 'fmplayer') openFmPlayer(t.dataset.slug, t.dataset.fmid);
     else if (act === 'market') { S.curMarket = t.dataset.mk; renderMarkets(); }
     else if (act === 'brkview') { S.brkView[S.curLeague] = t.dataset.v; renderBracket(); }
+    else if (act === 'smview') { S.smView = t.dataset.v; refreshSmBox(); }
     else if (act === 'qadd') {
       var slug = t.dataset.slug, p = (S.bundlePlayers[slug] || {})[t.dataset.pid];
       var v = p && marketVal(p, t.dataset.mk);
