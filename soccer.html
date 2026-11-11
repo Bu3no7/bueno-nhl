@@ -1787,7 +1787,7 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
         var first = arr[0] || {};
         var ref = first.$ref || first.href || '';
         var year = String(ref.split('/').pop() || new Date().getFullYear());
-        return seasonTypes(slug, year, function (t) { return !(slug === 'uefa.champions' && t.slug === 'league'); });
+        return seasonTypes(slug, year, function (t) { return !(slug === 'uefa.champions' && (t.slug === 'league' || t.slug === 'league-phase')); });
       }).then(function (out) { S.cupTypes[slug] = out; return out; })
         .catch(function () { S.cupTypes[slug] = []; return S.cupTypes[slug]; });
     }
