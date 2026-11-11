@@ -1725,6 +1725,30 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
   }
   function heatClass(p) { return p >= 0.45 ? 'h-hot' : p >= 0.22 ? 'h-mid' : 'h-cool'; }
   function inParlay(key) { return S.parlay.some(function (l) { return l.key === key; }); }
+  /* Markets row sub-line: "<Team> · vs <Opponent>" when the player's team is
+     home, "<Team> · at <Opponent>" when away — never "<Team> · <Home> vs
+     <Away>", which printed the team name twice. Home/away come from the
+     bundle's match record; the fixtureLabel parse is the fallback. */
+  function fxSub(p, b) {
+    var team = p.team || '';
+    if (!team) return '';
+    var m = b && b.matches && p.eventId != null ? b.matches[p.eventId] : null;
+    var home = m && m.home ? m.home.name : null, away = m && m.away ? m.away.name : null;
+    if (home && away) {
+      if (team === home) return team + ' · vs ' + away;
+      if (team === away) return team + ' · at ' + home;
+    }
+    if (p.fixtureLabel) {
+      var i = p.fixtureLabel.indexOf(' vs ');
+      if (i > 0) {
+        var h = p.fixtureLabel.slice(0, i), a = p.fixtureLabel.slice(i + 4);
+        if (team === h) return team + ' · vs ' + a;
+        if (team === a) return team + ' · at ' + h;
+      }
+      return team + ' · ' + p.fixtureLabel;
+    }
+    return team;
+  }
   function renderMarkets() {
     var slug = S.curLeague, el = $('lgPane-markets');
     if (!MARKETS.some(function (m) { return m[0] === S.curMarket; })) S.curMarket = 'anytime';
@@ -1750,7 +1774,7 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
         '<span class="heat ' + heatClass(v.p) + '"></span>' +
         faceHtml(p.id, p.name, 'sm') +
         '<span class="r-main"><span class="r-name">' + esc(p.name) + '</span>' +
-        '<span class="r-sub">' + esc(p.team || '') + (p.fixtureLabel ? ' · ' + esc(p.fixtureLabel) : '') + '</span></span>' +
+        '<span class="r-sub">' + esc(fxSub(p, b)) + '</span></span>' +
         '<span class="r-prob"><span class="p">' + pct(v.p) + '</span><span class="f">' + (v.line ? esc(v.line) : 'fair ' + fair(v.p)) + '</span></span>' +
         '<button class="qadd' + (inParlay(key) ? ' in' : '') + '" type="button" data-act="qadd" data-key="' + esc(key) + '" data-slug="' + slug + '" data-pid="' + esc(p.id) + '" data-mk="' + S.curMarket + '" aria-label="Add to parlay">' + (inParlay(key) ? '✓' : '+') + '</button></div>';
     }).join('') : '<p class="muted-note" style="padding:0 16px 12px">No prices for this market in the current bundle.</p>';
