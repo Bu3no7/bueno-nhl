@@ -228,6 +228,38 @@ details.acc summary::before{content:"";width:3px;height:13px;border-radius:2px;b
 details.acc summary .chev{margin-left:auto;color:var(--muted);font-size:14px;transition:transform .15s}
 details.acc[open] summary .chev{transform:rotate(90deg)}
 .acc-body{padding:2px 16px 14px}
+/* bracket (cups / UCL knockouts / torneo liguilla) */
+.brk-status { color:var(--muted);font-size:10.5px;font-weight:600;letter-spacing:.03em;text-transform:none }
+.brk-tie-note { padding:1px 16px 10px;color:var(--muted);font-size:11.5px }
+.brk-tie-note b { color:var(--volt);font-weight:700 }
+.brk-slot { margin:0 16px 10px;padding:11px 13px;border-radius:13px;border:1px dashed rgba(165,195,255,0.30);background:rgba(6,12,26,0.28);display:flex;align-items:center;gap:9px;font-size:13px;color:var(--muted) }
+.brk-slot-tag { font-size:9.5px;font-weight:800;letter-spacing:.1em;color:var(--volt);flex:0 0 auto;border:1px solid rgba(185,227,86,0.45);border-radius:6px;padding:2.5px 6px }
+.brk-slot-vs { color:rgba(168,180,200,0.55);font-size:11px }
+.brk-team { display:flex;align-items:center;gap:9px;flex:1;min-width:0;cursor:pointer }
+.brk-win-ic { color:var(--volt);font-weight:800 }
+.fx-trow.brk-lose { opacity:.55 }
+.brk-tree-panel { position:relative;overflow:hidden }
+.brk-scroll-hint { position:absolute;top:8px;right:10px;z-index:4;font-size:10.5px;font-weight:700;color:var(--volt);background:rgba(6,12,26,0.55);border:1px solid rgba(185,227,86,0.4);border-radius:999px;padding:3px 9px }
+.brk-tree-fade { position:absolute;top:0;right:0;bottom:0;width:36px;z-index:3;pointer-events:none;background:linear-gradient(90deg, rgba(7,13,27,0), rgba(7,13,27,0.55)) }
+.brk-scroll { overflow-x:auto;-webkit-overflow-scrolling:touch;padding:12px 14px }
+.brk-canvas { position:relative }
+.brk-wires { position:absolute;left:0;top:0;z-index:0 }
+.brk-col { position:absolute;top:0;z-index:1 }
+.brk-col-head { font-size:10.5px;font-weight:800;letter-spacing:.12em;color:var(--ink);height:28px }
+.brk-col-head small { display:block;color:var(--muted);font-weight:600;letter-spacing:.02em;font-size:9.5px;margin-top:1px }
+.brk-card { position:absolute;width:184px;background:rgba(9,20,38,0.72);border:1px solid var(--edge);border-radius:13px;padding:7px 9px;box-shadow:inset 0 1px 0 rgba(255,255,255,0.10) }
+.brk-card .fx-trow { gap:6px }
+.brk-card .fx-tname { font-size:12px }
+.brk-card .fx-sc { font-size:13px }
+.brk-card .tlogo { width:20px;height:20px }
+.brk-tie-meta { font-size:10px;color:var(--muted);margin-top:4px }
+.brk-card.slotcard { border-style:dashed;background:rgba(6,12,26,0.30);color:var(--muted);font-size:11.5px;display:flex;flex-direction:column;justify-content:center;gap:3px }
+.brk-card.slotcard .sv { color:rgba(168,180,200,0.55);font-size:10px }
+.brk-card.champ { border:1px solid rgba(185,227,86,0.55);background:rgba(185,227,86,0.08);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;text-align:center }
+.brk-card.champ .c-title { font-weight:800;font-size:12.5px;letter-spacing:.08em;color:var(--volt) }
+.brk-card.champ .c-sub { color:var(--muted);font-size:10px }
+.brk-card.champ .tlogo { width:26px;height:26px }
+
 .ln{display:flex;align-items:center;padding:7px 0;border-bottom:1px solid rgba(165,195,255,0.06);font-size:13.5px}
 .ln:last-child{border-bottom:none}
 .ln .k{flex:1;color:var(--muted)}
@@ -451,11 +483,13 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
       <div><h2 id="lgName">League</h2><div class="sub" id="lgSub"></div></div>
     </div>
     <div class="subnav" id="lgTabs">
+      <button class="mkt" type="button" data-tab="bracket" style="display:none">Bracket</button>
       <button class="mkt on" type="button" data-tab="markets">Markets</button>
       <button class="mkt" type="button" data-tab="fixtures">Fixtures</button>
       <button class="mkt" type="button" data-tab="table">Table</button>
       <button class="mkt" type="button" data-tab="leaders">Leaders</button>
     </div>
+    <div id="lgPane-bracket" hidden></div>
     <div id="lgPane-markets"></div>
     <div id="lgPane-fixtures" hidden></div>
     <div id="lgPane-table" hidden></div>
@@ -549,6 +583,7 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
     leadersLoading: {}, fx: {}, fxLoading: {}, athletes: {}, faces: null, facesLoading: null,
     fmFx: {}, fmFxP: {}, fmRes: {}, fmResP: {}, fmPd: {}, fmPdP: {}, fmBoards: {}, fmBoardUrls: {}, fmRev: null,
     torneoFm: {}, torneoFmP: {}, torneoType: {},
+    brk: {}, brkLoading: {}, brkEvents: {}, brkView: {}, cupFm: {}, cupFmP: {}, cupTypes: {}, cupTypesP: {},
     parlay: [], curLeague: null, curTab: 'markets', curMarket: 'anytime', slateSort: 'kickoff',
     searchPrimed: false
   };
@@ -624,7 +659,8 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
     return {
       id: String(t.id || ''), name: t.displayName || '', short: t.shortDisplayName || t.displayName || '',
       abbr: t.abbreviation || '', logo: t.logo || ((t.logos || [])[0] || {}).href || teamLogoUrl(t.id),
-      score: comp.score != null && comp.score !== '' ? Number(comp.score) : null, form: comp.form || ''
+      score: comp.score != null && comp.score !== '' ? Number(comp.score) : null, form: comp.form || '',
+      winner: !!comp.winner, shootout: comp.shootoutScore != null ? Number(comp.shootoutScore) : null
     };
   }
   function parseEvent(e, slug) {
@@ -647,9 +683,10 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
     var st = (e.status || {}).type || {};
     return {
       id: String(e.id), slug: slug, date: new Date(e.date), name: e.name || '',
+      seasonSlug: (e.season || {}).slug || '',
       state: st.state || 'pre', detail: st.detail || '', shortDetail: st.shortDetail || '',
       clock: (e.status || {}).displayClock || '', venue: ((c.venue || {}).fullName) || ((e.venue || {}).fullName) || '',
-      home: home, away: away, scorers: scorers
+      home: home, away: away, scorers: scorers, note: (((c.notes || [])[0] || {}).headline || ((c.notes || [])[0] || {}).text || '')
     };
   }
   function loadScoreboard(slug) {
@@ -1358,18 +1395,22 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
     });
     return '<span class="fx-scorers">' + parts.join(' · ') + '</span>';
   }
-  function fxRowHtml(ev, showTag) {
+  function fxRowHtml(ev, showTag, opts) {
+    opts = opts || {};
     var L = leagueOf(ev.slug);
     var live = ev.state === 'in', post = ev.state === 'post';
     var chip;
     if (live) chip = '<span class="fx-time live"><span class="live-dot"></span>' + esc(ev.clock || ev.detail || 'LIVE') + '</span>';
     else if (post) chip = '<span class="fx-time">FT</span>';
     else chip = '<span class="fx-time">' + esc(fmtTime(ev.date)) + '</span>';
+    var tapTeams = !!(L && (L.cup || L.slug === 'uefa.champions'));
     function trow(tm) {
       var sc = (live || post) && tm.score != null ? '<span class="fx-sc">' + tm.score + '</span>' : '';
-      return '<div class="fx-trow">' + logoImg(tm) +
-        '<span class="fx-tinfo"><span class="fx-tname">' + esc(tm.name) + '</span>' + teamScorersHtml(ev, tm) + '</span>' +
-        sc + '</div>';
+      var win = opts.win && post && tm.winner, lose = opts.win && post && !tm.winner;
+      var nm = esc(tm.name) + (win ? ' <span class="brk-win-ic">✓</span>' : '');
+      var inner = logoImg(tm) + '<span class="fx-tinfo"><span class="fx-tname"' + (win ? ' style="font-weight:800"' : '') + '>' + nm + '</span>' + teamScorersHtml(ev, tm) + '</span>';
+      if (tapTeams && tm.id) inner = '<span class="brk-team" data-act="team" data-slug="' + esc(ev.slug) + '" data-tid="' + esc(tm.id) + '">' + inner + '</span>';
+      return '<div class="fx-trow' + (lose ? ' brk-lose' : '') + '">' + inner + sc + '</div>';
     }
     var top = '';
     var b = S.bundles[ev.slug];
@@ -1499,25 +1540,52 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
   }
 
   /* ---------- league view ---------- */
+  function compKind(slug) {
+    var L = leagueOf(slug); if (!L) return 'league';
+    if (L.torneo) return 'torneo';
+    if (L.cup) return 'cup';
+    if (L.slug === 'uefa.champions') return 'ucl';
+    return 'league';
+  }
+  function visibleTabs(slug) {
+    var k = compKind(slug);
+    if (k === 'cup') return ['bracket', 'fixtures', 'leaders'];
+    if (k === 'ucl') return ['bracket', 'table', 'fixtures', 'leaders'];
+    if (k === 'torneo') {
+      var t = [];
+      if (S.brk[slug] && S.brk[slug].hasKnockout) t.push('bracket');
+      return t.concat(['fixtures', 'table', 'leaders']);
+    }
+    return ['markets', 'fixtures', 'table', 'leaders'];
+  }
+  function defaultTab(slug) { var k = compKind(slug); if (k === 'cup' || k === 'ucl') return 'bracket'; if (k === 'torneo') return 'fixtures'; return 'markets'; }
+  function applyTabVisibility(slug) {
+    var vis = visibleTabs(slug);
+    document.querySelectorAll('#lgTabs .mkt').forEach(function (b) {
+      var i = vis.indexOf(b.dataset.tab);
+      b.style.display = i >= 0 ? '' : 'none';
+      b.style.order = i >= 0 ? String(i) : '';
+    });
+  }
   function openLeague(slug, tab) {
     S.curLeague = slug;
     var L = leagueOf(slug);
     $('lgCrest').innerHTML = '<img src="' + L.logo + '" alt="" onerror="this.style.display=\'none\'">';
     $('lgName').textContent = L.name;
     $('lgSub').textContent = L.country;
-    var tblBtn = document.querySelector('#lgTabs .mkt[data-tab="table"]');
-    if (tblBtn) tblBtn.style.display = L.table === false ? 'none' : '';
-    if (tab === 'table' && L.table === false) tab = 'fixtures';
+    applyTabVisibility(slug);
     showView('league');
-    setTab(tab || 'markets');
+    setTab(tab || defaultTab(slug));
     loadBundle(slug).then(function () { if (S.curLeague === slug && S.curTab === 'markets') renderMarkets(); });
+    if (compKind(slug) === 'torneo') loadBracket(slug);
   }
   function setTab(tab) {
-    if (tab === 'table' && S.curLeague && (leagueOf(S.curLeague) || {}).table === false) tab = 'fixtures';
+    if (S.curLeague && visibleTabs(S.curLeague).indexOf(tab) < 0) tab = defaultTab(S.curLeague);
     S.curTab = tab;
     document.querySelectorAll('#lgTabs .mkt').forEach(function (b) { b.classList.toggle('on', b.dataset.tab === tab); });
-    ['markets', 'fixtures', 'table', 'leaders'].forEach(function (t) { $('lgPane-' + t).hidden = t !== tab; });
+    ['bracket', 'markets', 'fixtures', 'table', 'leaders'].forEach(function (t) { $('lgPane-' + t).hidden = t !== tab; });
     if (!S.curLeague) return;
+    if (tab === 'bracket') renderBracket();
     if (tab === 'markets') renderMarkets();
     if (tab === 'fixtures') renderFixtures();
     if (tab === 'table') renderTable();
@@ -1545,12 +1613,6 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
   function inParlay(key) { return S.parlay.some(function (l) { return l.key === key; }); }
   function renderMarkets() {
     var slug = S.curLeague, el = $('lgPane-markets');
-    if (isTorneo(slug)) {
-      el.innerHTML = '<div class="soc-panel prelaunch"><div class="pl-t">Prices live on the Liga MX page</div>' +
-        '<div class="pl-s">The model prices Liga MX at league level — fixtures, table and leaders in this view are split by tournament.</div></div>' +
-        '<div class="soc-row" data-act="league" data-slug="mex.1" data-tab="markets"><span class="r-main"><span class="r-name" style="color:var(--volt)">Open Liga MX Markets ›</span><span class="r-sub">Anytime scorer prices for the full league</span></span></div>';
-      return;
-    }
     if (!MARKETS.some(function (m) { return m[0] === S.curMarket; })) S.curMarket = 'anytime';
     var b = S.bundles[slug];
     var pills = '<div class="mkt-pills" style="padding-left:0;padding-right:0">' + MARKETS.map(function (m) {
@@ -1588,7 +1650,9 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
     return Object.keys(map).map(function (k) { return map[k]; }).sort(function (a, b) { return a.date - b.date; });
   }
   function findEvent(slug, eid) {
-    return leagueEvents(slug).filter(function (e) { return e.id === String(eid); })[0] || null;
+    var ev = leagueEvents(slug).filter(function (e) { return e.id === String(eid); })[0];
+    if (ev) return ev;
+    return (S.brkEvents[slug] || []).filter(function (e) { return e.id === String(eid); })[0] || null;
   }
   /* Torneo fixtures: ESPN events for exactly this torneo. The date set comes from
      the torneo's FotMob season instance (±1 day for ESPN's date bucketing) and every
@@ -1630,6 +1694,7 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
         out.forEach(function (p) { byId[p.id] = p; });
         S.fx[slug] = Object.keys(byId).map(function (k) { return byId[k]; }).sort(function (x, y) { return x.date - y.date; });
         if (S.curLeague === slug && S.curTab === 'fixtures') renderFixtures();
+        if (S.brk[slug]) { buildBracket(slug); if (S.curLeague === slug && S.curTab === 'bracket') renderBracket(); }
       });
     }).catch(function () { S.fx[slug] = S.fx[slug] || []; if (S.curLeague === slug && S.curTab === 'fixtures') renderFixtures(); });
   }
@@ -1669,6 +1734,385 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
         groups[k].map(function (ev) { return fxRowHtml(ev, false); }).join('');
     }).join('') + '</div>';
   }
+
+  /* ---------- bracket (cups / UCL knockouts / torneo liguilla) ----------
+     Rounds come from ESPN core season types (per-round stages with slugs,
+     hasLegs flags and date windows). Ties come from ESPN scoreboard events
+     (winner flags, shootout scores, penalty notes) swept over the dates of
+     the competition's FotMob fixtures; FotMob's playoff payload supplies
+     bracket order and undrawn slot labels. Display only — no pricing. */
+  function brkShortTag(name) {
+    return { 'Quarterfinals': 'QF', 'Semifinals': 'SF', 'Final': 'F', 'Finals': 'F', 'Round of 16': 'R16', 'Round of 32': 'R32', 'Round of 64': 'R64', 'Knockout Round Playoffs': 'PO', 'Knockout Round Play-offs': 'PO' }[name] ||
+      String(name || '').replace(/[^A-Za-z0-9]/g, '').slice(0, 4).toUpperCase();
+  }
+  function loadCupFm(slug) {
+    if (S.cupFm[slug] !== undefined) return Promise.resolve(S.cupFm[slug]);
+    if (S.cupFmP[slug]) return S.cupFmP[slug];
+    var id = FM_LEAGUE[slug];
+    if (!id) { S.cupFm[slug] = null; return Promise.resolve(null); }
+    var p = fmGet(FM_API + 'leagues?id=' + id).then(function (j) { S.cupFm[slug] = j || null; return S.cupFm[slug]; })
+      .catch(function () { S.cupFm[slug] = null; return null; });
+    S.cupFmP[slug] = p; return p;
+  }
+  function loadCupTypes(slug) {
+    if (S.cupTypes[slug]) return Promise.resolve(S.cupTypes[slug]);
+    if (S.cupTypesP[slug]) return S.cupTypesP[slug];
+    var L = leagueOf(slug), p;
+    function docsToTypes(docs, keep) {
+      var out = [];
+      (docs || []).forEach(function (d) {
+        if (!d || !d.slug) return;
+        var t = { id: String(d.id || ''), name: d.name || d.slug, slug: d.slug, start: d.startDate || '', end: d.endDate || '', hasLegs: !!d.hasLegs };
+        if (keep(t, d)) out.push(t);
+      });
+      out.sort(function (a, b) { return String(a.start).localeCompare(String(b.start)); });
+      return out;
+    }
+    function seasonTypes(base, year, keep) {
+      return getJ(CORE + base + '/seasons/' + year).then(function (j) {
+        var refs = (((j || {}).types || {}).items || []).map(function (t) { return t.$ref; }).filter(Boolean);
+        return Promise.all(refs.map(function (u) { return getJ(u).catch(function () { return null; }); }));
+      }).then(function (docs) { return docsToTypes(docs, keep); });
+    }
+    if (L && L.torneo) {
+      var ed = torneoEdition(L);
+      p = seasonTypes(L.base, ed.espnSeason, function (t) { return t.slug.indexOf(L.torneo + '---') === 0; })
+        .then(function (out) {
+          out.forEach(function (t) { t.name = String(t.name).replace(/^.*[-–]\s*/, ''); if (t.name === 'Finals') t.name = 'Final'; });
+          S.cupTypes[slug] = out; return out;
+        }).catch(function () { S.cupTypes[slug] = []; return S.cupTypes[slug]; });
+    } else {
+      p = getJ(CORE + slug + '/seasons').then(function (j) {
+        var arr = ((j || {}).items) || ((j || {}).seasons) || [];
+        var first = arr[0] || {};
+        var ref = first.$ref || first.href || '';
+        var year = String(ref.split('/').pop() || new Date().getFullYear());
+        return seasonTypes(slug, year, function (t) { return !(slug === 'uefa.champions' && t.slug === 'league'); });
+      }).then(function (out) { S.cupTypes[slug] = out; return out; })
+        .catch(function () { S.cupTypes[slug] = []; return S.cupTypes[slug]; });
+    }
+    S.cupTypesP[slug] = p; return p;
+  }
+  /* ESPN events for a cup/UCL: scoreboard sweep over the FotMob fixture dates
+     (+-1 day, batches of 10 — the torneo pattern), kept in a separate store. */
+  function loadCupEvents(slug) {
+    if (S.brkEvents[slug]) return Promise.resolve(S.brkEvents[slug]);
+    return loadCupFm(slug).then(function (pl) {
+      var seen = {}, keys = [];
+      function add(d) { var k = ymd(d); if (!seen[k]) { seen[k] = 1; keys.push(k); } }
+      (((pl || {}).fixtures || {}).allMatches || []).forEach(function (m) {
+        if (slug === 'uefa.champions' && /^\d+$/.test(String(m.round != null ? m.round : ''))) return; /* league-phase matchdays */
+        var t = Date.parse((m.status || {}).utcTime || '');
+        if (isNaN(t)) return;
+        add(new Date(t - 864e5)); add(new Date(t)); add(new Date(t + 864e5));
+      });
+      keys.sort();
+      if (!S.teams[slug]) S.teams[slug] = {};
+      var out = [], i = 0;
+      function batch() {
+        if (i >= keys.length) return Promise.resolve();
+        var part = keys.slice(i, i + 10); i += 10;
+        return Promise.all(part.map(function (d) {
+          return getJ(SITE + slug + '/scoreboard?dates=' + d).then(function (j) {
+            ((j && j.events) || []).forEach(function (e) { var pv = parseEvent(e, slug); if (pv) out.push(pv); });
+          }).catch(function () {});
+        })).then(batch);
+      }
+      return batch().then(function () {
+        var byId = {}; out.forEach(function (pv) { byId[pv.id] = pv; });
+        S.brkEvents[slug] = Object.keys(byId).map(function (k) { return byId[k]; }).sort(function (x, y) { return x.date - y.date; });
+        S.brkEvents[slug].forEach(function (ev) { [ev.home, ev.away].forEach(function (tm) { if (tm && tm.id && !S.teams[slug][tm.id]) S.teams[slug][tm.id] = tm; }); });
+        return S.brkEvents[slug];
+      });
+    });
+  }
+  function loadBracket(slug) {
+    if (S.brk[slug]) return Promise.resolve(S.brk[slug]);
+    if (S.brkLoading[slug]) return S.brkLoading[slug];
+    var kind = compKind(slug);
+    var jobs = [loadCupTypes(slug), kind === 'torneo' ? loadTorneoFm(slug) : loadCupFm(slug)];
+    jobs.push(kind === 'torneo' ? Promise.resolve(ensureTorneoFixtures(slug)) : loadCupEvents(slug));
+    var p = Promise.all(jobs).then(function () { buildBracket(slug); brkAfterLoad(slug); return S.brk[slug]; })
+      .catch(function () { if (!S.brk[slug]) S.brk[slug] = { rounds: [], hasKnockout: false, error: true, treeStart: 0 }; brkAfterLoad(slug); return S.brk[slug]; });
+    S.brkLoading[slug] = p; return p;
+  }
+  function brkAfterLoad(slug) {
+    if (S.curLeague !== slug) return;
+    applyTabVisibility(slug);
+    if (visibleTabs(slug).indexOf(S.curTab) < 0) setTab(defaultTab(slug));
+    else if (S.curTab === 'bracket') renderBracket();
+  }
+  function fmStageName(stage) {
+    var s = String(stage || '');
+    return { '1/32': 'Round of 32', '1/16': 'Round of 16', '1/8': 'Round of 16', '1/4': 'Quarterfinals', '1/2': 'Semifinals', 'final': 'Final' }[s] || s;
+  }
+  function fmRoundsOf(fm) {
+    var po = fm && fm.playoff;
+    if (!po || !po.rounds) return [];
+    return po.rounds.filter(function (r) { return (r.matchups || []).length; }).map(function (r, i) {
+      return { key: 'fm' + i + ':' + (r.stage || r.name || ''), name: r.name || fmStageName(r.stage), stage: r.stage, bestOf: r.bestOf || 1, matchups: r.matchups };
+    });
+  }
+  function matchFmRound(list, used, want) {
+    if (!want) return null;
+    for (var i = 0; i < list.length; i++) { if (!used[list[i].key] && list[i].matchups.length === want) return list[i]; }
+    return null;
+  }
+  function groupTies(evs) {
+    var used = {}, ties = [];
+    evs.forEach(function (ev) {
+      if (used[ev.id] || !ev.home || !ev.away) return;
+      var pair = null;
+      for (var i = 0; i < evs.length; i++) {
+        var e2 = evs[i];
+        if (e2.id === ev.id || used[e2.id] || !e2.home || !e2.away) continue;
+        if ((e2.home.id === ev.home.id && e2.away.id === ev.away.id) || (e2.home.id === ev.away.id && e2.away.id === ev.home.id)) { pair = e2; break; }
+      }
+      var legs = [ev]; used[ev.id] = 1;
+      if (pair) { legs.push(pair); used[pair.id] = 1; legs.sort(function (a, b) { return a.date - b.date; }); }
+      ties.push({ events: legs });
+    });
+    return ties;
+  }
+  function orderTies(ties, fmR) {
+    var rank = ties.map(function (t, i) {
+      var e = t.events[0], ns = e && e.home && e.away ? [fold(e.home.name), fold(e.away.name)] : [], best = 999;
+      fmR.matchups.forEach(function (mu, mi) {
+        if (ns.indexOf(fold(mu.homeTeam || '')) >= 0 || ns.indexOf(fold(mu.awayTeam || '')) >= 0) best = Math.min(best, mi);
+      });
+      return { t: t, r: best === 999 ? 500 + i : best };
+    });
+    rank.sort(function (a, b) { return a.r - b.r; });
+    for (var i = 0; i < ties.length; i++) ties[i] = rank[i].t;
+  }
+  function bracketTeamPool(slug) {
+    var pool = {};
+    function add(tm) { if (tm && tm.id) pool[tm.id] = tm; }
+    (S.brkEvents[slug] || []).forEach(function (ev) { add(ev.home); add(ev.away); });
+    leagueEvents(slug).forEach(function (ev) { add(ev.home); add(ev.away); });
+    Object.keys(S.teams[slug] || {}).forEach(function (k) { add(S.teams[slug][k]); });
+    return pool;
+  }
+  function slotFromMatchup(slug, mu, roundName, i) {
+    var pool = bracketTeamPool(slug);
+    function side(nm) {
+      if (!nm) return { text: 'To be decided' };
+      if (nm.indexOf('/') < 0 && !/^Winner/i.test(nm) && !/TBD/i.test(nm)) {
+        var f = fold(nm), hit = null;
+        Object.keys(pool).forEach(function (id) { if (fold(pool[id].name) === f) hit = pool[id]; });
+        if (hit) return { text: nm, team: hit };
+      }
+      return { text: nm };
+    }
+    return { tag: brkShortTag(roundName) + (i + 1), a: side(mu.homeTeam), b: side(mu.awayTeam) };
+  }
+  function buildBracket(slug) {
+    var kind = compKind(slug);
+    var types = (S.cupTypes[slug] || []).slice();
+    var fm = kind === 'torneo' ? S.torneoFm[slug] : S.cupFm[slug];
+    var fmRounds = fmRoundsOf(fm);
+    var events = kind === 'torneo' ? leagueEvents(slug) : (S.brkEvents[slug] || []);
+    if (!types.length && fmRounds.length) {
+      types = fmRounds.map(function (fr) { return { id: '', name: fr.name, slug: '', start: '', end: '', hasLegs: fr.bestOf > 1, fm: fr }; });
+    }
+    var usedFm = {}, prevCount = 0, prevName = '';
+    var rounds = types.map(function (tp, idx) {
+      var evs = events.filter(function (ev) {
+        if (tp.slug && ev.seasonSlug) return ev.seasonSlug === tp.slug;
+        if (tp.start && tp.end) return ev.date >= new Date(tp.start) && ev.date <= new Date(tp.end);
+        return false;
+      });
+      var ties = groupTies(evs);
+      var fmR = tp.fm || matchFmRound(fmRounds, usedFm, ties.length || (prevCount ? Math.floor(prevCount / 2) : 0));
+      if (fmR) { usedFm[fmR.key] = 1; if (ties.length) orderTies(ties, fmR); }
+      var slots = [], i, n;
+      if (!ties.length && kind === 'ucl') {
+        if (tp.slug === 'knockout-round-playoffs') { for (i = 0; i < 8; i++) slots.push({ tag: 'PO' + (i + 1), a: { text: 'Play-off Tie ' + (i + 1) }, b: { text: 'League-phase seeds 9–24' } }); }
+        else if (tp.slug === 'round-of-16') { for (i = 0; i < 8; i++) slots.push({ tag: 'R16' + (i + 1), a: { text: 'Winner of PO Tie ' + (i + 1) }, b: { text: 'League-phase top-8 seed' } }); }
+      }
+      if (!ties.length && !slots.length && fmR && fmR.matchups.length) {
+        slots = fmR.matchups.map(function (mu, mi) { return slotFromMatchup(slug, mu, tp.name, mi); });
+      }
+      if (!ties.length && !slots.length && prevCount >= 2) {
+        n = Math.floor(prevCount / 2);
+        for (i = 0; i < n; i++) slots.push({ tag: brkShortTag(tp.name) + (i + 1), a: { text: 'Winner of ' + brkShortTag(prevName) + ' Tie ' + (2 * i + 1) }, b: { text: 'Winner of ' + brkShortTag(prevName) + ' Tie ' + (2 * i + 2) } });
+      }
+      var count = ties.length + slots.length;
+      if (count > 0) { prevCount = count; prevName = tp.name; }
+      return { name: tp.name, slug: tp.slug, hasLegs: !!tp.hasLegs, ties: ties, slots: slots, count: count, start: tp.start, end: tp.end };
+    });
+    var hasKnockout = kind === 'torneo' ? rounds.some(function (r) { return r.count > 0; }) : rounds.length > 0;
+    var start = Math.max(0, rounds.length - 5);
+    while (start < rounds.length - 1 && rounds[start].count > 16) start++;
+    S.brk[slug] = { rounds: rounds, hasKnockout: hasKnockout, treeStart: start };
+    return S.brk[slug];
+  }
+  function tieInfo(tie) {
+    var legs = tie.events, first = legs[0], last = legs[legs.length - 1], agg = {};
+    legs.forEach(function (ev) { [ev.home, ev.away].forEach(function (tm) { if (tm && tm.id && tm.score != null) agg[tm.id] = (agg[tm.id] || 0) + tm.score; }); });
+    var winnerId = '';
+    [last.home, last.away].forEach(function (tm) { if (tm && tm.winner) winnerId = tm.id; });
+    var decided = last.state === 'post';
+    if (decided && !winnerId && legs.length > 1 && first.home && first.away) {
+      if ((agg[first.home.id] || 0) > (agg[first.away.id] || 0)) winnerId = first.home.id;
+      else if ((agg[first.away.id] || 0) > (agg[first.home.id] || 0)) winnerId = first.away.id;
+    }
+    return { legs: legs, first: first, last: last, agg: agg, winnerId: winnerId, decided: decided, twoLeg: legs.length > 1 };
+  }
+  function teamById(tie, id) { var f = tie.events[0]; return [f.home, f.away].filter(function (tm) { return tm && tm.id === id; })[0] || null; }
+  function pensText(ev) {
+    if (!ev) return '';
+    if (ev.note && /penalt/i.test(ev.note)) return ev.note;
+    var h = ev.home, a = ev.away;
+    if (h && a && h.shootout != null && a.shootout != null && (h.winner || a.winner)) {
+      var w = h.winner ? h : a, l = h.winner ? a : h;
+      return w.name + ' won ' + w.shootout + '–' + l.shootout + ' on penalties';
+    }
+    return '';
+  }
+  function roundStatus(r) {
+    var evs = [];
+    r.ties.forEach(function (t) { evs = evs.concat(t.events); });
+    var n = r.ties.length + r.slots.length;
+    if (!n) return 'Not yet drawn';
+    var post = evs.filter(function (e) { return e.state === 'post'; }).length;
+    var live = evs.filter(function (e) { return e.state === 'in'; }).length;
+    var word = n === 1 ? ' tie' : ' ties';
+    if (evs.length && post === evs.length) return 'Complete · ' + n + word;
+    if (live || post) return 'In progress · ' + n + word;
+    var ds = evs.map(function (e) { return e.date; });
+    if (ds.length) return dayLabel(new Date(Math.min.apply(null, ds))) + ' – ' + dayLabel(new Date(Math.max.apply(null, ds))) + ' · ' + n + word;
+    if (r.start && r.end) return dayLabel(new Date(r.start)) + ' – ' + dayLabel(new Date(r.end)) + ' · ' + n + word;
+    return n + word;
+  }
+  function renderBracket() {
+    var slug = S.curLeague; if (!slug) return;
+    var el = $('lgPane-bracket'); if (!el) return;
+    var br = S.brk[slug];
+    if (!br) { el.innerHTML = '<div class="soc-panel"><p class="muted-note">Loading bracket…</p></div>'; loadBracket(slug); return; }
+    var view = S.brkView[slug] || 'rounds';
+    var toggle = '<div class="mkt-pills" style="padding-left:0;padding-right:0">' +
+      '<button class="mkt' + (view === 'rounds' ? ' on' : '') + '" type="button" data-act="brkview" data-v="rounds">Rounds</button>' +
+      '<button class="mkt' + (view === 'tree' ? ' on' : '') + '" type="button" data-act="brkview" data-v="tree">Tree</button></div>';
+    var intro = '';
+    if (compKind(slug) === 'ucl' && !br.rounds.some(function (r) { return r.ties.length; })) {
+      intro = '<div class="soc-panel" style="margin-bottom:12px"><b>League phase in progress.</b><p class="muted-note" style="margin-top:4px">The knockout bracket below is the path to the final — ties appear once the play-off draw is made after Matchday 8.</p></div>';
+    }
+    el.innerHTML = toggle + intro + (view === 'tree' ? brkTreeHtml(slug, br) : brkRoundsHtml(slug, br));
+  }
+  function brkTieHtml(tie) {
+    var info = tieInfo(tie);
+    var html = info.legs.map(function (ev) { return fxRowHtml(ev, false, { win: true }); }).join('');
+    var notes = [];
+    if (info.twoLeg && info.decided) {
+      var fh = info.first.home, fa = info.first.away;
+      var w = info.winnerId ? teamById(tie, info.winnerId) : null;
+      notes.push('<b>Agg ' + (info.agg[fh.id] || 0) + '–' + (info.agg[fa.id] || 0) + '</b>' + (w ? ' · ' + esc(w.name) + ' advance' : ''));
+    }
+    var pt = pensText(info.last);
+    if (pt) notes.push(esc(pt));
+    if (notes.length) html += '<div class="brk-tie-note">' + notes.join(' · ') + '</div>';
+    return html;
+  }
+  function brkSlotHtml(s) {
+    function sideHtml(sd) {
+      if (sd.team) return '<span class="brk-team" data-act="team" data-slug="' + esc(S.curLeague) + '" data-tid="' + esc(sd.team.id) + '">' + logoImg(sd.team) + '<span>' + esc(sd.team.name) + '</span></span>';
+      return '<span>' + esc(sd.text) + '</span>';
+    }
+    return '<div class="brk-slot"><span class="brk-slot-tag">' + esc(s.tag) + '</span>' + sideHtml(s.a) + '<span class="brk-slot-vs">vs</span>' + sideHtml(s.b) + '</div>';
+  }
+  function brkRoundsHtml(slug, br) {
+    if (br.error) return '<div class="soc-panel"><p class="muted-note">Bracket unavailable right now.</p></div>';
+    var lastPlayed = -1;
+    br.rounds.forEach(function (r, idx) {
+      if (r.ties.some(function (t) { return t.events.some(function (e) { return e.state === 'post' || e.state === 'in'; }); })) lastPlayed = idx;
+    });
+    var nextUp = -1, i;
+    for (i = lastPlayed + 1; i < br.rounds.length; i++) { if (br.rounds[i].count > 0) { nextUp = i; break; } }
+    var html = br.rounds.map(function (r, idx) {
+      var open = idx === lastPlayed || idx === nextUp;
+      var body = '';
+      r.ties.forEach(function (t) { body += brkTieHtml(t); });
+      r.slots.forEach(function (s) { body += brkSlotHtml(s); });
+      if (!r.ties.length && !r.slots.length) body = '<p class="muted-note" style="padding:2px 16px 8px">Ties appear here once the draw is made.</p>';
+      return '<div class="soc-panel" style="padding:4px 0 8px;margin-bottom:12px"><details class="acc"' + (open ? ' open' : '') + '><summary>' + esc(r.name.toUpperCase()) + '<span class="brk-status">' + esc(roundStatus(r)) + '</span><span class="chev">›</span></summary><div class="acc-body" style="padding-left:0;padding-right:0">' + body + '</div></details></div>';
+    }).join('');
+    return html || '<div class="soc-panel"><p class="muted-note">Bracket unavailable right now.</p></div>';
+  }
+  function brkTreeCard(slug, en, top) {
+    function sideTxt(sd) { return esc(sd.team ? sd.team.name : sd.text); }
+    if (en.slot) {
+      function sdHtml(sd) {
+        if (sd.team) return '<span data-act="team" data-slug="' + esc(slug) + '" data-tid="' + esc(sd.team.id) + '" style="cursor:pointer">' + esc(sd.team.name) + '</span>';
+        return esc(sd.text);
+      }
+      return '<div class="brk-card slotcard" style="top:' + top + 'px"><span>' + sdHtml(en.slot.a) + '</span><span class="sv">vs</span><span>' + sdHtml(en.slot.b) + '</span></div>';
+    }
+    var info = tieInfo(en.tie), fh = info.first.home, fa = info.first.away;
+    function trowT(tm) {
+      var sc = '';
+      if (info.last.state !== 'pre') sc = info.twoLeg ? String(info.agg[tm.id] || 0) : (tm.score != null ? String(tm.score) : '');
+      var win = info.decided && info.winnerId === tm.id;
+      var inner = logoImg(tm) + '<span class="fx-tinfo"><span class="fx-tname"' + (win ? ' style="font-weight:800"' : '') + '>' + esc(tm.name) + (win ? ' <span class="brk-win-ic">✓</span>' : '') + '</span></span>';
+      if (tm.id) inner = '<span class="brk-team" data-act="team" data-slug="' + esc(slug) + '" data-tid="' + esc(tm.id) + '">' + inner + '</span>';
+      return '<div class="fx-trow">' + inner + (sc !== '' ? '<span class="fx-sc">' + sc + '</span>' : '') + '</div>';
+    }
+    var meta = '';
+    var pt = pensText(info.last);
+    if (pt) meta = '<div class="brk-tie-meta">' + esc(pt) + '</div>';
+    else if (info.twoLeg) meta = '<div class="brk-tie-meta">' + (info.decided ? 'Agg ' + (info.agg[fh.id] || 0) + '–' + (info.agg[fa.id] || 0) : 'Two legs') + '</div>';
+    else if (!info.decided && info.first.state === 'pre') meta = '<div class="brk-tie-meta">' + esc(dayLabel(info.first.date)) + '</div>';
+    return '<div class="brk-card" style="top:' + top + 'px">' + trowT(fh) + trowT(fa) + meta + '</div>';
+  }
+  function brkChampCard(slug, fr, top, isFinal) {
+    var champ = null;
+    if (isFinal && fr && fr.ties.length) { var info = tieInfo(fr.ties[0]); if (info.decided && info.winnerId) champ = teamById(fr.ties[0], info.winnerId); }
+    if (!champ) return '<div class="brk-card champ" style="top:' + top + 'px"><span style="font-size:19px">🏆</span><span class="c-sub">CHAMPION</span><span class="c-sub">Winner of the Final</span></div>';
+    var inner = logoImg(champ) + '<span style="font-weight:800;font-size:13px">' + esc(champ.name) + '</span>';
+    return '<div class="brk-card champ" style="top:' + top + 'px" data-act="team" data-slug="' + esc(slug) + '" data-tid="' + esc(champ.id) + '"><span style="font-size:19px">🏆</span><span class="c-title">CHAMPION</span>' + inner + '</div>';
+  }
+  function brkTreeHtml(slug, br) {
+    var rounds = br.rounds.slice(br.treeStart).filter(function (r) { return r.count > 0; });
+    if (!rounds.length) return '<div class="soc-panel"><p class="muted-note">The tree appears once the late rounds are set — see the Rounds view.</p></div>';
+    var COLW = 184, GAP = 44, HEAD = 32, CARDH = 62, UNIT = 84;
+    var H = HEAD + rounds[0].count * UNIT + 6;
+    var cols = rounds.length + 1;
+    var W = cols * COLW + (cols - 1) * GAP + 4;
+    function colX(c) { return c * (COLW + GAP); }
+    function cardTop(r, i) { var block = UNIT * Math.pow(2, r); return HEAD + i * block + (block - CARDH) / 2; }
+    var entries = rounds.map(function (r) {
+      var arr = [];
+      r.ties.forEach(function (t) { arr.push({ tie: t }); });
+      r.slots.forEach(function (s) { arr.push({ slot: s }); });
+      return arr;
+    });
+    var d = '', c, j;
+    for (c = 0; c < rounds.length - 1; c++) {
+      for (j = 0; j < entries[c + 1].length; j++) {
+        var ty = cardTop(c + 1, j) + CARDH / 2;
+        [2 * j, 2 * j + 1].forEach(function (si) {
+          if (si >= entries[c].length) return;
+          var sy = cardTop(c, si) + CARDH / 2;
+          d += 'M' + (colX(c) + COLW) + ' ' + sy + ' H' + (colX(c) + COLW + GAP / 2) + ' V' + ty + ' H' + colX(c + 1) + ' ';
+        });
+      }
+    }
+    if (entries[rounds.length - 1].length) {
+      var cy = cardTop(rounds.length - 1, 0) + CARDH / 2, fx1 = colX(rounds.length - 1) + COLW;
+      d += 'M' + fx1 + ' ' + cy + ' H' + (fx1 + GAP / 2) + ' V' + cy + ' H' + colX(rounds.length) + ' ';
+    }
+    var html = '<svg class="brk-wires" width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '"><path d="' + d + '" fill="none" stroke="rgba(185,227,86,0.38)" stroke-width="1.6"/></svg>';
+    rounds.forEach(function (r, ci) {
+      var note = r.ties.length ? r.ties.length + (r.ties.length === 1 ? ' tie' : ' ties') : 'not drawn';
+      var inner = '<div class="brk-col-head">' + esc(r.name.toUpperCase()) + '<small>' + esc(note) + '</small></div>';
+      entries[ci].forEach(function (en, i) { inner += brkTreeCard(slug, en, cardTop(ci, i)); });
+      html += '<div class="brk-col" style="left:' + colX(ci) + 'px;width:' + COLW + 'px">' + inner + '</div>';
+    });
+    html += '<div class="brk-col" style="left:' + colX(rounds.length) + 'px;width:' + COLW + 'px"><div class="brk-col-head">CHAMPION<small>🏆</small></div>' + brkChampCard(slug, rounds[rounds.length - 1], cardTop(rounds.length - 1, 0), rounds[rounds.length - 1] === br.rounds[br.rounds.length - 1]) + '</div>';
+    var cap = br.treeStart > 0 ? '<p class="muted-note" style="margin-top:8px">Earlier rounds live in the Rounds view — the tree starts at the ' + esc(rounds[0].name) + '.</p>' : '';
+    return '<div class="soc-panel brk-tree-panel"><span class="brk-scroll-hint">scroll →</span><div class="brk-tree-fade"></div><div class="brk-scroll"><div class="brk-canvas" style="width:' + W + 'px;height:' + H + 'px">' + html + '</div></div></div>' + cap;
+  }
+
   /* ---------- table ---------- */
   function renderTable() {
     var slug = S.curLeague, el = $('lgPane-table');
@@ -2339,6 +2783,7 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
     else if (act === 'eplayer') openEspnPlayer(t.dataset.slug, t.dataset.pid);
     else if (act === 'fmplayer') openFmPlayer(t.dataset.slug, t.dataset.fmid);
     else if (act === 'market') { S.curMarket = t.dataset.mk; renderMarkets(); }
+    else if (act === 'brkview') { S.brkView[S.curLeague] = t.dataset.v; renderBracket(); }
     else if (act === 'qadd') {
       var slug = t.dataset.slug, p = (S.bundlePlayers[slug] || {})[t.dataset.pid];
       var v = p && marketVal(p, t.dataset.mk);
