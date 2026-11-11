@@ -623,7 +623,7 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
   }
   function loadStandings(slug) {
     if (S.standings[slug]) return Promise.resolve(S.standings[slug]);
-    return getJ(SITE2 + slug + '/standings').then(function (j) {
+    var parseSt = function (j) {
       var groups = (j.children || []).map(function (ch) {
         var rows = (((ch.standings || {}).entries) || []).map(function (en, i) {
           var stats = {};
@@ -645,8 +645,23 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
         rows.sort(function (a, b) { return a.rank - b.rank; });
         return { name: ch.name || '', rows: rows };
       });
-      S.standings[slug] = { year: (j.season || {}).year || new Date().getFullYear(), future: !!((j.season || {}).startDate && new Date(j.season.startDate) > new Date()), groups: groups };
-      return S.standings[slug];
+      return { year: (j.season || {}).year || new Date().getFullYear(), future: !!((j.season || {}).startDate && new Date(j.season.startDate) > new Date()), groups: groups };
+    };
+    return getJ(SITE2 + slug + '/standings').then(function (j) {
+      var st = parseSt(j);
+      /* ESPN sometimes pre-creates next season's standings before it starts
+         (MLS rolled to 2027 in Nov 2026) — the shell belongs to a season that
+         has not kicked off while the live season is the previous one. Only
+         then, step back a season (same start-date guard as loadLeaders). */
+      if (st.future && st.year) {
+        return getJ(SITE2 + slug + '/standings?season=' + (st.year - 1)).then(function (j2) {
+          var st2 = parseSt(j2);
+          S.standings[slug] = (!st2.future && st2.groups.length) ? st2 : st;
+          return S.standings[slug];
+        }).catch(function () { S.standings[slug] = st; return st; });
+      }
+      S.standings[slug] = st;
+      return st;
     }).catch(function () { S.standings[slug] = { year: new Date().getFullYear(), groups: [] }; return S.standings[slug]; });
   }
   function loadAthlete(slug, year, id) {
