@@ -1025,9 +1025,9 @@ function parseSummary(espnId, d){
   SUMMARIES[espnId] = out;
 }
 function fetchESPN(){
-  /* ESPN calls this slate week 9; B.week is our numbering (10) and drives
-     the labels only — the live fetch must use the ESPN week. */
-  fetch("https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?week=9&seasontype=2&dates=2026").then(function(r){ return r.json(); }).then(function(d){
+  /* ESPN calls this slate week 11, same as our numbering (11) this time —
+     the labels come from B.week, the live fetch uses the ESPN week. */
+  fetch("https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?week=10&seasontype=2&dates=2026").then(function(r){ return r.json(); }).then(function(d){
     parseScoreboard(d);
     renderSlate(); renderLiveNow();
     stkRender();
