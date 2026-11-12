@@ -1271,6 +1271,11 @@ dataFetch("data/nfl-2026-w10.json").then(function(r){ return r.json(); }).then(f
 var PARLAY = {}, ZONES = null, PLAYOFF = null, WPSERIES = {}, TP_MKT = "any";
 (function(){
   var css = ""
+  + "#view-board .pills{display:none}"
+  + ".pb-bar{display:flex;align-items:center;gap:8px;margin:0 0 10px}"
+  + '.pb-bar select{flex:1;min-width:0;appearance:none;-webkit-appearance:none;background:#0b1322 url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'10\' height=\'6\'%3E%3Cpath d=\'M1 1l4 4 4-4\' stroke=\'%23e8b64c\' stroke-width=\'2\' fill=\'none\'/%3E%3C/svg%3E") no-repeat right .8rem center;border:1px solid rgba(165,195,255,.28);border-radius:11px;color:#eef3f9;font-size:.92rem;font-weight:700;padding:.62rem .8rem;font-family:inherit;cursor:pointer}'
+  + ".pb-bar select:focus{outline:2px solid #e8b64c;outline-offset:1px}"
+  + ".pb-ticket{font-size:.6rem;font-weight:900;letter-spacing:.1em;color:#8b96ab;white-space:nowrap}"
   + ".pq-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}"
   + ".pq-btn{font:inherit;font-size:.68rem;font-weight:700;letter-spacing:.02em;color:#dbe7fa;background:rgba(130,170,255,.10);border:1px solid rgba(165,195,255,.28);border-radius:999px;padding:.32rem .55rem;cursor:pointer}"
   + ".pq-btn b{color:#3adbe3;font-weight:900}"
@@ -1367,6 +1372,8 @@ function refreshParlayUI(){
   });
   var n = Object.keys(PARLAY).length, badge = $("plCount");
   if(badge){ badge.textContent = n; badge.style.display = n ? "inline-block" : "none"; }
+  var popt = document.querySelector('#pbSelect option[value="parlay"]');
+  if(popt) popt.textContent = n ? "Parlay (" + n + ")" : "Parlay";
   renderParlay();
 }
 function renderParlay(){
@@ -1383,6 +1390,23 @@ function renderParlay(){
     + '<p class="note" style="margin:10px 0 0">Joint model rate assumes independence. Fair (no-vig) odds. Not betting advice.</p>'
     + '<button type="button" class="pl-clear" data-clearleg="1">CLEAR ALL LEGS</button></div></div>';
   wrap.innerHTML = h;
+}
+
+/* ---------- playbook dropdown: one select switches the whole Playbook
+   between the four boards, the parlay builder and the playoff picture. */
+var PB_MODE = "td";
+function setPlaybookMode(mode){
+  PB_MODE = mode;
+  var sel = $("pbSelect"); if(sel) sel.value = mode;
+  var isBoard = mode !== "parlay" && mode !== "playoffs";
+  var bw = $("boardWrap"), bn = $("boardNote"), pp = $("parlayPanel"), po = $("playoffPanel");
+  if(bw) bw.style.display = isBoard ? "" : "none";
+  if(bn) bn.style.display = isBoard ? "" : "none";
+  if(pp) pp.style.display = mode === "parlay" ? "" : "none";
+  if(po) po.style.display = mode === "playoffs" ? "" : "none";
+  if(isBoard) renderBoard(mode);
+  else if(mode === "parlay") renderParlay();
+  else renderPlayoffs();
 }
 
 /* ---------- top picks strip (home) ---------- */
@@ -1488,33 +1512,49 @@ function renderPlayoffs(){
 
 /* ---------- boot: views, nav, overlays, sidecar loads ---------- */
 (function bootFeatures(){
-  var slate = $("view-slate");
-  var parent = slate ? slate.parentNode : document.body;
-  var par = document.createElement("section");
-  par.className = "view"; par.id = "view-parlay";
-  par.innerHTML = '<h2 class="sec">PARLAY BUILDER <span>legs price off the model, joint rate assumes independence</span></h2><div id="parlayWrap"></div>';
-  var po = document.createElement("section");
-  po.className = "view"; po.id = "view-playoffs";
-  po.innerHTML = '<h2 class="sec">PLAYOFF PICTURE <span>simulated · updates with the weekly bundle</span></h2><div id="playoffWrap"></div>';
-  var anchor = $("searchOverlay") || null;
-  parent.insertBefore(par, anchor); parent.insertBefore(po, anchor);
-  var nav = document.querySelector("nav.bottom");
-  if(nav){
-    var a1 = document.createElement("a");
-    a1.setAttribute("data-view", "view-parlay");
-    a1.innerHTML = '<span class="ic">🧾</span>PARLAY<span id="plCount"></span>';
-    a1.addEventListener("click", function(){ renderParlay(); show("view-parlay"); });
-    var a2 = document.createElement("a");
-    a2.setAttribute("data-view", "view-playoffs");
-    a2.innerHTML = '<span class="ic">🏆</span>PLAYOFFS';
-    a2.addEventListener("click", function(){ renderPlayoffs(); show("view-playoffs"); });
-    nav.appendChild(a1); nav.appendChild(a2);
+  /* Playbook: one NBA-style select (the .fb-filterbar select pattern)
+     replaces the pill row and switches the whole section — the four
+     boards, the parlay builder and the playoff picture live here. */
+  var boardSec = $("view-board");
+  if(boardSec){
+    var bar = document.createElement("div");
+    bar.className = "pb-bar";
+    bar.innerHTML = '<select id="pbSelect" aria-label="Choose a Playbook section"><option value="td">Touchdowns</option><option value="rush">Rushing</option><option value="rec">Receiving</option><option value="pass">Passing</option><option value="parlay">Parlay</option><option value="playoffs">Playoffs</option></select><span class="pb-ticket">TICKET <span id="plCount"></span></span>';
+    bar.querySelector("select").addEventListener("change", function(){ setPlaybookMode(this.value); });
+    boardSec.insertBefore(bar, boardSec.querySelector(".pills") || null);
+    var pp = document.createElement("div");
+    pp.id = "parlayPanel"; pp.style.display = "none";
+    pp.innerHTML = '<h2 class="sec">PARLAY BUILDER <span>legs price off the model, joint rate assumes independence</span></h2><div id="parlayWrap"></div>';
+    var po = document.createElement("div");
+    po.id = "playoffPanel"; po.style.display = "none";
+    po.innerHTML = '<h2 class="sec">PLAYOFF PICTURE <span>simulated · updates with the weekly bundle</span></h2><div id="playoffWrap"></div>';
+    boardSec.appendChild(pp); boardSec.appendChild(po);
   }
+  /* Bottom nav = exactly two buttons (Football / Playbook — Soccer's
+     Hub + Leaders pattern): drop the Slate anchor. The slate and
+     standings sections move into the home view just below. */
+  var nav = document.querySelector("nav.bottom");
+  if(nav){ var slA = nav.querySelector('a[data-view="view-slate"]'); if(slA) slA.remove(); }
   var home = $("view-football"), hero = $("heroBand");
   if(home && hero){
     var tw = document.createElement("div");
     tw.innerHTML = '<h2 class="sec">TOP PICKS <span>this week\'s likeliest names · tap for the card</span></h2><div class="tp-pills" id="tpPills"></div><div class="tp-strip" id="tpStrip"></div>';
     home.insertBefore(tw, hero.nextSibling ? hero.nextSibling.nextSibling : null);
+  }
+  /* Slate + standings live in the home view now: hero -> Top Picks ->
+     Live Now -> Slate -> Standings -> the home boards. The view-slate
+     section is removed; show() is wrapped below so anything still
+     pointing at view-slate (game-sheet back button, slate/standings
+     search rows) lands on Football home. */
+  var slateSec = $("view-slate");
+  if(home && slateSec){
+    var tdHead = null;
+    home.querySelectorAll("h2.sec").forEach(function(h){ if(!tdHead && h.textContent.indexOf("TOP TOUCHDOWN") === 0) tdHead = h; });
+    var refNode = tdHead || home.querySelector("footer") || null;
+    var kids = [];
+    while(slateSec.firstChild) kids.push(slateSec.removeChild(slateSec.firstChild));
+    kids.forEach(function(node){ home.insertBefore(node, refNode); });
+    slateSec.remove();
   }
   var usageSec = $("pUsageSec");
   if(usageSec){
@@ -1535,9 +1575,13 @@ function renderPlayoffs(){
 /* ---------- wrap existing renders (same names, called everywhere) ---------- */
 buildObjects = (function(orig){ return function(){
   orig();
-  SEARCH_ITEMS.push({ t: "Parlay Builder", s: "SECTION · YOUR TICKET", v: "view-parlay" });
-  SEARCH_ITEMS.push({ t: "Playoff Picture", s: "SECTION · SIMULATED ODDS", v: "view-playoffs" });
+  SEARCH_ITEMS.push({ t: "Parlay Builder", s: "PLAYBOOK · YOUR TICKET", v: "view-board" });
+  SEARCH_ITEMS.push({ t: "Playoff Picture", s: "PLAYBOOK · SIMULATED ODDS", v: "view-board" });
 }; })(buildObjects);
+/* Slate + standings live in the home view now: anything still pointing
+   at view-slate (game-sheet back button, slate/standings search rows)
+   lands on Football home instead. */
+show = (function(orig){ return function(id){ orig(id === "view-slate" ? "view-football" : id); }; })(show);
 renderHome = (function(orig){ return function(){ orig(); renderTopPicks(); }; })(renderHome);
 renderBoard = (function(orig){ return function(key){
   orig(key);
@@ -1602,6 +1646,8 @@ renderGame = (function(orig){ return function(key){
 /* ---------- clicks for the new controls (capture: beats the row router) ---------- */
 document.addEventListener("click", function(e){
   if(!e.target || !e.target.closest) return;
+  var sr = e.target.closest(".sresult");
+  if(sr){ var sb = sr.querySelector("b"); if(sb && sb.textContent === "Parlay Builder") setPlaybookMode("parlay"); else if(sb && sb.textContent === "Playoff Picture") setPlaybookMode("playoffs"); }
   var add = e.target.closest("[data-addleg]");
   if(add){ e.preventDefault(); e.stopPropagation(); toggleLeg(add.getAttribute("data-addleg")); return; }
   var rm = e.target.closest("[data-rmleg]");
