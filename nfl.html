@@ -1262,6 +1262,358 @@ dataFetch("data/nfl-2026-w10.json").then(function(r){ return r.json(); }).then(f
 }).catch(function(){
   $("boardWrap").innerHTML = '<p class="note" style="margin:12px 2px">The Week 10 price bundle could not load. Refresh in a moment.</p>';
 });
+
+/* ===== NFL polish (Nov 11): parlay builder + quick-add, top picks strip,
+   target-zone card section, live win% graph, tappable standings team
+   sheet, playoff picture. Display-only throughout: every leg and number
+   below comes from probabilities the bundle already ships, the ESPN
+   summary winprobability feed, or the two data/ sidecars. ===== */
+var PARLAY = {}, ZONES = null, PLAYOFF = null, WPSERIES = {}, TP_MKT = "any";
+(function(){
+  var css = ""
+  + ".pq-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}"
+  + ".pq-btn{font:inherit;font-size:.68rem;font-weight:700;letter-spacing:.02em;color:#dbe7fa;background:rgba(130,170,255,.10);border:1px solid rgba(165,195,255,.28);border-radius:999px;padding:.32rem .55rem;cursor:pointer}"
+  + ".pq-btn b{color:#3adbe3;font-weight:900}"
+  + ".pq-btn.on{background:rgba(232,182,76,.18);border-color:rgba(232,182,76,.65);color:#ffe1a1}"
+  + ".pq-btn.on b{color:#e8b64c}"
+  + ".tp-pills{display:flex;gap:6px;margin:2px 0 10px}"
+  + ".tp-strip{display:flex;gap:10px;overflow-x:auto;padding:2px 2px 8px;-webkit-overflow-scrolling:touch}"
+  + ".tp-card{flex:0 0 104px;text-align:center;background:linear-gradient(155deg, rgba(130,170,255,.13), rgba(6,12,26,.55));border:1px solid rgba(165,195,255,.22);border-radius:14px;padding:10px 6px 9px;cursor:pointer}"
+  + ".tp-card .face{margin:0 auto 6px}"
+  + ".tp-card b{display:block;font-size:.74rem;line-height:1.15;color:#eef3f9}"
+  + ".tp-card span{display:block;font-size:.6rem;font-weight:700;letter-spacing:.08em;color:#8b96ab;margin-top:2px}"
+  + ".tp-card .tp-num{font-size:1.28rem;font-weight:900;color:#e8b64c;margin-top:5px;line-height:1}"
+  + ".tp-card .tp-odds{font-size:.66rem;color:#3adbe3;font-weight:800;margin-top:2px}"
+  + ".zn-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin:8px 0 4px}"
+  + ".zn-cell{border-radius:9px;padding:7px 4px;text-align:center;border:1px solid rgba(165,195,255,.16)}"
+  + ".zn-cell b{display:block;font-size:.86rem;color:#fff}"
+  + ".zn-cell span{font-size:.56rem;font-weight:800;letter-spacing:.1em;color:#8b96ab}"
+  + ".zn-lab{display:flex;justify-content:space-between;font-size:.58rem;font-weight:800;letter-spacing:.12em;color:#8b96ab;margin-top:6px}"
+  + ".zn-bar{height:7px;border-radius:99px;background:rgba(130,170,255,.14);overflow:hidden;margin:3px 0 8px}"
+  + ".zn-bar i{display:block;height:100%;background:#e8b64c;border-radius:99px}"
+  + ".zn-bar.t i{background:#3adbe3}"
+  + ".wp-graph{margin-top:8px}"
+  + ".wp-graph .wp-cap{display:flex;justify-content:space-between;font-size:.6rem;font-weight:800;letter-spacing:.08em;color:#8b96ab;margin-top:3px}"
+  + ".po-row{display:flex;align-items:center;gap:9px;padding:7px 2px;border-bottom:1px solid rgba(165,195,255,.08)}"
+  + ".po-row:last-child{border-bottom:none}"
+  + ".po-row .po-team{display:flex;align-items:center;gap:8px;flex:1;min-width:0}"
+  + ".po-row .po-team b{font-size:.86rem;color:#eef3f9}"
+  + ".po-row .po-team span{display:block;font-size:.58rem;font-weight:700;letter-spacing:.06em;color:#8b96ab}"
+  + ".po-nums{display:flex;gap:4px}"
+  + ".po-num{text-align:center;min-width:52px;background:rgba(130,170,255,.08);border:1px solid rgba(165,195,255,.14);border-radius:9px;padding:4px 2px}"
+  + ".po-num b{display:block;font-size:.84rem;color:#fff}"
+  + ".po-num.hot b{color:#e8b64c}"
+  + ".po-num span{font-size:.52rem;font-weight:800;letter-spacing:.08em;color:#8b96ab}"
+  + ".po-head{display:flex;gap:4px;justify-content:flex-end;padding:0 2px 2px}"
+  + ".po-head span{min-width:52px;text-align:center;font-size:.52rem;font-weight:800;letter-spacing:.08em;color:#8b96ab}"
+  + "#teamSheet{position:fixed;inset:0;z-index:60;display:none}"
+  + "#teamSheet.on{display:block}"
+  + "#teamSheet .ts-bg{position:absolute;inset:0;background:rgba(3,6,12,.72)}"
+  + "#teamSheet .ts-card{position:absolute;left:0;right:0;bottom:0;max-height:82vh;overflow-y:auto;background:linear-gradient(165deg, rgba(16,28,52,.97), rgba(5,9,18,.98));border-top:1px solid rgba(165,195,255,.3);border-radius:18px 18px 0 0;padding:14px 14px 22px}"
+  + "#teamSheet .ts-head{display:flex;align-items:center;gap:10px;margin-bottom:6px}"
+  + "#teamSheet .ts-head b{font-size:1.02rem;color:#fff}"
+  + "#teamSheet .ts-head span{display:block;font-size:.62rem;font-weight:700;letter-spacing:.08em;color:#8b96ab}"
+  + "#teamSheet .ts-x{margin-left:auto;font-size:1rem;color:#dbe7fa;background:rgba(130,170,255,.12);border:1px solid rgba(165,195,255,.3);border-radius:50%;width:32px;height:32px;cursor:pointer}"
+  + ".ts-pos{font-size:.6rem;font-weight:900;letter-spacing:.16em;color:#e8b64c;margin:12px 0 2px}"
+  + "#plCount{display:none;background:#e8b64c;color:#0a1220;border-radius:99px;font-size:.58rem;font-weight:900;padding:.05rem .34rem;margin-left:4px;vertical-align:2px}"
+  + ".pl-empty{color:#8b96ab;font-size:.82rem;padding:10px 2px}"
+  + ".pl-foot{margin-top:12px;border-top:1px solid rgba(165,195,255,.14);padding-top:10px}"
+  + ".pl-joint{display:flex;gap:8px}"
+  + ".pl-joint .box{flex:1;text-align:center;background:rgba(130,170,255,.08);border:1px solid rgba(165,195,255,.16);border-radius:11px;padding:8px 4px}"
+  + ".pl-joint .box b{display:block;font-size:1.15rem;color:#e8b64c}"
+  + ".pl-joint .box i{font-style:normal;font-size:.56rem;font-weight:800;letter-spacing:.1em;color:#8b96ab}"
+  + ".pl-clear{margin-top:10px;width:100%;font:inherit;font-weight:800;font-size:.74rem;letter-spacing:.06em;color:#ffb3ad;background:rgba(240,102,94,.12);border:1px solid rgba(240,102,94,.4);border-radius:11px;padding:.55rem;cursor:pointer}"
+  + ".pl-rm{margin-left:auto;font:inherit;font-weight:900;color:#ffb3ad;background:none;border:none;font-size:1rem;cursor:pointer;padding:2px 6px}";
+  var st = document.createElement("style"); st.textContent = css; document.head.appendChild(st);
+})();
+
+/* ---------- parlay: legs come only from shipped probabilities ---------- */
+function playerLegs(pl){
+  var out = [], td = pl.td || {};
+  function add(mk, label, p){ if(p != null && isFinite(p) && p >= 0.005 && p <= 0.995) out.push({ mk: mk, label: label, p: p }); }
+  add("any", "Anytime TD", td.any); add("two", "2+ TDs", td.two); add("first", "First TD", td.first); add("passTd", "1+ Pass TD", td.passTd);
+  if(pl.pass){ add("p200", "200+ pass yds", pl.pass.p200); add("p300", "300+ pass yds", pl.pass.p300); add("p400", "400+ pass yds", pl.pass.p400); }
+  if(pl.rush){ add("r50", "50+ rush yds", pl.rush.p50); add("r75", "75+ rush yds", pl.rush.p75); add("r100", "100+ rush yds", pl.rush.p100); }
+  if(pl.rec){ add("c50", "50+ rec yds", pl.rec.p50); add("c75", "75+ rec yds", pl.rec.p75); add("c100", "100+ rec yds", pl.rec.p100); }
+  if(pl.scr){ add("s75", "75+ scrimmage yds", pl.scr.p75); add("s100", "100+ scrimmage yds", pl.scr.p100); add("s125", "125+ scrimmage yds", pl.scr.p125); }
+  return out;
+}
+function legBtn(pkey, leg){
+  var on = !!PARLAY[pkey + "|" + leg.mk];
+  return '<button type="button" class="pq-btn' + (on ? " on" : "") + '" data-addleg="' + pkey + "|" + leg.mk + '">' + leg.label + " · " + pct(leg.p) + " <b>" + (on ? "✓" : "+") + "</b></button>";
+}
+function legRow(pkey, mks){
+  var pl = PLAYERS[pkey] && PLAYERS[pkey].raw; if(!pl) return "";
+  var legs = playerLegs(pl).filter(function(l){ return mks.indexOf(l.mk) >= 0; });
+  return legs.length ? '<div class="pq-row">' + legs.map(function(l){ return legBtn(pkey, l); }).join("") + "</div>" : "";
+}
+function toggleLeg(id){
+  if(PARLAY[id]){ delete PARLAY[id]; }
+  else {
+    var pkey = id.split("|")[0], mk = id.split("|").slice(1).join("|");
+    var pl = PLAYERS[pkey] && PLAYERS[pkey].raw; if(!pl) return;
+    var leg = null;
+    playerLegs(pl).forEach(function(l){ if(l.mk === mk) leg = l; });
+    if(!leg) return;
+    PARLAY[id] = { id: id, pkey: pkey, mk: mk, label: leg.label, p: leg.p, name: pl.name, team: pl.team, pos: pl.pos };
+  }
+  refreshParlayUI();
+}
+function refreshParlayUI(){
+  document.querySelectorAll("[data-addleg]").forEach(function(btn){
+    var on = !!PARLAY[btn.getAttribute("data-addleg")];
+    btn.classList.toggle("on", on);
+    var b = btn.querySelector("b"); if(b) b.textContent = on ? "✓" : "+";
+  });
+  var n = Object.keys(PARLAY).length, badge = $("plCount");
+  if(badge){ badge.textContent = n; badge.style.display = n ? "inline-block" : "none"; }
+  renderParlay();
+}
+function renderParlay(){
+  var wrap = $("parlayWrap"); if(!wrap) return;
+  var legs = Object.keys(PARLAY).map(function(k){ return PARLAY[k]; });
+  if(!legs.length){
+    wrap.innerHTML = '<div class="card"><p class="pl-empty">No legs yet. Tap + on any board row or player card to start a ticket — anytime TDs, first TDs and the milestone rungs are all addable.</p></div>';
+    return;
+  }
+  var joint = legs.reduce(function(a, l){ return a * l.p; }, 1);
+  var h = '<div class="card">' + legs.map(function(l){
+    return '<div class="pick" style="cursor:default">' + faceHtml(l.pkey, l.name, 0) + '<div class="who"><b>' + l.name + '</b><span>' + l.label.toUpperCase() + " · " + l.pos + " · " + l.team + '</span></div><div class="num"><b>' + pct(l.p) + '</b><span>' + fmtOdds(l.p) + '</span></div><button type="button" class="pl-rm" data-rmleg="' + l.id + '" aria-label="Remove leg">✕</button></div>';
+  }).join("") + '<div class="pl-foot"><div class="pl-joint"><div class="box"><b>' + pct(joint) + '</b><i>JOINT · ' + legs.length + (legs.length === 1 ? " LEG" : " LEGS") + '</i></div><div class="box"><b>' + fmtOdds(joint) + '</b><i>COMBINED FAIR ODDS</i></div></div>'
+    + '<p class="note" style="margin:10px 0 0">Joint model rate assumes independence. Fair (no-vig) odds. Not betting advice.</p>'
+    + '<button type="button" class="pl-clear" data-clearleg="1">CLEAR ALL LEGS</button></div></div>';
+  wrap.innerHTML = h;
+}
+
+/* ---------- top picks strip (home) ---------- */
+var TP_MARKETS = [["any", "ANYTIME TD"], ["first", "FIRST TD"], ["two", "2+ TDS"]];
+function renderTopPicks(){
+  var strip = $("tpStrip"), pills = $("tpPills");
+  if(!strip || !B) return;
+  if(pills) pills.innerHTML = TP_MARKETS.map(function(m){ return '<div class="pill' + (TP_MKT === m[0] ? " on" : "") + '" data-tp="' + m[0] + '">' + m[1] + "</div>"; }).join("");
+  var rows = B.players.filter(function(pl){ return pl.td && pl.td[TP_MKT] != null; })
+    .sort(function(a, b){ return b.td[TP_MKT] - a.td[TP_MKT]; }).slice(0, 8);
+  strip.innerHTML = rows.map(function(pl, i){
+    return '<div class="tp-card" data-p="' + pl.key + '">' + faceHtml(pl.key, pl.name, i < 3 ? 1 : 0) + "<b>" + pl.name + "</b><span>" + pl.pos + " · " + pl.team + '</span><div class="tp-num">' + pct(pl.td[TP_MKT]) + '</div><div class="tp-odds">' + fmtOdds(pl.td[TP_MKT]) + "</div></div>";
+  }).join("");
+}
+
+/* ---------- zones sidecar section on the player card ---------- */
+function zonesHtml(z){
+  if(!z) return "";
+  var dirs = [["left", "LEFT"], ["middle", "MIDDLE"], ["right", "RIGHT"]];
+  function cell(v){ var a = Math.min(0.85, v * 1.9); return 'background:rgba(232,182,76,' + a.toFixed(2) + ')'; }
+  var h = '<div class="usg"><div class="usg-subline">WHERE HIS TARGETS GO · ' + z.tgt + " TARGETS · " + Math.round(z.tgtShare * 100) + "% OF TEAM TARGETS</div>";
+  h += '<div class="zn-lab"><span>DEEP · 10+ AIR YDS</span><span>TARGET SHARE BY ZONE</span></div><div class="zn-grid">'
+    + dirs.map(function(d){ return '<div class="zn-cell" style="' + cell(z.grid[d[0]][1]) + '"><b>' + Math.round(z.grid[d[0]][1] * 100) + '%</b><span>' + d[1] + " DEEP</span></div>"; }).join("") + "</div>";
+  h += '<div class="zn-grid">' + dirs.map(function(d){ return '<div class="zn-cell" style="' + cell(z.grid[d[0]][0]) + '"><b>' + Math.round(z.grid[d[0]][0] * 100) + '%</b><span>' + d[1] + " SHORT</span></div>"; }).join("") + "</div>";
+  h += '<div class="zn-lab"><span>SHORT · UNDER 10 AIR YDS</span><span></span></div>';
+  if(z.rzTgt > 0) h += '<div class="usg-rolelabel" style="margin-top:10px">RED-ZONE TARGET SHARE · ' + z.rzTgt + ' RZ TARGETS</div><div class="zn-bar t"><i style="width:' + Math.round(z.rzTgtShare * 100) + '%"></i></div>';
+  if(z.rzCar > 0) h += '<div class="usg-rolelabel">RED-ZONE CARRY SHARE · ' + z.rzCar + ' RZ CARRIES</div><div class="zn-bar"><i style="width:' + Math.round(z.rzCarShare * 100) + '%"></i></div>';
+  h += '<p class="note" style="margin:2px 0 0">Season to date from nflverse play-by-play. Display only — zone matchups were tested for pricing and cut.</p></div>';
+  return h;
+}
+
+/* ---------- live win% graph (score & clock calculation) ---------- */
+function wpGraphHtml(espnId, g){
+  var s = WPSERIES[espnId];
+  if(!s || s.length < 2 || !g) return "";
+  var pts = [g.model.homeWin].concat(s), W = 320, H = 92, X0 = 6, X1 = 314, YT = 8, YB = 78;
+  function X(i){ return X0 + (X1 - X0) * i / (pts.length - 1); }
+  function Y(w){ return YT + (1 - w) * (YB - YT); }
+  var line = pts.map(function(w, i){ return (i ? "L" : "M") + X(i).toFixed(1) + "," + Y(w).toFixed(1); }).join(" ");
+  var cur = s[s.length - 1];
+  return '<div class="wp-graph"><svg viewBox="0 0 320 92" width="100%" height="92" aria-hidden="true">'
+    + '<line x1="' + X0 + '" y1="' + Y(0.5) + '" x2="' + X1 + '" y2="' + Y(0.5) + '" stroke="rgba(160,190,255,.3)" stroke-width="1" stroke-dasharray="3 3"/>'
+    + '<path d="' + line + " L" + X1 + "," + YB + " L" + X0 + "," + YB + ' Z" fill="rgba(232,182,76,.13)"/>'
+    + '<path d="' + line + '" fill="none" stroke="#e8b64c" stroke-width="2"/>'
+    + '<circle cx="' + X(pts.length - 1) + '" cy="' + Y(cur) + '" r="3.2" fill="#e8b64c"/>'
+    + '<circle cx="' + X(0) + '" cy="' + Y(pts[0]) + '" r="2.6" fill="#8b96ab"/></svg>'
+    + '<div class="wp-cap"><span>KICKOFF · MODEL ' + g.home + " " + pct(g.model.homeWin) + '</span><span>NOW · ' + g.home + " " + pct(cur) + "</span></div></div>";
+}
+
+/* ---------- team sheet (standings tap) ---------- */
+function openTeamSheet(abbr){
+  var body = $("teamSheetBody"); if(!body || !B) return;
+  $("tsName").textContent = TEAMNAME[abbr] || abbr;
+  var ti = TEAMINFO[abbr] || {};
+  $("tsMeta").textContent = ((ti.rec || "") + (ti.div ? " · " + ti.div : "")).toUpperCase();
+  $("tsLogo").src = "https://a.espncdn.com/i/teamlogos/nfl/500/" + logoFile(abbr) + ".png";
+  var groups = [["QB", "QUARTERBACKS"], ["RB", "RUNNING BACKS"], ["WR", "WIDE RECEIVERS"], ["TE", "TIGHT ENDS"]];
+  var h = "";
+  groups.forEach(function(gr){
+    var ps = B.players.filter(function(pl){ return pl.team === abbr && pl.pos === gr[0]; })
+      .sort(function(a, b){ return ((b.td && b.td.any) || 0) - ((a.td && a.td.any) || 0); });
+    if(!ps.length) return;
+    h += '<div class="ts-pos">' + gr[1] + "</div>" + ps.map(function(pl){
+      return '<div class="pick" data-p="' + pl.key + '">' + faceHtml(pl.key, pl.name, 0) + '<div class="who"><b>' + pl.name + '</b><span>' + metaFor(pl.team, gameOf(pl.game)) + '</span></div><div class="num"><b>' + (pl.td ? pct(pl.td.any) : "—") + '</b><span>' + (pl.td ? fmtOdds(pl.td.any) : "") + "</span></div><div class=\"chev\">›</div></div>";
+    }).join("");
+  });
+  var ks = (B.kickers || []).filter(function(kk){ return kk.team === abbr; });
+  if(ks.length){
+    h += '<div class="ts-pos">KICKER</div>' + ks.map(function(kk){
+      return '<div class="pick" data-k="' + kk.key + '">' + faceHtml(kk.key, kk.name, 0) + '<div class="who"><b>' + kk.name + '</b><span>' + metaFor(kk.team, gameOf(kk.game)) + '</span></div><div class="num"><b>o 7.5</b><span>' + fmtOdds(kk.o75) + "</span></div><div class=\"chev\">›</div></div>";
+    }).join("");
+  }
+  body.innerHTML = h || '<p class="pl-empty">No priced players for this team in this week\'s bundle.</p>';
+  $("teamSheet").classList.add("on");
+}
+function closeTeamSheet(){ var ts = $("teamSheet"); if(ts) ts.classList.remove("on"); }
+
+/* ---------- playoff picture ---------- */
+function renderPlayoffs(){
+  var wrap = $("playoffWrap"); if(!wrap) return;
+  if(!PLAYOFF){
+    wrap.innerHTML = '<div class="card"><p class="pl-empty">The playoff picture could not load. Refresh in a moment.</p></div>';
+    return;
+  }
+  var meta = PLAYOFF._meta || {}, teams = PLAYOFF.teams || {};
+  function poRow(t){
+    var v = teams[t];
+    return '<div class="po-row"><div class="po-team">' + logoImg(t, "game-logo") + "<div><b>" + (TEAMNAME[t] || t) + '</b><span>' + v.rec + " · " + v.confName + " " + v.divName.toUpperCase() + '</span></div></div>'
+      + '<div class="po-nums"><div class="po-num hot"><b>' + Math.round(v.playoff * 100) + '%</b><span>PLAYOFF</span></div>'
+      + '<div class="po-num"><b>' + Math.round(v.div * 100) + '%</b><span>DIVISION</span></div>'
+      + '<div class="po-num"><b>' + Math.round(v.seed1 * 100) + '%</b><span>#1 SEED</span></div>'
+      + '<div class="po-num"><b>' + Math.round(v.sb * 100) + '%</b><span>SUPER BOWL</span></div></div></div>';
+  }
+  var h = "";
+  ["AFC", "NFC"].forEach(function(conf){
+    var ts = Object.keys(teams).filter(function(t){ return teams[t].confName === conf; })
+      .sort(function(a, b){ return teams[b].playoff - teams[a].playoff; });
+    h += '<h2 class="sec">' + conf + ' <span>playoff race</span></h2><div class="card">' + ts.map(poRow).join("") + "</div>";
+  });
+  h += '<p class="note">Simulation estimate — ' + (meta.sims ? meta.sims.toLocaleString() : "10,000") + ' simulated finishes of the remaining schedule (weeks ' + ((meta.weeksSimulated || []).join(", ") || "—") + '), ratings from points differential. Tiebreakers are simplified: win% → division record / head-to-head → point differential. Not betting advice.</p>';
+  wrap.innerHTML = h;
+}
+
+/* ---------- boot: views, nav, overlays, sidecar loads ---------- */
+(function bootFeatures(){
+  var slate = $("view-slate");
+  var parent = slate ? slate.parentNode : document.body;
+  var par = document.createElement("section");
+  par.className = "view"; par.id = "view-parlay";
+  par.innerHTML = '<h2 class="sec">PARLAY BUILDER <span>legs price off the model, joint rate assumes independence</span></h2><div id="parlayWrap"></div>';
+  var po = document.createElement("section");
+  po.className = "view"; po.id = "view-playoffs";
+  po.innerHTML = '<h2 class="sec">PLAYOFF PICTURE <span>simulated · updates with the weekly bundle</span></h2><div id="playoffWrap"></div>';
+  var anchor = $("searchOverlay") || null;
+  parent.insertBefore(par, anchor); parent.insertBefore(po, anchor);
+  var nav = document.querySelector("nav.bottom");
+  if(nav){
+    var a1 = document.createElement("a");
+    a1.setAttribute("data-view", "view-parlay");
+    a1.innerHTML = '<span class="ic">🧾</span>PARLAY<span id="plCount"></span>';
+    a1.addEventListener("click", function(){ renderParlay(); show("view-parlay"); });
+    var a2 = document.createElement("a");
+    a2.setAttribute("data-view", "view-playoffs");
+    a2.innerHTML = '<span class="ic">🏆</span>PLAYOFFS';
+    a2.addEventListener("click", function(){ renderPlayoffs(); show("view-playoffs"); });
+    nav.appendChild(a1); nav.appendChild(a2);
+  }
+  var home = $("view-football"), hero = $("heroBand");
+  if(home && hero){
+    var tw = document.createElement("div");
+    tw.innerHTML = '<h2 class="sec">TOP PICKS <span>this week\'s likeliest names · tap for the card</span></h2><div class="tp-pills" id="tpPills"></div><div class="tp-strip" id="tpStrip"></div>';
+    home.insertBefore(tw, hero.nextSibling ? hero.nextSibling.nextSibling : null);
+  }
+  var usageSec = $("pUsageSec");
+  if(usageSec){
+    var zs = document.createElement("details");
+    zs.className = "nfl-sec"; zs.id = "pZonesSec"; zs.style.display = "none";
+    zs.innerHTML = '<summary><span class="nfl-sec-t">TARGET ZONES · RED ZONE</span><span class="chev">▸</span></summary><div class="nfl-sec-body"><div id="pZones"></div></div>';
+    usageSec.parentNode.insertBefore(zs, usageSec.nextSibling);
+  }
+  var ts = document.createElement("div");
+  ts.id = "teamSheet";
+  ts.innerHTML = '<div class="ts-bg" data-closeteam="1"></div><div class="ts-card"><div class="ts-head"><img class="game-logo" id="tsLogo" alt=""><div><b id="tsName"></b><span id="tsMeta"></span></div><button type="button" class="ts-x" data-closeteam="1" aria-label="Close">✕</button></div><div id="teamSheetBody"></div></div>';
+  document.body.appendChild(ts);
+  renderParlay();
+  dataFetch("data/nfl-zones.json").then(function(r){ return r.json(); }).then(function(j){ ZONES = j; }).catch(function(){});
+  dataFetch("data/nfl-playoff.json").then(function(r){ return r.json(); }).then(function(j){ PLAYOFF = j; renderPlayoffs(); }).catch(function(){});
+})();
+
+/* ---------- wrap existing renders (same names, called everywhere) ---------- */
+buildObjects = (function(orig){ return function(){
+  orig();
+  SEARCH_ITEMS.push({ t: "Parlay Builder", s: "SECTION · YOUR TICKET", v: "view-parlay" });
+  SEARCH_ITEMS.push({ t: "Playoff Picture", s: "SECTION · SIMULATED ODDS", v: "view-playoffs" });
+}; })(buildObjects);
+renderHome = (function(orig){ return function(){ orig(); renderTopPicks(); }; })(renderHome);
+renderBoard = (function(orig){ return function(key){
+  orig(key);
+  var mks = { td: ["any", "two", "first"], rush: ["r75", "r100"], rec: ["c75", "c100"], pass: ["passTd", "p300", "p400"], scr: ["s100", "s125"] }[key];
+  if(!mks) return;
+  $("boardWrap").querySelectorAll("tr[data-p]").forEach(function(tr){
+    var td0 = tr.querySelector("td"); if(!td0) return;
+    td0.insertAdjacentHTML("beforeend", legRow(tr.getAttribute("data-p"), mks));
+  });
+}; })(renderBoard);
+openPlayer = (function(orig){ return function(key){
+  orig(key);
+  var d = PLAYERS[key]; if(!d || !d.raw) return;
+  var pl = d.raw;
+  var tdBody = $("pTdSec") ? $("pTdSec").querySelector(".nfl-sec-body") : null;
+  if(tdBody && $("pTdSec").style.display !== "none") tdBody.insertAdjacentHTML("beforeend", legRow(key, ["any", "two", "first", "passTd"]));
+  var miBody = $("pMilesSec") ? $("pMilesSec").querySelector(".nfl-sec-body") : null;
+  if(miBody && $("pMilesSec").style.display !== "none") miBody.insertAdjacentHTML("beforeend", legRow(key, ["p200", "p300", "p400", "r50", "r75", "r100", "c50", "c75", "c100", "s75", "s100", "s125"]));
+  var zs = $("pZonesSec"), zb = $("pZones");
+  if(zs && zb){
+    var z = ZONES && ZONES.players ? ZONES.players[key] : null;
+    zb.innerHTML = zonesHtml(z);
+    zs.style.display = z ? "" : "none";
+  }
+}; })(openPlayer);
+renderStandings = (function(orig){ return function(){
+  orig();
+  var flat = [];
+  (B.standings || []).forEach(function(dv){ dv.teams.forEach(function(t){ flat.push(t.abbr); }); });
+  $("standingsWrap").querySelectorAll(".pick").forEach(function(row, i){
+    if(flat[i]){ row.setAttribute("data-teamrow", flat[i]); row.style.cursor = "pointer"; }
+  });
+}; })(renderStandings);
+parseSummary = (function(orig){ return function(espnId, d){
+  orig(espnId, d);
+  var wp = (d && d.winprobability) || [];
+  if(wp.length > 1){
+    var step = Math.max(1, Math.floor(wp.length / 40)), s = [];
+    for(var i = 0; i < wp.length; i += step) s.push(wp[i].homeWinPercentage);
+    if(s[s.length - 1] !== wp[wp.length - 1].homeWinPercentage) s.push(wp[wp.length - 1].homeWinPercentage);
+    WPSERIES[espnId] = s;
+  }
+}; })(parseSummary);
+renderSlate = (function(orig){ return function(){
+  orig();
+  B.games.forEach(function(g){
+    var L = LIVE[g.espnId];
+    if(!L || L.state !== "in") return;
+    var card = $("slateWrap").querySelector('[data-game="' + slug(g.key) + '"]');
+    if(card) card.insertAdjacentHTML("beforeend", wpGraphHtml(g.espnId, g));
+  });
+}; })(renderSlate);
+renderGame = (function(orig){ return function(key){
+  orig(key);
+  var g = GAMES[key]; if(!g) return;
+  var raw = g.raw, L = LIVE[raw.espnId];
+  if(!L || L.state !== "in") return;
+  var wl = $("gBody").querySelector(".winlabels");
+  if(wl && wl.closest(".card")) wl.closest(".card").insertAdjacentHTML("afterend", '<h2 class="sec">WIN PROBABILITY <span>score &amp; clock calculation — not a projection</span></h2><div class="card">' + wpGraphHtml(raw.espnId, raw) + "</div>");
+}; })(renderGame);
+
+/* ---------- clicks for the new controls (capture: beats the row router) ---------- */
+document.addEventListener("click", function(e){
+  if(!e.target || !e.target.closest) return;
+  var add = e.target.closest("[data-addleg]");
+  if(add){ e.preventDefault(); e.stopPropagation(); toggleLeg(add.getAttribute("data-addleg")); return; }
+  var rm = e.target.closest("[data-rmleg]");
+  if(rm){ e.preventDefault(); e.stopPropagation(); toggleLeg(rm.getAttribute("data-rmleg")); return; }
+  if(e.target.closest("[data-clearleg]")){ e.preventDefault(); e.stopPropagation(); PARLAY = {}; refreshParlayUI(); return; }
+  var tp = e.target.closest("[data-tp]");
+  if(tp){ e.preventDefault(); e.stopPropagation(); TP_MKT = tp.getAttribute("data-tp"); renderTopPicks(); return; }
+  if(e.target.closest("[data-closeteam]")){ e.preventDefault(); e.stopPropagation(); closeTeamSheet(); return; }
+  var tr = e.target.closest("[data-teamrow]");
+  if(tr){ openTeamSheet(tr.getAttribute("data-teamrow")); return; }
+  if(e.target.closest("#teamSheet [data-p]") || e.target.closest("#teamSheet [data-k]")) closeTeamSheet();
+}, true);
 </script>
 
 <script src="sports-menu.js"></script>
