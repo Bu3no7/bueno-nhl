@@ -341,7 +341,7 @@
   <div class="card featured" id="tdLooks"></div>
   <h2 class="sec">TOP YARDAGE LOOKS <span>fair medians</span></h2>
   <div class="card" id="yardLooks"></div>
-  <h2 class="sec">ON BYE · WEEK 10 <span>no prices this week</span></h2>
+  <h2 class="sec">ON BYE · WEEK 11 <span>no prices this week</span></h2>
   <div class="card" id="byeWrap"></div>
   <h2 class="sec">HOW IT WORKS <span>the short version</span></h2>
   <div class="card">
@@ -364,7 +364,7 @@
 
 <!-- ============ VIEW: SLATE ============ -->
 <section class="view" id="view-slate">
-  <h2 class="sec">WEEK 10 SLATE <span>game model · live tracker</span></h2>
+  <h2 class="sec">WEEK 11 SLATE <span>game model · live tracker</span></h2>
   <div id="slateWrap"></div>
   <h2 class="sec">STANDINGS <span>by division</span></h2>
   <div id="standingsWrap"></div>
@@ -374,7 +374,7 @@
 <section class="view" id="view-game">
   <div class="backbar"><span class="backbtn" id="gameBackBtn">‹ Slate</span></div>
   <div class="phead">
-    <div><h3 id="gTitle">Baltimore at Jacksonville</h3><p id="gMeta">THU 6:15 PM · WEEK 10 · GAME BREAKDOWN</p></div>
+    <div><h3 id="gTitle">Baltimore at Jacksonville</h3><p id="gMeta">THU 6:15 PM · WEEK 11 · GAME BREAKDOWN</p></div>
   </div>
   <div id="gBody"></div>
 </section>
@@ -1256,6 +1256,8 @@ dataFetch("data/nfl-2026-w10.json").then(function(r){ return r.json(); }).then(f
   $("boardWrap").innerHTML = '<p class="note" style="margin:12px 2px">The Week 10 price bundle could not load. Refresh in a moment.</p>';
 });
 
+
+
 /* ===== NFL polish (Nov 11): parlay builder + quick-add, top picks strip,
    target-zone card section, live win% graph, tappable standings team
    sheet, playoff picture. Display-only throughout: every leg and number
@@ -1268,7 +1270,41 @@ var PARLAY = {}, ZONES = null, PLAYOFF = null, WPSERIES = {}, TP_MKT = "any";
   + ".pb-bar{display:flex;align-items:center;gap:8px;margin:0 0 10px}"
   + '.pb-bar select{flex:1;min-width:0;appearance:none;-webkit-appearance:none;background:#0b1322 url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'10\' height=\'6\'%3E%3Cpath d=\'M1 1l4 4 4-4\' stroke=\'%23e8b64c\' stroke-width=\'2\' fill=\'none\'/%3E%3C/svg%3E") no-repeat right .8rem center;border:1px solid rgba(165,195,255,.28);border-radius:11px;color:#eef3f9;font-size:.92rem;font-weight:700;padding:.62rem .8rem;font-family:inherit;cursor:pointer}'
   + ".pb-bar select:focus{outline:2px solid #e8b64c;outline-offset:1px}"
+  + ".pb-bar select#pbPos{flex:0 0 8.4rem;font-size:.84rem}"
+  + ".pb-bar select#pbPos:disabled{opacity:.45;cursor:default}"
+  + ".pb-norows td{text-align:center;color:#8b96ab;padding:18px 10px;font-size:.85rem}"
   + ".pb-ticket{font-size:.6rem;font-weight:900;letter-spacing:.1em;color:#8b96ab;white-space:nowrap}"
+  + ".pb-tabs{display:flex;gap:8px;margin:0 0 12px}"
+  + ".pb-tab{font:inherit;font-size:.78rem;font-weight:900;letter-spacing:.12em;color:#8b96ab;background:rgba(13,30,44,.6);border:1px solid rgba(165,195,255,.28);border-radius:999px;padding:.52rem .95rem;cursor:pointer}"
+  + ".pb-tab.on{background:#e8b64c;border-color:#e8b64c;color:#0a1526}"
+  + ".tk-confhead{display:flex;justify-content:space-between;align-items:baseline;margin:14px 0 6px}"
+  + ".tk-confhead b{font-size:1.05rem;color:#e8b64c;letter-spacing:.06em}"
+  + ".tk-confhead span{font-size:.6rem;font-weight:700;letter-spacing:.06em;color:#8b96ab}"
+  + ".tk-cols{display:grid;grid-template-columns:1.28fr 1.12fr .92fr;gap:8px;margin:0 0 5px}"
+  + ".tk-cols span{font-size:.55rem;font-weight:900;letter-spacing:.13em;color:#8b96ab;padding-left:4px}"
+  + ".tk-grid{display:grid;grid-template-columns:1.28fr 1.12fr .92fr;gap:8px}"
+  + ".tk-chip{position:relative;background:linear-gradient(155deg, rgba(130,170,255,.13), rgba(6,12,26,.55));border:1px solid rgba(165,195,255,.22);border-radius:13px;padding:6px 8px}"
+  + ".tk-chip.dim{opacity:.75}"
+  + ".tk-chip.gold{border-color:rgba(232,182,76,.65)}"
+  + ".tk-arrow::before{content:'›';position:absolute;left:-10px;top:50%;transform:translateY(-50%);color:#5a7186;font-weight:900;font-size:1rem;z-index:2}"
+  + ".tk-team{display:flex;align-items:center;gap:6px;padding:2.5px 0}"
+  + ".tk-team + .tk-team{border-top:1px solid rgba(165,195,255,.1)}"
+  + ".tk-seed{font-size:.72rem;font-weight:900;color:#e8b64c;min-width:12px}"
+  + ".tk-team img{width:23px;height:23px;object-fit:contain}"
+  + ".tk-team b{font-size:.84rem;color:#eef3f9}"
+  + ".tk-pct{margin-left:auto;font-size:.76rem;color:#3adbe3}"
+  + ".tk-byetag{font-size:.6rem;font-weight:900;letter-spacing:.08em;color:#e8b64c}"
+  + ".tk-sub{font-size:.64rem;font-style:italic;color:#8b96ab;padding:1px 0 2px 18px}"
+  + ".tk-tbd{font-size:.76rem;color:#8b96ab;padding:4px 0 4px 18px}"
+  + ".tk-champ{text-align:center;padding:8px 2px}"
+  + ".tk-champ b{display:block;font-size:.84rem;color:#eef3f9;letter-spacing:.04em}"
+  + ".tk-champ span{font-size:.58rem;font-weight:700;letter-spacing:.08em;color:#8b96ab}"
+  + ".tk-bubble{margin:9px 0 2px;font-size:.7rem;font-weight:800;letter-spacing:.07em;color:#8b96ab}"
+  + ".tk-bubble b{color:#eef3f9}"
+  + ".tk-bubble i{font-style:normal;color:#3adbe3;font-weight:700}"
+  + ".tk-sb{margin:16px auto 4px;max-width:340px;text-align:center;border:1.5px solid rgba(232,182,76,.7);border-radius:14px;padding:10px;background:rgba(13,30,44,.6)}"
+  + ".tk-sb b{display:block;font-size:.95rem;color:#e8b64c;letter-spacing:.1em}"
+  + ".tk-sb span{font-size:.6rem;font-weight:700;letter-spacing:.08em;color:#8b96ab}"
   + ".pq-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}"
   + ".pq-btn{font:inherit;font-size:.68rem;font-weight:700;letter-spacing:.02em;color:#dbe7fa;background:rgba(130,170,255,.10);border:1px solid rgba(165,195,255,.28);border-radius:999px;padding:.32rem .55rem;cursor:pointer}"
   + ".pq-btn b{color:#3adbe3;font-weight:900}"
@@ -1385,21 +1421,76 @@ function renderParlay(){
   wrap.innerHTML = h;
 }
 
-/* ---------- playbook dropdown: one select switches the whole Playbook
-   between the six boards, the parlay builder and the playoff picture. */
+/* ---------- playbook sub-pages (Nov 12 restructure): three tabs at
+   the top of the Playbook — MARKETS (the boards + parlay, as before),
+   SLATE (the week's games + the On Bye card), STANDINGS (the division
+   tables + the playoff tree). ---------- */
+var PB_TAB = "markets";
+function setPbTab(tab){
+  PB_TAB = tab;
+  document.querySelectorAll("[data-pbtab]").forEach(function(b){ b.classList.toggle("on", b.getAttribute("data-pbtab") === tab); });
+  var bar = $("pbBar"), bw = $("boardWrap"), bn = $("boardNote"), pp = $("parlayPanel");
+  if(tab === "markets"){
+    if(bar) bar.style.display = "";
+    setPlaybookMode(PB_MODE);
+  } else {
+    if(bar) bar.style.display = "none";
+    if(bw) bw.style.display = "none";
+    if(bn) bn.style.display = "none";
+    if(pp) pp.style.display = "none";
+  }
+  var ps = $("pbSlate"), pt = $("pbStandings");
+  if(ps) ps.style.display = tab === "slate" ? "" : "none";
+  if(pt) pt.style.display = tab === "standings" ? "" : "none";
+  if(tab === "standings") renderTree();
+}
+
+/* ---------- playbook dropdown: one select switches Markets between
+   the six boards and the parlay builder. */
 var PB_MODE = "td";
+var PB_POS = "";
+/* Position filter (Nov 12): the second select in the Playbook bar.
+   PB_POS sticks across board switches; the kick board parks the
+   select on All (disabled — kickers have no position split) and the
+   Parlay panel hides it (no player board to filter). */
+function syncPosSelect(mode){
+  var ps = $("pbPos"); if(!ps) return;
+  if(mode === "parlay"){ ps.style.display = "none"; return; }
+  ps.style.display = "";
+  if(mode === "kick"){ ps.disabled = true; ps.value = ""; }
+  else { ps.disabled = false; ps.value = PB_POS; }
+}
+function applyPosFilter(key){
+  if(!PB_POS) return;
+  var wrap = $("boardWrap"); if(!wrap) return;
+  var rows = wrap.querySelectorAll("tr[data-p]"); if(!rows.length) return;
+  var visible = 0;
+  rows.forEach(function(tr){
+    var d = PLAYERS[tr.getAttribute("data-p")];
+    var show = !!(d && d.raw && d.raw.pos === PB_POS);
+    tr.style.display = show ? "" : "none";
+    if(show) visible++;
+  });
+  if(!visible){
+    var table = wrap.querySelector("table.board"), b = BOARDS[key];
+    if(table){
+      var tr = document.createElement("tr");
+      tr.className = "pb-norows";
+      tr.innerHTML = '<td colspan="' + ((b ? b.cols.length : 1) + 1) + '">No ' + PB_POS + 's priced on this board</td>';
+      table.appendChild(tr);
+    }
+  }
+}
 function setPlaybookMode(mode){
   PB_MODE = mode;
   var sel = $("pbSelect"); if(sel) sel.value = mode;
-  var isBoard = mode !== "parlay" && mode !== "playoffs";
-  var bw = $("boardWrap"), bn = $("boardNote"), pp = $("parlayPanel"), po = $("playoffPanel");
-  if(bw) bw.style.display = isBoard ? "" : "none";
-  if(bn) bn.style.display = isBoard ? "" : "none";
+  syncPosSelect(mode);
+  var bw = $("boardWrap"), bn = $("boardNote"), pp = $("parlayPanel");
+  if(bw) bw.style.display = mode === "parlay" ? "none" : "";
+  if(bn) bn.style.display = mode === "parlay" ? "none" : "";
   if(pp) pp.style.display = mode === "parlay" ? "" : "none";
-  if(po) po.style.display = mode === "playoffs" ? "" : "none";
-  if(isBoard) renderBoard(mode);
-  else if(mode === "parlay") renderParlay();
-  else renderPlayoffs();
+  if(mode === "parlay") renderParlay();
+  else renderBoard(mode);
 }
 
 /* ---------- top picks strip (home) ---------- */
@@ -1477,55 +1568,92 @@ function openTeamSheet(abbr){
 }
 function closeTeamSheet(){ var ts = $("teamSheet"); if(ts) ts.classList.remove("on"); }
 
-/* ---------- playoff picture ---------- */
-function renderPlayoffs(){
-  var wrap = $("playoffWrap"); if(!wrap) return;
-  if(!PLAYOFF){
-    wrap.innerHTML = '<div class="card"><p class="pl-empty">The playoff picture could not load. Refresh in a moment.</p></div>';
-    return;
-  }
-  var meta = PLAYOFF._meta || {}, teams = PLAYOFF.teams || {};
-  function poRow(t){
-    var v = teams[t];
-    return '<div class="po-row"><div class="po-team">' + logoImg(t, "game-logo") + "<div><b>" + (TEAMNAME[t] || t) + '</b><span>' + v.rec + " · " + v.confName + " " + v.divName.toUpperCase() + '</span></div></div>'
-      + '<div class="po-nums"><div class="po-num hot"><b>' + Math.round(v.playoff * 100) + '%</b><span>PLAYOFF</span></div>'
-      + '<div class="po-num"><b>' + Math.round(v.div * 100) + '%</b><span>DIVISION</span></div>'
-      + '<div class="po-num"><b>' + Math.round(v.seed1 * 100) + '%</b><span>#1 SEED</span></div>'
-      + '<div class="po-num"><b>' + Math.round(v.sb * 100) + '%</b><span>SUPER BOWL</span></div></div></div>';
-  }
-  var h = "";
+/* ---------- playoff tree (Standings sub-page): seeded off the
+   current standings every render — division winners 1-4, wild cards
+   5-7, win% ties broken by the sim's team rating — with the sim's
+   playoff odds on each chip and the next two teams on the bubble.
+   Reseeds itself with each weekly bundle + sidecar refresh. ------- */
+function seedConf(conf){
+  var divs = (B.standings || []).filter(function(dv){ return dv.conf === conf; });
+  function wp(t){ return ((t.W || 0) + 0.5 * (t.T || 0)) / Math.max(1, (t.W || 0) + (t.L || 0) + (t.T || 0)); }
+  function rt(t){ var v = PLAYOFF && PLAYOFF.teams ? PLAYOFF.teams[t.abbr] : null; return v ? (v.rating || 0) : 0; }
+  function bySeed(a, b){ return (wp(b) - wp(a)) || (rt(b) - rt(a)); }
+  var winners = divs.map(function(dv){ return dv.teams.slice().sort(bySeed)[0]; }).sort(bySeed);
+  var wset = {}; winners.forEach(function(t){ wset[t.abbr] = 1; });
+  var rest = [];
+  divs.forEach(function(dv){ dv.teams.forEach(function(t){ if(!wset[t.abbr]) rest.push(t); }); });
+  rest.sort(bySeed);
+  return { seeds: winners.concat(rest.slice(0, 3)), bubble: rest.slice(3, 5) };
+}
+function tkTeam(seed, t, tag){
+  var v = PLAYOFF && PLAYOFF.teams ? PLAYOFF.teams[t.abbr] : null;
+  return '<div class="tk-team"><span class="tk-seed">' + seed + "</span>" + logoImg(t.abbr, "game-logo") + "<b>" + t.abbr + "</b>"
+    + (v ? '<span class="tk-pct">' + Math.round(v.playoff * 100) + "%</span>" : "")
+    + (tag ? '<span class="tk-byetag">' + tag + "</span>" : "") + "</div>";
+}
+function renderTree(){
+  var wrap = $("treeWrap"); if(!wrap || !B || !B.standings) return;
+  var meta = (PLAYOFF && PLAYOFF._meta) || {};
+  var h = '<p class="note" style="margin:0 0 4px">Seeds if the season ended today · % is the sim\'s playoff odds.</p>';
   ["AFC", "NFC"].forEach(function(conf){
-    var ts = Object.keys(teams).filter(function(t){ return teams[t].confName === conf; })
-      .sort(function(a, b){ return teams[b].playoff - teams[a].playoff; });
-    h += '<h2 class="sec">' + conf + ' <span>playoff race</span></h2><div class="card">' + ts.map(poRow).join("") + "</div>";
+    var sc = seedConf(conf), s = sc.seeds;
+    if(s.length < 7) return;
+    h += '<div class="tk-confhead"><b>' + conf + '</b><span>SEEDED ON TODAY\'S STANDINGS</span></div>'
+      + '<div class="tk-cols"><span>WILD CARD</span><span>DIVISIONAL</span><span>CONF FINAL</span></div>'
+      + '<div class="tk-grid">'
+      + '<div class="tk-chip gold" style="grid-column:1;grid-row:1">' + tkTeam(1, s[0], "BYE") + "</div>"
+      + '<div class="tk-chip" style="grid-column:1;grid-row:2">' + tkTeam(2, s[1]) + tkTeam(7, s[6]) + "</div>"
+      + '<div class="tk-chip" style="grid-column:1;grid-row:3">' + tkTeam(3, s[2]) + tkTeam(6, s[5]) + "</div>"
+      + '<div class="tk-chip" style="grid-column:1;grid-row:4">' + tkTeam(4, s[3]) + tkTeam(5, s[4]) + "</div>"
+      + '<div class="tk-chip tk-arrow" style="grid-column:2;grid-row:1 / span 2;align-self:center">' + tkTeam(1, s[0]) + '<div class="tk-sub">vs lowest WC winner</div></div>'
+      + '<div class="tk-chip dim tk-arrow" style="grid-column:2;grid-row:3 / span 2;align-self:center"><div class="tk-tbd">WC winner</div><div class="tk-tbd">WC winner</div></div>'
+      + '<div class="tk-chip gold tk-arrow" style="grid-column:3;grid-row:1 / span 4;align-self:center"><div class="tk-champ"><b>' + conf + ' CHAMP</b><span>TO SUPER BOWL</span></div></div>'
+      + "</div>"
+      + '<div class="tk-bubble">ON THE BUBBLE&nbsp; ' + sc.bubble.map(function(t){
+          var v = PLAYOFF && PLAYOFF.teams ? PLAYOFF.teams[t.abbr] : null;
+          return "<b>" + t.abbr + "</b>" + (v ? " <i>" + Math.round(v.playoff * 100) + "%</i>" : "");
+        }).join(" &nbsp;·&nbsp; ") + "</div>";
   });
-  h += '<p class="note">Simulation estimate — ' + (meta.sims ? meta.sims.toLocaleString() : "10,000") + ' simulated finishes of the remaining schedule (weeks ' + ((meta.weeksSimulated || []).join(", ") || "—") + '), ratings from points differential. Tiebreakers are simplified: win% → division record / head-to-head → point differential. Not betting advice.</p>';
+  h += '<div class="tk-sb"><b>SUPER BOWL</b><span>AFC CHAMP VS NFC CHAMP</span></div>'
+    + '<p class="note">Simulation estimate — ' + (meta.sims ? meta.sims.toLocaleString() : "10,000") + ' simulated finishes of the remaining schedule (weeks ' + ((meta.weeksSimulated || []).join(", ") || "—") + "), ratings from points differential. Tiebreakers are simplified: win% → division record / head-to-head → point differential. Not betting advice.</p>";
   wrap.innerHTML = h;
 }
 
 /* ---------- boot: views, nav, overlays, sidecar loads ---------- */
 (function bootFeatures(){
-  /* Playbook: one NBA-style select (the .fb-filterbar select pattern)
-     replaces the pill row and switches the whole section — the six
-     boards, the parlay builder and the playoff picture live here. */
+  /* Playbook sub-pages: a tab bar (MARKETS / SLATE / STANDINGS), then
+     the Markets furniture — one NBA-style select (the .fb-filterbar
+     select pattern) plus the position select and the parlay panel —
+     then the two empty sub-page containers the slate/standings move
+     further down fills in. */
   var boardSec = $("view-board");
   if(boardSec){
+    var pillsEl = boardSec.querySelector(".pills");
+    var tabs = document.createElement("div");
+    tabs.className = "pb-tabs";
+    tabs.innerHTML = '<button type="button" class="pb-tab on" data-pbtab="markets">MARKETS</button><button type="button" class="pb-tab" data-pbtab="slate">SLATE</button><button type="button" class="pb-tab" data-pbtab="standings">STANDINGS</button>';
+    tabs.querySelectorAll("[data-pbtab]").forEach(function(b){ b.addEventListener("click", function(){ setPbTab(b.getAttribute("data-pbtab")); }); });
+    boardSec.insertBefore(tabs, pillsEl || null);
     var bar = document.createElement("div");
     bar.className = "pb-bar";
-    bar.innerHTML = '<select id="pbSelect" aria-label="Choose a Playbook section"><option value="td">Touchdowns</option><option value="rush">Rushing</option><option value="rec">Receiving</option><option value="pass">Passing</option><option value="scr">Rush + Rec</option><option value="kick">Kickers</option><option value="parlay">Parlay</option><option value="playoffs">Playoffs</option></select><span class="pb-ticket">TICKET <span id="plCount"></span></span>';
+    bar.id = "pbBar";
+    bar.innerHTML = '<select id="pbSelect" aria-label="Choose a Playbook section"><option value="td">Touchdowns</option><option value="rush">Rushing</option><option value="rec">Receiving</option><option value="pass">Passing</option><option value="scr">Rush + Rec</option><option value="kick">Kickers</option><option value="parlay">Parlay</option></select><select id="pbPos" aria-label="Filter by position"><option value="">All positions</option><option value="QB">QB</option><option value="RB">RB</option><option value="WR">WR</option><option value="TE">TE</option></select><span class="pb-ticket">TICKET <span id="plCount"></span></span>';
     bar.querySelector("select").addEventListener("change", function(){ setPlaybookMode(this.value); });
-    boardSec.insertBefore(bar, boardSec.querySelector(".pills") || null);
+    bar.querySelector("#pbPos").addEventListener("change", function(){ PB_POS = this.value; if(PB_MODE !== "parlay" && PB_MODE !== "kick") renderBoard(PB_MODE); });
+    boardSec.insertBefore(bar, pillsEl || null);
     var pp = document.createElement("div");
     pp.id = "parlayPanel"; pp.style.display = "none";
     pp.innerHTML = '<h2 class="sec">PARLAY BUILDER <span>legs price off the model, joint rate assumes independence</span></h2><div id="parlayWrap"></div>';
-    var po = document.createElement("div");
-    po.id = "playoffPanel"; po.style.display = "none";
-    po.innerHTML = '<h2 class="sec">PLAYOFF PICTURE <span>simulated · updates with the weekly bundle</span></h2><div id="playoffWrap"></div>';
-    boardSec.appendChild(pp); boardSec.appendChild(po);
+    boardSec.appendChild(pp);
+    var psl = document.createElement("div");
+    psl.id = "pbSlate"; psl.style.display = "none";
+    var pst = document.createElement("div");
+    pst.id = "pbStandings"; pst.style.display = "none";
+    boardSec.appendChild(psl); boardSec.appendChild(pst);
   }
   /* Bottom nav = exactly two buttons (Football / Playbook — Soccer's
      Hub + Leaders pattern): drop the Slate anchor. The slate and
-     standings sections move into the home view just below. */
+     standings sections move into the Playbook sub-pages below. */
   var nav = document.querySelector("nav.bottom");
   if(nav){ var slA = nav.querySelector('a[data-view="view-slate"]'); if(slA) slA.remove(); }
   var home = $("view-football"), hero = $("heroBand");
@@ -1534,20 +1662,35 @@ function renderPlayoffs(){
     tw.innerHTML = '<h2 class="sec">TOP PICKS <span>this week\'s likeliest names · tap for the card</span></h2><div class="tp-pills" id="tpPills"></div><div class="tp-strip" id="tpStrip"></div>';
     home.insertBefore(tw, hero.nextSibling ? hero.nextSibling.nextSibling : null);
   }
-  /* Slate + standings live in the home view now: hero -> Top Picks ->
-     Live Now -> Slate -> Standings -> the home boards. The view-slate
-     section is removed; show() is wrapped below so anything still
-     pointing at view-slate (game-sheet back button, slate/standings
-     search rows) lands on Football home. */
-  var slateSec = $("view-slate");
-  if(home && slateSec){
-    var tdHead = null;
-    home.querySelectorAll("h2.sec").forEach(function(h){ if(!tdHead && h.textContent.indexOf("TOP TOUCHDOWN") === 0) tdHead = h; });
-    var refNode = tdHead || home.querySelector("footer") || null;
+  /* Slate + standings move into the Playbook sub-pages: the old
+     view-slate section held games and standings together, so its
+     children split by content — the standings wrap and its head go
+     to STANDINGS, everything else to SLATE — and home's On Bye block
+     (head + card) joins SLATE under the games. The playoff tree is
+     appended under the standings. view-slate is removed; show() is
+     wrapped below so anything still pointing at it (the game-sheet
+     back button) lands on the Playbook's Slate tab. */
+  var slateSec = $("view-slate"), pslEl = $("pbSlate"), pstEl = $("pbStandings");
+  if(slateSec && pslEl && pstEl){
     var kids = [];
     while(slateSec.firstChild) kids.push(slateSec.removeChild(slateSec.firstChild));
-    kids.forEach(function(node){ home.insertBefore(node, refNode); });
+    kids.forEach(function(node){
+      var toStd = node.id === "standingsWrap"
+        || (node.querySelector && node.querySelector("#standingsWrap"))
+        || (node.tagName === "H2" && node.textContent.indexOf("STANDINGS") === 0);
+      (toStd ? pstEl : pslEl).appendChild(node);
+    });
     slateSec.remove();
+    pstEl.insertAdjacentHTML("beforeend", '<h2 class="sec">PLAYOFF PICTURE <span>playoff tree · simulated odds</span></h2><div id="treeWrap"></div>');
+  }
+  if(home && pslEl){
+    var byeHead = null;
+    home.querySelectorAll("h2.sec").forEach(function(h){ if(!byeHead && h.textContent.indexOf("ON BYE") === 0) byeHead = h; });
+    if(byeHead){
+      var byeCard = byeHead.nextElementSibling;
+      pslEl.appendChild(byeHead);
+      if(byeCard) pslEl.appendChild(byeCard);
+    }
   }
   var usageSec = $("pUsageSec");
   if(usageSec){
@@ -1562,22 +1705,27 @@ function renderPlayoffs(){
   document.body.appendChild(ts);
   renderParlay();
   dataFetch("data/nfl-zones.json").then(function(r){ return r.json(); }).then(function(j){ ZONES = j; }).catch(function(){});
-  dataFetch("data/nfl-playoff.json").then(function(r){ return r.json(); }).then(function(j){ PLAYOFF = j; renderPlayoffs(); }).catch(function(){});
+  dataFetch("data/nfl-playoff.json").then(function(r){ return r.json(); }).then(function(j){ PLAYOFF = j; renderTree(); }).catch(function(){});
 })();
 
 /* ---------- wrap existing renders (same names, called everywhere) ---------- */
 buildObjects = (function(orig){ return function(){
   orig();
   SEARCH_ITEMS.push({ t: "Parlay Builder", s: "PLAYBOOK · YOUR TICKET", v: "view-board" });
-  SEARCH_ITEMS.push({ t: "Playoff Picture", s: "PLAYBOOK · SIMULATED ODDS", v: "view-board" });
+  SEARCH_ITEMS.push({ t: "Playoff Picture", s: "PLAYBOOK · STANDINGS · PLAYOFF TREE", v: "view-board" });
+  SEARCH_ITEMS.forEach(function(it){ if(it.s && it.s.indexOf("ON BYE") === 0) it.v = "view-board"; });
 }; })(buildObjects);
-/* Slate + standings live in the home view now: anything still pointing
+/* Slate lives on the Playbook's Slate tab now: anything still pointing
    at view-slate (game-sheet back button, slate/standings search rows)
-   lands on Football home instead. */
-show = (function(orig){ return function(id){ orig(id === "view-slate" ? "view-football" : id); }; })(show);
+   lands on the Playbook with the Slate tab up. */
+show = (function(orig){ return function(id){
+  if(id === "view-slate"){ orig("view-board"); setPbTab("slate"); return; }
+  orig(id);
+}; })(show);
 renderHome = (function(orig){ return function(){ orig(); renderTopPicks(); }; })(renderHome);
 renderBoard = (function(orig){ return function(key){
   orig(key);
+  applyPosFilter(key);
   var mks = { td: ["any", "two", "first"], rush: ["r75", "r100"], rec: ["c75", "c100"], pass: ["passTd", "p300", "p400"], scr: ["s100", "s125"] }[key];
   if(!mks) return;
   $("boardWrap").querySelectorAll("tr[data-p]").forEach(function(tr){
@@ -1607,6 +1755,7 @@ renderStandings = (function(orig){ return function(){
   $("standingsWrap").querySelectorAll(".pick").forEach(function(row, i){
     if(flat[i]){ row.setAttribute("data-teamrow", flat[i]); row.style.cursor = "pointer"; }
   });
+  renderTree();
 }; })(renderStandings);
 parseSummary = (function(orig){ return function(espnId, d){
   orig(espnId, d);
@@ -1640,7 +1789,7 @@ renderGame = (function(orig){ return function(key){
 document.addEventListener("click", function(e){
   if(!e.target || !e.target.closest) return;
   var sr = e.target.closest(".sresult");
-  if(sr){ var sb = sr.querySelector("b"); if(sb && sb.textContent === "Parlay Builder") setPlaybookMode("parlay"); else if(sb && sb.textContent === "Playoff Picture") setPlaybookMode("playoffs"); }
+  if(sr){ var sb = sr.querySelector("b"); if(sb && sb.textContent === "Parlay Builder"){ setPbTab("markets"); setPlaybookMode("parlay"); } else if(sb && sb.textContent === "Playoff Picture") setPbTab("standings"); else if(sr.textContent.indexOf("ON BYE") >= 0) setPbTab("slate"); }
   var add = e.target.closest("[data-addleg]");
   if(add){ e.preventDefault(); e.stopPropagation(); toggleLeg(add.getAttribute("data-addleg")); return; }
   var rm = e.target.closest("[data-rmleg]");
