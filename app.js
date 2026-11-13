@@ -2975,6 +2975,223 @@ async function ensureFinish(r) {
   if (!html) { dropAccSlot(slot); return; }
   slot.outerHTML = html;
 }
+/* ---------------- NHL EDGE tracking (live EDGE endpoints) ----------------
+   Season tracking from the NHL's own EDGE API — shot speed, skating
+   speed/bursts and zone time for skaters; save % by danger band for
+   goalies — fetched live through the same /nhl-api proxy as every
+   other NHL call (api-web.nhle.com sends no CORS headers; the
+   netlify.toml rewrite is the browser route). The /now form
+   307-redirects off-proxy, so the explicit season form is used.
+   DISPLAY ONLY — EDGE numbers feed no price, probability or sort
+   anywhere. Loaded lazily on the section's first open, cached per
+   player for the session; any fetch error or an empty EDGE record
+   drops the section silently. */
+const EDGE_PATH = `${SEASON}/2`; // EDGE season form, e.g. 20262027/2
+const edgeSkaterCache = new Map(); // pid -> Promise<parsed|null>
+const edgeGoalieCache = new Map(); // pid -> Promise<parsed|null>
+function edgeNum(x) { const n = Number(x); return Number.isFinite(n) ? n : null; }
+function edgePctLabel(p) {
+  if (p == null) return '';
+  const v = p * 100;
+  if (v >= 99.95) return '100th';
+  if (v >= 99) return v.toFixed(1) + 'th';
+  const n = Math.round(v);
+  const suf = (n % 100 >= 10 && n % 100 <= 20) ? 'th' : ({ 1: 'st', 2: 'nd', 3: 'rd' }[n % 10] || 'th');
+  return n + suf;
+}
+function edgeFetch(path) {
+  return fetchJSON(`${API}/edge/${path}`).catch(() => null);
+}
+/* --- skater --- */
+function parseEdgeSkater(detail, shot, skate) {
+  const d = { shot: null, skating: null, zone: null, teamAbbr: null };
+  if (detail && detail.player && detail.player.team && detail.player.team.abbrev) d.teamAbbr = detail.player.team.abbrev;
+  const sd = shot && shot.shotSpeedDetails;
+  const topSrc = (sd && sd.topShotSpeed) || (detail && detail.topShotSpeed);
+  if (topSrc && edgeNum(topSrc.imperial) != null) {
+    const avg = sd && sd.avgShotSpeed;
+    const bands = [];
+    if (sd) {
+      const band = (lab, o) => { const v = o && edgeNum(o.value); if (v != null) bands.push({ lab, n: v }); };
+      band('70–80 mph', sd.shotAttempts70To80);
+      band('80–90 mph', sd.shotAttempts80To90);
+      const hi = (sd.shotAttempts90To100 ? edgeNum(sd.shotAttempts90To100.value) : null);
+      const over = (sd.shotAttemptsOver100 ? edgeNum(sd.shotAttemptsOver100.value) : null);
+      if (hi != null || over != null) bands.push({ lab: '90+ mph', n: (hi || 0) + (over || 0) });
+    }
+    d.shot = {
+      top: { v: topSrc.imperial, pct: edgeNum(topSrc.percentile), lg: topSrc.leagueAvg ? edgeNum(topSrc.leagueAvg.imperial) : null },
+      avg: (avg && edgeNum(avg.imperial) != null)
+        ? { v: avg.imperial, pct: edgeNum(avg.percentile), lg: avg.leagueAvg ? edgeNum(avg.leagueAvg.imperial) : null } : null,
+      bands,
+      overlay: topSrc.overlay || null,
+    };
+  }
+  const kd = skate && skate.skatingSpeedDetails;
+  const kTop = (kd && kd.maxSkatingSpeed) || (detail && detail.skatingSpeed && detail.skatingSpeed.speedMax);
+  if (kTop && edgeNum(kTop.imperial) != null) {
+    const b22 = kd && kd.burstsOver22 ? edgeNum(kd.burstsOver22.value) : null;
+    const b2022 = kd && kd.bursts20To22 ? edgeNum(kd.bursts20To22.value) : null;
+    const b20 = detail && detail.skatingSpeed && detail.skatingSpeed.burstsOver20;
+    d.skating = {
+      top: { v: kTop.imperial, pct: edgeNum(kTop.percentile), lg: kTop.leagueAvg ? edgeNum(kTop.leagueAvg.imperial) : null },
+      bursts: (b22 != null || b2022 != null) ? (b22 || 0) + (b2022 || 0) : (b20 ? edgeNum(b20.value) : null),
+      bursts22: b22,
+      burstsPct: b20 ? edgeNum(b20.percentile) : null,
+    };
+  }
+  const z = detail && detail.zoneTimeDetails;
+  if (z && edgeNum(z.offensiveZonePctg) != null && edgeNum(z.neutralZonePctg) != null && edgeNum(z.defensiveZonePctg) != null) {
+    d.zone = {
+      off: z.offensiveZonePctg * 100, neu: z.neutralZonePctg * 100, def: z.defensiveZonePctg * 100,
+      offPct: edgeNum(z.offensiveZonePercentile), offLg: edgeNum(z.offensiveZoneLeagueAvg),
+    };
+  }
+  return (d.shot || d.skating || d.zone) ? d : null;
+}
+function loadEdgeSkater(pid) {
+  const key = String(pid);
+  if (!edgeSkaterCache.has(key)) {
+    edgeSkaterCache.set(key, (async () => {
+      const [detail, shot, skate] = await Promise.all([
+        edgeFetch(`skater-detail/${pid}/${EDGE_PATH}`),
+        edgeFetch(`skater-shot-speed-detail/${pid}/${EDGE_PATH}`),
+        edgeFetch(`skater-skating-speed-detail/${pid}/${EDGE_PATH}`),
+      ]);
+      return parseEdgeSkater(detail, shot, skate);
+    })());
+  }
+  return edgeSkaterCache.get(key);
+}
+function edgeTileHtml(lab, valHtml, sub, pct) {
+  return `<div class="edge-tile"><div class="edge-tile-lab">${lab}</div><div class="edge-tile-val">${valHtml}</div>`
+    + (sub ? `<div class="edge-tile-sub">${sub}</div>` : '')
+    + (pct != null ? `<div class="edge-pbar"><span style="width:${Math.max(2, Math.round(pct * 100))}%"></span></div>` : '')
+    + `</div>`;
+}
+function edgeTileSub(pct, lg, unit) {
+  const parts = [];
+  if (pct != null) parts.push(`${edgePctLabel(pct)} %ile`);
+  if (lg != null) parts.push(`league ${lg.toFixed(1)}${unit || ''}`);
+  return parts.join(' · ');
+}
+function pcEdgeHtml(r, d) {
+  let h = `<div class="pc-min" data-edge-root>
+    <div class="pc-min-h"><span class="pc-min-t">NHL Edge</span><span class="edge-season">2026-27 season</span></div>`;
+  if (d.shot) {
+    const s = d.shot;
+    h += `<div class="chem-sec-t" style="margin-top:.55rem">Shot speed</div><div class="edge-tiles">`;
+    h += edgeTileHtml('HARDEST', `${s.top.v.toFixed(1)} <small>mph</small>`, edgeTileSub(s.top.pct, s.top.lg), s.top.pct);
+    if (s.avg) h += edgeTileHtml('AVERAGE', `${s.avg.v.toFixed(1)} <small>mph</small>`, edgeTileSub(s.avg.pct, s.avg.lg), s.avg.pct);
+    h += `</div>`;
+    if (s.bands.length) {
+      const maxN = Math.max(...s.bands.map((b) => b.n));
+      h += `<div class="edge-bands"><span>Attempts by band:</span>`
+        + s.bands.map((b) => `<span class="edge-chip${b.n === maxN && maxN > 0 ? ' hot' : ''}">${b.lab} ×${b.n}</span>`).join('')
+        + `</div>`;
+    }
+    const ov = s.overlay;
+    if (ov && ov.gameDate && ov.awayTeam && ov.homeTeam) {
+      const mon = new Date(ov.gameDate + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      const homeGame = ov.homeTeam.abbrev === (d.teamAbbr || r.team);
+      const opp = homeGame ? ov.awayTeam.abbrev : ov.homeTeam.abbrev;
+      const per = ov.periodDescriptor && ov.periodDescriptor.number;
+      const perOrd = per === 1 ? '1st' : per === 2 ? '2nd' : per === 3 ? '3rd' : per ? `${per}th` : '';
+      h += `<p class="edge-note">Season hardest: ${esc(mon)} ${homeGame ? 'vs' : 'at'} ${esc(opp)}${perOrd ? ` · ${perOrd} period` : ''}${ov.timeInPeriod ? `, ${esc(ov.timeInPeriod)}` : ''}</p>`;
+    }
+  }
+  if (d.skating) {
+    const k = d.skating;
+    h += `<div class="chem-sec-t">Skating</div><div class="edge-tiles">`;
+    h += edgeTileHtml('TOP SPEED', `${k.top.v.toFixed(1)} <small>mph</small>`, edgeTileSub(k.top.pct, k.top.lg), k.top.pct);
+    if (k.bursts != null) {
+      const sub = [k.bursts22 != null ? `${k.bursts22} at 22+ mph` : '', k.burstsPct != null ? `${edgePctLabel(k.burstsPct)} %ile` : ''].filter(Boolean).join(' · ');
+      h += edgeTileHtml('BURSTS 20+ MPH', `${k.bursts}`, sub, k.burstsPct);
+    }
+    h += `</div>`;
+  }
+  if (d.zone) {
+    const z = d.zone;
+    const znote = z.offPct != null ? `Offensive zone ${edgePctLabel(z.offPct)} %ile${z.offLg != null ? ` · league ${(z.offLg * 100).toFixed(1)}%` : ''}` : '';
+    h += `<div class="chem-sec-t">Zone time${znote ? ` <span class="edge-zone-note">${znote}</span>` : ''}</div>
+    <div class="edge-zonebar"><span class="z-off" style="width:${z.off.toFixed(1)}%"></span><span class="z-neu" style="width:${z.neu.toFixed(1)}%"></span><span class="z-def" style="width:${z.def.toFixed(1)}%"></span></div>
+    <div class="edge-zone-labs"><span><b>Offensive</b> ${z.off.toFixed(1)}%</span><span><b>Neutral</b> ${z.neu.toFixed(1)}%</span><span><b>Defensive</b> ${z.def.toFixed(1)}%</span></div>
+    <p class="edge-note">Share of ice time by zone · all situations</p>`;
+  }
+  h += `<p class="fin-foot">NHL EDGE tracking · display only — not a price input</p></div>`;
+  return h;
+}
+function pcEdgeSlotHtml(r) {
+  return `<div class="pc-min" data-edge-slot="${esc(String(r.pid))}"><div class="pc-min-h"><span class="pc-min-t">NHL Edge</span></div><p class="muted small" style="margin:.35rem 0 0">Loading NHL EDGE tracking…</p></div>`;
+}
+async function ensureEdge(r) {
+  const d = await loadEdgeSkater(r.pid);
+  const body = $('modalBody');
+  if (!body) return;
+  const slot = body.querySelector(`[data-edge-slot="${esc(String(r.pid))}"]`);
+  if (!slot) return;
+  const html = d ? pcEdgeHtml(r, d) : '';
+  if (!html) { dropAccSlot(slot); return; }
+  slot.outerHTML = html;
+}
+/* --- goalie (danger-band save %; strip lives on the goalie card) --- */
+function parseEdgeGoalie(payload) {
+  const rows = (payload && payload.shotLocationSummary) || [];
+  const by = {};
+  for (const row of rows) if (row && row.locationCode) by[row.locationCode] = row;
+  const band = (code) => {
+    const row = by[code];
+    if (!row || edgeNum(row.savePctg) == null) return null;
+    const saves = edgeNum(row.saves) || 0;
+    const ga = edgeNum(row.goalsAgainst) || 0;
+    return { sv: row.savePctg, saves, shots: saves + ga, lg: edgeNum(row.savePctgLeagueAvg) };
+  };
+  const out = { all: band('all'), high: band('high'), mid: band('mid'), long: band('long') };
+  if (!out.all && payload && payload.player && edgeNum(payload.player.savePctg) != null) {
+    out.all = { sv: payload.player.savePctg, saves: 0, shots: 0, lg: null };
+  }
+  return (out.high || out.mid || out.long) ? out : null;
+}
+function loadEdgeGoalie(pid) {
+  const key = String(pid);
+  if (!edgeGoalieCache.has(key)) {
+    edgeGoalieCache.set(key, edgeFetch(`goalie-detail/${pid}/${EDGE_PATH}`).then(parseEdgeGoalie));
+  }
+  return edgeGoalieCache.get(key);
+}
+function edgeSvFmt(sv) {
+  const s = sv.toFixed(3);
+  return s.startsWith('0') ? s.slice(1) : s;
+}
+function pcGedgeHtml(pg, d) {
+  const bandTile = (cls, lab, b) => {
+    if (!b) return '';
+    const delta = b.lg != null ? b.sv - b.lg : null;
+    const dHtml = delta != null
+      ? `<div class="edge-band-delta ${delta >= 0.01 ? 'up' : delta <= -0.01 ? 'dn' : ''}">${delta >= 0 ? '+' : '−'}${Math.abs(delta).toFixed(3).replace(/^0/, '')} vs lg</div>` : '';
+    return `<div class="edge-band ${cls}"><div class="edge-band-lab">${lab}</div>`
+      + `<div class="edge-band-val">${edgeSvFmt(b.sv)}</div>${dHtml}`
+      + (b.shots ? `<div class="edge-band-vol">${b.saves} saves · ${b.shots} shots</div>` : '')
+      + (b.lg != null ? `<div class="edge-band-lg">league ${edgeSvFmt(b.lg)}</div>` : '')
+      + `</div>`;
+  };
+  return `<div class="pc-min" data-gedge-root>
+    <div class="pc-min-h"><span class="pc-min-t">NHL Edge · danger bands</span>${d.all ? `<span class="edge-all">ALL SHOTS ${edgeSvFmt(d.all.sv)}</span>` : ''}</div>
+    <div class="edge-bands3">${bandTile('hi', 'HIGH DANGER', d.high)}${bandTile('mid', 'MID RANGE', d.mid)}${bandTile('lng', 'LONG RANGE', d.long)}</div>
+    <p class="fin-foot">NHL EDGE tracking · display only — not a price input</p></div>`;
+}
+function pcGedgeSlotHtml(pg) {
+  return `<div class="pc-min" data-gedge-slot="${esc(String(pg.id))}"><div class="pc-min-h"><span class="pc-min-t">NHL Edge · danger bands</span></div><p class="muted small" style="margin:.35rem 0 0">Loading NHL EDGE tracking…</p></div>`;
+}
+async function ensureGoalieEdge(pg) {
+  const d = await loadEdgeGoalie(pg.id);
+  const body = $('modalBody');
+  if (!body) return;
+  const slot = body.querySelector(`[data-gedge-slot="${esc(String(pg.id))}"]`);
+  if (!slot) return;
+  const html = d ? pcGedgeHtml(pg, d) : '';
+  if (html) slot.outerHTML = html; else slot.remove();
+}
 /* ---------------- last-10 shots vs projection (last10 sidecar) ----------------
    data/last10-<date>.json comes from data-builder/last10.js (build step
    12): per skater, SOG + attempt locations over his last 10 played games.
@@ -3283,6 +3500,7 @@ function openPlayer(pid, gameId) {
     ${pcAccSec('ice', `Ice time${minN ? ` · last ${minN}` : ''}`, pcMinSlotHtml(r), false)}
     ${pcAccSec('chem', `Chemistry${chemEnt && chemEnt.sharedGames ? ` · last ${chemEnt.sharedGames}` : ''}`, pcChemSlotHtml(r), false)}
     ${pcAccSec('fin', 'Finishing', pcFinSlotHtml(r), false)}
+    ${pcAccSec('edge', 'EDGE · NHL tracking', pcEdgeSlotHtml(r), false)}
     ${pcAccSec('form', 'Form', `${formHtml}${pcLastGameHtml(l5)}${zoneNote}`, false)}
     ${pcAccSec('vs', vsTitle, vsBody, false)}
     ${pcAccSec('shotmap', '<span id="rinkTitle">Shot map</span> <span class="pcacc-hint">recent games, attacking ↑</span>', shotMapBody, false)}
@@ -3308,6 +3526,7 @@ function openPlayer(pid, gameId) {
   lazySec('ice', () => ensureMinutes(r));
   lazySec('chem', () => ensureChem(r));
   lazySec('fin', () => ensureFinish(r));
+  lazySec('edge', () => ensureEdge(r));
   lazySec('shotmap', () => ensureLast10(r));
   ensurePlayerBio(r);
   // map follows the Markets dropdown on open; pills let you switch without closing
@@ -3536,11 +3755,13 @@ async function openGoalie(goalieId, teamAbbrev, gameId) {
     ${goalieProjTableHtml(g, teamAbbrev, st)}
     <h4 style="margin:.8rem 0 .2rem">Weak zones <span class="muted small">save% by zone</span></h4>
     ${goalieZoneGridHtml(pg.id)}
+    ${pcGedgeSlotHtml(pg)}
     <h4 style="margin:.8rem 0 .2rem">Goals allowed <span class="muted small">locations</span></h4>
     ${map}`;
   $('playerModal').classList.remove('hidden');
   drawGoalieRinks();
   ensureGoalieWork(pg);
+  ensureGoalieEdge(pg);
 }
 /* ---------------- views & refresh ---------------- */
 /* Home + Top Shelf code lives in home.js */

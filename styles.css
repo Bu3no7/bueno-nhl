@@ -1254,6 +1254,42 @@ tr.team-row:focus-visible { outline: 2px solid var(--teal); outline-offset: -2px
 .fin-tick { position: absolute; left: 12%; right: 12%; height: 3px; border-radius: 2px; background: var(--gold); }
 .fin-cap { font-size: .72rem; color: var(--muted); margin: .35rem 0 0; }
 .fin-foot { font-size: .72rem; color: var(--muted); font-style: italic; margin: .55rem 0 0; border-top: 1px solid rgba(255, 255, 255, .09); padding-top: .5rem; }
+
+/* ---------------- NHL EDGE tracking (player + goalie cards) ----------------
+   Live NHL EDGE season tracking (shot speed / skating / zone time;
+   goalie save % by danger band). Display only — feeds no price. */
+.edge-season { font-size: .72rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
+.edge-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; margin-top: .45rem; }
+.edge-tile { background: rgba(255, 255, 255, .05); border: 1px solid rgba(255, 255, 255, .08); border-radius: 12px; padding: .55rem .65rem .6rem; }
+.edge-tile-lab { font-size: .64rem; font-weight: 800; letter-spacing: .08em; color: var(--muted); }
+.edge-tile-val { font-size: 1.45rem; font-weight: 800; line-height: 1.15; }
+.edge-tile-val small { font-size: .8rem; font-weight: 700; color: var(--muted); }
+.edge-tile-sub { font-size: .72rem; color: var(--muted); margin-top: .1rem; }
+.edge-pbar { height: 6px; border-radius: 3px; background: rgba(255, 255, 255, .12); margin-top: .45rem; overflow: hidden; }
+.edge-pbar span { display: block; height: 100%; border-radius: 3px; background: var(--teal); }
+.edge-bands { display: flex; flex-wrap: wrap; gap: .35rem; align-items: center; margin-top: .55rem; font-size: .74rem; color: var(--muted); }
+.edge-chip { background: rgba(255, 255, 255, .07); border-radius: 999px; padding: .24rem .55rem; font-size: .72rem; font-weight: 700; color: var(--text, #ecf1f9); }
+.edge-chip.hot { color: var(--gold); }
+.edge-note { font-size: .74rem; color: var(--muted); margin: .45rem 0 0; }
+.edge-zone-note { float: right; text-transform: none; letter-spacing: 0; font-weight: 600; }
+.edge-zonebar { display: flex; gap: 2px; height: 20px; border-radius: 7px; overflow: hidden; margin-top: .45rem; }
+.edge-zonebar span { display: block; height: 100%; }
+.edge-zonebar .z-off { background: var(--teal); }
+.edge-zonebar .z-neu { background: #60708a; }
+.edge-zonebar .z-def { background: #425c80; }
+.edge-zone-labs { display: flex; justify-content: space-between; gap: .5rem; font-size: .7rem; color: var(--muted); margin-top: .35rem; }
+.edge-zone-labs b { color: var(--text, #ecf1f9); }
+.edge-all { font-size: .8rem; font-weight: 800; color: var(--gold); background: rgba(255, 255, 255, .07); border-radius: 8px; padding: .2rem .5rem; }
+.edge-bands3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: .45rem; margin-top: .5rem; }
+.edge-band { background: rgba(255, 255, 255, .05); border: 1px solid rgba(255, 255, 255, .08); border-left: 4px solid #60708a; border-radius: 10px; padding: .5rem .55rem; }
+.edge-band.hi { border-left-color: var(--teal); }
+.edge-band.mid { border-left-color: var(--gold); }
+.edge-band-val { font-size: 1.3rem; font-weight: 800; line-height: 1.2; }
+.edge-band-lab { font-size: .6rem; font-weight: 800; letter-spacing: .07em; color: var(--muted); }
+.edge-band-delta { font-size: .7rem; font-weight: 800; color: var(--muted); }
+.edge-band-delta.up { color: var(--teal); }
+.edge-band-delta.dn { color: var(--gold); }
+.edge-band-vol, .edge-band-lg { font-size: .66rem; color: var(--muted); margin-top: .15rem; }
 /* ---------------- goalie workload (goalies sidecar) ---------------- */
 .gwork-last { font-size: .8rem; font-weight: 700; color: var(--muted); }
 .gwork-chips { display: flex; flex-direction: column; align-items: flex-start; gap: .4rem; margin-top: .55rem; }
