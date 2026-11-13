@@ -3248,6 +3248,12 @@ function pcTypeStripHtml(r) {
   return `<div class="pc-type-strip"><span class="pts-lab">TYPE ${esc(t.letter)} · ${esc((t.type || '').toUpperCase())}</span>${esc(meta.desc || '')}`
     + `<div class="pts-fit">Fit ${Math.round((t.fit || 0) * 100)}%${leanMeta ? ` · borderline — leans ${esc(t.lean)} ${esc(leanMeta.name || '')}` : ''}${top ? ` · diet: ${top}` : ''} · ${t.sog} shots on goal this season · display only</div></div>`;
 }
+/* Types view: a pills row (one pill per letter) over a single glass
+   panel — only the selected type renders, so the view is one screen
+   instead of six stacked groups. The panel header carries the type's
+   descriptor; member rows show the face and the TEAM LOGO (logos, not
+   abbreviations, per Alex's site-wide rule). */
+let typeSel = 'A';
 function renderTypes() {
   const el = $('typesBody');
   if (!el) return;
@@ -3259,26 +3265,33 @@ function renderTypes() {
   const players = typesSidecar.players || {};
   const byLetter = {};
   for (const [pid, t] of Object.entries(players)) (byLetter[t.letter] = byLetter[t.letter] || []).push({ pid, ...t });
-  const slate = new Map((state.skaters || []).map((r) => [String(r.pid), r]));
-  let html = '';
-  for (const L of Object.keys(letters).sort()) {
-    const meta = letters[L];
-    const members = (byLetter[L] || []).slice().sort((a, b) => ((b.fit || 0) - (a.fit || 0)) || ((b.sog || 0) - (a.sog || 0)));
-    if (!members.length) continue;
-    html += `<div class="types-group"><div class="types-head"><span class="type-badge"><span class="tb-l">${esc(L)}</span><span class="tb-n">${esc(meta.name)}</span></span><span class="types-count">${members.length} skaters</span></div>`
-      + `<p class="types-desc">${esc(meta.desc || '')}</p><div class="types-members">`;
-    html += members.map((m) => {
-      const row = slate.get(String(m.pid));
-      const nameHtml = row
-        ? pnameBtn(row)
-        : `<span class="pname pname-static"><img class="pavatar" src="${esc(m.headshot || headshotUrl(m.team, m.pid))}" alt="" ${imgFallback}><span class="pname-name">${esc(m.name)}</span></span>`;
-      const lean = m.lean ? ` <span class="type-badge lean" title="Borderline — leans ${esc(m.lean)} ${esc((letters[m.lean] || {}).name || '')}"><span class="tb-l">${esc(m.lean)}</span></span>` : '';
-      const top = (m.topAreas || []).map((a) => `${esc(TYPE_AREA_LABEL[a.area] || a.area)} ${Math.round(a.share * 100)}%`).join(' · ');
-      return `<div class="type-row">${nameHtml}${lean}<span class="type-row-meta">${esc(m.team)} · ${esc(m.pos)} · ${m.sog} SOG${top ? ` · ${top}` : ''}</span><span class="type-fit">${Math.round((m.fit || 0) * 100)}% fit</span></div>`;
-    }).join('');
-    html += '</div></div>';
+  const order = Object.keys(letters).sort();
+  if (!order.length) {
+    el.innerHTML = '<p class="muted">No typed skaters yet.</p>';
+    return;
   }
-  el.innerHTML = html || '<p class="muted">No typed skaters yet.</p>';
+  if (!order.includes(typeSel)) typeSel = order[0];
+  const slate = new Map((state.skaters || []).map((r) => [String(r.pid), r]));
+  let html = '<div class="type-pills">' + order.map((L) =>
+    `<button type="button" class="type-pill${L === typeSel ? ' on' : ''}" data-typepill="${esc(L)}" aria-pressed="${L === typeSel}"><span class="tp-l">${esc(L)}</span><span class="tp-n">${esc(letters[L].name)}</span></button>`
+  ).join('') + '</div>';
+  const L = typeSel;
+  const meta = letters[L];
+  const members = (byLetter[L] || []).slice().sort((a, b) => ((b.fit || 0) - (a.fit || 0)) || ((b.sog || 0) - (a.sog || 0)));
+  html += `<div class="types-group"><div class="types-head"><span class="type-badge"><span class="tb-l">${esc(L)}</span><span class="tb-n">${esc(meta.name)}</span></span><span class="types-count">${members.length} skaters</span></div>`
+    + `<p class="types-desc">${esc(meta.desc || '')}</p><div class="types-members">`;
+  html += members.map((m) => {
+    const row = slate.get(String(m.pid));
+    const nameHtml = row
+      ? pnameBtn(row)
+      : `<span class="pname pname-static"><img class="pavatar" src="${esc(m.headshot || headshotUrl(m.team, m.pid))}" alt="" ${imgFallback}><span class="pname-name">${esc(m.name)}</span></span>`;
+    const lean = m.lean ? ` <span class="type-badge lean" title="Borderline — leans ${esc(m.lean)} ${esc((letters[m.lean] || {}).name || '')}"><span class="tb-l">${esc(m.lean)}</span></span>` : '';
+    const top = (m.topAreas || []).map((a) => `${esc(TYPE_AREA_LABEL[a.area] || a.area)} ${Math.round(a.share * 100)}%`).join(' · ');
+    return `<div class="type-row">${nameHtml}${lean}<img class="type-tlogo" src="${esc(teamLogoUrl(m.team))}" alt="" ${imgFallback}><span class="type-row-meta">${esc(m.pos)} · ${m.sog} SOG${top ? ` · ${top}` : ''}</span><span class="type-fit">${Math.round((m.fit || 0) * 100)}% fit</span></div>`;
+  }).join('');
+  html += '</div></div>';
+  el.innerHTML = html;
+  el.querySelectorAll('[data-typepill]').forEach((b) => b.addEventListener('click', () => { typeSel = b.dataset.typepill; renderTypes(); }));
   wirePnameClicks(el);
 }
 /* ---------------- standouts (goalie-matchup reads) ----------------

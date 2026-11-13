@@ -474,14 +474,27 @@ details.pc-sec[open ] summary .chev { transform: rotate(90deg); }
 .so-game { background: var(--card2, #101a2c); border: 1px solid var(--border); border-radius: 14px; padding: .7rem .8rem; margin-bottom: .7rem; }
 .so-game h4 { margin: 0 0 .3rem; font-size: .92rem; font-weight: 800; }
 .so-game h4 .sub { color: var(--muted); font-weight: 600; font-size: .74rem; margin-left: .4rem; }
-.ty-letter { background: var(--card2, #101a2c); border: 1px solid var(--border); border-radius: 14px; padding: .75rem .85rem; margin-bottom: .65rem; }
+.ty-pills { display: flex; flex-wrap: wrap; gap: .4rem; margin: .15rem 0 .65rem; }
+.ty-pill { display: inline-flex; align-items: center; gap: .38rem; background: var(--card2, #101a2c); border: 1px solid var(--border); border-radius: 999px; padding: .22rem .65rem .22rem .3rem; color: var(--text); font-size: .74rem; font-weight: 700; cursor: pointer; font-family: inherit; }
+.ty-pill .tb-l { display: inline-flex; align-items: center; justify-content: center; width: 1.1rem; height: 1.1rem; border-radius: 50%; background: #FF7A1A; color: #16090a; font-size: .7rem; font-weight: 900; flex: none; }
+.ty-pill.active { background: #FF7A1A; border-color: #FF7A1A; color: #16090a; }
+.ty-pill.active .tb-l { background: #16090a; color: #FF7A1A; }
+.ty-how-btn { background: none; border: 1px solid var(--border); color: #FF7A1A; border-radius: 999px; padding: .14rem .55rem; font-size: .7rem; font-weight: 700; cursor: pointer; font-family: inherit; vertical-align: middle; white-space: nowrap; }
+.ty-how { border: 1px solid var(--border); background: rgba(8,13,24,.5); border-radius: 12px; padding: .55rem .7rem; margin: .1rem 0 .6rem; }
+.ty-how[hidden] { display: none; }
+.ty-how p { margin: 0; color: var(--muted); font-size: .78rem; }
+.ty-letter { background: linear-gradient(155deg, rgba(130,170,255,.13), rgba(6,12,26,.55)); border: 1px solid rgba(165,195,255,.22); border-radius: 14px; padding: .8rem .85rem; backdrop-filter: blur(14px) saturate(1.35); -webkit-backdrop-filter: blur(14px) saturate(1.35); box-shadow: inset 0 1px 0 rgba(255,255,255,.13), 0 14px 34px rgba(0,0,0,.32); }
 .ty-letter .ty-head { display: flex; align-items: center; gap: .6rem; }
-.ty-letter .ty-desc { color: var(--muted); font-size: .78rem; margin-top: .25rem; }
-.ty-members { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .55rem; }
-.ty-member { display: inline-flex; align-items: center; gap: .4rem; background: #0e1626; border: 1px solid var(--border); border-radius: 999px; padding: .18rem .6rem .18rem .2rem; font-size: .78rem; font-weight: 600; cursor: pointer; color: var(--text); font-family: inherit; }
-.ty-member img.hs { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; object-position: top; background: #101a2c; }
+.ty-letter .ty-desc { color: #c7d2e6; font-size: .86rem; margin-top: .3rem; }
+.ty-def-head { font-size: .72rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: .75rem 0 .3rem; }
+.ty-members { display: grid; grid-template-columns: repeat(2, 1fr); gap: .45rem; margin-top: .6rem; }
+.ty-member { display: flex; align-items: center; gap: .5rem; background: rgba(8,13,24,.55); border: 1px solid var(--border); border-radius: 12px; padding: .42rem .55rem; font-size: .82rem; font-weight: 600; cursor: pointer; color: var(--text); font-family: inherit; text-align: left; min-width: 0; width: 100%; box-sizing: border-box; }
+.ty-member img.hs { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; object-position: top; background: #101a2c; flex: none; }
 .ty-member:active { border-color: #FF7A1A; }
-.ty-member .tm-t { color: var(--muted); font-weight: 600; font-size: .7rem; }
+.ty-member .tm-main { display: flex; flex-direction: column; min-width: 0; }
+.ty-member .tm-name { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ty-member .tm-sub { display: flex; align-items: center; gap: .32rem; color: var(--muted); font-weight: 600; font-size: .68rem; min-height: .8rem; }
+.ty-member .tm-logo { width: 17px; height: 17px; object-fit: contain; flex: none; }
 table.ty-def { width: 100%; border-collapse: collapse; font-size: .72rem; font-variant-numeric: tabular-nums; }
 table.ty-def th, table.ty-def td { padding: .28rem .3rem; text-align: center; border-bottom: 1px solid rgba(31,44,68,.5); }
 table.ty-def th { color: var(--muted); font-weight: 700; }
@@ -760,11 +773,12 @@ body.sport-glass .pc-overlay,body.sport-glass .gm-overlay{background:rgba(2,5,10
 
   <section id="nba-view-types" class="view">
     <div class="fb-slim-head"><h2>Player Types</h2><span class="right">Shot-style groups · 2026-27</span></div>
-    <p class="muted small" style="margin:.2rem 0 .7rem">Every player typed by <b>how he shoots</b>, not his position — clustered from this season's shot diet (zones + shot kinds). The letter rides beside his name across the site. Types are a style shorthand, redrawn weekly; a second letter is his lean when the fit is borderline. Display only — types never move a price.</p>
+    <p class="muted small" style="margin:.2rem 0 .55rem">Every player typed by <b>how he shoots</b> — the letter rides beside his name site-wide. <button class="ty-how-btn" id="nbaTypesHowBtn" type="button" aria-expanded="false">How it works ›</button></p>
+    <div class="ty-how" id="nbaTypesHow" hidden>
+      <p>Types are clustered from this season's shot diet (zones + shot kinds), not his position — a style shorthand, redrawn weekly. A second letter is his lean when the fit is borderline. Inside each panel, the Defense vs Type rows show how many more or fewer points each defense gives that group against its own baseline — a defense needs 6+ games of history or it stays off the list. Display only — types never move a price.</p>
+    </div>
+    <div class="ty-pills" id="nbaTypePills"></div>
     <div id="nbaTypesBody"><p class="muted">Loading types…</p></div>
-    <h3 class="fb-sec-title" style="margin-top:1rem">Defense vs Type <span class="sub">per-game delta vs the type's own average</span></h3>
-    <p class="muted small" style="margin:.2rem 0 .55rem">How many more (green) or fewer (red) points each defense gives up to each shot-style group, against that group's own baseline. Needs 6+ games of history or the cell stays blank.</p>
-    <div id="nbaTypeDefBody"><p class="muted">Loading…</p></div>
   </section>
 
   <section id="nba-view-paint" class="view">
@@ -3551,14 +3565,15 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
     renderStandouts();
   }));
 
-  /* ---- Types view: the letters, their members, Defense vs Type ---- */
+  /* ---- Types view: pills pick a letter; one glass panel at a time ---- */
+  let typeSel = 'A';
   function renderTypes() {
     const body = $('nbaTypesBody');
     if (!body) return;
-    const defBody = $('nbaTypeDefBody');
+    const pillsEl = $('nbaTypePills');
     if (!nbaTypesSide) {
       body.innerHTML = '<p class="muted">Types load with tonight\'s slate data…</p>';
-      if (defBody) defBody.innerHTML = '<p class="muted">—</p>';
+      if (pillsEl) pillsEl.innerHTML = '';
       return;
     }
     const players = nbaTypesSide.players || {};
@@ -3567,53 +3582,63 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
       const t = players[pid];
       if (t && t.letter) (byLetter[t.letter] = byLetter[t.letter] || []).push({ pid, t });
     }
-    let h = '';
-    for (const L of TYPE_ORDER) {
-      const meta = (nbaTypesSide.types || {})[L] || {};
-      const members = (byLetter[L] || []).sort((a, b) => (b.t.fga || 0) - (a.t.fga || 0));
-      h += '<div class="ty-letter"><div class="ty-head"><span class="type-badge big"><span class="tb-l">' + L + '</span><span class="tb-n">' + esc(meta.name || '') + '</span></span>' +
-        '<span class="muted small">' + members.length + ' players</span></div>' +
-        '<div class="ty-desc">' + esc(meta.desc || '') + '</div>';
-      if (members.length) {
-        h += '<div class="ty-members">' + members.map(({ pid, t }) => {
-          const eid = t.espnId ? String(t.espnId) : null;
-          const known = eid && (pricedById[eid] || liveByPid[eid] || knownPlayers[eid]);
-          const img = eid ? '<img class="hs" src="' + headshot(eid) + '" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">' : '';
-          const inner = img + esc(t.name) + '<span class="tm-t">' + esc(t.team || '') + (t.lean ? ' · leans ' + esc(t.lean) : '') + '</span>';
-          return known
-            ? '<button type="button" class="ty-member" data-pid="' + eid + '">' + inner + '</button>'
-            : '<span class="ty-member" style="cursor:default">' + inner + '</span>';
-        }).join('') + '</div>';
-      } else {
-        h += '<p class="muted small" style="margin-top:.4rem">No typed players at the current shot floor.</p>';
-      }
-      h += '</div>';
+    const letters = TYPE_ORDER.filter((L) => (nbaTypesSide.types || {})[L] || (byLetter[L] && byLetter[L].length));
+    if (!letters.includes(typeSel)) typeSel = letters[0] || 'A';
+    if (pillsEl) {
+      pillsEl.innerHTML = letters.map((L) => {
+        const meta = (nbaTypesSide.types || {})[L] || {};
+        return '<button type="button" class="ty-pill' + (L === typeSel ? ' active' : '') + '" data-tyletter="' + L + '"><span class="tb-l">' + L + '</span><span class="tb-n">' + esc(meta.name || L) + '</span></button>';
+      }).join('');
+      pillsEl.querySelectorAll('[data-tyletter]').forEach((b) => b.addEventListener('click', () => { typeSel = b.dataset.tyletter; renderTypes(); }));
     }
+    const L = typeSel;
+    const meta = (nbaTypesSide.types || {})[L] || {};
+    const members = (byLetter[L] || []).sort((a, b) => (b.t.fga || 0) - (a.t.fga || 0));
+    let h = '<div class="ty-letter"><div class="ty-head"><span class="type-badge big"><span class="tb-l">' + L + '</span><span class="tb-n">' + esc(meta.name || '') + '</span></span>' +
+      '<span class="muted small">' + members.length + ' players</span></div>' +
+      '<div class="ty-desc">' + esc(meta.desc || '') + '</div>';
+    const def = (nbaTypesSide.defense || {})[L] || {};
+    const defRows = Object.keys(def).map((ab) => ({ ab, cell: def[ab] }))
+      .filter((x) => x.cell && x.cell.pts && x.cell.games >= 6)
+      .sort((a, b) => b.cell.pts.d - a.cell.pts.d);
+    h += '<div class="ty-def-head">Defense vs this type</div>';
+    if (defRows.length) {
+      h += '<div class="table-wrap"><table class="ty-def"><thead><tr><th style="text-align:left">Defense</th><th>PTS vs avg</th><th>Games</th></tr></thead><tbody>' +
+        defRows.map((x) => {
+          const s = x.cell.pts;
+          const cls = s.d >= 1.5 ? 'hot' : s.d <= -1.5 ? 'cold' : '';
+          return '<tr><td class="tm">' + esc(x.ab) + '</td><td class="' + cls + '">' + (s.d > 0 ? '+' : '') + s.d.toFixed(1) + '</td><td>' + x.cell.games + '</td></tr>';
+        }).join('') + '</tbody></table></div>' +
+        '<p class="muted small" style="margin-top:.35rem">Points per game vs the type group\'s own average, 2026-27 to date. Needs 6+ games of history or the defense stays off the list. Threes / rebounds / assists / free-throw splits live in the Standouts reads.</p>';
+    } else {
+      h += '<p class="muted small">No defense clears the 6-game history floor against this type yet — it builds as the season goes.</p>';
+    }
+    if (members.length) {
+      h += '<div class="ty-members">' + members.map(({ pid, t }) => {
+        const eid = t.espnId ? String(t.espnId) : null;
+        const known = eid && (pricedById[eid] || liveByPid[eid] || knownPlayers[eid]);
+        const img = eid ? '<img class="hs" src="' + headshot(eid) + '" alt="" onerror="this.style.visibility=\'hidden\'">' : '';
+        const logo = t.team ? '<img class="tm-logo" src="' + logoUrl(t.team) + '" alt="" onerror="this.style.display=\'none\'">' : '';
+        const sub = '<span class="tm-sub">' + logo + (t.lean ? '<span>leans ' + esc(t.lean) + '</span>' : '') + '</span>';
+        const inner = img + '<span class="tm-main"><span class="tm-name">' + esc(t.name) + '</span>' + sub + '</span>';
+        return known
+          ? '<button type="button" class="ty-member" data-pid="' + eid + '">' + inner + '</button>'
+          : '<span class="ty-member" style="cursor:default">' + inner + '</span>';
+      }).join('') + '</div>';
+    } else {
+      h += '<p class="muted small" style="margin-top:.4rem">No typed players at the current shot floor.</p>';
+    }
+    h += '</div>';
     body.innerHTML = h;
     body.querySelectorAll('.ty-member[data-pid]').forEach((b) => b.addEventListener('click', () => openPlayerCard(b.dataset.pid)));
-    if (defBody) {
-      const def = nbaTypesSide.defense || {};
-      const teamSet = {};
-      for (const L of Object.keys(def)) for (const ab of Object.keys(def[L] || {})) teamSet[ab] = 1;
-      const teamList = Object.keys(teamSet).sort();
-      if (!teamList.length) {
-        defBody.innerHTML = '<p class="muted">No type-vs-defense history yet — it builds as the season goes.</p>';
-      } else {
-        let t = '<div class="table-wrap"><table class="ty-def"><thead><tr><th style="text-align:left">Defense</th>' + TYPE_ORDER.map((L) => '<th>' + L + '</th>').join('') + '</tr></thead><tbody>';
-        for (const ab of teamList) {
-          t += '<tr><td class="tm">' + esc(ab) + '</td>' + TYPE_ORDER.map((L) => {
-            const cell = def[L] && def[L][ab];
-            const s = cell && cell.pts;
-            if (!s || cell.games < 6) return '<td>·</td>';
-            const cls = s.d >= 1.5 ? 'hot' : s.d <= -1.5 ? 'cold' : '';
-            return '<td class="' + cls + '">' + (s.d > 0 ? '+' : '') + s.d.toFixed(1) + '</td>';
-          }).join('') + '</tr>';
-        }
-        t += '</tbody></table></div><p class="muted small" style="margin-top:.4rem">Points per game vs the type group\'s own average, 2026-27 to date. Threes / rebounds / assists / free-throw splits live in the Standouts reads.</p>';
-        defBody.innerHTML = t;
-      }
-    }
   }
+  const tyHowBtn = $('nbaTypesHowBtn'), tyHowBox = $('nbaTypesHow');
+  if (tyHowBtn && tyHowBox) tyHowBtn.addEventListener('click', () => {
+    const open = tyHowBox.hidden;
+    tyHowBox.hidden = !open;
+    tyHowBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    tyHowBtn.textContent = open ? 'How it works ▾' : 'How it works ›';
+  });
 
   /* ---- Card: type-vs-defense read (inside the matchup sections) ---- */
   function typeReadHtml(row) {

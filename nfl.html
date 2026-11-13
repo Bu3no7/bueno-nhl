@@ -341,7 +341,7 @@
   <div class="card featured" id="tdLooks"></div>
   <h2 class="sec">TOP YARDAGE LOOKS <span>fair medians</span></h2>
   <div class="card" id="yardLooks"></div>
-  <h2 class="sec">ON BYE · WEEK 11 <span>no prices this week</span></h2>
+  <h2 class="sec">ON BYE · WEEK 10 <span>no prices this week</span></h2>
   <div class="card" id="byeWrap"></div>
   <h2 class="sec">HOW IT WORKS <span>the short version</span></h2>
   <div class="card">
@@ -364,7 +364,7 @@
 
 <!-- ============ VIEW: SLATE ============ -->
 <section class="view" id="view-slate">
-  <h2 class="sec">WEEK 11 SLATE <span>game model · live tracker</span></h2>
+  <h2 class="sec">WEEK 10 SLATE <span>game model · live tracker</span></h2>
   <div id="slateWrap"></div>
   <h2 class="sec">STANDINGS <span>by division</span></h2>
   <div id="standingsWrap"></div>
@@ -374,7 +374,7 @@
 <section class="view" id="view-game">
   <div class="backbar"><span class="backbtn" id="gameBackBtn">‹ Slate</span></div>
   <div class="phead">
-    <div><h3 id="gTitle">Baltimore at Jacksonville</h3><p id="gMeta">THU 6:15 PM · WEEK 11 · GAME BREAKDOWN</p></div>
+    <div><h3 id="gTitle">Baltimore at Jacksonville</h3><p id="gMeta">THU 6:15 PM · WEEK 10 · GAME BREAKDOWN</p></div>
   </div>
   <div id="gBody"></div>
 </section>
@@ -1371,6 +1371,15 @@ var PARLAY = {}, ZONES = null, PLAYOFF = null, WPSERIES = {}, TP_MKT = "any", TY
   + ".ty-mid b{display:block;font-size:.92rem;color:#eef3f9;letter-spacing:.04em}"
   + ".ty-mid span{display:block;font-size:.68rem;color:#8b96ab}"
   + ".ty-count{margin-left:auto;font-size:.7rem;font-weight:900;color:#e8b64c;flex:none}"
+  + ".ty-pills{display:flex;gap:6px;flex-wrap:wrap;margin:2px 0 12px}"
+  + ".ty-pill{font:inherit;display:inline-flex;align-items:center;gap:6px;font-size:.68rem;font-weight:800;letter-spacing:.06em;color:#dbe7fa;background:linear-gradient(155deg,rgba(130,170,255,.13),rgba(6,12,26,.55));border:1px solid rgba(165,195,255,.28);border-radius:999px;padding:.32rem .72rem .32rem .32rem;cursor:pointer;white-space:nowrap}"
+  + ".ty-pill i{font-style:normal;background:#e8b64c;color:#0a1526;border-radius:50%;width:17px;height:17px;display:inline-flex;align-items:center;justify-content:center;font-size:.62rem;font-weight:900}"
+  + ".ty-pill.on{background:#e8b64c;border-color:#e8b64c;color:#0a1526}"
+  + ".ty-pill.on i{background:#0a1526;color:#e8b64c}"
+  + ".ty-panel{background:linear-gradient(155deg,rgba(130,170,255,.13),rgba(6,12,26,.55));border:1px solid rgba(165,195,255,.22);border-radius:16px;padding:12px 12px 8px}"
+  + ".ty-panel .ty-head{margin-top:0}"
+  + ".ty-desc{margin:0 0 8px;font-size:.84rem;line-height:1.35;color:#dbe7fa}"
+  + ".ty-logo{width:22px;height:22px;object-fit:contain;vertical-align:-6px;margin-left:7px}"
   + ".so-chips{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 4px}"
   + ".so-chip{font:inherit;font-size:.72rem;font-weight:800;letter-spacing:.05em;color:#dbe7fa;background:rgba(130,170,255,.10);border:1px solid rgba(165,195,255,.28);border-radius:999px;padding:.42rem .8rem;cursor:pointer}"
   + ".so-chip.on{background:#e8b64c;border-color:#e8b64c;color:#0a1526}"
@@ -1573,6 +1582,11 @@ function typeBadge(key, mini){
 function bfImg(key){
   return FACES[key] ? '<img class="bface" style="border-color:' + (TEAMCOLOR[key] || "#2b3d66") + ";box-shadow:0 0 9px " + (TEAMCOLOR[key] || "#2b3d66") + '80" src="https://a.espncdn.com/i/headshots/nfl/players/full/' + FACES[key] + '.png" alt="" onerror="this.remove()">' : "";
 }
+/* Types view (pills layout, Alex-approved on the NBA mock 2026-11-12):
+   a pills row for all nine types sits on top; only the selected type's
+   glass panel renders below it. Members carry the team LOGO, never the
+   abbreviation text (Alex's logos-not-abbreviations rule). */
+var TY_SEL = "A";
 function renderTypes(){
   var wrap = $("boardWrap"), bn = $("boardNote"); if(!wrap || !B) return;
   if(!TYPES){
@@ -1581,22 +1595,40 @@ function renderTypes(){
     return;
   }
   var wk = TYPES._meta && TYPES._meta.weeks ? TYPES._meta.weeks : [1, 9];
-  var h = "";
-  ["A", "B", "C", "D", "E", "F", "G", "H", "I"].forEach(function(L){
-    var def = TYPES.letters[L]; if(!def) return;
-    var members = B.players.filter(function(pl){ var t = typeOf(pl.key); return t && t.letter === L; })
+  var LETTERS = ["A", "B", "C", "D", "E", "F", "G", "H", "I"];
+  var byLetter = {};
+  LETTERS.forEach(function(L){
+    byLetter[L] = B.players.filter(function(pl){ var t = typeOf(pl.key); return t && t.letter === L; })
       .sort(function(a, b){ return typeOf(b.key).fit - typeOf(a.key).fit; });
-    if(!members.length) return;
-    h += '<div class="ty-head"><div class="ty-letter">' + L + '</div><div class="ty-mid"><b>' + def.name.toUpperCase() + '</b><span>' + def.blurb + '</span></div><div class="ty-count">' + members.length + "</div></div>";
+  });
+  var avail = LETTERS.filter(function(L){ return byLetter[L].length; });
+  if(!avail.length){
+    wrap.innerHTML = '<p class="pl-empty">No typed players in this week\'s bundle.</p>';
+    if(bn) bn.textContent = "";
+    return;
+  }
+  if(!TYPES.letters[TY_SEL]) TY_SEL = avail[0];
+  var L = TY_SEL, def = TYPES.letters[L] || {}, members = byLetter[L] || [];
+  var h = '<div class="ty-pills">' + LETTERS.map(function(X){
+    var d = TYPES.letters[X]; if(!d) return "";
+    return '<button type="button" class="ty-pill' + (X === L ? " on" : "") + '" data-tyl="' + X + '"><i>' + X + "</i>" + (d.name || "").toUpperCase() + "</button>";
+  }).join("") + "</div>";
+  h += '<div class="ty-panel">'
+    + '<div class="ty-head"><div class="ty-letter">' + L + '</div><div class="ty-mid"><b>' + (def.name || "").toUpperCase() + '</b></div><div class="ty-count">' + members.length + (members.length === 1 ? " PLAYER" : " PLAYERS") + "</div></div>"
+    + '<p class="ty-desc">' + (def.blurb || "") + "</p>";
+  if(members.length){
     h += '<table class="board"><tr><th>PLAYER</th><th class="r">FIT</th><th class="r">SAMPLE</th></tr>' + members.map(function(pl){
       var t = typeOf(pl.key);
-      return '<tr data-p="' + pl.key + '"><td>' + bfImg(pl.key) + "<b>" + pl.name + "</b>"
-        + '<span class="sub">' + pl.pos + " · " + pl.team + (t.leans && t.leans.length ? " · LEANS " + t.leans.map(function(x){ return x.letter; }).join(" ") : "") + "<br>" + t.why + "</span></td>"
+      return '<tr data-p="' + pl.key + '"><td>' + bfImg(pl.key) + "<b>" + pl.name + "</b>" + logoImg(pl.team, "ty-logo")
+        + '<span class="sub">' + pl.pos + (t.leans && t.leans.length ? " · LEANS " + t.leans.map(function(x){ return x.letter; }).join(" ") : "") + "<br>" + t.why + "</span></td>"
         + '<td class="r"><b>' + Math.round(t.fit * 100) + '%</b></td>'
         + '<td class="r">' + t.n + '<span class="sub">' + (t.nLabel === "targets" ? "tgt" : "opp") + "</span></td></tr>";
     }).join("") + "</table>";
-  });
-  wrap.innerHTML = h || '<p class="pl-empty">No typed players in this week\'s bundle.</p>';
+  } else {
+    h += '<p class="pl-empty">No ' + (def.name || L) + 's in this week\'s bundle.</p>';
+  }
+  h += "</div>";
+  wrap.innerHTML = h;
   if(bn) bn.textContent = "Player types from 2026 nflverse play-by-play, weeks " + wk[0] + "–" + wk[1] + ": transparent percentile rules on ADOT, target depth, YAC, red-zone share, inside-5 work and explosive rate. Fit is the winning archetype's score; leans are the other archetypes on his heels. Display only — a type never moves a price. Thin samples (under 25 targets / 40 carries) get no type.";
   applyPosFilter("types");
 }
@@ -2030,6 +2062,8 @@ document.addEventListener("click", function(e){
   if(sr){ var sb = sr.querySelector("b"); if(sb && sb.textContent === "Parlay Builder"){ setPbTab("markets"); setPlaybookMode("parlay"); } else if(sb && sb.textContent === "Playoff Picture") setPbTab("standings"); else if(sb && sb.textContent === "Player Types"){ setPbTab("markets"); setPlaybookMode("types"); } else if(sb && sb.textContent === "Standouts"){ setPbTab("markets"); setPlaybookMode("standouts"); } else if(sr.textContent.indexOf("ON BYE") >= 0) setPbTab("slate"); }
   var soc = e.target.closest("[data-soc]");
   if(soc){ e.preventDefault(); e.stopPropagation(); SO_CAT = soc.getAttribute("data-soc"); renderStandouts(); return; }
+  var tyl = e.target.closest("[data-tyl]");
+  if(tyl){ e.preventDefault(); e.stopPropagation(); TY_SEL = tyl.getAttribute("data-tyl"); renderTypes(); return; }
   var add = e.target.closest("[data-addleg]");
   if(add){ e.preventDefault(); e.stopPropagation(); toggleLeg(add.getAttribute("data-addleg")); return; }
   var rm = e.target.closest("[data-rmleg]");

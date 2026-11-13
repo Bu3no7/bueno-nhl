@@ -1303,7 +1303,17 @@ tr.team-row:focus-visible { outline: 2px solid var(--teal); outline-offset: -2px
 .pc-type-strip .pts-lab { font-size: .62rem; font-weight: 800; letter-spacing: .09em; color: var(--teal); display: block; margin-bottom: .15rem; }
 .pc-type-strip .pts-fit { color: var(--muted); font-size: .78rem; }
 /* Types view */
-.types-group { margin: 0 0 1.1rem; }
+.how-works { margin-top: .3rem; }
+.how-works summary { cursor: pointer; color: var(--teal); font-size: .82rem; font-weight: 700; }
+.how-works p { margin: .35rem 0 0; max-width: 44rem; }
+.type-pills { display: flex; flex-wrap: wrap; gap: .45rem; margin: .2rem 0 1rem; }
+.type-pill { display: inline-flex; align-items: center; gap: .45rem; padding: .38rem .85rem .4rem .45rem; border-radius: 999px; border: 1px solid rgba(165, 195, 255, .25); background: rgba(255, 255, 255, .04); color: inherit; font-weight: 700; font-size: .85rem; cursor: pointer; }
+.type-pill .tp-l { display: inline-flex; align-items: center; justify-content: center; width: 1.35rem; height: 1.35rem; border-radius: 50%; background: rgba(58, 219, 227, .14); border: 1px solid rgba(58, 219, 227, .5); color: var(--teal); font-size: .74rem; font-weight: 900; line-height: 1; }
+.type-pill.on { background: var(--teal); border-color: var(--teal); color: #062a30; }
+.type-pill.on .tp-l { background: #062a30; border-color: #062a30; color: var(--teal); }
+.types-group { margin: 0 0 1.1rem; padding: .65rem .8rem .35rem; border-radius: 14px; background: linear-gradient(155deg, rgba(130, 170, 255, .10), rgba(6, 12, 26, .5)); border: 1px solid rgba(165, 195, 255, .20); }
+.types-group .type-row:last-child { border-bottom: none; }
+.type-tlogo { width: 22px; height: 22px; flex: none; }
 .types-head { display: flex; align-items: center; gap: .6rem; margin: .4rem 0 .15rem; }
 .types-head .type-badge { margin-left: 0; padding: .22rem .6rem .26rem; }
 .types-head .type-badge .tb-l { font-size: 1rem; }
