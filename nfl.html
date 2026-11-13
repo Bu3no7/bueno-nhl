@@ -341,7 +341,7 @@
   <div class="card featured" id="tdLooks"></div>
   <h2 class="sec">TOP YARDAGE LOOKS <span>fair medians</span></h2>
   <div class="card" id="yardLooks"></div>
-  <h2 class="sec">ON BYE · WEEK 10 <span>no prices this week</span></h2>
+  <h2 class="sec">ON BYE · WEEK 11 <span>no prices this week</span></h2>
   <div class="card" id="byeWrap"></div>
   <h2 class="sec">HOW IT WORKS <span>the short version</span></h2>
   <div class="card">
@@ -364,7 +364,7 @@
 
 <!-- ============ VIEW: SLATE ============ -->
 <section class="view" id="view-slate">
-  <h2 class="sec">WEEK 10 SLATE <span>game model · live tracker</span></h2>
+  <h2 class="sec">WEEK 11 SLATE <span>game model · live tracker</span></h2>
   <div id="slateWrap"></div>
   <h2 class="sec">STANDINGS <span>by division</span></h2>
   <div id="standingsWrap"></div>
@@ -374,7 +374,7 @@
 <section class="view" id="view-game">
   <div class="backbar"><span class="backbtn" id="gameBackBtn">‹ Slate</span></div>
   <div class="phead">
-    <div><h3 id="gTitle">Baltimore at Jacksonville</h3><p id="gMeta">THU 6:15 PM · WEEK 10 · GAME BREAKDOWN</p></div>
+    <div><h3 id="gTitle">Baltimore at Jacksonville</h3><p id="gMeta">THU 6:15 PM · WEEK 11 · GAME BREAKDOWN</p></div>
   </div>
   <div id="gBody"></div>
 </section>
@@ -1360,6 +1360,7 @@ var PARLAY = {}, ZONES = null, PLAYOFF = null, WPSERIES = {}, TP_MKT = "any", TY
   + ".pl-rm{margin-left:auto;font:inherit;font-weight:900;color:#ffb3ad;background:none;border:none;font-size:1rem;cursor:pointer;padding:2px 6px}"
   + ".ty-badge{display:inline-flex;align-items:center;gap:5px;vertical-align:2px;margin-left:7px;background:linear-gradient(155deg,rgba(232,182,76,.22),rgba(6,12,26,.5));border:1px solid rgba(232,182,76,.55);border-radius:999px;padding:1px 8px 1px 2px;font-size:.56rem;font-weight:900;letter-spacing:.08em;color:#ffe1a1;white-space:nowrap}"
   + ".ty-badge i{font-style:normal;background:#e8b64c;color:#0a1526;border-radius:50%;width:15px;height:15px;display:inline-flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:900}"
+  + ".ty-badge.mini{padding:1px 2px;margin-left:5px}"
   + ".ty-leans{font-size:.6rem;font-weight:800;letter-spacing:.08em;color:#8b96ab;margin-left:6px;white-space:nowrap}"
   + ".tp-type{margin-top:4px}"
   + ".tp-type .ty-badge{margin-left:0}"
@@ -1559,9 +1560,14 @@ function zonesHtml(z){
    require 3+ games of bundle usage. Faces follow the page's board
    pattern (ESPN headshot img, onerror removes it, never lazy). */
 function typeOf(key){ return TYPES && TYPES.players ? TYPES.players[key] || null : null; }
-function typeBadge(key){
+function typeBadge(key, mini){
   var t = typeOf(key); if(!t || !TYPES.letters) return "";
   var d = TYPES.letters[t.letter] || {};
+  /* Board rows are dense tables: the full letter + type-name pill hid
+     the rest of the board on phone width, so boards get the compact
+     letter-only chip. The full badge stays on the player-card header
+     and the Top Picks cards, where there is room. */
+  if(mini) return '<span class="ty-badge mini"><i>' + t.letter + "</i></span>";
   return '<span class="ty-badge"><i>' + t.letter + "</i>" + (d.name || "").toUpperCase() + "</span>";
 }
 function bfImg(key){
@@ -1680,7 +1686,7 @@ function soRowHtml(r, tough){
   var g = gameOf(pl.game);
   var match = g ? (pl.team === g.away ? "AT " + g.home : "VS " + g.away) : "";
   var tag = tough ? '<span class="so-tag tough">TOUGH SPOT</span>' : (r.stacked ? '<span class="so-tag stack">STACKED</span>' : '<span class="so-tag read">READ</span>');
-  return '<tr data-p="' + pl.key + '"><td>' + bfImg(pl.key) + "<b>" + pl.name + "</b>" + typeBadge(pl.key)
+  return '<tr data-p="' + pl.key + '"><td>' + bfImg(pl.key) + "<b>" + pl.name + "</b>" + typeBadge(pl.key, true)
     + '<span class="sub">' + pl.pos + " · " + pl.team + " · " + match + " · n=" + t.stats.games + " gms · " + t.n + " " + t.nLabel + "</span>"
     + '<div class="so-read">' + tag + r.factors.map(function(f){ return '<span class="so-fact">' + f + "</span>"; }).join("") + "</div>"
     + '<div class="so-model">MODEL · ' + r.modelLine + "</div></td></tr>";
@@ -1937,7 +1943,7 @@ renderBoard = (function(orig){ return function(key){
   orig(key);
   applyPosFilter(key);
   if(TYPES) $("boardWrap").querySelectorAll("tr[data-p]").forEach(function(tr){
-    var bd = typeBadge(tr.getAttribute("data-p")); if(!bd) return;
+    var bd = typeBadge(tr.getAttribute("data-p"), true); if(!bd) return;
     var b = tr.querySelector("td b"); if(b) b.insertAdjacentHTML("afterend", bd);
   });
   var mks = { td: ["any", "two", "first"], rush: ["r75", "r100"], rec: ["c75", "c100"], recc: ["rc2", "rc3", "rc4"], pass: ["passTd", "p300", "p400"], scr: ["s100", "s125"] }[key];

@@ -1296,6 +1296,7 @@ tr.team-row:focus-visible { outline: 2px solid var(--teal); outline-offset: -2px
 .type-badge { display: inline-flex; align-items: center; gap: .3rem; vertical-align: middle; margin-left: .45rem; padding: .1rem .45rem .12rem; border-radius: 999px; background: rgba(58, 219, 227, .13); border: 1px solid rgba(58, 219, 227, .5); white-space: nowrap; }
 .type-badge .tb-l { font-size: .72rem; font-weight: 900; color: var(--teal); line-height: 1; }
 .type-badge .tb-n { font-size: .56rem; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; color: #bfeef2; line-height: 1; }
+.type-badge.compact { margin-left: .35rem; padding: .08rem .38rem .1rem; }
 .type-badge.lean { background: rgba(255, 255, 255, .05); border-color: rgba(255, 255, 255, .22); }
 .type-badge.lean .tb-l { color: var(--muted); }
 .pc-type-strip { margin: .55rem 0 .1rem; padding: .6rem .75rem; border-radius: 12px; background: rgba(58, 219, 227, .07); border: 1px solid rgba(58, 219, 227, .3); font-size: .85rem; }

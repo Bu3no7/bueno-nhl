@@ -74,10 +74,19 @@ function stkGameChip(g) {
   const t = new Date(g.startUTC).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
   return `<button class="stk-chip" data-gid="${g.id}" type="button">${stkLogo(g.away)}<span class="stk-vs">@</span>${stkLogo(g.home)}<span class="stk-time">${esc(t)}</span></button>`;
 }
+/* NHL API name fields are localized objects ({default: "Florida"}), not
+   strings — interpolating them raw prints "[object Object]". Unwrap to
+   the default string; anything else yields '' so callers can skip it. */
+function stkLoc(v) {
+  if (typeof v === 'string') return v;
+  if (v && typeof v.default === 'string') return v.default;
+  return '';
+}
 function stkTeamName(t) {
   if (!t) return '';
-  if (t.placeName && t.commonName) return `${t.placeName} ${t.commonName}`;
-  return t.name || t.abbrev || '';
+  const place = stkLoc(t.placeName), common = stkLoc(t.commonName);
+  if (place && common) return `${place} ${common}`;
+  return common || place || stkLoc(t.name) || (typeof t.abbrev === 'string' ? t.abbrev : '');
 }
 function stkNews() {
   const out = [];
@@ -89,16 +98,18 @@ function stkNews() {
     const lT = as > hs ? g.pbp.homeTeam : g.pbp.awayTeam;
     const ws = Math.max(as, hs), ls = Math.min(as, hs);
     const per = g.pbp.periodDescriptor ? g.pbp.periodDescriptor.number : 3;
-    if (ls === 0) out.push(`<b>${esc(stkTeamName(wT))}</b> blank ${esc(stkTeamName(lT))} ${ws}–0`);
-    else if (per === 4) out.push(`<b>${esc(stkTeamName(wT))}</b> edge ${esc(stkTeamName(lT))} ${ws}–${ls} in overtime`);
-    else if (per > 4) out.push(`<b>${esc(stkTeamName(wT))}</b> top ${esc(stkTeamName(lT))} ${ws}–${ls} in a shootout`);
-    else if (ws - ls >= 4) out.push(`<b>${esc(stkTeamName(wT))}</b> rout ${esc(stkTeamName(lT))} ${ws}–${ls}`);
+    const wN = stkTeamName(wT), lN = stkTeamName(lT);
+    if (!wN || !lN) continue; // no string headline without real team names
+    if (ls === 0) out.push(`<b>${esc(wN)}</b> blank ${esc(lN)} ${ws}–0`);
+    else if (per === 4) out.push(`<b>${esc(wN)}</b> edge ${esc(lN)} ${ws}–${ls} in overtime`);
+    else if (per > 4) out.push(`<b>${esc(wN)}</b> top ${esc(lN)} ${ws}–${ls} in a shootout`);
+    else if (ws - ls >= 4) out.push(`<b>${esc(wN)}</b> rout ${esc(lN)} ${ws}–${ls}`);
   }
   const L = stkState.leaders;
   if (L && L.points && L.points[0]) {
     const p = L.points[0];
-    const last = String(p.name || '').split(' ').pop();
-    out.push(`<b>${esc(last)}</b> leads the league with ${p.value} points`);
+    const last = typeof p.name === 'string' ? p.name.split(' ').pop() : '';
+    if (last) out.push(`<b>${esc(last)}</b> leads the league with ${p.value} points`);
   }
   return out.slice(0, 4);
 }

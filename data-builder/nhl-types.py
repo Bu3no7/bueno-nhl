@@ -81,17 +81,51 @@ def latest_bundle():
     return os.path.join(SITE, "data", cands[-1])
 
 
+ROSTER_URL = "https://api-web.nhle.com/v1/roster/{team}/20262027"
+
+
+def _add_roster(out, team, roster):
+    for grp, pos_group in (("forwards", "F"), ("defensemen", "D")):
+        for p in roster.get(grp, []):
+            out[int(p["id"])] = {
+                "pid": int(p["id"]),
+                "name": f"{p['firstName']['default']} {p['lastName']['default']}",
+                "team": team, "pos": p["positionCode"], "group": pos_group,
+                "headshot": p.get("headshot"),
+            }
+
+
 def universe(bundle):
     out = {}
-    for team, roster in bundle["rosters"].items():
-        for grp, pos_group in (("forwards", "F"), ("defensemen", "D")):
-            for p in roster.get(grp, []):
-                out[int(p["id"])] = {
-                    "pid": int(p["id"]),
-                    "name": f"{p['firstName']['default']} {p['lastName']['default']}",
-                    "team": team, "pos": p["positionCode"], "group": pos_group,
-                    "headshot": p.get("headshot"),
-                }
+    rosters = bundle.get("rosters") or {}
+    for team, roster in rosters.items():
+        _add_roster(out, team, roster)
+    # A bundle can price a game whose teams have no roster block (the
+    # 2026-11-12 bundle was built ahead of the Helsinki game and shipped
+    # no CAR/SEA rosters, which silently left Aho, Stankoven and both
+    # full teams untyped). Fill any slate team missing from the bundle
+    # rosters straight from the NHL roster endpoint; fail-soft.
+    slate_teams = set()
+    for g in bundle.get("games", []):
+        if g.get("away"):
+            slate_teams.add(g["away"])
+        if g.get("home"):
+            slate_teams.add(g["home"])
+    for team in sorted(slate_teams - set(rosters)):
+        try:
+            r = subprocess.run(["curl", "-s", "--max-time", "20", "-H",
+                                "User-Agent: Mozilla/5.0",
+                                ROSTER_URL.format(team=team)],
+                               capture_output=True, text=True, timeout=30)
+            d = json.loads(r.stdout)
+            if d.get("forwards") or d.get("defensemen"):
+                _add_roster(out, team, d)
+                print(f"universe: {team} roster filled from NHL API "
+                      f"(missing from bundle rosters)", flush=True)
+            else:
+                print(f"universe: {team} roster fetch returned no skaters", flush=True)
+        except Exception as e:
+            print(f"universe: {team} roster fill failed ({e})", flush=True)
     return out
 
 

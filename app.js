@@ -803,9 +803,9 @@ function twoPlusProbs() {
     return { ...r, tpP: p, tpFair: fairOddsSafe(p) };
   }).sort((a, b) => b.tpP - a.tpP);
 }
-function pnameBtn(r) {
+function pnameBtn(r, compact) {
   const hs = r.headshot || headshotUrl(r.team, r.pid);
-  return `<button class="pname" data-pid="${r.pid}" data-gid="${r.gameId}"><img class="pavatar" src="${esc(hs)}" alt="" ${imgFallback}>${esc(r.name)}${typeBadgeHtml(r.pid)}</button>`;
+  return `<button class="pname" data-pid="${r.pid}" data-gid="${r.gameId}"><img class="pavatar" src="${esc(hs)}" alt="" ${imgFallback}>${esc(r.name)}${typeBadgeHtml(r.pid, compact)}</button>`;
 }
 /* ---------------- market heat (good-bet glow) ----------------
    Every market table scores each name: green = the model's strongest
@@ -841,7 +841,7 @@ function probTableHtml(rows, pKey, fairKey, bands, v) {
     const b = bands ? bands.get(r.pid) : null;
     return `
     <tr${b ? ` class="heat-row ${b}"` : ''}>
-      <td>${b ? `<span class="heat-dot ${b}"></span>` : ''}${pnameBtn(r)}</td>
+      <td>${b ? `<span class="heat-dot ${b}"></span>` : ''}${pnameBtn(r, true)}</td>
       <td><span class="team-cell"><img src="${teamLogoUrl(r.team)}" alt="" ${imgFallback}>${esc(r.team)}</span></td>
       <td class="num"><strong>${pct1(r[pKey])}</strong></td>
       <td class="num">${r[fairKey]}</td>
@@ -1142,7 +1142,7 @@ function renderGoalProbs() {
     const rows = filterGoalRows(state.skaters.slice().sort((a, b) => b.p - a.p));
     html = rows.map((r) => { const b = bands.get(r.pid); return `
     <tr class="heat-row ${b}">
-      <td><span class="heat-dot ${b}"></span>${pnameBtn(r)}</td>
+      <td><span class="heat-dot ${b}"></span>${pnameBtn(r, true)}</td>
       <td><span class="team-cell"><img src="${teamLogoUrl(r.team)}" alt="" ${imgFallback}>${esc(r.team)}</span></td>
       <td class="num"><strong>${pct1(r.p)}</strong></td>
       <td class="num">${r.fair}</td>
@@ -2123,7 +2123,7 @@ function renderBoard() {
   const tbl = $('boardTable');
   if (tbl && state.skaters.length) {
     const longest = Math.max(...state.skaters.map((r) => r.name.length));
-    tbl.style.setProperty('--bnw', (30 + 8 + 20 + Math.ceil(longest * 7.9) + 26 + (typesState === 'ok' ? 96 : 0)) + 'px');
+    tbl.style.setProperty('--bnw', (30 + 8 + 20 + Math.ceil(longest * 7.9) + 26 + (typesState === 'ok' ? 34 : 0)) + 'px');
   }
 
   if (!rows.length) {
@@ -2157,7 +2157,7 @@ function renderBoard() {
     const cells = boardCells(r, info, gameLam[r.gameId] || 0).map((c) => `<td class="num fac ${c.band}">${c.text}</td>`).join('');
     html += `
     <tr${ng ? ' class="scored"' : ''}>
-      <td>${pnameBtn(r)}${badge}${fitBadge}${streak}</td>
+      <td>${pnameBtn(r, true)}${badge}${fitBadge}${streak}</td>
       <td><span class="team-cell"><img src="${teamLogoUrl(r.team)}" alt="${esc(r.team)}" ${imgFallback}></span></td>
       <td class="num heat ${heat}"><strong>${pct1(p)}</strong></td>
       <td class="num">${fair}</td>
@@ -2202,7 +2202,7 @@ function renderMarkets() {
     const bands = heatBands(state.skaters, (r) => marketOver(r, kind, MARKET_HEADLINE[kind]), HEAT_REF[kind]);
     const body = sorted.map((r) => { const b = bands.get(r.pid); return `
       <tr class="heat-row ${b}">
-        <td><span class="heat-dot ${b}"></span>${pnameBtn(r)}</td>
+        <td><span class="heat-dot ${b}"></span>${pnameBtn(r, true)}</td>
         <td><span class="team-cell"><img src="${teamLogoUrl(r.team)}" alt="" ${imgFallback}>${esc(r.team)}</span></td>
         ${r.markets[kind].map((m) => `
           <td class="num"><strong>${pct1(m.over)}</strong><div class="small muted">${m.overFair}</div></td>`).join('')}
@@ -3217,13 +3217,17 @@ function typeOf(pid) {
   return typesSidecar.players[String(pid)] || null;
 }
 /* Shared badge helper: glass teal letter chip. Returns '' for untyped
-   players so every call site is fail-soft. */
-function typeBadgeHtml(pid) {
+   players so every call site is fail-soft. Dense surfaces (Board rows,
+   Markets tables) pass compact=true and get the letter only — the full
+   letter + name pill hides the table on phone widths. The card header,
+   Types view, Longshots, Standouts and search keep the full pill. */
+function typeBadgeHtml(pid, compact) {
   const t = typeOf(pid);
   if (!t) return '';
   const meta = (typesSidecar.letters || {})[t.letter] || {};
   const leanName = t.lean ? ((typesSidecar.letters[t.lean] || {}).name || t.lean) : null;
   const title = `${t.letter} · ${t.type}${leanName ? ` · borderline, leans ${t.lean} ${leanName}` : ''}${meta.desc ? ` — ${meta.desc}` : ''} Display only, not a price input.`;
+  if (compact) return `<span class="type-badge compact" title="${esc(title)}"><span class="tb-l">${esc(t.letter)}</span></span>`;
   return `<span class="type-badge" title="${esc(title)}"><span class="tb-l">${esc(t.letter)}</span><span class="tb-n">${esc(t.type)}</span></span>`;
 }
 function refreshTypeSurfaces() {

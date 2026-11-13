@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-11-13T05:24:31Z",
+ "generatedAt": "2026-11-13T05:50:32Z",
  "bundleDate": "2026-11-12",
  "season": "20262027",
  "floorSog": 20,
@@ -36,82 +36,82 @@
   }
  },
  "centers": {
+  "D": {
+   "netfront": 0.209,
+   "slot": 0.462,
+   "circles": 0.128,
+   "points": 0.051,
+   "corners": 0.014,
+   "outside": 0.084,
+   "long": 0.052,
+   "hdShare": 0.505,
+   "entropy": 0.713,
+   "slotConv": 0.144
+  },
+  "C": {
+   "netfront": 0.089,
+   "slot": 0.536,
+   "circles": 0.199,
+   "points": 0.055,
+   "corners": 0.005,
+   "outside": 0.083,
+   "long": 0.032,
+   "hdShare": 0.457,
+   "entropy": 0.64,
+   "slotConv": 0.173
+  },
   "A": {
-   "netfront": 0.112,
-   "slot": 0.333,
+   "netfront": 0.114,
+   "slot": 0.335,
    "circles": 0.261,
-   "points": 0.103,
-   "corners": 0.009,
-   "outside": 0.137,
+   "points": 0.102,
+   "corners": 0.008,
+   "outside": 0.134,
    "long": 0.046,
-   "hdShare": 0.281,
+   "hdShare": 0.284,
    "entropy": 0.81,
-   "slotConv": 0.162
+   "slotConv": 0.161
   },
   "B": {
-   "netfront": 0.077,
-   "slot": 0.173,
+   "netfront": 0.076,
+   "slot": 0.174,
    "circles": 0.359,
    "points": 0.144,
    "corners": 0.016,
-   "outside": 0.209,
-   "long": 0.021,
-   "hdShare": 0.127,
-   "entropy": 0.777,
-   "slotConv": 0.213
-  },
-  "C": {
-   "netfront": 0.091,
-   "slot": 0.529,
-   "circles": 0.202,
-   "points": 0.057,
-   "corners": 0.005,
-   "outside": 0.086,
-   "long": 0.031,
-   "hdShare": 0.454,
-   "entropy": 0.648,
-   "slotConv": 0.171
-  },
-  "D": {
-   "netfront": 0.21,
-   "slot": 0.461,
-   "circles": 0.127,
-   "points": 0.051,
-   "corners": 0.015,
-   "outside": 0.084,
-   "long": 0.052,
-   "hdShare": 0.503,
-   "entropy": 0.713,
-   "slotConv": 0.146
+   "outside": 0.208,
+   "long": 0.024,
+   "hdShare": 0.129,
+   "entropy": 0.778,
+   "slotConv": 0.216
   },
   "E": {
-   "netfront": 0.031,
-   "slot": 0.123,
-   "circles": 0.16,
-   "points": 0.544,
-   "corners": 0.004,
-   "outside": 0.09,
-   "long": 0.048,
-   "hdShare": 0.051,
-   "entropy": 0.653,
-   "slotConv": 0.147
+   "netfront": 0.026,
+   "slot": 0.114,
+   "circles": 0.164,
+   "points": 0.548,
+   "corners": 0.005,
+   "outside": 0.093,
+   "long": 0.05,
+   "hdShare": 0.042,
+   "entropy": 0.648,
+   "slotConv": 0.143
   },
   "F": {
-   "netfront": 0.057,
-   "slot": 0.196,
-   "circles": 0.23,
-   "points": 0.327,
-   "corners": 0.013,
-   "outside": 0.142,
-   "long": 0.035,
-   "hdShare": 0.082,
-   "entropy": 0.787,
-   "slotConv": 0.126
+   "netfront": 0.058,
+   "slot": 0.198,
+   "circles": 0.214,
+   "points": 0.345,
+   "corners": 0.011,
+   "outside": 0.135,
+   "long": 0.04,
+   "hdShare": 0.085,
+   "entropy": 0.781,
+   "slotConv": 0.133
   }
  },
- "universe": 443,
- "edgeOk": 429,
- "typed": 223,
+ "universe": 491,
+ "edgeOk": 474,
+ "typed": 248,
  "carriedStale": 0,
  "players": {
   "8481557": {
@@ -148,7 +148,7 @@
   "8481553": {
    "letter": "A",
    "type": "Rush creator",
-   "fit": 0.07,
+   "fit": 0.05,
    "lean": "B",
    "sog": 33,
    "goals": 2,
@@ -179,7 +179,7 @@
   "8476399": {
    "letter": "A",
    "type": "Rush creator",
-   "fit": 0.04,
+   "fit": 0.06,
    "lean": "C",
    "sog": 40,
    "goals": 5,
@@ -210,7 +210,7 @@
   "8478493": {
    "letter": "D",
    "type": "Net-front",
-   "fit": 0.25,
+   "fit": 0.26,
    "lean": null,
    "sog": 64,
    "goals": 6,
@@ -272,7 +272,7 @@
   "8478864": {
    "letter": "D",
    "type": "Net-front",
-   "fit": 0.07,
+   "fit": 0.06,
    "lean": "A",
    "sog": 62,
    "goals": 17,
@@ -303,7 +303,7 @@
   "8477446": {
    "letter": "D",
    "type": "Net-front",
-   "fit": 0.07,
+   "fit": 0.08,
    "lean": "A",
    "sog": 34,
    "goals": 3,
@@ -334,8 +334,8 @@
   "8485702": {
    "letter": "D",
    "type": "Net-front",
-   "fit": 0.09,
-   "lean": "C",
+   "fit": 0.1,
+   "lean": null,
    "sog": 29,
    "goals": 8,
    "team": "MIN",
@@ -365,7 +365,7 @@
   "8478508": {
    "letter": "C",
    "type": "Slot finisher",
-   "fit": 0.21,
+   "fit": 0.22,
    "lean": null,
    "sog": 20,
    "goals": 0,
@@ -396,7 +396,7 @@
   "8483525": {
    "letter": "A",
    "type": "Rush creator",
-   "fit": 0.06,
+   "fit": 0.05,
    "lean": "D",
    "sog": 28,
    "goals": 6,
@@ -427,7 +427,7 @@
   "8476927": {
    "letter": "C",
    "type": "Slot finisher",
-   "fit": 0.06,
+   "fit": 0.05,
    "lean": "A",
    "sog": 23,
    "goals": 2,
@@ -489,7 +489,7 @@
   "8480893": {
    "letter": "C",
    "type": "Slot finisher",
-   "fit": 0.15,
+   "fit": 0.14,
    "lean": null,
    "sog": 35,
    "goals": 6,
@@ -551,7 +551,7 @@
   "8486067": {
    "letter": "A",
    "type": "Rush creator",
-   "fit": 0.23,
+   "fit": 0.24,
    "lean": null,
    "sog": 36,
    "goals": 6,
@@ -582,7 +582,7 @@
   "8477939": {
    "letter": "A",
    "type": "Rush creator",
-   "fit": 0.22,
+   "fit": 0.21,
    "lean": null,
    "sog": 56,
    "goals": 11,
@@ -613,7 +613,7 @@
   "8477426": {
    "letter": "D",
    "type": "Net-front",
-   "fit": 0.23,
+   "fit": 0.24,
    "lean": null,
    "sog": 21,
    "goals": 2,
@@ -644,7 +644,7 @@
   "8478458": {
    "letter": "D",
    "type": "Net-front",
-   "fit": 0.09,
+   "fit": 0.08,
    "lean": "A",
    "sog": 51,
    "goals": 9,
@@ -675,7 +675,7 @@
   "8475166": {
    "letter": "C",
    "type": "Slot finisher",
-   "fit": 0.17,
+   "fit": 0.19,
    "lean": null,
    "sog": 22,
    "goals": 2,
@@ -706,7 +706,7 @@
   "8486171": {
    "letter": "D",
    "type": "Net-front",
-   "fit": 0.3,
+   "fit": 0.31,
    "lean": null,
    "sog": 46,
    "goals": 2,
@@ -737,7 +737,7 @@
   "8475172": {
    "letter": "C",
    "type": "Slot finisher",
-   "fit": 0.29,
+   "fit": 0.27,
    "lean": null,
    "sog": 51,
    "goals": 5,
@@ -768,7 +768,7 @@
   "8480448": {
    "letter": "A",
    "type": "Rush creator",
-   "fit": 0.05,
+   "fit": 0.04,
    "lean": "B",
    "sog": 21,
    "goals": 3,
@@ -830,7 +830,7 @@
   "8477476": {
    "letter": "C",
    "type": "Slot finisher",
-   "fit": 0.22,
+   "fit": 0.24,
    "lean": null,
    "sog": 42,
    "goals": 13,
@@ -861,7 +861,7 @@
   "8477492": {
    "letter": "A",
    "type": "Rush creator",
-   "fit": 0.28,
+   "fit": 0.26,
    "lean": null,
    "sog": 69,
    "goals": 10,
@@ -892,7 +892,7 @@
   "8480039": {
    "letter": "A",
    "type": "Rush creator",
-   "fit": 0.16,
+   "fit": 0.15,
    "lean": null,
    "sog": 40,
    "goals": 10,
@@ -923,7 +923,7 @@
   "8475754": {
    "letter": "C",
    "type": "Slot finisher",
-   "fit": 0.08,
+   "fit": 0.06,
    "lean": "A",
    "sog": 32,
    "goals": 5,
@@ -954,7 +954,7 @@
   "8475768": {
    "letter": "C",
    "type": "Slot finisher",
-   "fit": 0.42,
+   "fit": 0.44,
    "lean": null,
    "sog": 32,
    "goals": 7,
@@ -985,7 +985,7 @@
   "8476981": {
    "letter": "C",
    "type": "Slot finisher",
-   "fit": 0.03,
+   "fit": 0.02,
    "lean": "A",
    "sog": 33,
    "goals": 7,
@@ -1016,7 +1016,7 @@
   "8482737": {
    "letter": "C",
    "type": "Slot finisher",
-   "fit": 0.12,
+   "fit": 0.11,
    "lean": null,
    "sog": 30,
    "goals": 6,
@@ -1047,7 +1047,7 @@
   "8481540": {
    "letter": "A",
    "type": "Rush creator",
-   "fit": 0.1,
+   "fit": 0.09,
    "lean": "D",
    "sog": 59,
    "goals": 11,
@@ -1078,7 +1078,7 @@
   "8476479": {
    "letter": "C",
    "type": "Slot finisher",
-   "fit": 0.17,
+   "fit": 0.15,
    "lean": null,
    "sog": 23,
    "goals": 1,
@@ -1109,7 +1109,7 @@
   "8475184": {
    "letter": "C",
    "type": "Slot finisher",
-   "fit": 0.1,
+   "fit": 0.08,
    "lean": "D",
    "sog": 21,
    "goals": 3,
@@ -1171,7 +1171,7 @@
   "8480018": {
    "letter": "A",
    "type": "Rush creator",
-   "fit": 0.35,
+   "fit": 0.33,
    "lean": null,
    "sog": 34,
    "goals": 7,
@@ -1202,7 +1202,7 @@
   "8480074": {
    "letter": "A",
    "type": "Rush creator",
-   "fit": 0.11,
+   "fit": 0.12,
    "lean": null,
    "sog": 29,
    "goals": 2,
@@ -1264,7 +1264,7 @@
   "8480208": {
    "letter": "D",
    "type": "Net-front",
-   "fit": 0.17,
+   "fit": 0.18,
    "lean": null,
    "sog": 41,
    "goals": 9,
@@ -1295,7 +1295,7 @@
   "8481528": {
    "letter": "D",
    "type": "Net-front",
-   "fit": 0.35,
+   "fit": 0.34,
    "lean": null,
    "sog": 40,
    "goals": 4,
@@ -1327,7 +1327,7 @@
    "letter": "A",
    "type": "Rush creator",
    "fit": 0.1,
-   "lean": "F",
+   "lean": null,
    "sog": 28,
    "goals": 3,
    "team": "OTT",
@@ -1357,7 +1357,7 @@
   "8482092": {
    "letter": "C",
    "type": "Slot finisher",
-   "fit": 0.04,
+   "fit": 0.02,
    "lean": "D",
    "sog": 21,
    "goals": 3,
@@ -1388,7 +1388,7 @@
   "8483676": {
    "letter": "C",
    "type": "Slot finisher",
-   "fit": 0.3,
+   "fit": 0.31,
    "lean": null,
    "sog": 27,
    "goals": 3,
@@ -1419,7 +1419,7 @@
   "8481596": {
    "letter": "D",
    "type": "Net-front",
-   "fit": 0.18,
+   "fit": 0.19,
    "lean": null,
    "sog": 36,
    "goals": 7,
@@ -1481,7 +1481,7 @@
   "8480188": {
    "letter": "A",
    "type": "Rush creator",
-   "fit": 0.35,
+   "fit": 0.36,
    "lean": null,
    "sog": 39,
    "goals": 2,
@@ -1512,7 +1512,7 @@
   "8479987": {
    "letter": "B",
    "type": "Perimeter shooter",
-   "fit": 0.05,
+   "fit": 0.06,
    "lean": "A",
    "sog": 29,
    "goals": 5,
@@ -1543,7 +1543,7 @@
   "8485395": {
    "letter": "A",
    "type": "Rush creator",
-   "fit": 0.16,
+   "fit": 0.18,
    "lean": null,
    "sog": 34,
    "goals": 6,
@@ -1574,7 +1574,7 @@
   "8480355": {
    "letter": "A",
    "type": "Rush creator",
-   "fit": 0.11,
+   "fit": 0.12,
    "lean": null,
    "sog": 22,
    "goals": 3,
@@ -1636,8 +1636,8 @@
   "8483489": {
    "letter": "C",
    "type": "Slot finisher",
-   "fit": 0.11,
-   "lean": null,
+   "fit": 0.07,
+   "lean": "A",
    "sog": 35,
    "goals": 6,
    "team": "BOS",
@@ -1667,7 +1667,7 @@
   "8479999": {
    "letter": "C",
    "type": "Slot finisher",
-   "fit": 0.05,
+   "fit": 0.03,
    "lean": "A",
    "sog": 25,
    "goals": 5,
@@ -1698,7 +1698,7 @@
   "8477956": {
    "letter": "A",
    "type": "Rush creator",
-   "fit": 0.17,
+   "fit": 0.16,
    "lean": null,
    "sog": 64,
    "goals": 8,
@@ -1727,10 +1727,10 @@
    }
   },
   "8482175": {
-   "letter": "C",
-   "type": "Slot finisher",
-   "fit": 0.0,
-   "lean": "A",
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.03,
+   "lean": "C",
    "sog": 38,
    "goals": 5,
    "team": "BOS",
@@ -1760,7 +1760,7 @@
   "8478401": {
    "letter": "C",
    "type": "Slot finisher",
-   "fit": 0.3,
+   "fit": 0.29,
    "lean": null,
    "sog": 28,
    "goals": 5,
@@ -1791,7 +1791,7 @@
   "8478519": {
    "letter": "C",
    "type": "Slot finisher",
-   "fit": 0.04,
+   "fit": 0.03,
    "lean": "D",
    "sog": 28,
    "goals": 5,
@@ -1822,7 +1822,7 @@
   "8483447": {
    "letter": "C",
    "type": "Slot finisher",
-   "fit": 0.18,
+   "fit": 0.17,
    "lean": null,
    "sog": 24,
    "goals": 4,
@@ -1884,7 +1884,7 @@
   "8477404": {
    "letter": "D",
    "type": "Net-front",
-   "fit": 0.31,
+   "fit": 0.32,
    "lean": null,
    "sog": 48,
    "goals": 10,
@@ -1915,7 +1915,7 @@
   "8479542": {
    "letter": "C",
    "type": "Slot finisher",
-   "fit": 0.28,
+   "fit": 0.27,
    "lean": null,
    "sog": 70,
    "goals": 11,
@@ -1977,7 +1977,7 @@
   "8476453": {
    "letter": "B",
    "type": "Perimeter shooter",
-   "fit": 0.4,
+   "fit": 0.39,
    "lean": null,
    "sog": 56,
    "goals": 8,
@@ -2039,7 +2039,7 @@
   "8478010": {
    "letter": "C",
    "type": "Slot finisher",
-   "fit": 0.29,
+   "fit": 0.27,
    "lean": null,
    "sog": 36,
    "goals": 5,
@@ -2132,7 +2132,7 @@
   "8482146": {
    "letter": "D",
    "type": "Net-front",
-   "fit": 0.11,
+   "fit": 0.13,
    "lean": null,
    "sog": 45,
    "goals": 4,
@@ -2163,7 +2163,7 @@
   "8479996": {
    "letter": "C",
    "type": "Slot finisher",
-   "fit": 0.27,
+   "fit": 0.28,
    "lean": null,
    "sog": 25,
    "goals": 2,
@@ -2194,7 +2194,7 @@
   "8481721": {
    "letter": "A",
    "type": "Rush creator",
-   "fit": 0.18,
+   "fit": 0.19,
    "lean": null,
    "sog": 45,
    "goals": 8,
@@ -2225,7 +2225,7 @@
   "8480002": {
    "letter": "D",
    "type": "Net-front",
-   "fit": 0.02,
+   "fit": 0.03,
    "lean": "C",
    "sog": 43,
    "goals": 8,
@@ -2287,7 +2287,7 @@
   "8483695": {
    "letter": "C",
    "type": "Slot finisher",
-   "fit": 0.18,
+   "fit": 0.16,
    "lean": null,
    "sog": 26,
    "goals": 0,
@@ -2318,7 +2318,7 @@
   "8477511": {
    "letter": "C",
    "type": "Slot finisher",
-   "fit": 0.31,
+   "fit": 0.33,
    "lean": null,
    "sog": 21,
    "goals": 5,
@@ -2349,7 +2349,7 @@
   "8478414": {
    "letter": "A",
    "type": "Rush creator",
-   "fit": 0.38,
+   "fit": 0.39,
    "lean": null,
    "sog": 73,
    "goals": 3,
@@ -2380,7 +2380,7 @@
   "8478542": {
    "letter": "B",
    "type": "Perimeter shooter",
-   "fit": 0.11,
+   "fit": 0.12,
    "lean": null,
    "sog": 27,
    "goals": 3,
@@ -2411,7 +2411,7 @@
   "8476432": {
    "letter": "A",
    "type": "Rush creator",
-   "fit": 0.03,
+   "fit": 0.02,
    "lean": "D",
    "sog": 35,
    "goals": 6,
@@ -2442,8 +2442,8 @@
   "8479385": {
    "letter": "A",
    "type": "Rush creator",
-   "fit": 0.08,
-   "lean": "F",
+   "fit": 0.09,
+   "lean": "B",
    "sog": 24,
    "goals": 5,
    "team": "WSH",
@@ -2535,7 +2535,7 @@
   "8481656": {
    "letter": "C",
    "type": "Slot finisher",
-   "fit": 0.37,
+   "fit": 0.38,
    "lean": null,
    "sog": 20,
    "goals": 2,
@@ -2566,7 +2566,7 @@
   "8478440": {
    "letter": "C",
    "type": "Slot finisher",
-   "fit": 0.22,
+   "fit": 0.21,
    "lean": null,
    "sog": 32,
    "goals": 3,
@@ -2628,7 +2628,7 @@
   "8476880": {
    "letter": "A",
    "type": "Rush creator",
-   "fit": 0.04,
+   "fit": 0.05,
    "lean": "C",
    "sog": 29,
    "goals": 2,
@@ -2721,7 +2721,7 @@
   "8482660": {
    "letter": "C",
    "type": "Slot finisher",
-   "fit": 0.02,
+   "fit": 0.0,
    "lean": "A",
    "sog": 34,
    "goals": 8,
@@ -2752,7 +2752,7 @@
   "8482720": {
    "letter": "C",
    "type": "Slot finisher",
-   "fit": 0.35,
+   "fit": 0.37,
    "lean": null,
    "sog": 23,
    "goals": 2,
@@ -2845,7 +2845,7 @@
   "8482705": {
    "letter": "C",
    "type": "Slot finisher",
-   "fit": 0.18,
+   "fit": 0.15,
    "lean": null,
    "sog": 27,
    "goals": 4,
@@ -2938,7 +2938,7 @@
   "8477429": {
    "letter": "D",
    "type": "Net-front",
-   "fit": 0.23,
+   "fit": 0.22,
    "lean": null,
    "sog": 31,
    "goals": 3,
@@ -2969,7 +2969,7 @@
   "8479337": {
    "letter": "B",
    "type": "Perimeter shooter",
-   "fit": 0.06,
+   "fit": 0.08,
    "lean": "A",
    "sog": 67,
    "goals": 7,
@@ -3031,7 +3031,7 @@
   "8479992": {
    "letter": "C",
    "type": "Slot finisher",
-   "fit": 0.37,
+   "fit": 0.38,
    "lean": null,
    "sog": 28,
    "goals": 1,
@@ -3093,7 +3093,7 @@
   "8484144": {
    "letter": "C",
    "type": "Slot finisher",
-   "fit": 0.27,
+   "fit": 0.26,
    "lean": null,
    "sog": 37,
    "goals": 5,
@@ -3124,7 +3124,7 @@
   "8485391": {
    "letter": "B",
    "type": "Perimeter shooter",
-   "fit": 0.08,
+   "fit": 0.07,
    "lean": "A",
    "sog": 34,
    "goals": 3,
@@ -3155,7 +3155,7 @@
   "8474141": {
    "letter": "A",
    "type": "Rush creator",
-   "fit": 0.21,
+   "fit": 0.22,
    "lean": null,
    "sog": 25,
    "goals": 1,
@@ -3186,7 +3186,7 @@
   "8484390": {
    "letter": "A",
    "type": "Rush creator",
-   "fit": 0.05,
+   "fit": 0.07,
    "lean": "C",
    "sog": 31,
    "goals": 9,
@@ -3246,10 +3246,10 @@
    }
   },
   "8483493": {
-   "letter": "C",
-   "type": "Slot finisher",
+   "letter": "A",
+   "type": "Rush creator",
    "fit": 0.02,
-   "lean": "A",
+   "lean": "C",
    "sog": 28,
    "goals": 5,
    "team": "CHI",
@@ -3279,7 +3279,7 @@
   "8482062": {
    "letter": "C",
    "type": "Slot finisher",
-   "fit": 0.15,
+   "fit": 0.14,
    "lean": null,
    "sog": 21,
    "goals": 1,
@@ -3310,7 +3310,7 @@
   "8484145": {
    "letter": "C",
    "type": "Slot finisher",
-   "fit": 0.32,
+   "fit": 0.35,
    "lean": null,
    "sog": 46,
    "goals": 2,
@@ -3341,7 +3341,7 @@
   "8482659": {
    "letter": "D",
    "type": "Net-front",
-   "fit": 0.31,
+   "fit": 0.3,
    "lean": null,
    "sog": 33,
    "goals": 4,
@@ -3372,7 +3372,7 @@
   "8480064": {
    "letter": "D",
    "type": "Net-front",
-   "fit": 0.17,
+   "fit": 0.18,
    "lean": null,
    "sog": 22,
    "goals": 4,
@@ -3403,7 +3403,7 @@
   "8483500": {
    "letter": "A",
    "type": "Rush creator",
-   "fit": 0.35,
+   "fit": 0.37,
    "lean": null,
    "sog": 43,
    "goals": 4,
@@ -3434,7 +3434,7 @@
   "8482097": {
    "letter": "A",
    "type": "Rush creator",
-   "fit": 0.19,
+   "fit": 0.18,
    "lean": null,
    "sog": 52,
    "goals": 9,
@@ -3496,7 +3496,7 @@
   "8480289": {
    "letter": "C",
    "type": "Slot finisher",
-   "fit": 0.45,
+   "fit": 0.46,
    "lean": null,
    "sog": 26,
    "goals": 3,
@@ -3527,7 +3527,7 @@
   "8478398": {
    "letter": "C",
    "type": "Slot finisher",
-   "fit": 0.14,
+   "fit": 0.12,
    "lean": null,
    "sog": 81,
    "goals": 15,
@@ -3558,7 +3558,7 @@
   "8480113": {
    "letter": "C",
    "type": "Slot finisher",
-   "fit": 0.33,
+   "fit": 0.34,
    "lean": null,
    "sog": 23,
    "goals": 4,
@@ -3589,7 +3589,7 @@
   "8482110": {
    "letter": "C",
    "type": "Slot finisher",
-   "fit": 0.22,
+   "fit": 0.2,
    "lean": null,
    "sog": 37,
    "goals": 3,
@@ -3620,7 +3620,7 @@
   "8482149": {
    "letter": "C",
    "type": "Slot finisher",
-   "fit": 0.26,
+   "fit": 0.27,
    "lean": null,
    "sog": 57,
    "goals": 7,
@@ -3682,7 +3682,7 @@
   "8480014": {
    "letter": "D",
    "type": "Net-front",
-   "fit": 0.1,
+   "fit": 0.12,
    "lean": null,
    "sog": 35,
    "goals": 1,
@@ -3713,7 +3713,7 @@
   "8477935": {
    "letter": "C",
    "type": "Slot finisher",
-   "fit": 0.06,
+   "fit": 0.04,
    "lean": "A",
    "sog": 50,
    "goals": 7,
@@ -3775,7 +3775,7 @@
   "8482113": {
    "letter": "A",
    "type": "Rush creator",
-   "fit": 0.19,
+   "fit": 0.18,
    "lean": null,
    "sog": 50,
    "goals": 4,
@@ -3806,7 +3806,7 @@
   "8480185": {
    "letter": "C",
    "type": "Slot finisher",
-   "fit": 0.07,
+   "fit": 0.05,
    "lean": "D",
    "sog": 21,
    "goals": 2,
@@ -3837,7 +3837,7 @@
   "8477933": {
    "letter": "D",
    "type": "Net-front",
-   "fit": 0.14,
+   "fit": 0.16,
    "lean": null,
    "sog": 60,
    "goals": 10,
@@ -3868,7 +3868,7 @@
   "8480801": {
    "letter": "C",
    "type": "Slot finisher",
-   "fit": 0.3,
+   "fit": 0.28,
    "lean": null,
    "sog": 68,
    "goals": 10,
@@ -3899,7 +3899,7 @@
   "8479314": {
    "letter": "A",
    "type": "Rush creator",
-   "fit": 0.14,
+   "fit": 0.15,
    "lean": null,
    "sog": 41,
    "goals": 4,
@@ -3961,7 +3961,7 @@
   "8483771": {
    "letter": "A",
    "type": "Rush creator",
-   "fit": 0.17,
+   "fit": 0.19,
    "lean": null,
    "sog": 22,
    "goals": 3,
@@ -3992,7 +3992,7 @@
   "8473994": {
    "letter": "B",
    "type": "Perimeter shooter",
-   "fit": 0.3,
+   "fit": 0.32,
    "lean": null,
    "sog": 20,
    "goals": 3,
@@ -4054,7 +4054,7 @@
   "8484938": {
    "letter": "A",
    "type": "Rush creator",
-   "fit": 0.07,
+   "fit": 0.06,
    "lean": "B",
    "sog": 33,
    "goals": 4,
@@ -4085,7 +4085,7 @@
   "8482740": {
    "letter": "C",
    "type": "Slot finisher",
-   "fit": 0.28,
+   "fit": 0.3,
    "lean": null,
    "sog": 42,
    "goals": 3,
@@ -4116,7 +4116,7 @@
   "8478420": {
    "letter": "A",
    "type": "Rush creator",
-   "fit": 0.3,
+   "fit": 0.29,
    "lean": null,
    "sog": 34,
    "goals": 9,
@@ -4147,7 +4147,7 @@
   "8480027": {
    "letter": "C",
    "type": "Slot finisher",
-   "fit": 0.1,
+   "fit": 0.09,
    "lean": "A",
    "sog": 55,
    "goals": 9,
@@ -4178,7 +4178,7 @@
   "8475794": {
    "letter": "D",
    "type": "Net-front",
-   "fit": 0.3,
+   "fit": 0.31,
    "lean": null,
    "sog": 36,
    "goals": 3,
@@ -4271,7 +4271,7 @@
   "8484164": {
    "letter": "A",
    "type": "Rush creator",
-   "fit": 0.47,
+   "fit": 0.45,
    "lean": null,
    "sog": 25,
    "goals": 4,
@@ -4302,7 +4302,7 @@
   "8482077": {
    "letter": "C",
    "type": "Slot finisher",
-   "fit": 0.01,
+   "fit": 0.0,
    "lean": "A",
    "sog": 46,
    "goals": 3,
@@ -4364,7 +4364,7 @@
   "8482745": {
    "letter": "C",
    "type": "Slot finisher",
-   "fit": 0.16,
+   "fit": 0.15,
    "lean": null,
    "sog": 48,
    "goals": 7,
@@ -4395,7 +4395,7 @@
   "8482089": {
    "letter": "C",
    "type": "Slot finisher",
-   "fit": 0.2,
+   "fit": 0.22,
    "lean": null,
    "sog": 27,
    "goals": 4,
@@ -4426,7 +4426,7 @@
   "8483516": {
    "letter": "A",
    "type": "Rush creator",
-   "fit": 0.18,
+   "fit": 0.17,
    "lean": null,
    "sog": 42,
    "goals": 10,
@@ -4457,7 +4457,7 @@
   "8480459": {
    "letter": "A",
    "type": "Rush creator",
-   "fit": 0.02,
+   "fit": 0.0,
    "lean": "B",
    "sog": 22,
    "goals": 5,
@@ -4519,7 +4519,7 @@
   "8476469": {
    "letter": "A",
    "type": "Rush creator",
-   "fit": 0.14,
+   "fit": 0.11,
    "lean": null,
    "sog": 22,
    "goals": 3,
@@ -4550,7 +4550,7 @@
   "8482124": {
    "letter": "C",
    "type": "Slot finisher",
-   "fit": 0.14,
+   "fit": 0.11,
    "lean": null,
    "sog": 36,
    "goals": 4,
@@ -4581,7 +4581,7 @@
   "8475287": {
    "letter": "C",
    "type": "Slot finisher",
-   "fit": 0.41,
+   "fit": 0.4,
    "lean": null,
    "sog": 27,
    "goals": 3,
@@ -4612,7 +4612,7 @@
   "8477960": {
    "letter": "A",
    "type": "Rush creator",
-   "fit": 0.01,
+   "fit": 0.02,
    "lean": "C",
    "sog": 50,
    "goals": 6,
@@ -4643,7 +4643,7 @@
   "8482155": {
    "letter": "C",
    "type": "Slot finisher",
-   "fit": 0.06,
+   "fit": 0.03,
    "lean": "A",
    "sog": 49,
    "goals": 3,
@@ -4674,7 +4674,7 @@
   "8479675": {
    "letter": "A",
    "type": "Rush creator",
-   "fit": 0.38,
+   "fit": 0.39,
    "lean": null,
    "sog": 30,
    "goals": 2,
@@ -4705,7 +4705,7 @@
   "8478550": {
    "letter": "B",
    "type": "Perimeter shooter",
-   "fit": 0.13,
+   "fit": 0.19,
    "lean": null,
    "sog": 51,
    "goals": 8,
@@ -4736,7 +4736,7 @@
   "8470621": {
    "letter": "D",
    "type": "Net-front",
-   "fit": 0.16,
+   "fit": 0.17,
    "lean": null,
    "sog": 25,
    "goals": 2,
@@ -4767,7 +4767,7 @@
   "8477407": {
    "letter": "C",
    "type": "Slot finisher",
-   "fit": 0.31,
+   "fit": 0.3,
    "lean": null,
    "sog": 22,
    "goals": 4,
@@ -4798,7 +4798,7 @@
   "8485388": {
    "letter": "C",
    "type": "Slot finisher",
-   "fit": 0.25,
+   "fit": 0.27,
    "lean": null,
    "sog": 26,
    "goals": 6,
@@ -4829,7 +4829,7 @@
   "8482476": {
    "letter": "A",
    "type": "Rush creator",
-   "fit": 0.22,
+   "fit": 0.23,
    "lean": null,
    "sog": 26,
    "goals": 2,
@@ -4891,7 +4891,7 @@
   "8477500": {
    "letter": "A",
    "type": "Rush creator",
-   "fit": 0.17,
+   "fit": 0.18,
    "lean": null,
    "sog": 56,
    "goals": 7,
@@ -4953,7 +4953,7 @@
   "8475151": {
    "letter": "D",
    "type": "Net-front",
-   "fit": 0.18,
+   "fit": 0.19,
    "lean": null,
    "sog": 35,
    "goals": 3,
@@ -4984,7 +4984,7 @@
   "8475170": {
    "letter": "A",
    "type": "Rush creator",
-   "fit": 0.13,
+   "fit": 0.14,
    "lean": null,
    "sog": 30,
    "goals": 5,
@@ -5077,7 +5077,7 @@
   "8478474": {
    "letter": "C",
    "type": "Slot finisher",
-   "fit": 0.02,
+   "fit": 0.01,
    "lean": "D",
    "sog": 28,
    "goals": 2,
@@ -5201,7 +5201,7 @@
   "8475314": {
    "letter": "C",
    "type": "Slot finisher",
-   "fit": 0.28,
+   "fit": 0.26,
    "lean": null,
    "sog": 33,
    "goals": 3,
@@ -5232,7 +5232,7 @@
   "8480855": {
    "letter": "A",
    "type": "Rush creator",
-   "fit": 0.16,
+   "fit": 0.15,
    "lean": null,
    "sog": 20,
    "goals": 2,
@@ -5325,7 +5325,7 @@
   "8479977": {
    "letter": "C",
    "type": "Slot finisher",
-   "fit": 0.2,
+   "fit": 0.21,
    "lean": null,
    "sog": 21,
    "goals": 3,
@@ -5353,10 +5353,568 @@
     "long": 0.0
    }
   },
+  "8478427": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.09,
+   "lean": "A",
+   "sog": 54,
+   "goals": 10,
+   "team": "CAR",
+   "pos": "C",
+   "name": "Sebastian Aho",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/CAR/8478427.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.5
+    },
+    {
+     "area": "circles",
+     "share": 0.259
+    }
+   ],
+   "diet": {
+    "netfront": 0.148,
+    "slot": 0.5,
+    "circles": 0.259,
+    "points": 0.037,
+    "corners": 0.0,
+    "outside": 0.056,
+    "long": 0.0
+   }
+  },
+  "8482809": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.38,
+   "lean": null,
+   "sog": 49,
+   "goals": 5,
+   "team": "CAR",
+   "pos": "R",
+   "name": "Jackson Blake",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/CAR/8482809.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.571
+    },
+    {
+     "area": "circles",
+     "share": 0.224
+    }
+   ],
+   "diet": {
+    "netfront": 0.102,
+    "slot": 0.571,
+    "circles": 0.224,
+    "points": 0.041,
+    "corners": 0.0,
+    "outside": 0.02,
+    "long": 0.041
+   }
+  },
+  "8477478": {
+   "letter": "D",
+   "type": "Net-front",
+   "fit": 0.36,
+   "lean": null,
+   "sog": 31,
+   "goals": 1,
+   "team": "CAR",
+   "pos": "L",
+   "name": "William Carrier",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/CAR/8477478.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.484
+    },
+    {
+     "area": "netfront",
+     "share": 0.194
+    }
+   ],
+   "diet": {
+    "netfront": 0.194,
+    "slot": 0.484,
+    "circles": 0.161,
+    "points": 0.032,
+    "corners": 0.0,
+    "outside": 0.129,
+    "long": 0.0
+   }
+  },
+  "8477940": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.18,
+   "lean": null,
+   "sog": 43,
+   "goals": 4,
+   "team": "CAR",
+   "pos": "L",
+   "name": "Nikolaj Ehlers",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/CAR/8477940.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.279
+    },
+    {
+     "area": "netfront",
+     "share": 0.163
+    }
+   ],
+   "diet": {
+    "netfront": 0.163,
+    "slot": 0.279,
+    "circles": 0.163,
+    "points": 0.163,
+    "corners": 0.0,
+    "outside": 0.163,
+    "long": 0.07
+   }
+  },
+  "8475791": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.15,
+   "lean": null,
+   "sog": 22,
+   "goals": 3,
+   "team": "CAR",
+   "pos": "L",
+   "name": "Taylor Hall",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/CAR/8475791.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.682
+    },
+    {
+     "area": "circles",
+     "share": 0.136
+    }
+   ],
+   "diet": {
+    "netfront": 0.091,
+    "slot": 0.682,
+    "circles": 0.136,
+    "points": 0.0,
+    "corners": 0.0,
+    "outside": 0.045,
+    "long": 0.045
+   }
+  },
+  "8476873": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.19,
+   "lean": null,
+   "sog": 28,
+   "goals": 8,
+   "team": "CAR",
+   "pos": "L",
+   "name": "Mark Jankowski",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/CAR/8476873.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.75
+    },
+    {
+     "area": "circles",
+     "share": 0.143
+    }
+   ],
+   "diet": {
+    "netfront": 0.036,
+    "slot": 0.75,
+    "circles": 0.143,
+    "points": 0.0,
+    "corners": 0.0,
+    "outside": 0.0,
+    "long": 0.071
+   }
+  },
+  "8480829": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.15,
+   "lean": null,
+   "sog": 20,
+   "goals": 5,
+   "team": "CAR",
+   "pos": "C",
+   "name": "Jesperi Kotkaniemi",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/CAR/8480829.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.55
+    },
+    {
+     "area": "outside",
+     "share": 0.15
+    }
+   ],
+   "diet": {
+    "netfront": 0.0,
+    "slot": 0.55,
+    "circles": 0.05,
+    "points": 0.1,
+    "corners": 0.0,
+    "outside": 0.15,
+    "long": 0.15
+   }
+  },
+  "8476921": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.06,
+   "lean": "D",
+   "sog": 30,
+   "goals": 4,
+   "team": "CAR",
+   "pos": "L",
+   "name": "Jordan Martinook",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/CAR/8476921.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.367
+    },
+    {
+     "area": "circles",
+     "share": 0.233
+    }
+   ],
+   "diet": {
+    "netfront": 0.167,
+    "slot": 0.367,
+    "circles": 0.233,
+    "points": 0.067,
+    "corners": 0.0,
+    "outside": 0.133,
+    "long": 0.033
+   }
+  },
+  "8480762": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.6,
+   "lean": null,
+   "sog": 26,
+   "goals": 2,
+   "team": "CAR",
+   "pos": "L",
+   "name": "Eric Robinson",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/CAR/8480762.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.346
+    },
+    {
+     "area": "circles",
+     "share": 0.269
+    }
+   ],
+   "diet": {
+    "netfront": 0.115,
+    "slot": 0.346,
+    "circles": 0.269,
+    "points": 0.115,
+    "corners": 0.0,
+    "outside": 0.154,
+    "long": 0.0
+   }
+  },
+  "8482702": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.18,
+   "lean": null,
+   "sog": 55,
+   "goals": 11,
+   "team": "CAR",
+   "pos": "C",
+   "name": "Logan Stankoven",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/CAR/8482702.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.545
+    },
+    {
+     "area": "circles",
+     "share": 0.145
+    }
+   ],
+   "diet": {
+    "netfront": 0.127,
+    "slot": 0.545,
+    "circles": 0.145,
+    "points": 0.073,
+    "corners": 0.0,
+    "outside": 0.055,
+    "long": 0.055
+   }
+  },
+  "8480830": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.2,
+   "lean": null,
+   "sog": 56,
+   "goals": 9,
+   "team": "CAR",
+   "pos": "R",
+   "name": "Andrei Svechnikov",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/CAR/8480830.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.411
+    },
+    {
+     "area": "circles",
+     "share": 0.232
+    }
+   ],
+   "diet": {
+    "netfront": 0.125,
+    "slot": 0.411,
+    "circles": 0.232,
+    "points": 0.107,
+    "corners": 0.0,
+    "outside": 0.107,
+    "long": 0.018
+   }
+  },
+  "8484800": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.27,
+   "lean": null,
+   "sog": 26,
+   "goals": 5,
+   "team": "SEA",
+   "pos": "C",
+   "name": "Berkly Catton",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/SEA/8484800.png",
+   "topAreas": [
+    {
+     "area": "circles",
+     "share": 0.346
+    },
+    {
+     "area": "slot",
+     "share": 0.308
+    }
+   ],
+   "diet": {
+    "netfront": 0.115,
+    "slot": 0.308,
+    "circles": 0.346,
+    "points": 0.115,
+    "corners": 0.0,
+    "outside": 0.038,
+    "long": 0.077
+   }
+  },
+  "8474586": {
+   "letter": "D",
+   "type": "Net-front",
+   "fit": 0.02,
+   "lean": "C",
+   "sog": 36,
+   "goals": 5,
+   "team": "SEA",
+   "pos": "R",
+   "name": "Jordan Eberle",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/SEA/8474586.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.528
+    },
+    {
+     "area": "netfront",
+     "share": 0.139
+    }
+   ],
+   "diet": {
+    "netfront": 0.139,
+    "slot": 0.528,
+    "circles": 0.139,
+    "points": 0.056,
+    "corners": 0.0,
+    "outside": 0.028,
+    "long": 0.111
+   }
+  },
+  "8477955": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.07,
+   "lean": "B",
+   "sog": 28,
+   "goals": 3,
+   "team": "SEA",
+   "pos": "L",
+   "name": "Jared McCann",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/SEA/8477955.png",
+   "topAreas": [
+    {
+     "area": "circles",
+     "share": 0.321
+    },
+    {
+     "area": "slot",
+     "share": 0.25
+    }
+   ],
+   "diet": {
+    "netfront": 0.107,
+    "slot": 0.25,
+    "circles": 0.321,
+    "points": 0.071,
+    "corners": 0.0,
+    "outside": 0.179,
+    "long": 0.071
+   }
+  },
+  "8482259": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.28,
+   "lean": null,
+   "sog": 44,
+   "goals": 3,
+   "team": "SEA",
+   "pos": "C",
+   "name": "Bobby McMann",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/SEA/8482259.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.341
+    },
+    {
+     "area": "circles",
+     "share": 0.25
+    }
+   ],
+   "diet": {
+    "netfront": 0.182,
+    "slot": 0.341,
+    "circles": 0.25,
+    "points": 0.091,
+    "corners": 0.0,
+    "outside": 0.045,
+    "long": 0.091
+   }
+  },
+  "8482713": {
+   "letter": "B",
+   "type": "Perimeter shooter",
+   "fit": 0.23,
+   "lean": null,
+   "sog": 27,
+   "goals": 6,
+   "team": "SEA",
+   "pos": "R",
+   "name": "Mackie Samoskevich",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/SEA/8482713.png",
+   "topAreas": [
+    {
+     "area": "circles",
+     "share": 0.37
+    },
+    {
+     "area": "slot",
+     "share": 0.222
+    }
+   ],
+   "diet": {
+    "netfront": 0.037,
+    "slot": 0.222,
+    "circles": 0.37,
+    "points": 0.111,
+    "corners": 0.0,
+    "outside": 0.148,
+    "long": 0.111
+   }
+  },
+  "8482751": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.44,
+   "lean": null,
+   "sog": 24,
+   "goals": 2,
+   "team": "SEA",
+   "pos": "C",
+   "name": "Ryan Winterton",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/SEA/8482751.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.542
+    },
+    {
+     "area": "circles",
+     "share": 0.25
+    }
+   ],
+   "diet": {
+    "netfront": 0.083,
+    "slot": 0.542,
+    "circles": 0.25,
+    "points": 0.083,
+    "corners": 0.0,
+    "outside": 0.0,
+    "long": 0.042
+   }
+  },
+  "8484241": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.31,
+   "lean": null,
+   "sog": 22,
+   "goals": 1,
+   "team": "SEA",
+   "pos": "R",
+   "name": "Matthew Wood",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/SEA/8484241.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.636
+    },
+    {
+     "area": "circles",
+     "share": 0.227
+    }
+   ],
+   "diet": {
+    "netfront": 0.0,
+    "slot": 0.636,
+    "circles": 0.227,
+    "points": 0.0,
+    "corners": 0.0,
+    "outside": 0.136,
+    "long": 0.0
+   }
+  },
   "8476463": {
    "letter": "E",
    "type": "Point shooter",
-   "fit": 0.3,
+   "fit": 0.28,
    "lean": null,
    "sog": 21,
    "goals": 0,
@@ -5387,8 +5945,8 @@
   "8480800": {
    "letter": "E",
    "type": "Point shooter",
-   "fit": 0.12,
-   "lean": null,
+   "fit": 0.04,
+   "lean": "F",
    "sog": 52,
    "goals": 6,
    "team": "MIN",
@@ -5449,7 +6007,7 @@
   "8478178": {
    "letter": "E",
    "type": "Point shooter",
-   "fit": 0.47,
+   "fit": 0.44,
    "lean": null,
    "sog": 46,
    "goals": 1,
@@ -5480,7 +6038,7 @@
   "8476853": {
    "letter": "F",
    "type": "Activating defenseman",
-   "fit": 0.05,
+   "fit": 0.07,
    "lean": "E",
    "sog": 21,
    "goals": 0,
@@ -5511,7 +6069,7 @@
   "8479442": {
    "letter": "E",
    "type": "Point shooter",
-   "fit": 0.25,
+   "fit": 0.21,
    "lean": null,
    "sog": 23,
    "goals": 2,
@@ -5573,7 +6131,7 @@
   "8480069": {
    "letter": "E",
    "type": "Point shooter",
-   "fit": 0.4,
+   "fit": 0.31,
    "lean": null,
    "sog": 47,
    "goals": 5,
@@ -5604,7 +6162,7 @@
   "8484258": {
    "letter": "E",
    "type": "Point shooter",
-   "fit": 0.32,
+   "fit": 0.33,
    "lean": null,
    "sog": 25,
    "goals": 0,
@@ -5635,7 +6193,7 @@
   "8478038": {
    "letter": "E",
    "type": "Point shooter",
-   "fit": 0.34,
+   "fit": 0.27,
    "lean": null,
    "sog": 36,
    "goals": 6,
@@ -5666,7 +6224,7 @@
   "8480865": {
    "letter": "E",
    "type": "Point shooter",
-   "fit": 0.44,
+   "fit": 0.47,
    "lean": null,
    "sog": 40,
    "goals": 0,
@@ -5695,10 +6253,10 @@
    }
   },
   "8483457": {
-   "letter": "E",
-   "type": "Point shooter",
-   "fit": 0.03,
-   "lean": "F",
+   "letter": "F",
+   "type": "Activating defenseman",
+   "fit": 0.06,
+   "lean": "E",
    "sog": 37,
    "goals": 3,
    "team": "MTL",
@@ -5728,7 +6286,7 @@
   "8478469": {
    "letter": "E",
    "type": "Point shooter",
-   "fit": 0.17,
+   "fit": 0.16,
    "lean": null,
    "sog": 27,
    "goals": 1,
@@ -5759,7 +6317,7 @@
   "8482095": {
    "letter": "E",
    "type": "Point shooter",
-   "fit": 0.04,
+   "fit": 0.03,
    "lean": "F",
    "sog": 24,
    "goals": 2,
@@ -5790,8 +6348,8 @@
   "8482105": {
    "letter": "F",
    "type": "Activating defenseman",
-   "fit": 0.11,
-   "lean": null,
+   "fit": 0.1,
+   "lean": "B",
    "sog": 21,
    "goals": 1,
    "team": "OTT",
@@ -5821,7 +6379,7 @@
   "8484759": {
    "letter": "E",
    "type": "Point shooter",
-   "fit": 0.46,
+   "fit": 0.49,
    "lean": null,
    "sog": 22,
    "goals": 1,
@@ -5850,10 +6408,10 @@
    }
   },
   "8476854": {
-   "letter": "E",
-   "type": "Point shooter",
-   "fit": 0.01,
-   "lean": "F",
+   "letter": "F",
+   "type": "Activating defenseman",
+   "fit": 0.05,
+   "lean": "E",
    "sog": 22,
    "goals": 1,
    "team": "BOS",
@@ -5881,10 +6439,10 @@
    }
   },
   "8479325": {
-   "letter": "E",
-   "type": "Point shooter",
-   "fit": 0.01,
-   "lean": "F",
+   "letter": "F",
+   "type": "Activating defenseman",
+   "fit": 0.04,
+   "lean": "E",
    "sog": 22,
    "goals": 1,
    "team": "BOS",
@@ -5914,8 +6472,8 @@
   "8474590": {
    "letter": "F",
    "type": "Activating defenseman",
-   "fit": 0.07,
-   "lean": "A",
+   "fit": 0.1,
+   "lean": null,
    "sog": 41,
    "goals": 6,
    "team": "TBL",
@@ -5945,7 +6503,7 @@
   "8478416": {
    "letter": "E",
    "type": "Point shooter",
-   "fit": 0.44,
+   "fit": 0.34,
    "lean": null,
    "sog": 20,
    "goals": 0,
@@ -5976,7 +6534,7 @@
   "8480426": {
    "letter": "E",
    "type": "Point shooter",
-   "fit": 0.3,
+   "fit": 0.28,
    "lean": null,
    "sog": 25,
    "goals": 3,
@@ -6007,7 +6565,7 @@
   "8476462": {
    "letter": "E",
    "type": "Point shooter",
-   "fit": 0.48,
+   "fit": 0.47,
    "lean": null,
    "sog": 49,
    "goals": 2,
@@ -6038,7 +6596,7 @@
   "8482684": {
    "letter": "F",
    "type": "Activating defenseman",
-   "fit": 0.04,
+   "fit": 0.09,
    "lean": "E",
    "sog": 43,
    "goals": 6,
@@ -6069,8 +6627,8 @@
   "8479345": {
    "letter": "E",
    "type": "Point shooter",
-   "fit": 0.14,
-   "lean": null,
+   "fit": 0.06,
+   "lean": "F",
    "sog": 50,
    "goals": 2,
    "team": "WSH",
@@ -6129,10 +6687,10 @@
    }
   },
   "8483485": {
-   "letter": "E",
-   "type": "Point shooter",
-   "fit": 0.0,
-   "lean": "F",
+   "letter": "F",
+   "type": "Activating defenseman",
+   "fit": 0.11,
+   "lean": null,
    "sog": 29,
    "goals": 4,
    "team": "CBJ",
@@ -6162,7 +6720,7 @@
   "8478460": {
    "letter": "F",
    "type": "Activating defenseman",
-   "fit": 0.13,
+   "fit": 0.14,
    "lean": null,
    "sog": 50,
    "goals": 2,
@@ -6193,7 +6751,7 @@
   "8475753": {
    "letter": "E",
    "type": "Point shooter",
-   "fit": 0.21,
+   "fit": 0.24,
    "lean": null,
    "sog": 25,
    "goals": 3,
@@ -6222,10 +6780,10 @@
    }
   },
   "8483679": {
-   "letter": "E",
-   "type": "Point shooter",
-   "fit": 0.01,
-   "lean": "F",
+   "letter": "F",
+   "type": "Activating defenseman",
+   "fit": 0.09,
+   "lean": "E",
    "sog": 20,
    "goals": 2,
    "team": "DET",
@@ -6255,7 +6813,7 @@
   "8481542": {
    "letter": "E",
    "type": "Point shooter",
-   "fit": 0.36,
+   "fit": 0.38,
    "lean": null,
    "sog": 38,
    "goals": 1,
@@ -6286,7 +6844,7 @@
   "8484783": {
    "letter": "F",
    "type": "Activating defenseman",
-   "fit": 0.07,
+   "fit": 0.08,
    "lean": "E",
    "sog": 24,
    "goals": 1,
@@ -6348,7 +6906,7 @@
   "8481568": {
    "letter": "E",
    "type": "Point shooter",
-   "fit": 0.2,
+   "fit": 0.17,
    "lean": null,
    "sog": 20,
    "goals": 0,
@@ -6379,7 +6937,7 @@
   "8480839": {
    "letter": "E",
    "type": "Point shooter",
-   "fit": 0.37,
+   "fit": 0.39,
    "lean": null,
    "sog": 44,
    "goals": 3,
@@ -6410,7 +6968,7 @@
   "8482671": {
    "letter": "E",
    "type": "Point shooter",
-   "fit": 0.21,
+   "fit": 0.17,
    "lean": null,
    "sog": 24,
    "goals": 2,
@@ -6441,7 +6999,7 @@
   "8480807": {
    "letter": "F",
    "type": "Activating defenseman",
-   "fit": 0.02,
+   "fit": 0.06,
    "lean": "E",
    "sog": 26,
    "goals": 2,
@@ -6503,7 +7061,7 @@
   "8479983": {
    "letter": "E",
    "type": "Point shooter",
-   "fit": 0.33,
+   "fit": 0.38,
    "lean": null,
    "sog": 22,
    "goals": 2,
@@ -6534,7 +7092,7 @@
   "8480145": {
    "letter": "E",
    "type": "Point shooter",
-   "fit": 0.26,
+   "fit": 0.21,
    "lean": null,
    "sog": 47,
    "goals": 4,
@@ -6565,7 +7123,7 @@
   "8480049": {
    "letter": "E",
    "type": "Point shooter",
-   "fit": 0.32,
+   "fit": 0.25,
    "lean": null,
    "sog": 20,
    "goals": 2,
@@ -6596,7 +7154,7 @@
   "8477932": {
    "letter": "F",
    "type": "Activating defenseman",
-   "fit": 0.02,
+   "fit": 0.08,
    "lean": "E",
    "sog": 25,
    "goals": 1,
@@ -6656,10 +7214,10 @@
    }
   },
   "8477495": {
-   "letter": "E",
-   "type": "Point shooter",
-   "fit": 0.07,
-   "lean": "F",
+   "letter": "F",
+   "type": "Activating defenseman",
+   "fit": 0.05,
+   "lean": "E",
    "sog": 45,
    "goals": 3,
    "team": "FLA",
@@ -6689,7 +7247,7 @@
   "8478859": {
    "letter": "F",
    "type": "Activating defenseman",
-   "fit": 0.22,
+   "fit": 0.28,
    "lean": null,
    "sog": 25,
    "goals": 2,
@@ -6720,7 +7278,7 @@
   "8481581": {
    "letter": "F",
    "type": "Activating defenseman",
-   "fit": 0.19,
+   "fit": 0.28,
    "lean": null,
    "sog": 34,
    "goals": 2,
@@ -6751,7 +7309,7 @@
   "8480036": {
    "letter": "F",
    "type": "Activating defenseman",
-   "fit": 0.14,
+   "fit": 0.13,
    "lean": null,
    "sog": 26,
    "goals": 3,
@@ -6813,8 +7371,8 @@
   "8481598": {
    "letter": "F",
    "type": "Activating defenseman",
-   "fit": 0.07,
-   "lean": "A",
+   "fit": 0.12,
+   "lean": null,
    "sog": 39,
    "goals": 4,
    "team": "STL",
@@ -6844,7 +7402,7 @@
   "8475764": {
    "letter": "E",
    "type": "Point shooter",
-   "fit": 0.24,
+   "fit": 0.27,
    "lean": null,
    "sog": 20,
    "goals": 0,
@@ -6875,7 +7433,7 @@
   "8476892": {
    "letter": "F",
    "type": "Activating defenseman",
-   "fit": 0.19,
+   "fit": 0.21,
    "lean": null,
    "sog": 23,
    "goals": 0,
@@ -6906,7 +7464,7 @@
   "8482730": {
    "letter": "E",
    "type": "Point shooter",
-   "fit": 0.2,
+   "fit": 0.11,
    "lean": null,
    "sog": 26,
    "goals": 3,
@@ -6937,8 +7495,8 @@
   "8485366": {
    "letter": "F",
    "type": "Activating defenseman",
-   "fit": 0.1,
-   "lean": "E",
+   "fit": 0.12,
+   "lean": null,
    "sog": 62,
    "goals": 5,
    "team": "NYI",
@@ -6968,7 +7526,7 @@
   "8479410": {
    "letter": "E",
    "type": "Point shooter",
-   "fit": 0.34,
+   "fit": 0.31,
    "lean": null,
    "sog": 46,
    "goals": 5,
@@ -6999,7 +7557,7 @@
   "8477346": {
    "letter": "E",
    "type": "Point shooter",
-   "fit": 0.19,
+   "fit": 0.21,
    "lean": null,
    "sog": 33,
    "goals": 2,
@@ -7025,6 +7583,223 @@
     "corners": 0.0,
     "outside": 0.061,
     "long": 0.061
+   }
+  },
+  "8478970": {
+   "letter": "E",
+   "type": "Point shooter",
+   "fit": 0.1,
+   "lean": "F",
+   "sog": 24,
+   "goals": 2,
+   "team": "CAR",
+   "pos": "D",
+   "name": "Jalen Chatfield",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/CAR/8478970.png",
+   "topAreas": [
+    {
+     "area": "points",
+     "share": 0.458
+    },
+    {
+     "area": "circles",
+     "share": 0.167
+    }
+   ],
+   "diet": {
+    "netfront": 0.083,
+    "slot": 0.042,
+    "circles": 0.167,
+    "points": 0.458,
+    "corners": 0.0,
+    "outside": 0.125,
+    "long": 0.125
+   }
+  },
+  "8476906": {
+   "letter": "E",
+   "type": "Point shooter",
+   "fit": 0.49,
+   "lean": null,
+   "sog": 35,
+   "goals": 3,
+   "team": "CAR",
+   "pos": "D",
+   "name": "Shayne Gostisbehere",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/CAR/8476906.png",
+   "topAreas": [
+    {
+     "area": "points",
+     "share": 0.571
+    },
+    {
+     "area": "circles",
+     "share": 0.171
+    }
+   ],
+   "diet": {
+    "netfront": 0.029,
+    "slot": 0.057,
+    "circles": 0.171,
+    "points": 0.571,
+    "corners": 0.0,
+    "outside": 0.086,
+    "long": 0.086
+   }
+  },
+  "8480817": {
+   "letter": "E",
+   "type": "Point shooter",
+   "fit": 0.27,
+   "lean": null,
+   "sog": 29,
+   "goals": 1,
+   "team": "CAR",
+   "pos": "D",
+   "name": "K'Andre Miller",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/CAR/8480817.png",
+   "topAreas": [
+    {
+     "area": "points",
+     "share": 0.448
+    },
+    {
+     "area": "circles",
+     "share": 0.207
+    }
+   ],
+   "diet": {
+    "netfront": 0.0,
+    "slot": 0.103,
+    "circles": 0.207,
+    "points": 0.448,
+    "corners": 0.0,
+    "outside": 0.138,
+    "long": 0.103
+   }
+  },
+  "8476958": {
+   "letter": "E",
+   "type": "Point shooter",
+   "fit": 0.17,
+   "lean": null,
+   "sog": 31,
+   "goals": 0,
+   "team": "CAR",
+   "pos": "D",
+   "name": "Jaccob Slavin",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/CAR/8476958.png",
+   "topAreas": [
+    {
+     "area": "points",
+     "share": 0.452
+    },
+    {
+     "area": "outside",
+     "share": 0.194
+    }
+   ],
+   "diet": {
+    "netfront": 0.032,
+    "slot": 0.0,
+    "circles": 0.129,
+    "points": 0.452,
+    "corners": 0.032,
+    "outside": 0.194,
+    "long": 0.161
+   }
+  },
+  "8480336": {
+   "letter": "F",
+   "type": "Activating defenseman",
+   "fit": 0.21,
+   "lean": null,
+   "sog": 38,
+   "goals": 3,
+   "team": "CAR",
+   "pos": "D",
+   "name": "Sean Walker",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/CAR/8480336.png",
+   "topAreas": [
+    {
+     "area": "points",
+     "share": 0.342
+    },
+    {
+     "area": "slot",
+     "share": 0.263
+    }
+   ],
+   "diet": {
+    "netfront": 0.026,
+    "slot": 0.263,
+    "circles": 0.105,
+    "points": 0.342,
+    "corners": 0.026,
+    "outside": 0.184,
+    "long": 0.053
+   }
+  },
+  "8478407": {
+   "letter": "E",
+   "type": "Point shooter",
+   "fit": 0.33,
+   "lean": null,
+   "sog": 34,
+   "goals": 3,
+   "team": "SEA",
+   "pos": "D",
+   "name": "Vince Dunn",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/SEA/8478407.png",
+   "topAreas": [
+    {
+     "area": "points",
+     "share": 0.676
+    },
+    {
+     "area": "slot",
+     "share": 0.176
+    }
+   ],
+   "diet": {
+    "netfront": 0.0,
+    "slot": 0.176,
+    "circles": 0.118,
+    "points": 0.676,
+    "corners": 0.0,
+    "outside": 0.029,
+    "long": 0.0
+   }
+  },
+  "8477986": {
+   "letter": "F",
+   "type": "Activating defenseman",
+   "fit": 0.21,
+   "lean": null,
+   "sog": 27,
+   "goals": 3,
+   "team": "SEA",
+   "pos": "D",
+   "name": "Brandon Montour",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/SEA/8477986.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.333
+    },
+    {
+     "area": "points",
+     "share": 0.259
+    }
+   ],
+   "diet": {
+    "netfront": 0.037,
+    "slot": 0.333,
+    "circles": 0.222,
+    "points": 0.259,
+    "corners": 0.0,
+    "outside": 0.111,
+    "long": 0.037
    }
   }
  }
