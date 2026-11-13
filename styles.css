@@ -344,6 +344,28 @@ td .pname img.pavatar {
   width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
   background: var(--panel2); object-fit: cover; border: 1px solid var(--border);
 }
+/* Base face treatment (2026-11-13): a .pavatar is ALWAYS the standard
+   small circular ring avatar, whatever container it lands in. The
+   rules above only ever sized it inside table cells and a few scoped
+   rows — div-based rows (Standouts, Types members, Center Ice search)
+   rendered the mug at natural size, a full-screen white card, until
+   this base rule landed. Scoped rules (leader rows 34px, ice-breaker
+   spot 34px) still win in their contexts. */
+img.pavatar {
+  width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+  background: var(--panel2); object-fit: cover; border: 1px solid var(--border);
+}
+/* The name button gets the same reset outside table cells, where it
+   otherwise falls back to browser button chrome. */
+.pname {
+  color: var(--teal); cursor: pointer; font-weight: 650; font-family: inherit;
+  background: none; border: 0; padding: .12rem .3rem; margin: -.12rem -.3rem;
+  font-size: inherit; text-align: left; border-radius: 6px;
+  display: inline-flex; align-items: center; gap: .45rem;
+  transition: background .12s ease, color .12s ease;
+}
+.pname:hover { color: #7cebf1; }
+.pname-static { display: inline-flex; align-items: center; gap: .45rem; }
 .team-cell { display: inline-flex; align-items: center; gap: .4rem; font-weight: 600; }
 .team-cell img { width: 20px; height: 20px; }
 .prob-bar { height: 6px; background: #182031; border-radius: 99px; margin-top: 4px; min-width: 70px; overflow: hidden; }

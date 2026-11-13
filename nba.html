@@ -54,6 +54,13 @@
 .nba-search-wrap .ci-group h4 { color: #FF7A1A; }
 .nba-search-wrap .ci-row:active { border-color: #FF7A1A; }
 .nba-search-wrap .ci-row .pct { color: #FF7A1A; }
+/* Base face treatment (2026-11-13): an .hs headshot is ALWAYS a small
+   circular avatar, whatever container it lands in; the context rules
+   below (fb-perf 58px, so-row 38px, ty-member 30px, pc-head 86px...)
+   still win locally. The search-row faces added with the types build
+   had no context rule and rendered the cutout at natural size. */
+img.hs { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; object-position: top; background: #101a2c; flex: none; }
+.nba-search-wrap .ci-row > span:first-child { display: inline-flex; align-items: center; gap: .5rem; min-width: 0; }
 .fb-perf img.hs { width: 58px; height: 58px; border-radius: 50%; object-fit: cover; object-position: top; background: #0e1626; }
 .fb-perf .pname { font-weight: 700; font-size: .8rem; margin-top: .4rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .fb-perf .pteam { display: flex; align-items: center; justify-content: center; gap: .3rem; color: var(--muted); font-size: .7rem; margin-top: .1rem; }
