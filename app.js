@@ -805,7 +805,7 @@ function twoPlusProbs() {
 }
 function pnameBtn(r) {
   const hs = r.headshot || headshotUrl(r.team, r.pid);
-  return `<button class="pname" data-pid="${r.pid}" data-gid="${r.gameId}"><img class="pavatar" src="${esc(hs)}" alt="" ${imgFallback}>${esc(r.name)}</button>`;
+  return `<button class="pname" data-pid="${r.pid}" data-gid="${r.gameId}"><img class="pavatar" src="${esc(hs)}" alt="" ${imgFallback}>${esc(r.name)}${typeBadgeHtml(r.pid)}</button>`;
 }
 /* ---------------- market heat (good-bet glow) ----------------
    Every market table scores each name: green = the model's strongest
@@ -2123,7 +2123,7 @@ function renderBoard() {
   const tbl = $('boardTable');
   if (tbl && state.skaters.length) {
     const longest = Math.max(...state.skaters.map((r) => r.name.length));
-    tbl.style.setProperty('--bnw', (30 + 8 + 20 + Math.ceil(longest * 7.9) + 26) + 'px');
+    tbl.style.setProperty('--bnw', (30 + 8 + 20 + Math.ceil(longest * 7.9) + 26 + (typesState === 'ok' ? 96 : 0)) + 'px');
   }
 
   if (!rows.length) {
@@ -2177,7 +2177,7 @@ function renderLongshots() {
     <div class="ls-card heat-edge-${lsBands.get(r.pid)}">
       <img class="headshot" src="${esc(r.headshot || headshotUrl(r.team, r.pid))}" alt="" ${imgFallback}>
       <div class="ls-info">
-        <span class="heat-dot ${lsBands.get(r.pid)}"></span><button class="pname" data-pid="${r.pid}" data-gid="${r.gameId}">${esc(r.name)}</button>
+        <span class="heat-dot ${lsBands.get(r.pid)}"></span><button class="pname" data-pid="${r.pid}" data-gid="${r.gameId}">${esc(r.name)}</button>${typeBadgeHtml(r.pid)}
         <div class="ls-stats">${esc(r.team)} · ${esc(r.pos)} · ${pct1(r.p)} model · ${r.goals}G/${r.gp}GP</div>
       </div>
       <div class="ls-odds"><div class="fair">${r.fair}</div><div class="ls-stats">fair</div></div>
@@ -3192,6 +3192,273 @@ async function ensureGoalieEdge(pg) {
   const html = d ? pcGedgeHtml(pg, d) : '';
   if (html) slot.outerHTML = html; else slot.remove();
 }
+/* ---------------- player types (nhl-types sidecar) ----------------
+   data/nhl-types.json is built WEEKLY by data-builder/nhl-types.py:
+   every skater clustered on his season shot diet (NHL EDGE shot
+   locations) — forwards A–D, defensemen from E. The letter rides
+   beside his name across the site (Markets, Board, Leaders, Longshots,
+   search, player card). DISPLAY ONLY — types feed no price,
+   probability or sort anywhere. A missing sidecar or an untyped
+   player renders exactly as before. */
+let typesSidecar = null, typesState = 'idle'; // idle | loading | ok | fail
+async function loadTypes() {
+  if (typesState === 'loading' || typesState === 'ok') return;
+  typesState = 'loading';
+  try {
+    const r = await dataFetch('data/nhl-types.json', { headers: { 'Accept': 'application/json' } });
+    if (!r.ok) throw new Error('no types sidecar');
+    typesSidecar = await r.json();
+    typesState = 'ok';
+  } catch (e) { typesState = 'fail'; }
+  if (typesState === 'ok') refreshTypeSurfaces();
+}
+function typeOf(pid) {
+  if (typesState !== 'ok' || !typesSidecar || !typesSidecar.players) return null;
+  return typesSidecar.players[String(pid)] || null;
+}
+/* Shared badge helper: glass teal letter chip. Returns '' for untyped
+   players so every call site is fail-soft. */
+function typeBadgeHtml(pid) {
+  const t = typeOf(pid);
+  if (!t) return '';
+  const meta = (typesSidecar.letters || {})[t.letter] || {};
+  const leanName = t.lean ? ((typesSidecar.letters[t.lean] || {}).name || t.lean) : null;
+  const title = `${t.letter} · ${t.type}${leanName ? ` · borderline, leans ${t.lean} ${leanName}` : ''}${meta.desc ? ` — ${meta.desc}` : ''} Display only, not a price input.`;
+  return `<span class="type-badge" title="${esc(title)}"><span class="tb-l">${esc(t.letter)}</span><span class="tb-n">${esc(t.type)}</span></span>`;
+}
+function refreshTypeSurfaces() {
+  renderTypes();
+  if (!state.skaters || !state.skaters.length) return;
+  setMarketKind(state.marketKind); // Markets tables + Leaders carry pnameBtn badges
+  renderBoard();
+  renderLongshots();
+  renderStandouts();
+}
+const TYPE_AREA_LABEL = { netfront: 'net-front', slot: 'slot', circles: 'circles', points: 'point', corners: 'corners', outside: 'outside', long: 'long range' };
+function pcTypeStripHtml(r) {
+  const t = typeOf(r.pid);
+  if (!t) return '';
+  const meta = (typesSidecar.letters || {})[t.letter] || {};
+  const leanMeta = t.lean ? (typesSidecar.letters[t.lean] || {}) : null;
+  const top = (t.topAreas || []).map((a) => `${esc(TYPE_AREA_LABEL[a.area] || a.area)} ${Math.round(a.share * 100)}%`).join(' · ');
+  return `<div class="pc-type-strip"><span class="pts-lab">TYPE ${esc(t.letter)} · ${esc((t.type || '').toUpperCase())}</span>${esc(meta.desc || '')}`
+    + `<div class="pts-fit">Fit ${Math.round((t.fit || 0) * 100)}%${leanMeta ? ` · borderline — leans ${esc(t.lean)} ${esc(leanMeta.name || '')}` : ''}${top ? ` · diet: ${top}` : ''} · ${t.sog} shots on goal this season · display only</div></div>`;
+}
+function renderTypes() {
+  const el = $('typesBody');
+  if (!el) return;
+  if (typesState !== 'ok' || !typesSidecar) {
+    el.innerHTML = '<p class="muted">Player types have not loaded for this slate yet.</p>';
+    return;
+  }
+  const letters = typesSidecar.letters || {};
+  const players = typesSidecar.players || {};
+  const byLetter = {};
+  for (const [pid, t] of Object.entries(players)) (byLetter[t.letter] = byLetter[t.letter] || []).push({ pid, ...t });
+  const slate = new Map((state.skaters || []).map((r) => [String(r.pid), r]));
+  let html = '';
+  for (const L of Object.keys(letters).sort()) {
+    const meta = letters[L];
+    const members = (byLetter[L] || []).slice().sort((a, b) => ((b.fit || 0) - (a.fit || 0)) || ((b.sog || 0) - (a.sog || 0)));
+    if (!members.length) continue;
+    html += `<div class="types-group"><div class="types-head"><span class="type-badge"><span class="tb-l">${esc(L)}</span><span class="tb-n">${esc(meta.name)}</span></span><span class="types-count">${members.length} skaters</span></div>`
+      + `<p class="types-desc">${esc(meta.desc || '')}</p><div class="types-members">`;
+    html += members.map((m) => {
+      const row = slate.get(String(m.pid));
+      const nameHtml = row
+        ? pnameBtn(row)
+        : `<span class="pname pname-static"><img class="pavatar" src="${esc(m.headshot || headshotUrl(m.team, m.pid))}" alt="" ${imgFallback}><span class="pname-name">${esc(m.name)}</span></span>`;
+      const lean = m.lean ? ` <span class="type-badge lean" title="Borderline — leans ${esc(m.lean)} ${esc((letters[m.lean] || {}).name || '')}"><span class="tb-l">${esc(m.lean)}</span></span>` : '';
+      const top = (m.topAreas || []).map((a) => `${esc(TYPE_AREA_LABEL[a.area] || a.area)} ${Math.round(a.share * 100)}%`).join(' · ');
+      return `<div class="type-row">${nameHtml}${lean}<span class="type-row-meta">${esc(m.team)} · ${esc(m.pos)} · ${m.sog} SOG${top ? ` · ${top}` : ''}</span><span class="type-fit">${Math.round((m.fit || 0) * 100)}% fit</span></div>`;
+    }).join('');
+    html += '</div></div>';
+  }
+  el.innerHTML = html || '<p class="muted">No typed skaters yet.</p>';
+  wirePnameClicks(el);
+}
+/* ---------------- standouts (goalie-matchup reads) ----------------
+   Tonight's slate read against the goalie each skater faces, computed
+   client-side from the day's bundle. READ layer: the opposing priced
+   goalie's save % (the bundle price), his recent danger-band and zone
+   numbers from charted shots, and the skater's zone fit against that
+   goalie's weak zones — the same machinery as the card's Vs-goalie
+   section. MODEL layer: the site's own probability for the chosen
+   category. The two are shown separately, never blended. STACKED =
+   the zone-fit read and the model agree (real fit AND a strong
+   price). A row whose only case is a soft goalie is flagged as one —
+   no fake edges. Every row prints its basis (goalie, priced SV,
+   charted sample) or does not render: no priced goalie, no row.
+   "Priced goalie" = the goalie the bundle priced (panelGoalie) — the
+   page cannot confirm starters beyond the bundle. */
+let soCat = 'atg';
+let soCacheDate = null;
+const SO_CATS = [
+  { key: 'atg', label: 'Anytime Goal', floor: 0.15 },
+  { key: 'firstgoal', label: 'First Goal', floor: 0.035 },
+  { key: 'shots', label: 'Shots · o2.5', floor: 0.35, line: ['shots', 2.5] },
+  { key: 'points', label: 'Points · o1.5', floor: 0.28, line: ['points', 1.5] },
+  { key: 'twoplus', label: '2+ Goals', floor: 0.05 },
+];
+const SO_ZONE_LABEL = { 'Left-Low': 'low left', 'Center-Low': 'low middle', 'Right-Low': 'low right', 'Left-High': 'high left', 'Center-High': 'high middle', 'Right-High': 'high right' };
+const soSvPct = (sv) => `${(sv * 100).toFixed(1)}%`;
+const soGoalieCache = new Map();
+function soGoalieStats(goalieId) {
+  const key = String(goalieId);
+  if (soGoalieCache.has(key)) return soGoalieCache.get(key);
+  const shots = shotsAgainstGoalie(goalieId);
+  const goals = goalsAgainstGoalie(goalieId);
+  const hdS = shots.filter((s) => isHighDanger(s.x, s.y));
+  const hdG = goals.filter((s) => isHighDanger(s.x, s.y));
+  const out = {
+    n: shots.length,
+    hdN: hdS.length,
+    hdSv: hdS.length >= 8 ? 1 - hdG.length / hdS.length : null,
+    zones: goalieZoneStats(goalieId),
+  };
+  soGoalieCache.set(key, out);
+  return out;
+}
+function buildStandoutCtx() {
+  const games = new Map();
+  for (const g of state.games || []) {
+    for (const side of ['away', 'home']) {
+      const team = g[side];
+      games.set(`${g.id}|${team}`, { game: g, team, pg: panelGoalie(g, team) });
+    }
+  }
+  const priced = new Map();
+  const svs = [];
+  for (const r of state.skaters || []) {
+    const k = `${r.gameId}|${r.oppAbbr}`;
+    if (!priced.has(k) && r.oppSv != null) priced.set(k, r.oppSv);
+    if (r.oppSv != null) svs.push(r.oppSv);
+  }
+  svs.sort((a, b) => a - b);
+  const q = (f) => (svs.length ? svs[Math.min(svs.length - 1, Math.floor(f * svs.length))] : null);
+  return { games, priced, q1: q(0.25), q3: q(0.75) };
+}
+/* The read for one skater against his priced goalie. Returns null when
+   there is no basis (no priced goalie / no priced SV) — the row then
+   never renders. Kept separate from rendering so the logic is testable. */
+function standoutRead(r, ctx) {
+  const ent = ctx.games.get(`${r.gameId}|${r.oppAbbr}`);
+  if (!ent || !ent.pg || !ent.pg.id) return null;
+  const pricedSv = ctx.priced.get(`${r.gameId}|${r.oppAbbr}`);
+  if (pricedSv == null) return null;
+  const gs = soGoalieStats(ent.pg.id);
+  const last = ent.pg.name.split(' ').slice(-1)[0];
+  const soft = ctx.q1 != null && pricedSv <= ctx.q1;
+  const tough = ctx.q3 != null && pricedSv >= ctx.q3;
+  const diet = (r.seasonShots && r.seasonShots.length >= 8) ? r.seasonShots : (r.shots || []);
+  let fit = false, antiFit = false, antiZone = null;
+  const fitParts = [];
+  if (diet.length >= 8 && gs.n >= 8) {
+    const counts = {};
+    for (const s of diet) { const z = netZone(s.x, s.y); counts[z] = (counts[z] || 0) + 1; }
+    const topZones = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 2);
+    const zoned = NET_ZONES.filter((z) => gs.zones[z] && gs.zones[z].sv != null);
+    const weak = zoned.slice().sort((a, b) => gs.zones[a].sv - gs.zones[b].sv).slice(0, 2);
+    const strong = zoned.slice().sort((a, b) => gs.zones[b].sv - gs.zones[a].sv).slice(0, 1);
+    for (const [z, n] of topZones) {
+      const share = n / diet.length;
+      if (share < 0.18) continue;
+      const gz = gs.zones[z];
+      if (!gz || gz.sv == null) continue;
+      if (weak.includes(z) && gz.sv <= 0.87) {
+        fit = true;
+        fitParts.push(`${Math.round(share * 100)}% of his shots go ${SO_ZONE_LABEL[z] || z} — that is where ${last} leaks (${soSvPct(gz.sv)} SV on ${gz.shots} shots)`);
+      } else if (strong.includes(z) && gz.sv >= 0.93) {
+        antiFit = true;
+        antiZone = { z, sv: gz.sv, share };
+      }
+    }
+    const hdShare = r.zone && !r.zone.lowSample ? r.zone.share : null;
+    if (hdShare != null && hdShare >= 0.40 && gs.hdSv != null && gs.hdSv <= 0.815) {
+      fit = true;
+      fitParts.push(`his diet is ${Math.round(hdShare * 100)}% high-danger, and ${last} stops ${soSvPct(gs.hdSv)} of high-danger shots (${gs.hdN} charted)`);
+    }
+  }
+  return { pg: ent.pg, pricedSv, gs, soft, tough, fit, antiFit, antiZone, fitParts };
+}
+function soProbFor(r, catKey, maps) {
+  if (catKey === 'atg') return { p: r.p, fair: r.fair };
+  if (catKey === 'firstgoal') { const e = maps.fg.get(r.pid); return e ? { p: e.fgP, fair: e.fgFair } : null; }
+  if (catKey === 'twoplus') { const e = maps.tp.get(r.pid); return e ? { p: e.tpP, fair: e.tpFair } : null; }
+  const cat = SO_CATS.find((c) => c.key === catKey);
+  const m = cat && cat.line ? marketOver(r, cat.line[0], cat.line[1]) : null;
+  return m ? { p: m.over, fair: m.overFair } : null;
+}
+function renderStandouts() {
+  const body = $('standoutsBody');
+  const catsEl = $('standoutCats');
+  if (!body) return;
+  if (catsEl) {
+    catsEl.innerHTML = SO_CATS.map((c) => `<button type="button" class="so-cat${c.key === soCat ? ' on' : ''}" data-socat="${c.key}">${c.label}</button>`).join('');
+    catsEl.querySelectorAll('[data-socat]').forEach((b) => b.addEventListener('click', () => { soCat = b.dataset.socat; renderStandouts(); }));
+  }
+  if (!(state.skaters || []).length) {
+    body.innerHTML = '<p class="muted">No slate loaded yet.</p>';
+    return;
+  }
+  if (soCacheDate !== state.date) { soGoalieCache.clear(); soCacheDate = state.date; }
+  const cat = SO_CATS.find((c) => c.key === soCat) || SO_CATS[0];
+  const ctx = buildStandoutCtx();
+  const maps = {
+    fg: new Map(firstGoalProbs().map((e) => [e.pid, e])),
+    tp: new Map(twoPlusProbs().map((e) => [e.pid, e])),
+  };
+  const rows = [];
+  for (const r of state.skaters) {
+    const read = standoutRead(r, ctx);
+    if (!read) continue;
+    const pr = soProbFor(r, cat.key, maps);
+    if (!pr || !(pr.p > 0)) continue;
+    rows.push({ r, read, p: pr.p, fair: pr.fair });
+  }
+  const ps = rows.map((x) => x.p).sort((a, b) => a - b);
+  const pQ3 = ps.length ? ps[Math.min(ps.length - 1, Math.floor(0.75 * ps.length))] : 1;
+  for (const x of rows) {
+    x.stacked = x.read.fit && (x.read.soft || x.p >= pQ3);
+    x.goalieOnly = x.read.soft && !x.read.fit;
+  }
+  const standouts = rows.filter((x) => (x.read.fit || x.read.soft) && x.p >= cat.floor)
+    .sort((a, b) => (Number(b.stacked) - Number(a.stacked)) || (b.p - a.p)).slice(0, 6);
+  const toughSpots = rows.filter((x) => !x.read.fit && (x.read.tough || x.read.antiFit) && x.p >= cat.floor)
+    .sort((a, b) => b.p - a.p).slice(0, 5);
+  const lastOf = (name) => name.split(' ').slice(-1)[0];
+  const rowHtml = (x, isTough) => {
+    const { r, read } = x;
+    const g = (state.games || []).find((gg) => String(gg.id) === String(r.gameId));
+    const match = g ? `${r.team} ${r.team === g.home ? 'vs' : '@'} ${r.oppAbbr}` : r.team;
+    let readText;
+    if (read.fitParts.length) readText = read.fitParts.join('; ') + '.';
+    else if (isTough) {
+      readText = `${lastOf(read.pg.name)} is priced at ${soSvPct(read.pricedSv)} SV — toughest quarter tonight.`
+        + (read.antiFit && read.antiZone ? ` His favourite area (${SO_ZONE_LABEL[read.antiZone.z] || read.antiZone.z}) is ${lastOf(read.pg.name)}'s strongest (${soSvPct(read.antiZone.sv)} SV).` : ' No zone fit either.');
+    } else {
+      readText = `No zone fit — the read is ${lastOf(read.pg.name)}'s priced number, softest quarter tonight.`;
+    }
+    const basis = `Basis — vs ${esc(read.pg.name)} (${esc(read.pg.tag ? read.pg.tag.toLowerCase() : 'priced goalie')}) · priced ${soSvPct(read.pricedSv)} SV`
+      + (read.gs.hdSv != null ? ` · high-danger ${soSvPct(read.gs.hdSv)} SV on ${read.gs.hdN} charted shots` : '')
+      + ` · ${read.gs.n} charted shots against, recent window`;
+    return `<div class="so-row"><div class="so-row-head">${pnameBtn(r)}<span class="so-match">${esc(match)}</span>`
+      + (x.stacked ? '<span class="so-stacked">STACKED</span>' : '')
+      + (x.goalieOnly && !isTough ? '<span class="so-flag">⚠ CASE = SOFT GOALIE ONLY</span>' : '')
+      + `</div><div class="so-read">${esc(readText)}</div>`
+      + `<div class="so-model">Model — ${esc(cat.label)}: ${pct1(x.p)} (${esc(x.fair)} fair)</div>`
+      + `<div class="so-basis">${basis}</div></div>`;
+  };
+  let html = '<p class="muted small">All reads are vs the <strong>priced goalie</strong> in each game — the goalie the bundle priced. The page cannot confirm starters beyond the bundle.</p>';
+  html += '<div class="so-h">BIGGEST STANDOUTS TONIGHT</div>';
+  html += standouts.length ? standouts.map((x) => rowHtml(x, false)).join('') : '<p class="muted">No standout reads in this category tonight — nobody with a real price has a zone fit or a soft priced goalie.</p>';
+  if (toughSpots.length) {
+    html += '<div class="so-h tough">TOUGH SPOTS TONIGHT</div>' + toughSpots.map((x) => rowHtml(x, true)).join('');
+  }
+  html += '<p class="so-foot">Goalie numbers are a read — the goalie\'s numbers, not a price. Stacked = the zone-fit read and the model agree. Zone and band numbers come from charted shots in the recent window, so samples are small — the basis line shows them.</p>';
+  body.innerHTML = html;
+  wirePnameClicks(body);
+}
 /* ---------------- last-10 shots vs projection (last10 sidecar) ----------------
    data/last10-<date>.json comes from data-builder/last10.js (build step
    12): per skater, SOG + attempt locations over his last 10 played games.
@@ -3484,7 +3751,7 @@ function openPlayer(pid, gameId) {
     <div class="pc-head hero-card-head" style="--pc-tc:${tc}">
       <img class="headshot" src="${esc(r.headshot)}" alt="" ${imgFallback} style="border-color:${tc};box-shadow:0 0 22px ${tc}">
       <div class="pc-head-main">
-        <h3 class="pc-name">${jnumChip}${esc(r.name)}</h3>
+        <h3 class="pc-name">${jnumChip}${esc(r.name)}${typeBadgeHtml(r.pid)}</h3>
         <div class="pc-teamline"><img class="tlogo" src="${teamLogoUrl(r.team)}" alt="" ${imgFallback}><span>${esc(teamFull)} · ${esc(r.pos)}</span></div>
         ${matchLine ? `<div class="pc-matchline">${esc(matchLine)}</div>` : ''}
       </div>
@@ -3494,6 +3761,7 @@ function openPlayer(pid, gameId) {
       </div>
     </div>
     <div class="pc-status">${lineBadge}${statusPill}</div>
+    ${pcTypeStripHtml(r)}
     ${pcTonightHtml(r, g)}
     ${pcAccSec('lines', "Tonight's lines", linesBody, true)}
     ${pcAccSec('miles', 'Milestones', milesBody, false)}
@@ -3772,6 +4040,7 @@ function renderAll() {
   renderGoals();
   renderBoard();
   renderLongshots();
+  renderStandouts();
   setMarketKind(state.marketKind);
   renderParlay();
   renderHome();
@@ -3963,7 +4232,7 @@ async function refreshScores() {
    so a fresh session sees it expanded again. No burger icon: the sports
    switcher already owns ☰. View switching itself is untouched. */
 let shelfNavFirstVisit = true; // session only
-const SHELF_LABELS = { markets: 'Markets', leaders: 'Leaders', longshots: 'Longshots', parlay: 'Parlay', slate: 'Slate', goals: 'Live', board: 'Board' };
+const SHELF_LABELS = { markets: 'Markets', leaders: 'Leaders', longshots: 'Longshots', parlay: 'Parlay', slate: 'Slate', goals: 'Live', board: 'Board', standouts: 'Standouts', types: 'Types' };
 function shelfSetExpanded(expanded) {
   const stack = $('shelfStack'), bar = $('shelfBar');
   if (!stack || !bar) return;
@@ -3980,7 +4249,7 @@ function shelfSyncNav() {
   if (dot) dot.classList.toggle('on', anyLive);
 }
 const HOME_VIEWS = ['home', 'standings', 'teamlineup', 'playoffodds'];
-const LAB_VIEWS = ['markets', 'leaders', 'longshots', 'parlay', 'slate', 'goals', 'board'];
+const LAB_VIEWS = ['markets', 'leaders', 'longshots', 'parlay', 'slate', 'goals', 'board', 'standouts', 'types'];
 function setView(v) {
   state.view = v;
   // Keep the section in sync with the view
@@ -4001,6 +4270,8 @@ function setView(v) {
   if (v === 'standings') renderStandings();
   if (v === 'teamlineup') renderTeamLineup();
   if (v === 'playoffodds') renderPlayoffOdds();
+  if (v === 'types') renderTypes();
+  if (v === 'standouts') renderStandouts();
   window.scrollTo(0, 0);
 }
 function startAutoRefresh() {
@@ -4134,7 +4405,7 @@ function ciRenderSearch() {
   const skaters = state.skaters || [];
   const pRows = skaters.filter((s) => ciNorm(s.name).includes(q) || ciTeamHay(s.team).includes(q)).slice(0, CI_CAP).map((s) => {
     const b = document.createElement('button'); b.type = 'button'; b.className = 'ci-row';
-    b.innerHTML = '<span>' + esc(s.name) + ' <span class="muted small">' + esc(CI_TEAM_FULL[s.team] || s.team) + '</span></span><span class="pct">' + Math.round(s.p * 100) + '%</span>';
+    b.innerHTML = '<span style="display:flex;align-items:center;gap:.5rem;min-width:0"><img class="pavatar" src="' + esc(s.headshot || headshotUrl(s.team, s.pid)) + '" alt="" ' + imgFallback + '><span>' + esc(s.name) + ' <span class="muted small">' + esc(CI_TEAM_FULL[s.team] || s.team) + '</span></span>' + typeBadgeHtml(s.pid) + '</span><span class="pct">' + Math.round(s.p * 100) + '%</span>';
     b.addEventListener('click', () => { ciGoHome(); openPlayer(s.pid, s.gameId); });
     return b;
   });
@@ -4283,5 +4554,6 @@ startAutoRefresh();
   const dp = $('datePicker');
   if (dp && t >= dp.min && t <= dp.max) dp.value = t;
 })();
+loadTypes();
 boot(false, $('datePicker').value);
 

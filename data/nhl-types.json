@@ -1,0 +1,7031 @@
+{
+ "generatedAt": "2026-11-13T05:24:31Z",
+ "bundleDate": "2026-11-12",
+ "season": "20262027",
+ "floorSog": 20,
+ "letters": {
+  "A": {
+   "name": "Rush creator",
+   "group": "F",
+   "desc": "Scores from everywhere \u2014 a spread diet, driven off the rush."
+  },
+  "B": {
+   "name": "Perimeter shooter",
+   "group": "F",
+   "desc": "Lives in the circles \u2014 beats goalies clean from mid-range."
+  },
+  "C": {
+   "name": "Slot finisher",
+   "group": "F",
+   "desc": "Home-plate diet \u2014 his shots come from the slot, and they convert."
+  },
+  "D": {
+   "name": "Net-front",
+   "group": "F",
+   "desc": "Crease and net-side diet \u2014 tips, rebounds and clean-up goals."
+  },
+  "E": {
+   "name": "Point shooter",
+   "group": "D",
+   "desc": "The offense runs through his point shot from the blue line."
+  },
+  "F": {
+   "name": "Activating defenseman",
+   "group": "D",
+   "desc": "Jumps into the play \u2014 shoots from the circles and slot like a forward."
+  }
+ },
+ "centers": {
+  "A": {
+   "netfront": 0.112,
+   "slot": 0.333,
+   "circles": 0.261,
+   "points": 0.103,
+   "corners": 0.009,
+   "outside": 0.137,
+   "long": 0.046,
+   "hdShare": 0.281,
+   "entropy": 0.81,
+   "slotConv": 0.162
+  },
+  "B": {
+   "netfront": 0.077,
+   "slot": 0.173,
+   "circles": 0.359,
+   "points": 0.144,
+   "corners": 0.016,
+   "outside": 0.209,
+   "long": 0.021,
+   "hdShare": 0.127,
+   "entropy": 0.777,
+   "slotConv": 0.213
+  },
+  "C": {
+   "netfront": 0.091,
+   "slot": 0.529,
+   "circles": 0.202,
+   "points": 0.057,
+   "corners": 0.005,
+   "outside": 0.086,
+   "long": 0.031,
+   "hdShare": 0.454,
+   "entropy": 0.648,
+   "slotConv": 0.171
+  },
+  "D": {
+   "netfront": 0.21,
+   "slot": 0.461,
+   "circles": 0.127,
+   "points": 0.051,
+   "corners": 0.015,
+   "outside": 0.084,
+   "long": 0.052,
+   "hdShare": 0.503,
+   "entropy": 0.713,
+   "slotConv": 0.146
+  },
+  "E": {
+   "netfront": 0.031,
+   "slot": 0.123,
+   "circles": 0.16,
+   "points": 0.544,
+   "corners": 0.004,
+   "outside": 0.09,
+   "long": 0.048,
+   "hdShare": 0.051,
+   "entropy": 0.653,
+   "slotConv": 0.147
+  },
+  "F": {
+   "netfront": 0.057,
+   "slot": 0.196,
+   "circles": 0.23,
+   "points": 0.327,
+   "corners": 0.013,
+   "outside": 0.142,
+   "long": 0.035,
+   "hdShare": 0.082,
+   "entropy": 0.787,
+   "slotConv": 0.126
+  }
+ },
+ "universe": 443,
+ "edgeOk": 429,
+ "typed": 223,
+ "carriedStale": 0,
+ "players": {
+  "8481557": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.31,
+   "lean": null,
+   "sog": 83,
+   "goals": 7,
+   "team": "MIN",
+   "pos": "L",
+   "name": "Matt Boldy",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/MIN/8481557.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.289
+    },
+    {
+     "area": "circles",
+     "share": 0.229
+    }
+   ],
+   "diet": {
+    "netfront": 0.169,
+    "slot": 0.289,
+    "circles": 0.229,
+    "points": 0.096,
+    "corners": 0.012,
+    "outside": 0.108,
+    "long": 0.096
+   }
+  },
+  "8481553": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.07,
+   "lean": "B",
+   "sog": 33,
+   "goals": 2,
+   "team": "MIN",
+   "pos": "R",
+   "name": "Bobby Brink",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/MIN/8481553.png",
+   "topAreas": [
+    {
+     "area": "circles",
+     "share": 0.364
+    },
+    {
+     "area": "slot",
+     "share": 0.273
+    }
+   ],
+   "diet": {
+    "netfront": 0.091,
+    "slot": 0.273,
+    "circles": 0.364,
+    "points": 0.091,
+    "corners": 0.0,
+    "outside": 0.182,
+    "long": 0.0
+   }
+  },
+  "8476399": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.04,
+   "lean": "C",
+   "sog": 40,
+   "goals": 5,
+   "team": "MIN",
+   "pos": "L",
+   "name": "Blake Coleman",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/MIN/8476399.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.425
+    },
+    {
+     "area": "circles",
+     "share": 0.2
+    }
+   ],
+   "diet": {
+    "netfront": 0.125,
+    "slot": 0.425,
+    "circles": 0.2,
+    "points": 0.075,
+    "corners": 0.0,
+    "outside": 0.05,
+    "long": 0.125
+   }
+  },
+  "8478493": {
+   "letter": "D",
+   "type": "Net-front",
+   "fit": 0.25,
+   "lean": null,
+   "sog": 64,
+   "goals": 6,
+   "team": "MIN",
+   "pos": "C",
+   "name": "Joel Eriksson Ek",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/MIN/8478493.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.5
+    },
+    {
+     "area": "netfront",
+     "share": 0.188
+    }
+   ],
+   "diet": {
+    "netfront": 0.188,
+    "slot": 0.5,
+    "circles": 0.094,
+    "points": 0.125,
+    "corners": 0.0,
+    "outside": 0.078,
+    "long": 0.016
+   }
+  },
+  "8477451": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.22,
+   "lean": null,
+   "sog": 23,
+   "goals": 1,
+   "team": "MIN",
+   "pos": "R",
+   "name": "Ryan Hartman",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/MIN/8477451.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.348
+    },
+    {
+     "area": "circles",
+     "share": 0.261
+    }
+   ],
+   "diet": {
+    "netfront": 0.13,
+    "slot": 0.348,
+    "circles": 0.261,
+    "points": 0.0,
+    "corners": 0.0,
+    "outside": 0.13,
+    "long": 0.13
+   }
+  },
+  "8478864": {
+   "letter": "D",
+   "type": "Net-front",
+   "fit": 0.07,
+   "lean": "A",
+   "sog": 62,
+   "goals": 17,
+   "team": "MIN",
+   "pos": "L",
+   "name": "Kirill Kaprizov",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/MIN/8478864.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.403
+    },
+    {
+     "area": "netfront",
+     "share": 0.177
+    }
+   ],
+   "diet": {
+    "netfront": 0.177,
+    "slot": 0.403,
+    "circles": 0.161,
+    "points": 0.081,
+    "corners": 0.0,
+    "outside": 0.129,
+    "long": 0.048
+   }
+  },
+  "8477446": {
+   "letter": "D",
+   "type": "Net-front",
+   "fit": 0.07,
+   "lean": "A",
+   "sog": 34,
+   "goals": 3,
+   "team": "MIN",
+   "pos": "C",
+   "name": "Michael McCarron",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/MIN/8477446.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.294
+    },
+    {
+     "area": "netfront",
+     "share": 0.235
+    }
+   ],
+   "diet": {
+    "netfront": 0.235,
+    "slot": 0.294,
+    "circles": 0.059,
+    "points": 0.118,
+    "corners": 0.029,
+    "outside": 0.176,
+    "long": 0.088
+   }
+  },
+  "8485702": {
+   "letter": "D",
+   "type": "Net-front",
+   "fit": 0.09,
+   "lean": "C",
+   "sog": 29,
+   "goals": 8,
+   "team": "MIN",
+   "pos": "R",
+   "name": "Maxim Shabanov",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/MIN/8485702.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.448
+    },
+    {
+     "area": "netfront",
+     "share": 0.172
+    }
+   ],
+   "diet": {
+    "netfront": 0.172,
+    "slot": 0.448,
+    "circles": 0.172,
+    "points": 0.069,
+    "corners": 0.0,
+    "outside": 0.103,
+    "long": 0.034
+   }
+  },
+  "8478508": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.21,
+   "lean": null,
+   "sog": 20,
+   "goals": 0,
+   "team": "MIN",
+   "pos": "C",
+   "name": "Yakov Trenin",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/MIN/8478508.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.6
+    },
+    {
+     "area": "netfront",
+     "share": 0.1
+    }
+   ],
+   "diet": {
+    "netfront": 0.1,
+    "slot": 0.6,
+    "circles": 0.1,
+    "points": 0.05,
+    "corners": 0.0,
+    "outside": 0.1,
+    "long": 0.05
+   }
+  },
+  "8483525": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.06,
+   "lean": "D",
+   "sog": 28,
+   "goals": 6,
+   "team": "MIN",
+   "pos": "R",
+   "name": "Danila Yurov",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/MIN/8483525.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.321
+    },
+    {
+     "area": "netfront",
+     "share": 0.179
+    }
+   ],
+   "diet": {
+    "netfront": 0.179,
+    "slot": 0.321,
+    "circles": 0.179,
+    "points": 0.0,
+    "corners": 0.036,
+    "outside": 0.179,
+    "long": 0.107
+   }
+  },
+  "8476927": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.06,
+   "lean": "A",
+   "sog": 23,
+   "goals": 2,
+   "team": "TOR",
+   "pos": "C",
+   "name": "Teddy Blueger",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/TOR/8476927.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.478
+    },
+    {
+     "area": "points",
+     "share": 0.217
+    }
+   ],
+   "diet": {
+    "netfront": 0.0,
+    "slot": 0.478,
+    "circles": 0.13,
+    "points": 0.217,
+    "corners": 0.0,
+    "outside": 0.087,
+    "long": 0.087
+   }
+  },
+  "8484158": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.2,
+   "lean": null,
+   "sog": 41,
+   "goals": 7,
+   "team": "TOR",
+   "pos": "R",
+   "name": "Easton Cowan",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/TOR/8484158.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.39
+    },
+    {
+     "area": "circles",
+     "share": 0.341
+    }
+   ],
+   "diet": {
+    "netfront": 0.073,
+    "slot": 0.39,
+    "circles": 0.341,
+    "points": 0.049,
+    "corners": 0.0,
+    "outside": 0.098,
+    "long": 0.049
+   }
+  },
+  "8480893": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.15,
+   "lean": null,
+   "sog": 35,
+   "goals": 6,
+   "team": "TOR",
+   "pos": "R",
+   "name": "Kirill Marchenko",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/TOR/8480893.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.543
+    },
+    {
+     "area": "circles",
+     "share": 0.371
+    }
+   ],
+   "diet": {
+    "netfront": 0.029,
+    "slot": 0.543,
+    "circles": 0.371,
+    "points": 0.0,
+    "corners": 0.0,
+    "outside": 0.057,
+    "long": 0.0
+   }
+  },
+  "8479318": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.54,
+   "lean": null,
+   "sog": 62,
+   "goals": 11,
+   "team": "TOR",
+   "pos": "C",
+   "name": "Auston Matthews",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/TOR/8479318.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.548
+    },
+    {
+     "area": "circles",
+     "share": 0.194
+    }
+   ],
+   "diet": {
+    "netfront": 0.113,
+    "slot": 0.548,
+    "circles": 0.194,
+    "points": 0.032,
+    "corners": 0.0,
+    "outside": 0.097,
+    "long": 0.016
+   }
+  },
+  "8486067": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.23,
+   "lean": null,
+   "sog": 36,
+   "goals": 6,
+   "team": "TOR",
+   "pos": "L",
+   "name": "Gavin McKenna",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/TOR/8486067.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.361
+    },
+    {
+     "area": "circles",
+     "share": 0.306
+    }
+   ],
+   "diet": {
+    "netfront": 0.139,
+    "slot": 0.361,
+    "circles": 0.306,
+    "points": 0.028,
+    "corners": 0.0,
+    "outside": 0.139,
+    "long": 0.028
+   }
+  },
+  "8477939": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.22,
+   "lean": null,
+   "sog": 56,
+   "goals": 11,
+   "team": "TOR",
+   "pos": "R",
+   "name": "William Nylander",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/TOR/8477939.png",
+   "topAreas": [
+    {
+     "area": "circles",
+     "share": 0.375
+    },
+    {
+     "area": "slot",
+     "share": 0.357
+    }
+   ],
+   "diet": {
+    "netfront": 0.107,
+    "slot": 0.357,
+    "circles": 0.375,
+    "points": 0.089,
+    "corners": 0.0,
+    "outside": 0.036,
+    "long": 0.036
+   }
+  },
+  "8477426": {
+   "letter": "D",
+   "type": "Net-front",
+   "fit": 0.23,
+   "lean": null,
+   "sog": 21,
+   "goals": 2,
+   "team": "TOR",
+   "pos": "L",
+   "name": "Nick Paul",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/TOR/8477426.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.619
+    },
+    {
+     "area": "netfront",
+     "share": 0.238
+    }
+   ],
+   "diet": {
+    "netfront": 0.238,
+    "slot": 0.619,
+    "circles": 0.048,
+    "points": 0.048,
+    "corners": 0.0,
+    "outside": 0.048,
+    "long": 0.0
+   }
+  },
+  "8478458": {
+   "letter": "D",
+   "type": "Net-front",
+   "fit": 0.09,
+   "lean": "A",
+   "sog": 51,
+   "goals": 9,
+   "team": "TOR",
+   "pos": "C",
+   "name": "Jack Roslovic",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/TOR/8478458.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.373
+    },
+    {
+     "area": "circles",
+     "share": 0.196
+    }
+   ],
+   "diet": {
+    "netfront": 0.176,
+    "slot": 0.373,
+    "circles": 0.196,
+    "points": 0.059,
+    "corners": 0.0,
+    "outside": 0.157,
+    "long": 0.039
+   }
+  },
+  "8475166": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.17,
+   "lean": null,
+   "sog": 22,
+   "goals": 2,
+   "team": "TOR",
+   "pos": "C",
+   "name": "John Tavares",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/TOR/8475166.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.727
+    },
+    {
+     "area": "circles",
+     "share": 0.136
+    }
+   ],
+   "diet": {
+    "netfront": 0.045,
+    "slot": 0.727,
+    "circles": 0.136,
+    "points": 0.045,
+    "corners": 0.0,
+    "outside": 0.045,
+    "long": 0.0
+   }
+  },
+  "8486171": {
+   "letter": "D",
+   "type": "Net-front",
+   "fit": 0.3,
+   "lean": null,
+   "sog": 46,
+   "goals": 2,
+   "team": "COL",
+   "pos": "R",
+   "name": "T.J. Hughes",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/COL/8486171.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.522
+    },
+    {
+     "area": "netfront",
+     "share": 0.196
+    }
+   ],
+   "diet": {
+    "netfront": 0.196,
+    "slot": 0.522,
+    "circles": 0.065,
+    "points": 0.087,
+    "corners": 0.0,
+    "outside": 0.087,
+    "long": 0.043
+   }
+  },
+  "8475172": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.29,
+   "lean": null,
+   "sog": 51,
+   "goals": 5,
+   "team": "COL",
+   "pos": "C",
+   "name": "Nazem Kadri",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/COL/8475172.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.51
+    },
+    {
+     "area": "circles",
+     "share": 0.255
+    }
+   ],
+   "diet": {
+    "netfront": 0.059,
+    "slot": 0.51,
+    "circles": 0.255,
+    "points": 0.078,
+    "corners": 0.0,
+    "outside": 0.098,
+    "long": 0.0
+   }
+  },
+  "8480448": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.05,
+   "lean": "B",
+   "sog": 21,
+   "goals": 3,
+   "team": "COL",
+   "pos": "C",
+   "name": "Parker Kelly",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/COL/8480448.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.333
+    },
+    {
+     "area": "circles",
+     "share": 0.333
+    }
+   ],
+   "diet": {
+    "netfront": 0.0,
+    "slot": 0.333,
+    "circles": 0.333,
+    "points": 0.095,
+    "corners": 0.0,
+    "outside": 0.048,
+    "long": 0.19
+   }
+  },
+  "8476455": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.26,
+   "lean": null,
+   "sog": 27,
+   "goals": 7,
+   "team": "COL",
+   "pos": "L",
+   "name": "Gabriel Landeskog",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/COL/8476455.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.556
+    },
+    {
+     "area": "circles",
+     "share": 0.148
+    }
+   ],
+   "diet": {
+    "netfront": 0.111,
+    "slot": 0.556,
+    "circles": 0.148,
+    "points": 0.037,
+    "corners": 0.0,
+    "outside": 0.148,
+    "long": 0.0
+   }
+  },
+  "8477476": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.22,
+   "lean": null,
+   "sog": 42,
+   "goals": 13,
+   "team": "COL",
+   "pos": "L",
+   "name": "Artturi Lehkonen",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/COL/8477476.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.69
+    },
+    {
+     "area": "circles",
+     "share": 0.214
+    }
+   ],
+   "diet": {
+    "netfront": 0.071,
+    "slot": 0.69,
+    "circles": 0.214,
+    "points": 0.0,
+    "corners": 0.0,
+    "outside": 0.024,
+    "long": 0.0
+   }
+  },
+  "8477492": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.28,
+   "lean": null,
+   "sog": 69,
+   "goals": 10,
+   "team": "COL",
+   "pos": "C",
+   "name": "Nathan MacKinnon",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/COL/8477492.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.29
+    },
+    {
+     "area": "circles",
+     "share": 0.275
+    }
+   ],
+   "diet": {
+    "netfront": 0.101,
+    "slot": 0.29,
+    "circles": 0.275,
+    "points": 0.13,
+    "corners": 0.0,
+    "outside": 0.188,
+    "long": 0.014
+   }
+  },
+  "8480039": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.16,
+   "lean": null,
+   "sog": 40,
+   "goals": 10,
+   "team": "COL",
+   "pos": "C",
+   "name": "Martin Necas",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/COL/8480039.png",
+   "topAreas": [
+    {
+     "area": "circles",
+     "share": 0.35
+    },
+    {
+     "area": "slot",
+     "share": 0.3
+    }
+   ],
+   "diet": {
+    "netfront": 0.1,
+    "slot": 0.3,
+    "circles": 0.35,
+    "points": 0.075,
+    "corners": 0.0,
+    "outside": 0.15,
+    "long": 0.025
+   }
+  },
+  "8475754": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.08,
+   "lean": "A",
+   "sog": 32,
+   "goals": 5,
+   "team": "COL",
+   "pos": "C",
+   "name": "Brock Nelson",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/COL/8475754.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.469
+    },
+    {
+     "area": "circles",
+     "share": 0.281
+    }
+   ],
+   "diet": {
+    "netfront": 0.125,
+    "slot": 0.469,
+    "circles": 0.281,
+    "points": 0.031,
+    "corners": 0.0,
+    "outside": 0.094,
+    "long": 0.0
+   }
+  },
+  "8475768": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.42,
+   "lean": null,
+   "sog": 32,
+   "goals": 7,
+   "team": "COL",
+   "pos": "L",
+   "name": "Jaden Schwartz",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/COL/8475768.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.594
+    },
+    {
+     "area": "circles",
+     "share": 0.156
+    }
+   ],
+   "diet": {
+    "netfront": 0.031,
+    "slot": 0.594,
+    "circles": 0.156,
+    "points": 0.062,
+    "corners": 0.0,
+    "outside": 0.125,
+    "long": 0.031
+   }
+  },
+  "8476981": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.03,
+   "lean": "A",
+   "sog": 33,
+   "goals": 7,
+   "team": "MTL",
+   "pos": "R",
+   "name": "Josh Anderson",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/MTL/8476981.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.424
+    },
+    {
+     "area": "circles",
+     "share": 0.273
+    }
+   ],
+   "diet": {
+    "netfront": 0.091,
+    "slot": 0.424,
+    "circles": 0.273,
+    "points": 0.03,
+    "corners": 0.0,
+    "outside": 0.091,
+    "long": 0.091
+   }
+  },
+  "8482737": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.12,
+   "lean": null,
+   "sog": 30,
+   "goals": 6,
+   "team": "MTL",
+   "pos": "R",
+   "name": "Zachary Bolduc",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/MTL/8482737.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.467
+    },
+    {
+     "area": "circles",
+     "share": 0.167
+    }
+   ],
+   "diet": {
+    "netfront": 0.133,
+    "slot": 0.467,
+    "circles": 0.167,
+    "points": 0.033,
+    "corners": 0.0,
+    "outside": 0.133,
+    "long": 0.067
+   }
+  },
+  "8481540": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.1,
+   "lean": "D",
+   "sog": 59,
+   "goals": 11,
+   "team": "MTL",
+   "pos": "R",
+   "name": "Cole Caufield",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/MTL/8481540.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.271
+    },
+    {
+     "area": "netfront",
+     "share": 0.254
+    }
+   ],
+   "diet": {
+    "netfront": 0.254,
+    "slot": 0.271,
+    "circles": 0.254,
+    "points": 0.051,
+    "corners": 0.017,
+    "outside": 0.136,
+    "long": 0.017
+   }
+  },
+  "8476479": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.17,
+   "lean": null,
+   "sog": 23,
+   "goals": 1,
+   "team": "MTL",
+   "pos": "C",
+   "name": "Phillip Danault",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/MTL/8476479.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.478
+    },
+    {
+     "area": "circles",
+     "share": 0.174
+    }
+   ],
+   "diet": {
+    "netfront": 0.13,
+    "slot": 0.478,
+    "circles": 0.174,
+    "points": 0.087,
+    "corners": 0.0,
+    "outside": 0.087,
+    "long": 0.043
+   }
+  },
+  "8475184": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.1,
+   "lean": "D",
+   "sog": 21,
+   "goals": 3,
+   "team": "MTL",
+   "pos": "L",
+   "name": "Chris Kreider",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/MTL/8475184.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.429
+    },
+    {
+     "area": "circles",
+     "share": 0.238
+    }
+   ],
+   "diet": {
+    "netfront": 0.143,
+    "slot": 0.429,
+    "circles": 0.238,
+    "points": 0.048,
+    "corners": 0.0,
+    "outside": 0.095,
+    "long": 0.048
+   }
+  },
+  "8483515": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.17,
+   "lean": null,
+   "sog": 42,
+   "goals": 2,
+   "team": "MTL",
+   "pos": "L",
+   "name": "Juraj Slafkovsk\u00fd",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/MTL/8483515.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.238
+    },
+    {
+     "area": "netfront",
+     "share": 0.214
+    }
+   ],
+   "diet": {
+    "netfront": 0.214,
+    "slot": 0.238,
+    "circles": 0.214,
+    "points": 0.071,
+    "corners": 0.0,
+    "outside": 0.214,
+    "long": 0.048
+   }
+  },
+  "8480018": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.35,
+   "lean": null,
+   "sog": 34,
+   "goals": 7,
+   "team": "MTL",
+   "pos": "C",
+   "name": "Nick Suzuki",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/MTL/8480018.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.353
+    },
+    {
+     "area": "circles",
+     "share": 0.206
+    }
+   ],
+   "diet": {
+    "netfront": 0.088,
+    "slot": 0.353,
+    "circles": 0.206,
+    "points": 0.088,
+    "corners": 0.029,
+    "outside": 0.206,
+    "long": 0.029
+   }
+  },
+  "8480074": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.11,
+   "lean": null,
+   "sog": 29,
+   "goals": 2,
+   "team": "MTL",
+   "pos": "L",
+   "name": "Alexandre Texier",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/MTL/8480074.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.345
+    },
+    {
+     "area": "circles",
+     "share": 0.241
+    }
+   ],
+   "diet": {
+    "netfront": 0.172,
+    "slot": 0.345,
+    "circles": 0.241,
+    "points": 0.172,
+    "corners": 0.0,
+    "outside": 0.034,
+    "long": 0.034
+   }
+  },
+  "8478020": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.02,
+   "lean": "D",
+   "sog": 24,
+   "goals": 6,
+   "team": "OTT",
+   "pos": "R",
+   "name": "Michael Amadio",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/OTT/8478020.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.625
+    },
+    {
+     "area": "netfront",
+     "share": 0.167
+    }
+   ],
+   "diet": {
+    "netfront": 0.167,
+    "slot": 0.625,
+    "circles": 0.167,
+    "points": 0.0,
+    "corners": 0.0,
+    "outside": 0.0,
+    "long": 0.042
+   }
+  },
+  "8480208": {
+   "letter": "D",
+   "type": "Net-front",
+   "fit": 0.17,
+   "lean": null,
+   "sog": 41,
+   "goals": 9,
+   "team": "OTT",
+   "pos": "R",
+   "name": "Drake Batherson",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/OTT/8480208.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.39
+    },
+    {
+     "area": "netfront",
+     "share": 0.22
+    }
+   ],
+   "diet": {
+    "netfront": 0.22,
+    "slot": 0.39,
+    "circles": 0.171,
+    "points": 0.024,
+    "corners": 0.024,
+    "outside": 0.122,
+    "long": 0.049
+   }
+  },
+  "8481528": {
+   "letter": "D",
+   "type": "Net-front",
+   "fit": 0.35,
+   "lean": null,
+   "sog": 40,
+   "goals": 4,
+   "team": "OTT",
+   "pos": "C",
+   "name": "Dylan Cozens",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/OTT/8481528.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.4
+    },
+    {
+     "area": "netfront",
+     "share": 0.275
+    }
+   ],
+   "diet": {
+    "netfront": 0.275,
+    "slot": 0.4,
+    "circles": 0.15,
+    "points": 0.075,
+    "corners": 0.0,
+    "outside": 0.075,
+    "long": 0.025
+   }
+  },
+  "8473512": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.1,
+   "lean": "F",
+   "sog": 28,
+   "goals": 3,
+   "team": "OTT",
+   "pos": "R",
+   "name": "Claude Giroux",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/OTT/8473512.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.393
+    },
+    {
+     "area": "points",
+     "share": 0.214
+    }
+   ],
+   "diet": {
+    "netfront": 0.036,
+    "slot": 0.393,
+    "circles": 0.179,
+    "points": 0.214,
+    "corners": 0.0,
+    "outside": 0.107,
+    "long": 0.071
+   }
+  },
+  "8482092": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.04,
+   "lean": "D",
+   "sog": 21,
+   "goals": 3,
+   "team": "OTT",
+   "pos": "C",
+   "name": "Ridly Greig",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/OTT/8482092.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.476
+    },
+    {
+     "area": "netfront",
+     "share": 0.143
+    }
+   ],
+   "diet": {
+    "netfront": 0.143,
+    "slot": 0.476,
+    "circles": 0.143,
+    "points": 0.095,
+    "corners": 0.0,
+    "outside": 0.143,
+    "long": 0.0
+   }
+  },
+  "8483676": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.3,
+   "lean": null,
+   "sog": 27,
+   "goals": 3,
+   "team": "OTT",
+   "pos": "C",
+   "name": "Stephen Halliday",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/OTT/8483676.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.593
+    },
+    {
+     "area": "circles",
+     "share": 0.148
+    }
+   ],
+   "diet": {
+    "netfront": 0.111,
+    "slot": 0.593,
+    "circles": 0.148,
+    "points": 0.074,
+    "corners": 0.0,
+    "outside": 0.074,
+    "long": 0.0
+   }
+  },
+  "8481596": {
+   "letter": "D",
+   "type": "Net-front",
+   "fit": 0.18,
+   "lean": null,
+   "sog": 36,
+   "goals": 7,
+   "team": "OTT",
+   "pos": "C",
+   "name": "Shane Pinto",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/OTT/8481596.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.528
+    },
+    {
+     "area": "netfront",
+     "share": 0.194
+    }
+   ],
+   "diet": {
+    "netfront": 0.194,
+    "slot": 0.528,
+    "circles": 0.139,
+    "points": 0.056,
+    "corners": 0.0,
+    "outside": 0.028,
+    "long": 0.056
+   }
+  },
+  "8482116": {
+   "letter": "D",
+   "type": "Net-front",
+   "fit": 0.07,
+   "lean": "A",
+   "sog": 43,
+   "goals": 9,
+   "team": "OTT",
+   "pos": "C",
+   "name": "Tim St\u00fctzle",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/OTT/8482116.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.395
+    },
+    {
+     "area": "netfront",
+     "share": 0.233
+    }
+   ],
+   "diet": {
+    "netfront": 0.233,
+    "slot": 0.395,
+    "circles": 0.163,
+    "points": 0.07,
+    "corners": 0.0,
+    "outside": 0.116,
+    "long": 0.023
+   }
+  },
+  "8480188": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.35,
+   "lean": null,
+   "sog": 39,
+   "goals": 2,
+   "team": "OTT",
+   "pos": "L",
+   "name": "Fabian Zetterlund",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/OTT/8480188.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.282
+    },
+    {
+     "area": "circles",
+     "share": 0.282
+    }
+   ],
+   "diet": {
+    "netfront": 0.179,
+    "slot": 0.282,
+    "circles": 0.282,
+    "points": 0.077,
+    "corners": 0.0,
+    "outside": 0.128,
+    "long": 0.051
+   }
+  },
+  "8479987": {
+   "letter": "B",
+   "type": "Perimeter shooter",
+   "fit": 0.05,
+   "lean": "A",
+   "sog": 29,
+   "goals": 5,
+   "team": "BOS",
+   "pos": "C",
+   "name": "Morgan Geekie",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/BOS/8479987.png",
+   "topAreas": [
+    {
+     "area": "circles",
+     "share": 0.448
+    },
+    {
+     "area": "slot",
+     "share": 0.31
+    }
+   ],
+   "diet": {
+    "netfront": 0.0,
+    "slot": 0.31,
+    "circles": 0.448,
+    "points": 0.034,
+    "corners": 0.0,
+    "outside": 0.207,
+    "long": 0.0
+   }
+  },
+  "8485395": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.16,
+   "lean": null,
+   "sog": 34,
+   "goals": 6,
+   "team": "BOS",
+   "pos": "C",
+   "name": "James Hagens",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/BOS/8485395.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.412
+    },
+    {
+     "area": "circles",
+     "share": 0.206
+    }
+   ],
+   "diet": {
+    "netfront": 0.147,
+    "slot": 0.412,
+    "circles": 0.206,
+    "points": 0.088,
+    "corners": 0.029,
+    "outside": 0.088,
+    "long": 0.029
+   }
+  },
+  "8480355": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.11,
+   "lean": null,
+   "sog": 22,
+   "goals": 3,
+   "team": "BOS",
+   "pos": "C",
+   "name": "Mark Kastelic",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/BOS/8480355.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.364
+    },
+    {
+     "area": "outside",
+     "share": 0.273
+    }
+   ],
+   "diet": {
+    "netfront": 0.091,
+    "slot": 0.364,
+    "circles": 0.182,
+    "points": 0.045,
+    "corners": 0.0,
+    "outside": 0.273,
+    "long": 0.045
+   }
+  },
+  "8477496": {
+   "letter": "D",
+   "type": "Net-front",
+   "fit": 0.31,
+   "lean": null,
+   "sog": 33,
+   "goals": 7,
+   "team": "BOS",
+   "pos": "C",
+   "name": "Elias Lindholm",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/BOS/8477496.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.455
+    },
+    {
+     "area": "netfront",
+     "share": 0.182
+    }
+   ],
+   "diet": {
+    "netfront": 0.182,
+    "slot": 0.455,
+    "circles": 0.061,
+    "points": 0.091,
+    "corners": 0.0,
+    "outside": 0.121,
+    "long": 0.091
+   }
+  },
+  "8483489": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.11,
+   "lean": null,
+   "sog": 35,
+   "goals": 6,
+   "team": "BOS",
+   "pos": "C",
+   "name": "Fraser Minten",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/BOS/8483489.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.457
+    },
+    {
+     "area": "circles",
+     "share": 0.2
+    }
+   ],
+   "diet": {
+    "netfront": 0.114,
+    "slot": 0.457,
+    "circles": 0.2,
+    "points": 0.114,
+    "corners": 0.0,
+    "outside": 0.057,
+    "long": 0.057
+   }
+  },
+  "8479999": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.05,
+   "lean": "A",
+   "sog": 25,
+   "goals": 5,
+   "team": "BOS",
+   "pos": "C",
+   "name": "Casey Mittelstadt",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/BOS/8479999.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.44
+    },
+    {
+     "area": "circles",
+     "share": 0.28
+    }
+   ],
+   "diet": {
+    "netfront": 0.12,
+    "slot": 0.44,
+    "circles": 0.28,
+    "points": 0.0,
+    "corners": 0.0,
+    "outside": 0.08,
+    "long": 0.08
+   }
+  },
+  "8477956": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.17,
+   "lean": null,
+   "sog": 64,
+   "goals": 8,
+   "team": "BOS",
+   "pos": "R",
+   "name": "David Pastrnak",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/BOS/8477956.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.328
+    },
+    {
+     "area": "circles",
+     "share": 0.312
+    }
+   ],
+   "diet": {
+    "netfront": 0.109,
+    "slot": 0.328,
+    "circles": 0.312,
+    "points": 0.188,
+    "corners": 0.0,
+    "outside": 0.062,
+    "long": 0.0
+   }
+  },
+  "8482175": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.0,
+   "lean": "A",
+   "sog": 38,
+   "goals": 5,
+   "team": "BOS",
+   "pos": "R",
+   "name": "JJ Peterka",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/BOS/8482175.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.421
+    },
+    {
+     "area": "circles",
+     "share": 0.263
+    }
+   ],
+   "diet": {
+    "netfront": 0.105,
+    "slot": 0.421,
+    "circles": 0.263,
+    "points": 0.053,
+    "corners": 0.0,
+    "outside": 0.132,
+    "long": 0.026
+   }
+  },
+  "8478401": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.3,
+   "lean": null,
+   "sog": 28,
+   "goals": 5,
+   "team": "BOS",
+   "pos": "C",
+   "name": "Pavel Zacha",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/BOS/8478401.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.571
+    },
+    {
+     "area": "circles",
+     "share": 0.25
+    }
+   ],
+   "diet": {
+    "netfront": 0.0,
+    "slot": 0.571,
+    "circles": 0.25,
+    "points": 0.071,
+    "corners": 0.0,
+    "outside": 0.071,
+    "long": 0.036
+   }
+  },
+  "8478519": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.04,
+   "lean": "D",
+   "sog": 28,
+   "goals": 5,
+   "team": "TBL",
+   "pos": "C",
+   "name": "Anthony Cirelli",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/TBL/8478519.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.536
+    },
+    {
+     "area": "netfront",
+     "share": 0.143
+    }
+   ],
+   "diet": {
+    "netfront": 0.143,
+    "slot": 0.536,
+    "circles": 0.107,
+    "points": 0.071,
+    "corners": 0.0,
+    "outside": 0.143,
+    "long": 0.0
+   }
+  },
+  "8483447": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.18,
+   "lean": null,
+   "sog": 24,
+   "goals": 4,
+   "team": "TBL",
+   "pos": "C",
+   "name": "Conor Geekie",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/TBL/8483447.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.5
+    },
+    {
+     "area": "circles",
+     "share": 0.333
+    }
+   ],
+   "diet": {
+    "netfront": 0.0,
+    "slot": 0.5,
+    "circles": 0.333,
+    "points": 0.083,
+    "corners": 0.0,
+    "outside": 0.083,
+    "long": 0.0
+   }
+  },
+  "8476878": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.08,
+   "lean": "D",
+   "sog": 22,
+   "goals": 1,
+   "team": "TBL",
+   "pos": "C",
+   "name": "Zemgus Girgensons",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/TBL/8476878.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.409
+    },
+    {
+     "area": "netfront",
+     "share": 0.182
+    }
+   ],
+   "diet": {
+    "netfront": 0.182,
+    "slot": 0.409,
+    "circles": 0.136,
+    "points": 0.136,
+    "corners": 0.0,
+    "outside": 0.136,
+    "long": 0.0
+   }
+  },
+  "8477404": {
+   "letter": "D",
+   "type": "Net-front",
+   "fit": 0.31,
+   "lean": null,
+   "sog": 48,
+   "goals": 10,
+   "team": "TBL",
+   "pos": "C",
+   "name": "Jake Guentzel",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/TBL/8477404.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.396
+    },
+    {
+     "area": "netfront",
+     "share": 0.25
+    }
+   ],
+   "diet": {
+    "netfront": 0.25,
+    "slot": 0.396,
+    "circles": 0.229,
+    "points": 0.042,
+    "corners": 0.0,
+    "outside": 0.042,
+    "long": 0.042
+   }
+  },
+  "8479542": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.28,
+   "lean": null,
+   "sog": 70,
+   "goals": 11,
+   "team": "TBL",
+   "pos": "L",
+   "name": "Brandon Hagel",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/TBL/8479542.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.529
+    },
+    {
+     "area": "circles",
+     "share": 0.157
+    }
+   ],
+   "diet": {
+    "netfront": 0.114,
+    "slot": 0.529,
+    "circles": 0.157,
+    "points": 0.1,
+    "corners": 0.0,
+    "outside": 0.029,
+    "long": 0.071
+   }
+  },
+  "8480995": {
+   "letter": "D",
+   "type": "Net-front",
+   "fit": 0.27,
+   "lean": null,
+   "sog": 32,
+   "goals": 6,
+   "team": "TBL",
+   "pos": "R",
+   "name": "Pontus Holmberg",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/TBL/8480995.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.406
+    },
+    {
+     "area": "netfront",
+     "share": 0.188
+    }
+   ],
+   "diet": {
+    "netfront": 0.188,
+    "slot": 0.406,
+    "circles": 0.125,
+    "points": 0.0,
+    "corners": 0.0,
+    "outside": 0.188,
+    "long": 0.094
+   }
+  },
+  "8476453": {
+   "letter": "B",
+   "type": "Perimeter shooter",
+   "fit": 0.4,
+   "lean": null,
+   "sog": 56,
+   "goals": 8,
+   "team": "TBL",
+   "pos": "R",
+   "name": "Nikita Kucherov",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/TBL/8476453.png",
+   "topAreas": [
+    {
+     "area": "circles",
+     "share": 0.339
+    },
+    {
+     "area": "outside",
+     "share": 0.25
+    }
+   ],
+   "diet": {
+    "netfront": 0.107,
+    "slot": 0.107,
+    "circles": 0.339,
+    "points": 0.179,
+    "corners": 0.018,
+    "outside": 0.25,
+    "long": 0.0
+   }
+  },
+  "8481624": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.0,
+   "lean": "F",
+   "sog": 23,
+   "goals": 4,
+   "team": "TBL",
+   "pos": "R",
+   "name": "Ilya Mikheyev",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/TBL/8481624.png",
+   "topAreas": [
+    {
+     "area": "points",
+     "share": 0.304
+    },
+    {
+     "area": "slot",
+     "share": 0.261
+    }
+   ],
+   "diet": {
+    "netfront": 0.13,
+    "slot": 0.261,
+    "circles": 0.174,
+    "points": 0.304,
+    "corners": 0.0,
+    "outside": 0.087,
+    "long": 0.043
+   }
+  },
+  "8478010": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.29,
+   "lean": null,
+   "sog": 36,
+   "goals": 5,
+   "team": "TBL",
+   "pos": "C",
+   "name": "Brayden Point",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/TBL/8478010.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.528
+    },
+    {
+     "area": "circles",
+     "share": 0.306
+    }
+   ],
+   "diet": {
+    "netfront": 0.056,
+    "slot": 0.528,
+    "circles": 0.306,
+    "points": 0.083,
+    "corners": 0.0,
+    "outside": 0.028,
+    "long": 0.0
+   }
+  },
+  "8480003": {
+   "letter": "D",
+   "type": "Net-front",
+   "fit": 0.27,
+   "lean": null,
+   "sog": 22,
+   "goals": 5,
+   "team": "NJD",
+   "pos": "C",
+   "name": "Jesper Boqvist",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/NJD/8480003.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.455
+    },
+    {
+     "area": "netfront",
+     "share": 0.273
+    }
+   ],
+   "diet": {
+    "netfront": 0.273,
+    "slot": 0.455,
+    "circles": 0.182,
+    "points": 0.0,
+    "corners": 0.0,
+    "outside": 0.045,
+    "long": 0.045
+   }
+  },
+  "8479407": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.22,
+   "lean": null,
+   "sog": 44,
+   "goals": 4,
+   "team": "NJD",
+   "pos": "L",
+   "name": "Jesper Bratt",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/NJD/8479407.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.341
+    },
+    {
+     "area": "netfront",
+     "share": 0.182
+    }
+   ],
+   "diet": {
+    "netfront": 0.182,
+    "slot": 0.341,
+    "circles": 0.182,
+    "points": 0.114,
+    "corners": 0.0,
+    "outside": 0.182,
+    "long": 0.0
+   }
+  },
+  "8482146": {
+   "letter": "D",
+   "type": "Net-front",
+   "fit": 0.11,
+   "lean": null,
+   "sog": 45,
+   "goals": 4,
+   "team": "NJD",
+   "pos": "R",
+   "name": "Luke Evangelista",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/NJD/8482146.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.489
+    },
+    {
+     "area": "netfront",
+     "share": 0.156
+    }
+   ],
+   "diet": {
+    "netfront": 0.156,
+    "slot": 0.489,
+    "circles": 0.133,
+    "points": 0.067,
+    "corners": 0.0,
+    "outside": 0.156,
+    "long": 0.0
+   }
+  },
+  "8479996": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.27,
+   "lean": null,
+   "sog": 25,
+   "goals": 2,
+   "team": "NJD",
+   "pos": "C",
+   "name": "Cody Glass",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/NJD/8479996.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.56
+    },
+    {
+     "area": "circles",
+     "share": 0.12
+    }
+   ],
+   "diet": {
+    "netfront": 0.04,
+    "slot": 0.56,
+    "circles": 0.12,
+    "points": 0.12,
+    "corners": 0.0,
+    "outside": 0.04,
+    "long": 0.12
+   }
+  },
+  "8481721": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.18,
+   "lean": null,
+   "sog": 45,
+   "goals": 8,
+   "team": "NJD",
+   "pos": "R",
+   "name": "Arseny Gritsyuk",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/NJD/8481721.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.422
+    },
+    {
+     "area": "circles",
+     "share": 0.156
+    }
+   ],
+   "diet": {
+    "netfront": 0.089,
+    "slot": 0.422,
+    "circles": 0.156,
+    "points": 0.133,
+    "corners": 0.0,
+    "outside": 0.156,
+    "long": 0.044
+   }
+  },
+  "8480002": {
+   "letter": "D",
+   "type": "Net-front",
+   "fit": 0.02,
+   "lean": "C",
+   "sog": 43,
+   "goals": 8,
+   "team": "NJD",
+   "pos": "C",
+   "name": "Nico Hischier",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/NJD/8480002.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.512
+    },
+    {
+     "area": "circles",
+     "share": 0.256
+    }
+   ],
+   "diet": {
+    "netfront": 0.186,
+    "slot": 0.512,
+    "circles": 0.256,
+    "points": 0.0,
+    "corners": 0.0,
+    "outside": 0.047,
+    "long": 0.0
+   }
+  },
+  "8481559": {
+   "letter": "D",
+   "type": "Net-front",
+   "fit": 0.06,
+   "lean": "A",
+   "sog": 76,
+   "goals": 9,
+   "team": "NJD",
+   "pos": "C",
+   "name": "Jack Hughes",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/NJD/8481559.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.368
+    },
+    {
+     "area": "outside",
+     "share": 0.211
+    }
+   ],
+   "diet": {
+    "netfront": 0.197,
+    "slot": 0.368,
+    "circles": 0.171,
+    "points": 0.039,
+    "corners": 0.013,
+    "outside": 0.211,
+    "long": 0.0
+   }
+  },
+  "8483695": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.18,
+   "lean": null,
+   "sog": 26,
+   "goals": 0,
+   "team": "NJD",
+   "pos": "C",
+   "name": "Amadeus Lombardi",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/NJD/8483695.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.5
+    },
+    {
+     "area": "outside",
+     "share": 0.192
+    }
+   ],
+   "diet": {
+    "netfront": 0.115,
+    "slot": 0.5,
+    "circles": 0.154,
+    "points": 0.038,
+    "corners": 0.0,
+    "outside": 0.192,
+    "long": 0.0
+   }
+  },
+  "8477511": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.31,
+   "lean": null,
+   "sog": 21,
+   "goals": 5,
+   "team": "NJD",
+   "pos": "R",
+   "name": "Anthony Mantha",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/NJD/8477511.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.619
+    },
+    {
+     "area": "circles",
+     "share": 0.238
+    }
+   ],
+   "diet": {
+    "netfront": 0.095,
+    "slot": 0.619,
+    "circles": 0.238,
+    "points": 0.0,
+    "corners": 0.0,
+    "outside": 0.048,
+    "long": 0.0
+   }
+  },
+  "8478414": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.38,
+   "lean": null,
+   "sog": 73,
+   "goals": 3,
+   "team": "NJD",
+   "pos": "R",
+   "name": "Timo Meier",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/NJD/8478414.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.384
+    },
+    {
+     "area": "circles",
+     "share": 0.247
+    }
+   ],
+   "diet": {
+    "netfront": 0.096,
+    "slot": 0.384,
+    "circles": 0.247,
+    "points": 0.082,
+    "corners": 0.0,
+    "outside": 0.151,
+    "long": 0.041
+   }
+  },
+  "8478542": {
+   "letter": "B",
+   "type": "Perimeter shooter",
+   "fit": 0.11,
+   "lean": null,
+   "sog": 27,
+   "goals": 3,
+   "team": "NJD",
+   "pos": "C",
+   "name": "Evan Rodrigues",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/NJD/8478542.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.296
+    },
+    {
+     "area": "circles",
+     "share": 0.296
+    }
+   ],
+   "diet": {
+    "netfront": 0.0,
+    "slot": 0.296,
+    "circles": 0.296,
+    "points": 0.111,
+    "corners": 0.0,
+    "outside": 0.296,
+    "long": 0.0
+   }
+  },
+  "8476432": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.03,
+   "lean": "D",
+   "sog": 35,
+   "goals": 6,
+   "team": "WSH",
+   "pos": "C",
+   "name": "Boone Jenner",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/WSH/8476432.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.314
+    },
+    {
+     "area": "netfront",
+     "share": 0.2
+    }
+   ],
+   "diet": {
+    "netfront": 0.2,
+    "slot": 0.314,
+    "circles": 0.171,
+    "points": 0.029,
+    "corners": 0.0,
+    "outside": 0.114,
+    "long": 0.171
+   }
+  },
+  "8479385": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.08,
+   "lean": "F",
+   "sog": 24,
+   "goals": 5,
+   "team": "WSH",
+   "pos": "R",
+   "name": "Jordan Kyrou",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/WSH/8479385.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.333
+    },
+    {
+     "area": "points",
+     "share": 0.208
+    }
+   ],
+   "diet": {
+    "netfront": 0.125,
+    "slot": 0.333,
+    "circles": 0.167,
+    "points": 0.208,
+    "corners": 0.0,
+    "outside": 0.167,
+    "long": 0.0
+   }
+  },
+  "8484186": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.09,
+   "lean": "B",
+   "sog": 42,
+   "goals": 5,
+   "team": "WSH",
+   "pos": "R",
+   "name": "Ryan Leonard",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/WSH/8484186.png",
+   "topAreas": [
+    {
+     "area": "circles",
+     "share": 0.286
+    },
+    {
+     "area": "slot",
+     "share": 0.238
+    }
+   ],
+   "diet": {
+    "netfront": 0.119,
+    "slot": 0.238,
+    "circles": 0.286,
+    "points": 0.143,
+    "corners": 0.0,
+    "outside": 0.095,
+    "long": 0.119
+   }
+  },
+  "8471214": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.11,
+   "lean": null,
+   "sog": 26,
+   "goals": 1,
+   "team": "WSH",
+   "pos": "L",
+   "name": "Alex Ovechkin",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/WSH/8471214.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.385
+    },
+    {
+     "area": "points",
+     "share": 0.231
+    }
+   ],
+   "diet": {
+    "netfront": 0.077,
+    "slot": 0.385,
+    "circles": 0.192,
+    "points": 0.231,
+    "corners": 0.0,
+    "outside": 0.077,
+    "long": 0.038
+   }
+  },
+  "8481656": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.37,
+   "lean": null,
+   "sog": 20,
+   "goals": 2,
+   "team": "WSH",
+   "pos": "L",
+   "name": "Aliaksei Protas",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/WSH/8481656.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.55
+    },
+    {
+     "area": "circles",
+     "share": 0.25
+    }
+   ],
+   "diet": {
+    "netfront": 0.1,
+    "slot": 0.55,
+    "circles": 0.25,
+    "points": 0.05,
+    "corners": 0.0,
+    "outside": 0.0,
+    "long": 0.05
+   }
+  },
+  "8478440": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.22,
+   "lean": null,
+   "sog": 32,
+   "goals": 3,
+   "team": "WSH",
+   "pos": "C",
+   "name": "Dylan Strome",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/WSH/8478440.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.5
+    },
+    {
+     "area": "circles",
+     "share": 0.188
+    }
+   ],
+   "diet": {
+    "netfront": 0.125,
+    "slot": 0.5,
+    "circles": 0.188,
+    "points": 0.0,
+    "corners": 0.0,
+    "outside": 0.094,
+    "long": 0.094
+   }
+  },
+  "8477949": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.4,
+   "lean": null,
+   "sog": 42,
+   "goals": 11,
+   "team": "WSH",
+   "pos": "R",
+   "name": "Alex Tuch",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/WSH/8477949.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.571
+    },
+    {
+     "area": "circles",
+     "share": 0.286
+    }
+   ],
+   "diet": {
+    "netfront": 0.048,
+    "slot": 0.571,
+    "circles": 0.286,
+    "points": 0.024,
+    "corners": 0.0,
+    "outside": 0.071,
+    "long": 0.0
+   }
+  },
+  "8476880": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.04,
+   "lean": "C",
+   "sog": 29,
+   "goals": 2,
+   "team": "WSH",
+   "pos": "R",
+   "name": "Tom Wilson",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/WSH/8476880.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.483
+    },
+    {
+     "area": "circles",
+     "share": 0.172
+    }
+   ],
+   "diet": {
+    "netfront": 0.103,
+    "slot": 0.483,
+    "circles": 0.172,
+    "points": 0.172,
+    "corners": 0.0,
+    "outside": 0.034,
+    "long": 0.034
+   }
+  },
+  "8475745": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.09,
+   "lean": "D",
+   "sog": 30,
+   "goals": 3,
+   "team": "CBJ",
+   "pos": "C",
+   "name": "Charlie Coyle",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/CBJ/8475745.png",
+   "topAreas": [
+    {
+     "area": "netfront",
+     "share": 0.233
+    },
+    {
+     "area": "slot",
+     "share": 0.233
+    }
+   ],
+   "diet": {
+    "netfront": 0.233,
+    "slot": 0.233,
+    "circles": 0.233,
+    "points": 0.067,
+    "corners": 0.0,
+    "outside": 0.2,
+    "long": 0.033
+   }
+  },
+  "8484166": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.23,
+   "lean": null,
+   "sog": 48,
+   "goals": 4,
+   "team": "CBJ",
+   "pos": "C",
+   "name": "Adam Fantilli",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/CBJ/8484166.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.438
+    },
+    {
+     "area": "circles",
+     "share": 0.25
+    }
+   ],
+   "diet": {
+    "netfront": 0.083,
+    "slot": 0.438,
+    "circles": 0.25,
+    "points": 0.083,
+    "corners": 0.021,
+    "outside": 0.104,
+    "long": 0.021
+   }
+  },
+  "8482660": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.02,
+   "lean": "A",
+   "sog": 34,
+   "goals": 8,
+   "team": "CBJ",
+   "pos": "C",
+   "name": "Kent Johnson",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/CBJ/8482660.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.441
+    },
+    {
+     "area": "circles",
+     "share": 0.353
+    }
+   ],
+   "diet": {
+    "netfront": 0.059,
+    "slot": 0.441,
+    "circles": 0.353,
+    "points": 0.088,
+    "corners": 0.0,
+    "outside": 0.059,
+    "long": 0.0
+   }
+  },
+  "8482720": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.35,
+   "lean": null,
+   "sog": 23,
+   "goals": 2,
+   "team": "CBJ",
+   "pos": "L",
+   "name": "Matthew Knies",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/CBJ/8482720.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.609
+    },
+    {
+     "area": "circles",
+     "share": 0.13
+    }
+   ],
+   "diet": {
+    "netfront": 0.087,
+    "slot": 0.609,
+    "circles": 0.13,
+    "points": 0.043,
+    "corners": 0.0,
+    "outside": 0.087,
+    "long": 0.043
+   }
+  },
+  "8477501": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.0,
+   "lean": "F",
+   "sog": 23,
+   "goals": 2,
+   "team": "CBJ",
+   "pos": "R",
+   "name": "Valeri Nichushkin",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/CBJ/8477501.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.304
+    },
+    {
+     "area": "circles",
+     "share": 0.261
+    }
+   ],
+   "diet": {
+    "netfront": 0.087,
+    "slot": 0.304,
+    "circles": 0.261,
+    "points": 0.261,
+    "corners": 0.0,
+    "outside": 0.087,
+    "long": 0.0
+   }
+  },
+  "8479671": {
+   "letter": "D",
+   "type": "Net-front",
+   "fit": 0.16,
+   "lean": null,
+   "sog": 31,
+   "goals": 3,
+   "team": "CBJ",
+   "pos": "R",
+   "name": "Mathieu Olivier",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/CBJ/8479671.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.323
+    },
+    {
+     "area": "netfront",
+     "share": 0.194
+    }
+   ],
+   "diet": {
+    "netfront": 0.194,
+    "slot": 0.323,
+    "circles": 0.129,
+    "points": 0.065,
+    "corners": 0.0,
+    "outside": 0.161,
+    "long": 0.129
+   }
+  },
+  "8482705": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.18,
+   "lean": null,
+   "sog": 27,
+   "goals": 4,
+   "team": "CBJ",
+   "pos": "C",
+   "name": "Cole Sillinger",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/CBJ/8482705.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.444
+    },
+    {
+     "area": "circles",
+     "share": 0.222
+    }
+   ],
+   "diet": {
+    "netfront": 0.111,
+    "slot": 0.444,
+    "circles": 0.222,
+    "points": 0.037,
+    "corners": 0.0,
+    "outside": 0.148,
+    "long": 0.037
+   }
+  },
+  "8478042": {
+   "letter": "D",
+   "type": "Net-front",
+   "fit": 0.26,
+   "lean": null,
+   "sog": 55,
+   "goals": 8,
+   "team": "DET",
+   "pos": "L",
+   "name": "Viktor Arvidsson",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/DET/8478042.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.327
+    },
+    {
+     "area": "netfront",
+     "share": 0.255
+    }
+   ],
+   "diet": {
+    "netfront": 0.255,
+    "slot": 0.327,
+    "circles": 0.182,
+    "points": 0.073,
+    "corners": 0.0,
+    "outside": 0.127,
+    "long": 0.036
+   }
+  },
+  "8484794": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.08,
+   "lean": "D",
+   "sog": 34,
+   "goals": 3,
+   "team": "DET",
+   "pos": "R",
+   "name": "Michael Brandsegg-Nyg\u00e5rd",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/DET/8484794.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.5
+    },
+    {
+     "area": "points",
+     "share": 0.176
+    }
+   ],
+   "diet": {
+    "netfront": 0.088,
+    "slot": 0.5,
+    "circles": 0.088,
+    "points": 0.176,
+    "corners": 0.029,
+    "outside": 0.059,
+    "long": 0.059
+   }
+  },
+  "8477429": {
+   "letter": "D",
+   "type": "Net-front",
+   "fit": 0.23,
+   "lean": null,
+   "sog": 31,
+   "goals": 3,
+   "team": "DET",
+   "pos": "C",
+   "name": "Andrew Copp",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/DET/8477429.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.387
+    },
+    {
+     "area": "netfront",
+     "share": 0.226
+    }
+   ],
+   "diet": {
+    "netfront": 0.226,
+    "slot": 0.387,
+    "circles": 0.129,
+    "points": 0.129,
+    "corners": 0.0,
+    "outside": 0.097,
+    "long": 0.032
+   }
+  },
+  "8479337": {
+   "letter": "B",
+   "type": "Perimeter shooter",
+   "fit": 0.06,
+   "lean": "A",
+   "sog": 67,
+   "goals": 7,
+   "team": "DET",
+   "pos": "R",
+   "name": "Alex DeBrincat",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/DET/8479337.png",
+   "topAreas": [
+    {
+     "area": "circles",
+     "share": 0.328
+    },
+    {
+     "area": "slot",
+     "share": 0.254
+    }
+   ],
+   "diet": {
+    "netfront": 0.09,
+    "slot": 0.254,
+    "circles": 0.328,
+    "points": 0.104,
+    "corners": 0.015,
+    "outside": 0.164,
+    "long": 0.045
+   }
+  },
+  "8484471": {
+   "letter": "D",
+   "type": "Net-front",
+   "fit": 0.02,
+   "lean": "A",
+   "sog": 40,
+   "goals": 7,
+   "team": "DET",
+   "pos": "C",
+   "name": "Emmitt Finnie",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/DET/8484471.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.4
+    },
+    {
+     "area": "circles",
+     "share": 0.225
+    }
+   ],
+   "diet": {
+    "netfront": 0.175,
+    "slot": 0.4,
+    "circles": 0.225,
+    "points": 0.025,
+    "corners": 0.0,
+    "outside": 0.15,
+    "long": 0.025
+   }
+  },
+  "8479992": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.37,
+   "lean": null,
+   "sog": 28,
+   "goals": 1,
+   "team": "DET",
+   "pos": "C",
+   "name": "Michael Rasmussen",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/DET/8479992.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.536
+    },
+    {
+     "area": "circles",
+     "share": 0.25
+    }
+   ],
+   "diet": {
+    "netfront": 0.071,
+    "slot": 0.536,
+    "circles": 0.25,
+    "points": 0.036,
+    "corners": 0.0,
+    "outside": 0.036,
+    "long": 0.071
+   }
+  },
+  "8482078": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.04,
+   "lean": "B",
+   "sog": 57,
+   "goals": 6,
+   "team": "DET",
+   "pos": "L",
+   "name": "Lucas Raymond",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/DET/8482078.png",
+   "topAreas": [
+    {
+     "area": "circles",
+     "share": 0.368
+    },
+    {
+     "area": "slot",
+     "share": 0.246
+    }
+   ],
+   "diet": {
+    "netfront": 0.123,
+    "slot": 0.246,
+    "circles": 0.368,
+    "points": 0.105,
+    "corners": 0.0,
+    "outside": 0.123,
+    "long": 0.035
+   }
+  },
+  "8484144": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.27,
+   "lean": null,
+   "sog": 37,
+   "goals": 5,
+   "team": "CHI",
+   "pos": "C",
+   "name": "Connor Bedard",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/CHI/8484144.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.541
+    },
+    {
+     "area": "circles",
+     "share": 0.243
+    }
+   ],
+   "diet": {
+    "netfront": 0.027,
+    "slot": 0.541,
+    "circles": 0.243,
+    "points": 0.108,
+    "corners": 0.0,
+    "outside": 0.081,
+    "long": 0.0
+   }
+  },
+  "8485391": {
+   "letter": "B",
+   "type": "Perimeter shooter",
+   "fit": 0.08,
+   "lean": "A",
+   "sog": 34,
+   "goals": 3,
+   "team": "CHI",
+   "pos": "C",
+   "name": "Anton Frondell",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/CHI/8485391.png",
+   "topAreas": [
+    {
+     "area": "circles",
+     "share": 0.412
+    },
+    {
+     "area": "slot",
+     "share": 0.206
+    }
+   ],
+   "diet": {
+    "netfront": 0.147,
+    "slot": 0.206,
+    "circles": 0.412,
+    "points": 0.059,
+    "corners": 0.0,
+    "outside": 0.176,
+    "long": 0.0
+   }
+  },
+  "8474141": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.21,
+   "lean": null,
+   "sog": 25,
+   "goals": 1,
+   "team": "CHI",
+   "pos": "R",
+   "name": "Patrick Kane",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/CHI/8474141.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.32
+    },
+    {
+     "area": "circles",
+     "share": 0.24
+    }
+   ],
+   "diet": {
+    "netfront": 0.2,
+    "slot": 0.32,
+    "circles": 0.24,
+    "points": 0.12,
+    "corners": 0.0,
+    "outside": 0.08,
+    "long": 0.04
+   }
+  },
+  "8484390": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.05,
+   "lean": "C",
+   "sog": 31,
+   "goals": 9,
+   "team": "CHI",
+   "pos": "R",
+   "name": "Roman Kantserov",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/CHI/8484390.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.419
+    },
+    {
+     "area": "circles",
+     "share": 0.29
+    }
+   ],
+   "diet": {
+    "netfront": 0.097,
+    "slot": 0.419,
+    "circles": 0.29,
+    "points": 0.065,
+    "corners": 0.0,
+    "outside": 0.097,
+    "long": 0.032
+   }
+  },
+  "8484197": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.03,
+   "lean": "C",
+   "sog": 29,
+   "goals": 2,
+   "team": "CHI",
+   "pos": "C",
+   "name": "Oliver Moore",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/CHI/8484197.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.448
+    },
+    {
+     "area": "points",
+     "share": 0.138
+    }
+   ],
+   "diet": {
+    "netfront": 0.069,
+    "slot": 0.448,
+    "circles": 0.103,
+    "points": 0.138,
+    "corners": 0.0,
+    "outside": 0.138,
+    "long": 0.103
+   }
+  },
+  "8483493": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.02,
+   "lean": "A",
+   "sog": 28,
+   "goals": 5,
+   "team": "CHI",
+   "pos": "C",
+   "name": "Frank Nazar",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/CHI/8483493.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.429
+    },
+    {
+     "area": "circles",
+     "share": 0.25
+    }
+   ],
+   "diet": {
+    "netfront": 0.107,
+    "slot": 0.429,
+    "circles": 0.25,
+    "points": 0.107,
+    "corners": 0.0,
+    "outside": 0.071,
+    "long": 0.036
+   }
+  },
+  "8482062": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.15,
+   "lean": null,
+   "sog": 21,
+   "goals": 1,
+   "team": "CHI",
+   "pos": "R",
+   "name": "Cole Smith",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/CHI/8482062.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.524
+    },
+    {
+     "area": "circles",
+     "share": 0.143
+    }
+   ],
+   "diet": {
+    "netfront": 0.095,
+    "slot": 0.524,
+    "circles": 0.143,
+    "points": 0.048,
+    "corners": 0.048,
+    "outside": 0.048,
+    "long": 0.095
+   }
+  },
+  "8484145": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.32,
+   "lean": null,
+   "sog": 46,
+   "goals": 2,
+   "team": "BUF",
+   "pos": "L",
+   "name": "Zach Benson",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/BUF/8484145.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.63
+    },
+    {
+     "area": "circles",
+     "share": 0.174
+    }
+   ],
+   "diet": {
+    "netfront": 0.065,
+    "slot": 0.63,
+    "circles": 0.174,
+    "points": 0.022,
+    "corners": 0.0,
+    "outside": 0.065,
+    "long": 0.043
+   }
+  },
+  "8482659": {
+   "letter": "D",
+   "type": "Net-front",
+   "fit": 0.31,
+   "lean": null,
+   "sog": 33,
+   "goals": 4,
+   "team": "BUF",
+   "pos": "R",
+   "name": "Josh Doan",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/BUF/8482659.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.394
+    },
+    {
+     "area": "netfront",
+     "share": 0.242
+    }
+   ],
+   "diet": {
+    "netfront": 0.242,
+    "slot": 0.394,
+    "circles": 0.212,
+    "points": 0.061,
+    "corners": 0.0,
+    "outside": 0.091,
+    "long": 0.0
+   }
+  },
+  "8480064": {
+   "letter": "D",
+   "type": "Net-front",
+   "fit": 0.17,
+   "lean": null,
+   "sog": 22,
+   "goals": 4,
+   "team": "BUF",
+   "pos": "C",
+   "name": "Josh Norris",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/BUF/8480064.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.455
+    },
+    {
+     "area": "circles",
+     "share": 0.227
+    }
+   ],
+   "diet": {
+    "netfront": 0.182,
+    "slot": 0.455,
+    "circles": 0.227,
+    "points": 0.045,
+    "corners": 0.0,
+    "outside": 0.045,
+    "long": 0.045
+   }
+  },
+  "8483500": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.35,
+   "lean": null,
+   "sog": 43,
+   "goals": 4,
+   "team": "BUF",
+   "pos": "C",
+   "name": "Noah Ostlund",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/BUF/8483500.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.349
+    },
+    {
+     "area": "circles",
+     "share": 0.326
+    }
+   ],
+   "diet": {
+    "netfront": 0.14,
+    "slot": 0.349,
+    "circles": 0.326,
+    "points": 0.093,
+    "corners": 0.0,
+    "outside": 0.07,
+    "long": 0.023
+   }
+  },
+  "8482097": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.19,
+   "lean": null,
+   "sog": 52,
+   "goals": 9,
+   "team": "BUF",
+   "pos": "R",
+   "name": "Jack Quinn",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/BUF/8482097.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.385
+    },
+    {
+     "area": "circles",
+     "share": 0.288
+    }
+   ],
+   "diet": {
+    "netfront": 0.096,
+    "slot": 0.385,
+    "circles": 0.288,
+    "points": 0.019,
+    "corners": 0.019,
+    "outside": 0.154,
+    "long": 0.038
+   }
+  },
+  "8479420": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.47,
+   "lean": null,
+   "sog": 73,
+   "goals": 11,
+   "team": "BUF",
+   "pos": "C",
+   "name": "Tage Thompson",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/BUF/8479420.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.342
+    },
+    {
+     "area": "circles",
+     "share": 0.247
+    }
+   ],
+   "diet": {
+    "netfront": 0.137,
+    "slot": 0.342,
+    "circles": 0.247,
+    "points": 0.11,
+    "corners": 0.0,
+    "outside": 0.151,
+    "long": 0.014
+   }
+  },
+  "8480289": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.45,
+   "lean": null,
+   "sog": 26,
+   "goals": 3,
+   "team": "WPG",
+   "pos": "C",
+   "name": "Morgan Barron",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/WPG/8480289.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.577
+    },
+    {
+     "area": "circles",
+     "share": 0.231
+    }
+   ],
+   "diet": {
+    "netfront": 0.038,
+    "slot": 0.577,
+    "circles": 0.231,
+    "points": 0.038,
+    "corners": 0.0,
+    "outside": 0.038,
+    "long": 0.077
+   }
+  },
+  "8478398": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.14,
+   "lean": null,
+   "sog": 81,
+   "goals": 15,
+   "team": "WPG",
+   "pos": "L",
+   "name": "Kyle Connor",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/WPG/8478398.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.469
+    },
+    {
+     "area": "circles",
+     "share": 0.21
+    }
+   ],
+   "diet": {
+    "netfront": 0.099,
+    "slot": 0.469,
+    "circles": 0.21,
+    "points": 0.049,
+    "corners": 0.0,
+    "outside": 0.148,
+    "long": 0.025
+   }
+  },
+  "8480113": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.33,
+   "lean": null,
+   "sog": 23,
+   "goals": 4,
+   "team": "WPG",
+   "pos": "L",
+   "name": "Alex Iafallo",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/WPG/8480113.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.565
+    },
+    {
+     "area": "circles",
+     "share": 0.13
+    }
+   ],
+   "diet": {
+    "netfront": 0.043,
+    "slot": 0.565,
+    "circles": 0.13,
+    "points": 0.087,
+    "corners": 0.0,
+    "outside": 0.043,
+    "long": 0.13
+   }
+  },
+  "8482110": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.22,
+   "lean": null,
+   "sog": 37,
+   "goals": 3,
+   "team": "WPG",
+   "pos": "C",
+   "name": "Dawson Mercer",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/WPG/8482110.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.514
+    },
+    {
+     "area": "circles",
+     "share": 0.135
+    }
+   ],
+   "diet": {
+    "netfront": 0.081,
+    "slot": 0.514,
+    "circles": 0.135,
+    "points": 0.135,
+    "corners": 0.0,
+    "outside": 0.081,
+    "long": 0.054
+   }
+  },
+  "8482149": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.26,
+   "lean": null,
+   "sog": 57,
+   "goals": 7,
+   "team": "WPG",
+   "pos": "C",
+   "name": "Cole Perfetti",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/WPG/8482149.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.579
+    },
+    {
+     "area": "circles",
+     "share": 0.158
+    }
+   ],
+   "diet": {
+    "netfront": 0.123,
+    "slot": 0.579,
+    "circles": 0.158,
+    "points": 0.07,
+    "corners": 0.0,
+    "outside": 0.07,
+    "long": 0.0
+   }
+  },
+  "8476460": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.33,
+   "lean": null,
+   "sog": 41,
+   "goals": 4,
+   "team": "WPG",
+   "pos": "C",
+   "name": "Mark Scheifele",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/WPG/8476460.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.537
+    },
+    {
+     "area": "circles",
+     "share": 0.22
+    }
+   ],
+   "diet": {
+    "netfront": 0.073,
+    "slot": 0.537,
+    "circles": 0.22,
+    "points": 0.049,
+    "corners": 0.0,
+    "outside": 0.122,
+    "long": 0.0
+   }
+  },
+  "8480014": {
+   "letter": "D",
+   "type": "Net-front",
+   "fit": 0.1,
+   "lean": null,
+   "sog": 35,
+   "goals": 1,
+   "team": "WPG",
+   "pos": "C",
+   "name": "Gabriel Vilardi",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/WPG/8480014.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.486
+    },
+    {
+     "area": "netfront",
+     "share": 0.171
+    }
+   ],
+   "diet": {
+    "netfront": 0.171,
+    "slot": 0.486,
+    "circles": 0.171,
+    "points": 0.0,
+    "corners": 0.0,
+    "outside": 0.143,
+    "long": 0.029
+   }
+  },
+  "8477935": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.06,
+   "lean": "A",
+   "sog": 50,
+   "goals": 7,
+   "team": "FLA",
+   "pos": "C",
+   "name": "Sam Bennett",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/FLA/8477935.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.42
+    },
+    {
+     "area": "circles",
+     "share": 0.32
+    }
+   ],
+   "diet": {
+    "netfront": 0.12,
+    "slot": 0.42,
+    "circles": 0.32,
+    "points": 0.02,
+    "corners": 0.0,
+    "outside": 0.08,
+    "long": 0.04
+   }
+  },
+  "8474189": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.16,
+   "lean": null,
+   "sog": 22,
+   "goals": 2,
+   "team": "FLA",
+   "pos": "C",
+   "name": "Lars Eller",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/FLA/8474189.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.409
+    },
+    {
+     "area": "circles",
+     "share": 0.227
+    }
+   ],
+   "diet": {
+    "netfront": 0.045,
+    "slot": 0.409,
+    "circles": 0.227,
+    "points": 0.182,
+    "corners": 0.0,
+    "outside": 0.136,
+    "long": 0.0
+   }
+  },
+  "8482113": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.19,
+   "lean": null,
+   "sog": 50,
+   "goals": 4,
+   "team": "FLA",
+   "pos": "C",
+   "name": "Anton Lundell",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/FLA/8482113.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.36
+    },
+    {
+     "area": "circles",
+     "share": 0.22
+    }
+   ],
+   "diet": {
+    "netfront": 0.14,
+    "slot": 0.36,
+    "circles": 0.22,
+    "points": 0.02,
+    "corners": 0.02,
+    "outside": 0.12,
+    "long": 0.12
+   }
+  },
+  "8480185": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.07,
+   "lean": "D",
+   "sog": 21,
+   "goals": 2,
+   "team": "FLA",
+   "pos": "C",
+   "name": "Eetu Luostarinen",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/FLA/8480185.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.429
+    },
+    {
+     "area": "circles",
+     "share": 0.286
+    }
+   ],
+   "diet": {
+    "netfront": 0.143,
+    "slot": 0.429,
+    "circles": 0.286,
+    "points": 0.0,
+    "corners": 0.048,
+    "outside": 0.095,
+    "long": 0.0
+   }
+  },
+  "8477933": {
+   "letter": "D",
+   "type": "Net-front",
+   "fit": 0.14,
+   "lean": null,
+   "sog": 60,
+   "goals": 10,
+   "team": "FLA",
+   "pos": "C",
+   "name": "Sam Reinhart",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/FLA/8477933.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.533
+    },
+    {
+     "area": "netfront",
+     "share": 0.167
+    }
+   ],
+   "diet": {
+    "netfront": 0.167,
+    "slot": 0.533,
+    "circles": 0.133,
+    "points": 0.033,
+    "corners": 0.0,
+    "outside": 0.067,
+    "long": 0.067
+   }
+  },
+  "8480801": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.3,
+   "lean": null,
+   "sog": 68,
+   "goals": 10,
+   "team": "FLA",
+   "pos": "L",
+   "name": "Brady Tkachuk",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/FLA/8480801.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.5
+    },
+    {
+     "area": "circles",
+     "share": 0.162
+    }
+   ],
+   "diet": {
+    "netfront": 0.118,
+    "slot": 0.5,
+    "circles": 0.162,
+    "points": 0.059,
+    "corners": 0.0,
+    "outside": 0.162,
+    "long": 0.0
+   }
+  },
+  "8479314": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.14,
+   "lean": null,
+   "sog": 41,
+   "goals": 4,
+   "team": "FLA",
+   "pos": "L",
+   "name": "Matthew Tkachuk",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/FLA/8479314.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.415
+    },
+    {
+     "area": "outside",
+     "share": 0.171
+    }
+   ],
+   "diet": {
+    "netfront": 0.098,
+    "slot": 0.415,
+    "circles": 0.146,
+    "points": 0.146,
+    "corners": 0.0,
+    "outside": 0.171,
+    "long": 0.024
+   }
+  },
+  "8477409": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.13,
+   "lean": null,
+   "sog": 42,
+   "goals": 10,
+   "team": "FLA",
+   "pos": "C",
+   "name": "Carter Verhaeghe",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/FLA/8477409.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.333
+    },
+    {
+     "area": "circles",
+     "share": 0.31
+    }
+   ],
+   "diet": {
+    "netfront": 0.214,
+    "slot": 0.333,
+    "circles": 0.31,
+    "points": 0.024,
+    "corners": 0.0,
+    "outside": 0.071,
+    "long": 0.048
+   }
+  },
+  "8483771": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.17,
+   "lean": null,
+   "sog": 22,
+   "goals": 3,
+   "team": "FLA",
+   "pos": "L",
+   "name": "Sandis Vilmanis",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/FLA/8483771.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.364
+    },
+    {
+     "area": "circles",
+     "share": 0.364
+    }
+   ],
+   "diet": {
+    "netfront": 0.136,
+    "slot": 0.364,
+    "circles": 0.364,
+    "points": 0.091,
+    "corners": 0.0,
+    "outside": 0.0,
+    "long": 0.045
+   }
+  },
+  "8473994": {
+   "letter": "B",
+   "type": "Perimeter shooter",
+   "fit": 0.3,
+   "lean": null,
+   "sog": 20,
+   "goals": 3,
+   "team": "DAL",
+   "pos": "L",
+   "name": "Jamie Benn",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/DAL/8473994.png",
+   "topAreas": [
+    {
+     "area": "circles",
+     "share": 0.35
+    },
+    {
+     "area": "outside",
+     "share": 0.25
+    }
+   ],
+   "diet": {
+    "netfront": 0.05,
+    "slot": 0.2,
+    "circles": 0.35,
+    "points": 0.1,
+    "corners": 0.0,
+    "outside": 0.25,
+    "long": 0.05
+   }
+  },
+  "8478449": {
+   "letter": "D",
+   "type": "Net-front",
+   "fit": 0.11,
+   "lean": null,
+   "sog": 32,
+   "goals": 7,
+   "team": "DAL",
+   "pos": "C",
+   "name": "Roope Hintz",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/DAL/8478449.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.625
+    },
+    {
+     "area": "netfront",
+     "share": 0.188
+    }
+   ],
+   "diet": {
+    "netfront": 0.188,
+    "slot": 0.625,
+    "circles": 0.094,
+    "points": 0.062,
+    "corners": 0.0,
+    "outside": 0.031,
+    "long": 0.0
+   }
+  },
+  "8484938": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.07,
+   "lean": "B",
+   "sog": 33,
+   "goals": 4,
+   "team": "DAL",
+   "pos": "R",
+   "name": "Arttu Hyry",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/DAL/8484938.png",
+   "topAreas": [
+    {
+     "area": "circles",
+     "share": 0.333
+    },
+    {
+     "area": "slot",
+     "share": 0.273
+    }
+   ],
+   "diet": {
+    "netfront": 0.061,
+    "slot": 0.273,
+    "circles": 0.333,
+    "points": 0.182,
+    "corners": 0.0,
+    "outside": 0.03,
+    "long": 0.121
+   }
+  },
+  "8482740": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.28,
+   "lean": null,
+   "sog": 42,
+   "goals": 3,
+   "team": "DAL",
+   "pos": "C",
+   "name": "Wyatt Johnston",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/DAL/8482740.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.643
+    },
+    {
+     "area": "circles",
+     "share": 0.143
+    }
+   ],
+   "diet": {
+    "netfront": 0.095,
+    "slot": 0.643,
+    "circles": 0.143,
+    "points": 0.071,
+    "corners": 0.0,
+    "outside": 0.048,
+    "long": 0.0
+   }
+  },
+  "8478420": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.3,
+   "lean": null,
+   "sog": 34,
+   "goals": 9,
+   "team": "DAL",
+   "pos": "R",
+   "name": "Mikko Rantanen",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/DAL/8478420.png",
+   "topAreas": [
+    {
+     "area": "circles",
+     "share": 0.324
+    },
+    {
+     "area": "slot",
+     "share": 0.265
+    }
+   ],
+   "diet": {
+    "netfront": 0.118,
+    "slot": 0.265,
+    "circles": 0.324,
+    "points": 0.088,
+    "corners": 0.0,
+    "outside": 0.147,
+    "long": 0.059
+   }
+  },
+  "8480027": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.1,
+   "lean": "A",
+   "sog": 55,
+   "goals": 9,
+   "team": "DAL",
+   "pos": "L",
+   "name": "Jason Robertson",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/DAL/8480027.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.473
+    },
+    {
+     "area": "points",
+     "share": 0.145
+    }
+   ],
+   "diet": {
+    "netfront": 0.073,
+    "slot": 0.473,
+    "circles": 0.091,
+    "points": 0.145,
+    "corners": 0.0,
+    "outside": 0.109,
+    "long": 0.109
+   }
+  },
+  "8475794": {
+   "letter": "D",
+   "type": "Net-front",
+   "fit": 0.3,
+   "lean": null,
+   "sog": 36,
+   "goals": 3,
+   "team": "DAL",
+   "pos": "C",
+   "name": "Tyler Seguin",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/DAL/8475794.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.472
+    },
+    {
+     "area": "netfront",
+     "share": 0.222
+    }
+   ],
+   "diet": {
+    "netfront": 0.222,
+    "slot": 0.472,
+    "circles": 0.139,
+    "points": 0.028,
+    "corners": 0.0,
+    "outside": 0.139,
+    "long": 0.0
+   }
+  },
+  "8481013": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.1,
+   "lean": "D",
+   "sog": 26,
+   "goals": 2,
+   "team": "STL",
+   "pos": "R",
+   "name": "Jonatan Berggren",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/STL/8481013.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.538
+    },
+    {
+     "area": "outside",
+     "share": 0.192
+    }
+   ],
+   "diet": {
+    "netfront": 0.077,
+    "slot": 0.538,
+    "circles": 0.038,
+    "points": 0.115,
+    "corners": 0.0,
+    "outside": 0.192,
+    "long": 0.038
+   }
+  },
+  "8477402": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.07,
+   "lean": "C",
+   "sog": 30,
+   "goals": 3,
+   "team": "STL",
+   "pos": "L",
+   "name": "Pavel Buchnevich",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/STL/8477402.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.4
+    },
+    {
+     "area": "outside",
+     "share": 0.2
+    }
+   ],
+   "diet": {
+    "netfront": 0.1,
+    "slot": 0.4,
+    "circles": 0.167,
+    "points": 0.033,
+    "corners": 0.0,
+    "outside": 0.2,
+    "long": 0.1
+   }
+  },
+  "8484164": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.47,
+   "lean": null,
+   "sog": 25,
+   "goals": 4,
+   "team": "STL",
+   "pos": "R",
+   "name": "Dalibor Dvorsky",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/STL/8484164.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.36
+    },
+    {
+     "area": "circles",
+     "share": 0.28
+    }
+   ],
+   "diet": {
+    "netfront": 0.08,
+    "slot": 0.36,
+    "circles": 0.28,
+    "points": 0.12,
+    "corners": 0.0,
+    "outside": 0.12,
+    "long": 0.04
+   }
+  },
+  "8482077": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.01,
+   "lean": "A",
+   "sog": 46,
+   "goals": 3,
+   "team": "STL",
+   "pos": "L",
+   "name": "Dylan Holloway",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/STL/8482077.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.478
+    },
+    {
+     "area": "circles",
+     "share": 0.304
+    }
+   ],
+   "diet": {
+    "netfront": 0.043,
+    "slot": 0.478,
+    "circles": 0.304,
+    "points": 0.087,
+    "corners": 0.0,
+    "outside": 0.087,
+    "long": 0.0
+   }
+  },
+  "8481580": {
+   "letter": "D",
+   "type": "Net-front",
+   "fit": 0.28,
+   "lean": null,
+   "sog": 26,
+   "goals": 2,
+   "team": "STL",
+   "pos": "L",
+   "name": "Connor McMichael",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/STL/8481580.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.462
+    },
+    {
+     "area": "netfront",
+     "share": 0.192
+    }
+   ],
+   "diet": {
+    "netfront": 0.192,
+    "slot": 0.462,
+    "circles": 0.077,
+    "points": 0.115,
+    "corners": 0.0,
+    "outside": 0.115,
+    "long": 0.038
+   }
+  },
+  "8482745": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.16,
+   "lean": null,
+   "sog": 48,
+   "goals": 7,
+   "team": "STL",
+   "pos": "C",
+   "name": "Mason McTavish",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/STL/8482745.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.542
+    },
+    {
+     "area": "circles",
+     "share": 0.188
+    }
+   ],
+   "diet": {
+    "netfront": 0.146,
+    "slot": 0.542,
+    "circles": 0.188,
+    "points": 0.042,
+    "corners": 0.0,
+    "outside": 0.083,
+    "long": 0.0
+   }
+  },
+  "8482089": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.2,
+   "lean": null,
+   "sog": 27,
+   "goals": 4,
+   "team": "STL",
+   "pos": "L",
+   "name": "Jake Neighbours",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/STL/8482089.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.741
+    },
+    {
+     "area": "circles",
+     "share": 0.185
+    }
+   ],
+   "diet": {
+    "netfront": 0.0,
+    "slot": 0.741,
+    "circles": 0.185,
+    "points": 0.037,
+    "corners": 0.0,
+    "outside": 0.037,
+    "long": 0.0
+   }
+  },
+  "8483516": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.18,
+   "lean": null,
+   "sog": 42,
+   "goals": 10,
+   "team": "STL",
+   "pos": "R",
+   "name": "Jimmy Snuggerud",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/STL/8483516.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.31
+    },
+    {
+     "area": "circles",
+     "share": 0.286
+    }
+   ],
+   "diet": {
+    "netfront": 0.071,
+    "slot": 0.31,
+    "circles": 0.286,
+    "points": 0.024,
+    "corners": 0.0,
+    "outside": 0.238,
+    "long": 0.071
+   }
+  },
+  "8480459": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.02,
+   "lean": "B",
+   "sog": 22,
+   "goals": 5,
+   "team": "STL",
+   "pos": "C",
+   "name": "Pius Suter",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/STL/8480459.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.318
+    },
+    {
+     "area": "circles",
+     "share": 0.318
+    }
+   ],
+   "diet": {
+    "netfront": 0.0,
+    "slot": 0.318,
+    "circles": 0.318,
+    "points": 0.091,
+    "corners": 0.045,
+    "outside": 0.091,
+    "long": 0.136
+   }
+  },
+  "8480023": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.25,
+   "lean": null,
+   "sog": 24,
+   "goals": 3,
+   "team": "STL",
+   "pos": "C",
+   "name": "Robert Thomas",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/STL/8480023.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.542
+    },
+    {
+     "area": "circles",
+     "share": 0.292
+    }
+   ],
+   "diet": {
+    "netfront": 0.125,
+    "slot": 0.542,
+    "circles": 0.292,
+    "points": 0.0,
+    "corners": 0.0,
+    "outside": 0.042,
+    "long": 0.0
+   }
+  },
+  "8476469": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.14,
+   "lean": null,
+   "sog": 22,
+   "goals": 3,
+   "team": "LAK",
+   "pos": "R",
+   "name": "Joel Armia",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/LAK/8476469.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.318
+    },
+    {
+     "area": "circles",
+     "share": 0.318
+    }
+   ],
+   "diet": {
+    "netfront": 0.045,
+    "slot": 0.318,
+    "circles": 0.318,
+    "points": 0.136,
+    "corners": 0.0,
+    "outside": 0.091,
+    "long": 0.091
+   }
+  },
+  "8482124": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.14,
+   "lean": null,
+   "sog": 36,
+   "goals": 4,
+   "team": "LAK",
+   "pos": "R",
+   "name": "Quinton Byfield",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/LAK/8482124.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.472
+    },
+    {
+     "area": "circles",
+     "share": 0.194
+    }
+   ],
+   "diet": {
+    "netfront": 0.083,
+    "slot": 0.472,
+    "circles": 0.194,
+    "points": 0.139,
+    "corners": 0.0,
+    "outside": 0.056,
+    "long": 0.056
+   }
+  },
+  "8475287": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.41,
+   "lean": null,
+   "sog": 27,
+   "goals": 3,
+   "team": "LAK",
+   "pos": "L",
+   "name": "Erik Haula",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/LAK/8475287.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.556
+    },
+    {
+     "area": "circles",
+     "share": 0.259
+    }
+   ],
+   "diet": {
+    "netfront": 0.037,
+    "slot": 0.556,
+    "circles": 0.259,
+    "points": 0.074,
+    "corners": 0.0,
+    "outside": 0.037,
+    "long": 0.037
+   }
+  },
+  "8477960": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.01,
+   "lean": "C",
+   "sog": 50,
+   "goals": 6,
+   "team": "LAK",
+   "pos": "R",
+   "name": "Adrian Kempe",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/LAK/8477960.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.46
+    },
+    {
+     "area": "circles",
+     "share": 0.28
+    }
+   ],
+   "diet": {
+    "netfront": 0.02,
+    "slot": 0.46,
+    "circles": 0.28,
+    "points": 0.18,
+    "corners": 0.0,
+    "outside": 0.02,
+    "long": 0.04
+   }
+  },
+  "8482155": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.06,
+   "lean": "A",
+   "sog": 49,
+   "goals": 3,
+   "team": "LAK",
+   "pos": "R",
+   "name": "Alex Laferriere",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/LAK/8482155.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.449
+    },
+    {
+     "area": "circles",
+     "share": 0.286
+    }
+   ],
+   "diet": {
+    "netfront": 0.122,
+    "slot": 0.449,
+    "circles": 0.286,
+    "points": 0.061,
+    "corners": 0.02,
+    "outside": 0.061,
+    "long": 0.0
+   }
+  },
+  "8479675": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.38,
+   "lean": null,
+   "sog": 30,
+   "goals": 2,
+   "team": "LAK",
+   "pos": "L",
+   "name": "Trevor Moore",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/LAK/8479675.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.367
+    },
+    {
+     "area": "circles",
+     "share": 0.2
+    }
+   ],
+   "diet": {
+    "netfront": 0.1,
+    "slot": 0.367,
+    "circles": 0.2,
+    "points": 0.133,
+    "corners": 0.0,
+    "outside": 0.133,
+    "long": 0.067
+   }
+  },
+  "8478550": {
+   "letter": "B",
+   "type": "Perimeter shooter",
+   "fit": 0.13,
+   "lean": null,
+   "sog": 51,
+   "goals": 8,
+   "team": "LAK",
+   "pos": "L",
+   "name": "Artemi Panarin",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/LAK/8478550.png",
+   "topAreas": [
+    {
+     "area": "circles",
+     "share": 0.392
+    },
+    {
+     "area": "points",
+     "share": 0.235
+    }
+   ],
+   "diet": {
+    "netfront": 0.059,
+    "slot": 0.137,
+    "circles": 0.392,
+    "points": 0.235,
+    "corners": 0.0,
+    "outside": 0.118,
+    "long": 0.059
+   }
+  },
+  "8470621": {
+   "letter": "D",
+   "type": "Net-front",
+   "fit": 0.16,
+   "lean": null,
+   "sog": 25,
+   "goals": 2,
+   "team": "LAK",
+   "pos": "R",
+   "name": "Corey Perry",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/LAK/8470621.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.52
+    },
+    {
+     "area": "netfront",
+     "share": 0.16
+    }
+   ],
+   "diet": {
+    "netfront": 0.16,
+    "slot": 0.52,
+    "circles": 0.12,
+    "points": 0.08,
+    "corners": 0.0,
+    "outside": 0.04,
+    "long": 0.08
+   }
+  },
+  "8477407": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.31,
+   "lean": null,
+   "sog": 22,
+   "goals": 4,
+   "team": "NYI",
+   "pos": "L",
+   "name": "Anthony Duclair",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/NYI/8477407.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.545
+    },
+    {
+     "area": "circles",
+     "share": 0.318
+    }
+   ],
+   "diet": {
+    "netfront": 0.091,
+    "slot": 0.545,
+    "circles": 0.318,
+    "points": 0.045,
+    "corners": 0.0,
+    "outside": 0.0,
+    "long": 0.0
+   }
+  },
+  "8485388": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.25,
+   "lean": null,
+   "sog": 26,
+   "goals": 6,
+   "team": "NYI",
+   "pos": "R",
+   "name": "Victor Eklund",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/NYI/8485388.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.654
+    },
+    {
+     "area": "circles",
+     "share": 0.115
+    }
+   ],
+   "diet": {
+    "netfront": 0.077,
+    "slot": 0.654,
+    "circles": 0.115,
+    "points": 0.038,
+    "corners": 0.0,
+    "outside": 0.077,
+    "long": 0.038
+   }
+  },
+  "8482476": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.22,
+   "lean": null,
+   "sog": 26,
+   "goals": 2,
+   "team": "NYI",
+   "pos": "L",
+   "name": "Emil Heineman",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/NYI/8482476.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.423
+    },
+    {
+     "area": "circles",
+     "share": 0.269
+    }
+   ],
+   "diet": {
+    "netfront": 0.077,
+    "slot": 0.423,
+    "circles": 0.269,
+    "points": 0.077,
+    "corners": 0.0,
+    "outside": 0.077,
+    "long": 0.077
+   }
+  },
+  "8481601": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.08,
+   "lean": "A",
+   "sog": 30,
+   "goals": 5,
+   "team": "NYI",
+   "pos": "R",
+   "name": "Simon Holmstrom",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/NYI/8481601.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.467
+    },
+    {
+     "area": "long",
+     "share": 0.2
+    }
+   ],
+   "diet": {
+    "netfront": 0.1,
+    "slot": 0.467,
+    "circles": 0.1,
+    "points": 0.067,
+    "corners": 0.0,
+    "outside": 0.067,
+    "long": 0.2
+   }
+  },
+  "8477500": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.17,
+   "lean": null,
+   "sog": 56,
+   "goals": 7,
+   "team": "NYI",
+   "pos": "C",
+   "name": "Bo Horvat",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/NYI/8477500.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.429
+    },
+    {
+     "area": "circles",
+     "share": 0.214
+    }
+   ],
+   "diet": {
+    "netfront": 0.071,
+    "slot": 0.429,
+    "circles": 0.214,
+    "points": 0.089,
+    "corners": 0.0,
+    "outside": 0.143,
+    "long": 0.054
+   }
+  },
+  "8476419": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.32,
+   "lean": null,
+   "sog": 22,
+   "goals": 1,
+   "team": "NYI",
+   "pos": "C",
+   "name": "Jean-Gabriel Pageau",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/NYI/8476419.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.591
+    },
+    {
+     "area": "circles",
+     "share": 0.182
+    }
+   ],
+   "diet": {
+    "netfront": 0.0,
+    "slot": 0.591,
+    "circles": 0.182,
+    "points": 0.091,
+    "corners": 0.0,
+    "outside": 0.045,
+    "long": 0.091
+   }
+  },
+  "8475151": {
+   "letter": "D",
+   "type": "Net-front",
+   "fit": 0.18,
+   "lean": null,
+   "sog": 35,
+   "goals": 3,
+   "team": "NYI",
+   "pos": "C",
+   "name": "Kyle Palmieri",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/NYI/8475151.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.429
+    },
+    {
+     "area": "circles",
+     "share": 0.229
+    }
+   ],
+   "diet": {
+    "netfront": 0.2,
+    "slot": 0.429,
+    "circles": 0.229,
+    "points": 0.0,
+    "corners": 0.0,
+    "outside": 0.114,
+    "long": 0.029
+   }
+  },
+  "8475170": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.13,
+   "lean": null,
+   "sog": 30,
+   "goals": 5,
+   "team": "NYI",
+   "pos": "C",
+   "name": "Brayden Schenn",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/NYI/8475170.png",
+   "topAreas": [
+    {
+     "area": "circles",
+     "share": 0.4
+    },
+    {
+     "area": "slot",
+     "share": 0.267
+    }
+   ],
+   "diet": {
+    "netfront": 0.2,
+    "slot": 0.267,
+    "circles": 0.4,
+    "points": 0.067,
+    "corners": 0.0,
+    "outside": 0.067,
+    "long": 0.0
+   }
+  },
+  "8479619": {
+   "letter": "D",
+   "type": "Net-front",
+   "fit": 0.28,
+   "lean": null,
+   "sog": 21,
+   "goals": 1,
+   "team": "UTA",
+   "pos": "L",
+   "name": "Michael Carcone",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/UTA/8479619.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.476
+    },
+    {
+     "area": "netfront",
+     "share": 0.19
+    }
+   ],
+   "diet": {
+    "netfront": 0.19,
+    "slot": 0.476,
+    "circles": 0.048,
+    "points": 0.048,
+    "corners": 0.048,
+    "outside": 0.143,
+    "long": 0.048
+   }
+  },
+  "8483431": {
+   "letter": "D",
+   "type": "Net-front",
+   "fit": 0.11,
+   "lean": null,
+   "sog": 31,
+   "goals": 11,
+   "team": "UTA",
+   "pos": "C",
+   "name": "Logan Cooley",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/UTA/8483431.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.484
+    },
+    {
+     "area": "netfront",
+     "share": 0.194
+    }
+   ],
+   "diet": {
+    "netfront": 0.194,
+    "slot": 0.484,
+    "circles": 0.161,
+    "points": 0.161,
+    "corners": 0.0,
+    "outside": 0.0,
+    "long": 0.0
+   }
+  },
+  "8478474": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.02,
+   "lean": "D",
+   "sog": 28,
+   "goals": 2,
+   "team": "UTA",
+   "pos": "L",
+   "name": "Lawson Crouse",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/UTA/8478474.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.5
+    },
+    {
+     "area": "outside",
+     "share": 0.179
+    }
+   ],
+   "diet": {
+    "netfront": 0.143,
+    "slot": 0.5,
+    "circles": 0.143,
+    "points": 0.0,
+    "corners": 0.0,
+    "outside": 0.179,
+    "long": 0.036
+   }
+  },
+  "8482699": {
+   "letter": "B",
+   "type": "Perimeter shooter",
+   "fit": 0.22,
+   "lean": null,
+   "sog": 46,
+   "goals": 6,
+   "team": "UTA",
+   "pos": "R",
+   "name": "Dylan Guenther",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/UTA/8482699.png",
+   "topAreas": [
+    {
+     "area": "circles",
+     "share": 0.283
+    },
+    {
+     "area": "slot",
+     "share": 0.196
+    }
+   ],
+   "diet": {
+    "netfront": 0.087,
+    "slot": 0.196,
+    "circles": 0.283,
+    "points": 0.196,
+    "corners": 0.0,
+    "outside": 0.196,
+    "long": 0.043
+   }
+  },
+  "8480849": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.15,
+   "lean": null,
+   "sog": 36,
+   "goals": 2,
+   "team": "UTA",
+   "pos": "C",
+   "name": "Barrett Hayton",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/UTA/8480849.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.389
+    },
+    {
+     "area": "circles",
+     "share": 0.333
+    }
+   ],
+   "diet": {
+    "netfront": 0.083,
+    "slot": 0.389,
+    "circles": 0.333,
+    "points": 0.028,
+    "corners": 0.0,
+    "outside": 0.167,
+    "long": 0.0
+   }
+  },
+  "8479343": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.47,
+   "lean": null,
+   "sog": 52,
+   "goals": 5,
+   "team": "UTA",
+   "pos": "R",
+   "name": "Clayton Keller",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/UTA/8479343.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.327
+    },
+    {
+     "area": "circles",
+     "share": 0.192
+    }
+   ],
+   "diet": {
+    "netfront": 0.135,
+    "slot": 0.327,
+    "circles": 0.192,
+    "points": 0.115,
+    "corners": 0.0,
+    "outside": 0.135,
+    "long": 0.096
+   }
+  },
+  "8475314": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.28,
+   "lean": null,
+   "sog": 33,
+   "goals": 3,
+   "team": "UTA",
+   "pos": "L",
+   "name": "Anders Lee",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/UTA/8475314.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.485
+    },
+    {
+     "area": "circles",
+     "share": 0.273
+    }
+   ],
+   "diet": {
+    "netfront": 0.121,
+    "slot": 0.485,
+    "circles": 0.273,
+    "points": 0.0,
+    "corners": 0.0,
+    "outside": 0.121,
+    "long": 0.0
+   }
+  },
+  "8480855": {
+   "letter": "A",
+   "type": "Rush creator",
+   "fit": 0.16,
+   "lean": null,
+   "sog": 20,
+   "goals": 2,
+   "team": "UTA",
+   "pos": "C",
+   "name": "Jack McBain",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/UTA/8480855.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.3
+    },
+    {
+     "area": "outside",
+     "share": 0.25
+    }
+   ],
+   "diet": {
+    "netfront": 0.15,
+    "slot": 0.3,
+    "circles": 0.2,
+    "points": 0.05,
+    "corners": 0.05,
+    "outside": 0.25,
+    "long": 0.0
+   }
+  },
+  "8477951": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.55,
+   "lean": null,
+   "sog": 48,
+   "goals": 9,
+   "team": "UTA",
+   "pos": "C",
+   "name": "Nick Schmaltz",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/UTA/8477951.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.542
+    },
+    {
+     "area": "circles",
+     "share": 0.188
+    }
+   ],
+   "diet": {
+    "netfront": 0.083,
+    "slot": 0.542,
+    "circles": 0.188,
+    "points": 0.083,
+    "corners": 0.0,
+    "outside": 0.104,
+    "long": 0.0
+   }
+  },
+  "8476389": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.08,
+   "lean": "D",
+   "sog": 32,
+   "goals": 3,
+   "team": "UTA",
+   "pos": "C",
+   "name": "Vincent Trocheck",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/UTA/8476389.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.594
+    },
+    {
+     "area": "circles",
+     "share": 0.156
+    }
+   ],
+   "diet": {
+    "netfront": 0.125,
+    "slot": 0.594,
+    "circles": 0.156,
+    "points": 0.031,
+    "corners": 0.062,
+    "outside": 0.0,
+    "long": 0.031
+   }
+  },
+  "8479977": {
+   "letter": "C",
+   "type": "Slot finisher",
+   "fit": 0.2,
+   "lean": null,
+   "sog": 21,
+   "goals": 3,
+   "team": "UTA",
+   "pos": "R",
+   "name": "Kailer Yamamoto",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/UTA/8479977.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.619
+    },
+    {
+     "area": "circles",
+     "share": 0.238
+    }
+   ],
+   "diet": {
+    "netfront": 0.095,
+    "slot": 0.619,
+    "circles": 0.238,
+    "points": 0.0,
+    "corners": 0.0,
+    "outside": 0.048,
+    "long": 0.0
+   }
+  },
+  "8476463": {
+   "letter": "E",
+   "type": "Point shooter",
+   "fit": 0.3,
+   "lean": null,
+   "sog": 21,
+   "goals": 0,
+   "team": "MIN",
+   "pos": "D",
+   "name": "Jonas Brodin",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/MIN/8476463.png",
+   "topAreas": [
+    {
+     "area": "points",
+     "share": 0.619
+    },
+    {
+     "area": "outside",
+     "share": 0.143
+    }
+   ],
+   "diet": {
+    "netfront": 0.048,
+    "slot": 0.048,
+    "circles": 0.0,
+    "points": 0.619,
+    "corners": 0.0,
+    "outside": 0.143,
+    "long": 0.143
+   }
+  },
+  "8480800": {
+   "letter": "E",
+   "type": "Point shooter",
+   "fit": 0.12,
+   "lean": null,
+   "sog": 52,
+   "goals": 6,
+   "team": "MIN",
+   "pos": "D",
+   "name": "Quinn Hughes",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/MIN/8480800.png",
+   "topAreas": [
+    {
+     "area": "points",
+     "share": 0.5
+    },
+    {
+     "area": "circles",
+     "share": 0.154
+    }
+   ],
+   "diet": {
+    "netfront": 0.096,
+    "slot": 0.096,
+    "circles": 0.154,
+    "points": 0.5,
+    "corners": 0.0,
+    "outside": 0.115,
+    "long": 0.038
+   }
+  },
+  "8476931": {
+   "letter": "F",
+   "type": "Activating defenseman",
+   "fit": 0.09,
+   "lean": "E",
+   "sog": 20,
+   "goals": 0,
+   "team": "TOR",
+   "pos": "D",
+   "name": "Jake McCabe",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/TOR/8476931.png",
+   "topAreas": [
+    {
+     "area": "points",
+     "share": 0.35
+    },
+    {
+     "area": "circles",
+     "share": 0.25
+    }
+   ],
+   "diet": {
+    "netfront": 0.05,
+    "slot": 0.15,
+    "circles": 0.25,
+    "points": 0.35,
+    "corners": 0.0,
+    "outside": 0.1,
+    "long": 0.1
+   }
+  },
+  "8478178": {
+   "letter": "E",
+   "type": "Point shooter",
+   "fit": 0.47,
+   "lean": null,
+   "sog": 46,
+   "goals": 1,
+   "team": "TOR",
+   "pos": "D",
+   "name": "Darren Raddysh",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/TOR/8478178.png",
+   "topAreas": [
+    {
+     "area": "points",
+     "share": 0.63
+    },
+    {
+     "area": "slot",
+     "share": 0.109
+    }
+   ],
+   "diet": {
+    "netfront": 0.043,
+    "slot": 0.109,
+    "circles": 0.109,
+    "points": 0.63,
+    "corners": 0.0,
+    "outside": 0.087,
+    "long": 0.022
+   }
+  },
+  "8476853": {
+   "letter": "F",
+   "type": "Activating defenseman",
+   "fit": 0.05,
+   "lean": "E",
+   "sog": 21,
+   "goals": 0,
+   "team": "TOR",
+   "pos": "D",
+   "name": "Morgan Rielly",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/TOR/8476853.png",
+   "topAreas": [
+    {
+     "area": "outside",
+     "share": 0.333
+    },
+    {
+     "area": "points",
+     "share": 0.286
+    }
+   ],
+   "diet": {
+    "netfront": 0.095,
+    "slot": 0.048,
+    "circles": 0.095,
+    "points": 0.286,
+    "corners": 0.0,
+    "outside": 0.333,
+    "long": 0.143
+   }
+  },
+  "8479442": {
+   "letter": "E",
+   "type": "Point shooter",
+   "fit": 0.25,
+   "lean": null,
+   "sog": 23,
+   "goals": 2,
+   "team": "TOR",
+   "pos": "D",
+   "name": "Troy Stecher",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/TOR/8479442.png",
+   "topAreas": [
+    {
+     "area": "points",
+     "share": 0.565
+    },
+    {
+     "area": "circles",
+     "share": 0.13
+    }
+   ],
+   "diet": {
+    "netfront": 0.087,
+    "slot": 0.087,
+    "circles": 0.13,
+    "points": 0.565,
+    "corners": 0.0,
+    "outside": 0.043,
+    "long": 0.087
+   }
+  },
+  "8470613": {
+   "letter": "E",
+   "type": "Point shooter",
+   "fit": 0.22,
+   "lean": null,
+   "sog": 28,
+   "goals": 0,
+   "team": "COL",
+   "pos": "D",
+   "name": "Brent Burns",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/COL/8470613.png",
+   "topAreas": [
+    {
+     "area": "points",
+     "share": 0.643
+    },
+    {
+     "area": "outside",
+     "share": 0.286
+    }
+   ],
+   "diet": {
+    "netfront": 0.0,
+    "slot": 0.0,
+    "circles": 0.0,
+    "points": 0.643,
+    "corners": 0.0,
+    "outside": 0.286,
+    "long": 0.071
+   }
+  },
+  "8480069": {
+   "letter": "E",
+   "type": "Point shooter",
+   "fit": 0.4,
+   "lean": null,
+   "sog": 47,
+   "goals": 5,
+   "team": "COL",
+   "pos": "D",
+   "name": "Cale Makar",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/COL/8480069.png",
+   "topAreas": [
+    {
+     "area": "points",
+     "share": 0.553
+    },
+    {
+     "area": "circles",
+     "share": 0.191
+    }
+   ],
+   "diet": {
+    "netfront": 0.064,
+    "slot": 0.128,
+    "circles": 0.191,
+    "points": 0.553,
+    "corners": 0.0,
+    "outside": 0.064,
+    "long": 0.0
+   }
+  },
+  "8484258": {
+   "letter": "E",
+   "type": "Point shooter",
+   "fit": 0.32,
+   "lean": null,
+   "sog": 25,
+   "goals": 0,
+   "team": "COL",
+   "pos": "D",
+   "name": "Sam Malinski",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/COL/8484258.png",
+   "topAreas": [
+    {
+     "area": "points",
+     "share": 0.76
+    },
+    {
+     "area": "circles",
+     "share": 0.12
+    }
+   ],
+   "diet": {
+    "netfront": 0.0,
+    "slot": 0.04,
+    "circles": 0.12,
+    "points": 0.76,
+    "corners": 0.0,
+    "outside": 0.04,
+    "long": 0.04
+   }
+  },
+  "8478038": {
+   "letter": "E",
+   "type": "Point shooter",
+   "fit": 0.34,
+   "lean": null,
+   "sog": 36,
+   "goals": 6,
+   "team": "COL",
+   "pos": "D",
+   "name": "Devon Toews",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/COL/8478038.png",
+   "topAreas": [
+    {
+     "area": "points",
+     "share": 0.639
+    },
+    {
+     "area": "slot",
+     "share": 0.139
+    }
+   ],
+   "diet": {
+    "netfront": 0.028,
+    "slot": 0.139,
+    "circles": 0.111,
+    "points": 0.639,
+    "corners": 0.0,
+    "outside": 0.0,
+    "long": 0.083
+   }
+  },
+  "8480865": {
+   "letter": "E",
+   "type": "Point shooter",
+   "fit": 0.44,
+   "lean": null,
+   "sog": 40,
+   "goals": 0,
+   "team": "MTL",
+   "pos": "D",
+   "name": "Noah Dobson",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/MTL/8480865.png",
+   "topAreas": [
+    {
+     "area": "points",
+     "share": 0.625
+    },
+    {
+     "area": "circles",
+     "share": 0.175
+    }
+   ],
+   "diet": {
+    "netfront": 0.025,
+    "slot": 0.05,
+    "circles": 0.175,
+    "points": 0.625,
+    "corners": 0.0,
+    "outside": 0.05,
+    "long": 0.075
+   }
+  },
+  "8483457": {
+   "letter": "E",
+   "type": "Point shooter",
+   "fit": 0.03,
+   "lean": "F",
+   "sog": 37,
+   "goals": 3,
+   "team": "MTL",
+   "pos": "D",
+   "name": "Lane Hutson",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/MTL/8483457.png",
+   "topAreas": [
+    {
+     "area": "points",
+     "share": 0.459
+    },
+    {
+     "area": "slot",
+     "share": 0.189
+    }
+   ],
+   "diet": {
+    "netfront": 0.054,
+    "slot": 0.189,
+    "circles": 0.135,
+    "points": 0.459,
+    "corners": 0.0,
+    "outside": 0.081,
+    "long": 0.081
+   }
+  },
+  "8478469": {
+   "letter": "E",
+   "type": "Point shooter",
+   "fit": 0.17,
+   "lean": null,
+   "sog": 27,
+   "goals": 1,
+   "team": "OTT",
+   "pos": "D",
+   "name": "Thomas Chabot",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/OTT/8478469.png",
+   "topAreas": [
+    {
+     "area": "points",
+     "share": 0.481
+    },
+    {
+     "area": "circles",
+     "share": 0.222
+    }
+   ],
+   "diet": {
+    "netfront": 0.074,
+    "slot": 0.074,
+    "circles": 0.222,
+    "points": 0.481,
+    "corners": 0.0,
+    "outside": 0.111,
+    "long": 0.037
+   }
+  },
+  "8482095": {
+   "letter": "E",
+   "type": "Point shooter",
+   "fit": 0.04,
+   "lean": "F",
+   "sog": 24,
+   "goals": 2,
+   "team": "OTT",
+   "pos": "D",
+   "name": "Tyler Kleven",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/OTT/8482095.png",
+   "topAreas": [
+    {
+     "area": "points",
+     "share": 0.375
+    },
+    {
+     "area": "circles",
+     "share": 0.208
+    }
+   ],
+   "diet": {
+    "netfront": 0.0,
+    "slot": 0.167,
+    "circles": 0.208,
+    "points": 0.375,
+    "corners": 0.0,
+    "outside": 0.125,
+    "long": 0.125
+   }
+  },
+  "8482105": {
+   "letter": "F",
+   "type": "Activating defenseman",
+   "fit": 0.11,
+   "lean": null,
+   "sog": 21,
+   "goals": 1,
+   "team": "OTT",
+   "pos": "D",
+   "name": "Jake Sanderson",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/OTT/8482105.png",
+   "topAreas": [
+    {
+     "area": "circles",
+     "share": 0.333
+    },
+    {
+     "area": "points",
+     "share": 0.333
+    }
+   ],
+   "diet": {
+    "netfront": 0.0,
+    "slot": 0.19,
+    "circles": 0.333,
+    "points": 0.333,
+    "corners": 0.0,
+    "outside": 0.095,
+    "long": 0.048
+   }
+  },
+  "8484759": {
+   "letter": "E",
+   "type": "Point shooter",
+   "fit": 0.46,
+   "lean": null,
+   "sog": 22,
+   "goals": 1,
+   "team": "OTT",
+   "pos": "D",
+   "name": "Carter Yakemchuk",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/OTT/8484759.png",
+   "topAreas": [
+    {
+     "area": "points",
+     "share": 0.591
+    },
+    {
+     "area": "circles",
+     "share": 0.136
+    }
+   ],
+   "diet": {
+    "netfront": 0.0,
+    "slot": 0.091,
+    "circles": 0.136,
+    "points": 0.591,
+    "corners": 0.0,
+    "outside": 0.136,
+    "long": 0.045
+   }
+  },
+  "8476854": {
+   "letter": "E",
+   "type": "Point shooter",
+   "fit": 0.01,
+   "lean": "F",
+   "sog": 22,
+   "goals": 1,
+   "team": "BOS",
+   "pos": "D",
+   "name": "Hampus Lindholm",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/BOS/8476854.png",
+   "topAreas": [
+    {
+     "area": "points",
+     "share": 0.409
+    },
+    {
+     "area": "long",
+     "share": 0.227
+    }
+   ],
+   "diet": {
+    "netfront": 0.091,
+    "slot": 0.091,
+    "circles": 0.136,
+    "points": 0.409,
+    "corners": 0.0,
+    "outside": 0.045,
+    "long": 0.227
+   }
+  },
+  "8479325": {
+   "letter": "E",
+   "type": "Point shooter",
+   "fit": 0.01,
+   "lean": "F",
+   "sog": 22,
+   "goals": 1,
+   "team": "BOS",
+   "pos": "D",
+   "name": "Charlie McAvoy",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/BOS/8479325.png",
+   "topAreas": [
+    {
+     "area": "points",
+     "share": 0.545
+    },
+    {
+     "area": "slot",
+     "share": 0.227
+    }
+   ],
+   "diet": {
+    "netfront": 0.045,
+    "slot": 0.227,
+    "circles": 0.0,
+    "points": 0.545,
+    "corners": 0.0,
+    "outside": 0.136,
+    "long": 0.045
+   }
+  },
+  "8474590": {
+   "letter": "F",
+   "type": "Activating defenseman",
+   "fit": 0.07,
+   "lean": "A",
+   "sog": 41,
+   "goals": 6,
+   "team": "TBL",
+   "pos": "D",
+   "name": "John Carlson",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/TBL/8474590.png",
+   "topAreas": [
+    {
+     "area": "points",
+     "share": 0.415
+    },
+    {
+     "area": "slot",
+     "share": 0.366
+    }
+   ],
+   "diet": {
+    "netfront": 0.0,
+    "slot": 0.366,
+    "circles": 0.098,
+    "points": 0.415,
+    "corners": 0.0,
+    "outside": 0.098,
+    "long": 0.024
+   }
+  },
+  "8478416": {
+   "letter": "E",
+   "type": "Point shooter",
+   "fit": 0.44,
+   "lean": null,
+   "sog": 20,
+   "goals": 0,
+   "team": "TBL",
+   "pos": "D",
+   "name": "Erik Cernak",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/TBL/8478416.png",
+   "topAreas": [
+    {
+     "area": "points",
+     "share": 0.55
+    },
+    {
+     "area": "slot",
+     "share": 0.15
+    }
+   ],
+   "diet": {
+    "netfront": 0.05,
+    "slot": 0.15,
+    "circles": 0.15,
+    "points": 0.55,
+    "corners": 0.0,
+    "outside": 0.1,
+    "long": 0.0
+   }
+  },
+  "8480426": {
+   "letter": "E",
+   "type": "Point shooter",
+   "fit": 0.3,
+   "lean": null,
+   "sog": 25,
+   "goals": 3,
+   "team": "TBL",
+   "pos": "D",
+   "name": "Charle-Edouard D'Astous",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/TBL/8480426.png",
+   "topAreas": [
+    {
+     "area": "points",
+     "share": 0.64
+    },
+    {
+     "area": "slot",
+     "share": 0.16
+    }
+   ],
+   "diet": {
+    "netfront": 0.0,
+    "slot": 0.16,
+    "circles": 0.04,
+    "points": 0.64,
+    "corners": 0.0,
+    "outside": 0.12,
+    "long": 0.04
+   }
+  },
+  "8476462": {
+   "letter": "E",
+   "type": "Point shooter",
+   "fit": 0.48,
+   "lean": null,
+   "sog": 49,
+   "goals": 2,
+   "team": "NJD",
+   "pos": "D",
+   "name": "Dougie Hamilton",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/NJD/8476462.png",
+   "topAreas": [
+    {
+     "area": "points",
+     "share": 0.551
+    },
+    {
+     "area": "circles",
+     "share": 0.163
+    }
+   ],
+   "diet": {
+    "netfront": 0.0,
+    "slot": 0.143,
+    "circles": 0.163,
+    "points": 0.551,
+    "corners": 0.0,
+    "outside": 0.102,
+    "long": 0.041
+   }
+  },
+  "8482684": {
+   "letter": "F",
+   "type": "Activating defenseman",
+   "fit": 0.04,
+   "lean": "E",
+   "sog": 43,
+   "goals": 6,
+   "team": "NJD",
+   "pos": "D",
+   "name": "Luke Hughes",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/NJD/8482684.png",
+   "topAreas": [
+    {
+     "area": "points",
+     "share": 0.442
+    },
+    {
+     "area": "slot",
+     "share": 0.279
+    }
+   ],
+   "diet": {
+    "netfront": 0.023,
+    "slot": 0.279,
+    "circles": 0.14,
+    "points": 0.442,
+    "corners": 0.0,
+    "outside": 0.047,
+    "long": 0.07
+   }
+  },
+  "8479345": {
+   "letter": "E",
+   "type": "Point shooter",
+   "fit": 0.14,
+   "lean": null,
+   "sog": 50,
+   "goals": 2,
+   "team": "WSH",
+   "pos": "D",
+   "name": "Jakob Chychrun",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/WSH/8479345.png",
+   "topAreas": [
+    {
+     "area": "points",
+     "share": 0.46
+    },
+    {
+     "area": "circles",
+     "share": 0.24
+    }
+   ],
+   "diet": {
+    "netfront": 0.04,
+    "slot": 0.12,
+    "circles": 0.24,
+    "points": 0.46,
+    "corners": 0.0,
+    "outside": 0.08,
+    "long": 0.06
+   }
+  },
+  "8484873": {
+   "letter": "F",
+   "type": "Activating defenseman",
+   "fit": 0.0,
+   "lean": "B",
+   "sog": 32,
+   "goals": 5,
+   "team": "WSH",
+   "pos": "D",
+   "name": "Cole Hutson",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/WSH/8484873.png",
+   "topAreas": [
+    {
+     "area": "circles",
+     "share": 0.531
+    },
+    {
+     "area": "slot",
+     "share": 0.219
+    }
+   ],
+   "diet": {
+    "netfront": 0.0,
+    "slot": 0.219,
+    "circles": 0.531,
+    "points": 0.094,
+    "corners": 0.0,
+    "outside": 0.156,
+    "long": 0.0
+   }
+  },
+  "8483485": {
+   "letter": "E",
+   "type": "Point shooter",
+   "fit": 0.0,
+   "lean": "F",
+   "sog": 29,
+   "goals": 4,
+   "team": "CBJ",
+   "pos": "D",
+   "name": "Denton Mateychuk",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/CBJ/8483485.png",
+   "topAreas": [
+    {
+     "area": "points",
+     "share": 0.483
+    },
+    {
+     "area": "slot",
+     "share": 0.207
+    }
+   ],
+   "diet": {
+    "netfront": 0.069,
+    "slot": 0.207,
+    "circles": 0.138,
+    "points": 0.483,
+    "corners": 0.0,
+    "outside": 0.069,
+    "long": 0.034
+   }
+  },
+  "8478460": {
+   "letter": "F",
+   "type": "Activating defenseman",
+   "fit": 0.13,
+   "lean": null,
+   "sog": 50,
+   "goals": 2,
+   "team": "CBJ",
+   "pos": "D",
+   "name": "Zach Werenski",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/CBJ/8478460.png",
+   "topAreas": [
+    {
+     "area": "points",
+     "share": 0.38
+    },
+    {
+     "area": "circles",
+     "share": 0.24
+    }
+   ],
+   "diet": {
+    "netfront": 0.02,
+    "slot": 0.16,
+    "circles": 0.24,
+    "points": 0.38,
+    "corners": 0.0,
+    "outside": 0.2,
+    "long": 0.0
+   }
+  },
+  "8475753": {
+   "letter": "E",
+   "type": "Point shooter",
+   "fit": 0.21,
+   "lean": null,
+   "sog": 25,
+   "goals": 3,
+   "team": "DET",
+   "pos": "D",
+   "name": "Justin Faulk",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/DET/8475753.png",
+   "topAreas": [
+    {
+     "area": "points",
+     "share": 0.52
+    },
+    {
+     "area": "circles",
+     "share": 0.32
+    }
+   ],
+   "diet": {
+    "netfront": 0.0,
+    "slot": 0.0,
+    "circles": 0.32,
+    "points": 0.52,
+    "corners": 0.0,
+    "outside": 0.04,
+    "long": 0.12
+   }
+  },
+  "8483679": {
+   "letter": "E",
+   "type": "Point shooter",
+   "fit": 0.01,
+   "lean": "F",
+   "sog": 20,
+   "goals": 2,
+   "team": "DET",
+   "pos": "D",
+   "name": "Anton Johansson",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/DET/8483679.png",
+   "topAreas": [
+    {
+     "area": "points",
+     "share": 0.5
+    },
+    {
+     "area": "slot",
+     "share": 0.15
+    }
+   ],
+   "diet": {
+    "netfront": 0.1,
+    "slot": 0.15,
+    "circles": 0.15,
+    "points": 0.5,
+    "corners": 0.0,
+    "outside": 0.1,
+    "long": 0.0
+   }
+  },
+  "8481542": {
+   "letter": "E",
+   "type": "Point shooter",
+   "fit": 0.36,
+   "lean": null,
+   "sog": 38,
+   "goals": 1,
+   "team": "DET",
+   "pos": "D",
+   "name": "Moritz Seider",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/DET/8481542.png",
+   "topAreas": [
+    {
+     "area": "points",
+     "share": 0.553
+    },
+    {
+     "area": "slot",
+     "share": 0.132
+    }
+   ],
+   "diet": {
+    "netfront": 0.0,
+    "slot": 0.132,
+    "circles": 0.105,
+    "points": 0.553,
+    "corners": 0.0,
+    "outside": 0.132,
+    "long": 0.079
+   }
+  },
+  "8484783": {
+   "letter": "F",
+   "type": "Activating defenseman",
+   "fit": 0.07,
+   "lean": "E",
+   "sog": 24,
+   "goals": 1,
+   "team": "CHI",
+   "pos": "D",
+   "name": "Artyom Levshunov",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/CHI/8484783.png",
+   "topAreas": [
+    {
+     "area": "points",
+     "share": 0.417
+    },
+    {
+     "area": "slot",
+     "share": 0.208
+    }
+   ],
+   "diet": {
+    "netfront": 0.0,
+    "slot": 0.208,
+    "circles": 0.083,
+    "points": 0.417,
+    "corners": 0.042,
+    "outside": 0.208,
+    "long": 0.042
+   }
+  },
+  "8483506": {
+   "letter": "E",
+   "type": "Point shooter",
+   "fit": 0.4,
+   "lean": null,
+   "sog": 22,
+   "goals": 1,
+   "team": "CHI",
+   "pos": "D",
+   "name": "Sam Rinzel",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/CHI/8483506.png",
+   "topAreas": [
+    {
+     "area": "points",
+     "share": 0.545
+    },
+    {
+     "area": "circles",
+     "share": 0.227
+    }
+   ],
+   "diet": {
+    "netfront": 0.0,
+    "slot": 0.136,
+    "circles": 0.227,
+    "points": 0.545,
+    "corners": 0.0,
+    "outside": 0.091,
+    "long": 0.0
+   }
+  },
+  "8481568": {
+   "letter": "E",
+   "type": "Point shooter",
+   "fit": 0.2,
+   "lean": null,
+   "sog": 20,
+   "goals": 0,
+   "team": "CHI",
+   "pos": "D",
+   "name": "Alex Vlasic",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/CHI/8481568.png",
+   "topAreas": [
+    {
+     "area": "points",
+     "share": 0.45
+    },
+    {
+     "area": "long",
+     "share": 0.25
+    }
+   ],
+   "diet": {
+    "netfront": 0.0,
+    "slot": 0.15,
+    "circles": 0.05,
+    "points": 0.45,
+    "corners": 0.0,
+    "outside": 0.1,
+    "long": 0.25
+   }
+  },
+  "8480839": {
+   "letter": "E",
+   "type": "Point shooter",
+   "fit": 0.37,
+   "lean": null,
+   "sog": 44,
+   "goals": 3,
+   "team": "BUF",
+   "pos": "D",
+   "name": "Rasmus Dahlin",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/BUF/8480839.png",
+   "topAreas": [
+    {
+     "area": "points",
+     "share": 0.568
+    },
+    {
+     "area": "circles",
+     "share": 0.182
+    }
+   ],
+   "diet": {
+    "netfront": 0.0,
+    "slot": 0.159,
+    "circles": 0.182,
+    "points": 0.568,
+    "corners": 0.0,
+    "outside": 0.091,
+    "long": 0.0
+   }
+  },
+  "8482671": {
+   "letter": "E",
+   "type": "Point shooter",
+   "fit": 0.21,
+   "lean": null,
+   "sog": 24,
+   "goals": 2,
+   "team": "BUF",
+   "pos": "D",
+   "name": "Owen Power",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/BUF/8482671.png",
+   "topAreas": [
+    {
+     "area": "points",
+     "share": 0.458
+    },
+    {
+     "area": "circles",
+     "share": 0.208
+    }
+   ],
+   "diet": {
+    "netfront": 0.0,
+    "slot": 0.125,
+    "circles": 0.208,
+    "points": 0.458,
+    "corners": 0.0,
+    "outside": 0.167,
+    "long": 0.042
+   }
+  },
+  "8480807": {
+   "letter": "F",
+   "type": "Activating defenseman",
+   "fit": 0.02,
+   "lean": "E",
+   "sog": 26,
+   "goals": 2,
+   "team": "BUF",
+   "pos": "D",
+   "name": "Mattias Samuelsson",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/BUF/8480807.png",
+   "topAreas": [
+    {
+     "area": "points",
+     "share": 0.423
+    },
+    {
+     "area": "slot",
+     "share": 0.154
+    }
+   ],
+   "diet": {
+    "netfront": 0.115,
+    "slot": 0.154,
+    "circles": 0.154,
+    "points": 0.423,
+    "corners": 0.0,
+    "outside": 0.115,
+    "long": 0.038
+   }
+  },
+  "8482803": {
+   "letter": "F",
+   "type": "Activating defenseman",
+   "fit": 0.0,
+   "lean": "B",
+   "sog": 31,
+   "goals": 3,
+   "team": "BUF",
+   "pos": "D",
+   "name": "Olen Zellweger",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/BUF/8482803.png",
+   "topAreas": [
+    {
+     "area": "points",
+     "share": 0.29
+    },
+    {
+     "area": "circles",
+     "share": 0.258
+    }
+   ],
+   "diet": {
+    "netfront": 0.194,
+    "slot": 0.065,
+    "circles": 0.258,
+    "points": 0.29,
+    "corners": 0.0,
+    "outside": 0.129,
+    "long": 0.065
+   }
+  },
+  "8479983": {
+   "letter": "E",
+   "type": "Point shooter",
+   "fit": 0.33,
+   "lean": null,
+   "sog": 22,
+   "goals": 2,
+   "team": "WPG",
+   "pos": "D",
+   "name": "Mario Ferraro",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/WPG/8479983.png",
+   "topAreas": [
+    {
+     "area": "points",
+     "share": 0.545
+    },
+    {
+     "area": "circles",
+     "share": 0.227
+    }
+   ],
+   "diet": {
+    "netfront": 0.0,
+    "slot": 0.045,
+    "circles": 0.227,
+    "points": 0.545,
+    "corners": 0.0,
+    "outside": 0.091,
+    "long": 0.091
+   }
+  },
+  "8480145": {
+   "letter": "E",
+   "type": "Point shooter",
+   "fit": 0.26,
+   "lean": null,
+   "sog": 47,
+   "goals": 4,
+   "team": "WPG",
+   "pos": "D",
+   "name": "Neal Pionk",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/WPG/8480145.png",
+   "topAreas": [
+    {
+     "area": "points",
+     "share": 0.617
+    },
+    {
+     "area": "slot",
+     "share": 0.191
+    }
+   ],
+   "diet": {
+    "netfront": 0.0,
+    "slot": 0.191,
+    "circles": 0.064,
+    "points": 0.617,
+    "corners": 0.0,
+    "outside": 0.085,
+    "long": 0.043
+   }
+  },
+  "8480049": {
+   "letter": "E",
+   "type": "Point shooter",
+   "fit": 0.32,
+   "lean": null,
+   "sog": 20,
+   "goals": 2,
+   "team": "WPG",
+   "pos": "D",
+   "name": "Dylan Samberg",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/WPG/8480049.png",
+   "topAreas": [
+    {
+     "area": "points",
+     "share": 0.5
+    },
+    {
+     "area": "outside",
+     "share": 0.15
+    }
+   ],
+   "diet": {
+    "netfront": 0.05,
+    "slot": 0.1,
+    "circles": 0.1,
+    "points": 0.5,
+    "corners": 0.0,
+    "outside": 0.15,
+    "long": 0.1
+   }
+  },
+  "8477932": {
+   "letter": "F",
+   "type": "Activating defenseman",
+   "fit": 0.02,
+   "lean": "E",
+   "sog": 25,
+   "goals": 1,
+   "team": "FLA",
+   "pos": "D",
+   "name": "Aaron Ekblad",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/FLA/8477932.png",
+   "topAreas": [
+    {
+     "area": "points",
+     "share": 0.44
+    },
+    {
+     "area": "outside",
+     "share": 0.24
+    }
+   ],
+   "diet": {
+    "netfront": 0.08,
+    "slot": 0.16,
+    "circles": 0.04,
+    "points": 0.44,
+    "corners": 0.0,
+    "outside": 0.24,
+    "long": 0.04
+   }
+  },
+  "8478055": {
+   "letter": "E",
+   "type": "Point shooter",
+   "fit": 0.3,
+   "lean": null,
+   "sog": 24,
+   "goals": 1,
+   "team": "FLA",
+   "pos": "D",
+   "name": "Gustav Forsling",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/FLA/8478055.png",
+   "topAreas": [
+    {
+     "area": "points",
+     "share": 0.5
+    },
+    {
+     "area": "slot",
+     "share": 0.167
+    }
+   ],
+   "diet": {
+    "netfront": 0.0,
+    "slot": 0.167,
+    "circles": 0.167,
+    "points": 0.5,
+    "corners": 0.0,
+    "outside": 0.125,
+    "long": 0.042
+   }
+  },
+  "8477495": {
+   "letter": "E",
+   "type": "Point shooter",
+   "fit": 0.07,
+   "lean": "F",
+   "sog": 45,
+   "goals": 3,
+   "team": "FLA",
+   "pos": "D",
+   "name": "Seth Jones",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/FLA/8477495.png",
+   "topAreas": [
+    {
+     "area": "points",
+     "share": 0.511
+    },
+    {
+     "area": "slot",
+     "share": 0.2
+    }
+   ],
+   "diet": {
+    "netfront": 0.067,
+    "slot": 0.2,
+    "circles": 0.133,
+    "points": 0.511,
+    "corners": 0.0,
+    "outside": 0.067,
+    "long": 0.022
+   }
+  },
+  "8478859": {
+   "letter": "F",
+   "type": "Activating defenseman",
+   "fit": 0.22,
+   "lean": null,
+   "sog": 25,
+   "goals": 2,
+   "team": "FLA",
+   "pos": "D",
+   "name": "Niko Mikkola",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/FLA/8478859.png",
+   "topAreas": [
+    {
+     "area": "points",
+     "share": 0.36
+    },
+    {
+     "area": "slot",
+     "share": 0.2
+    }
+   ],
+   "diet": {
+    "netfront": 0.04,
+    "slot": 0.2,
+    "circles": 0.12,
+    "points": 0.36,
+    "corners": 0.0,
+    "outside": 0.2,
+    "long": 0.08
+   }
+  },
+  "8481581": {
+   "letter": "F",
+   "type": "Activating defenseman",
+   "fit": 0.19,
+   "lean": null,
+   "sog": 34,
+   "goals": 2,
+   "team": "DAL",
+   "pos": "D",
+   "name": "Thomas Harley",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/DAL/8481581.png",
+   "topAreas": [
+    {
+     "area": "points",
+     "share": 0.412
+    },
+    {
+     "area": "circles",
+     "share": 0.235
+    }
+   ],
+   "diet": {
+    "netfront": 0.059,
+    "slot": 0.147,
+    "circles": 0.235,
+    "points": 0.412,
+    "corners": 0.0,
+    "outside": 0.118,
+    "long": 0.029
+   }
+  },
+  "8480036": {
+   "letter": "F",
+   "type": "Activating defenseman",
+   "fit": 0.14,
+   "lean": null,
+   "sog": 26,
+   "goals": 3,
+   "team": "DAL",
+   "pos": "D",
+   "name": "Miro Heiskanen",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/DAL/8480036.png",
+   "topAreas": [
+    {
+     "area": "circles",
+     "share": 0.346
+    },
+    {
+     "area": "points",
+     "share": 0.308
+    }
+   ],
+   "diet": {
+    "netfront": 0.038,
+    "slot": 0.115,
+    "circles": 0.346,
+    "points": 0.308,
+    "corners": 0.0,
+    "outside": 0.154,
+    "long": 0.038
+   }
+  },
+  "8482111": {
+   "letter": "F",
+   "type": "Activating defenseman",
+   "fit": 0.0,
+   "lean": "B",
+   "sog": 24,
+   "goals": 3,
+   "team": "STL",
+   "pos": "D",
+   "name": "Justin Barron",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/STL/8482111.png",
+   "topAreas": [
+    {
+     "area": "circles",
+     "share": 0.25
+    },
+    {
+     "area": "outside",
+     "share": 0.208
+    }
+   ],
+   "diet": {
+    "netfront": 0.083,
+    "slot": 0.167,
+    "circles": 0.25,
+    "points": 0.167,
+    "corners": 0.0,
+    "outside": 0.208,
+    "long": 0.125
+   }
+  },
+  "8481598": {
+   "letter": "F",
+   "type": "Activating defenseman",
+   "fit": 0.07,
+   "lean": "A",
+   "sog": 39,
+   "goals": 4,
+   "team": "STL",
+   "pos": "D",
+   "name": "Philip Broberg",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/STL/8481598.png",
+   "topAreas": [
+    {
+     "area": "slot",
+     "share": 0.359
+    },
+    {
+     "area": "points",
+     "share": 0.256
+    }
+   ],
+   "diet": {
+    "netfront": 0.077,
+    "slot": 0.359,
+    "circles": 0.205,
+    "points": 0.256,
+    "corners": 0.0,
+    "outside": 0.026,
+    "long": 0.077
+   }
+  },
+  "8475764": {
+   "letter": "E",
+   "type": "Point shooter",
+   "fit": 0.24,
+   "lean": null,
+   "sog": 20,
+   "goals": 0,
+   "team": "STL",
+   "pos": "D",
+   "name": "Cam Fowler",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/STL/8475764.png",
+   "topAreas": [
+    {
+     "area": "points",
+     "share": 0.5
+    },
+    {
+     "area": "circles",
+     "share": 0.3
+    }
+   ],
+   "diet": {
+    "netfront": 0.0,
+    "slot": 0.05,
+    "circles": 0.3,
+    "points": 0.5,
+    "corners": 0.0,
+    "outside": 0.1,
+    "long": 0.05
+   }
+  },
+  "8476892": {
+   "letter": "F",
+   "type": "Activating defenseman",
+   "fit": 0.19,
+   "lean": null,
+   "sog": 23,
+   "goals": 0,
+   "team": "STL",
+   "pos": "D",
+   "name": "Colton Parayko",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/STL/8476892.png",
+   "topAreas": [
+    {
+     "area": "points",
+     "share": 0.304
+    },
+    {
+     "area": "slot",
+     "share": 0.261
+    }
+   ],
+   "diet": {
+    "netfront": 0.043,
+    "slot": 0.261,
+    "circles": 0.174,
+    "points": 0.304,
+    "corners": 0.0,
+    "outside": 0.13,
+    "long": 0.087
+   }
+  },
+  "8482730": {
+   "letter": "E",
+   "type": "Point shooter",
+   "fit": 0.2,
+   "lean": null,
+   "sog": 26,
+   "goals": 3,
+   "team": "LAK",
+   "pos": "D",
+   "name": "Brandt Clarke",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/LAK/8482730.png",
+   "topAreas": [
+    {
+     "area": "points",
+     "share": 0.538
+    },
+    {
+     "area": "slot",
+     "share": 0.154
+    }
+   ],
+   "diet": {
+    "netfront": 0.038,
+    "slot": 0.154,
+    "circles": 0.038,
+    "points": 0.538,
+    "corners": 0.0,
+    "outside": 0.154,
+    "long": 0.077
+   }
+  },
+  "8485366": {
+   "letter": "F",
+   "type": "Activating defenseman",
+   "fit": 0.1,
+   "lean": "E",
+   "sog": 62,
+   "goals": 5,
+   "team": "NYI",
+   "pos": "D",
+   "name": "Matthew Schaefer",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/NYI/8485366.png",
+   "topAreas": [
+    {
+     "area": "points",
+     "share": 0.403
+    },
+    {
+     "area": "circles",
+     "share": 0.323
+    }
+   ],
+   "diet": {
+    "netfront": 0.032,
+    "slot": 0.177,
+    "circles": 0.323,
+    "points": 0.403,
+    "corners": 0.0,
+    "outside": 0.048,
+    "long": 0.016
+   }
+  },
+  "8479410": {
+   "letter": "E",
+   "type": "Point shooter",
+   "fit": 0.34,
+   "lean": null,
+   "sog": 46,
+   "goals": 5,
+   "team": "UTA",
+   "pos": "D",
+   "name": "Mikhail Sergachev",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/UTA/8479410.png",
+   "topAreas": [
+    {
+     "area": "points",
+     "share": 0.543
+    },
+    {
+     "area": "slot",
+     "share": 0.174
+    }
+   ],
+   "diet": {
+    "netfront": 0.022,
+    "slot": 0.174,
+    "circles": 0.087,
+    "points": 0.543,
+    "corners": 0.0,
+    "outside": 0.022,
+    "long": 0.152
+   }
+  },
+  "8477346": {
+   "letter": "E",
+   "type": "Point shooter",
+   "fit": 0.19,
+   "lean": null,
+   "sog": 33,
+   "goals": 2,
+   "team": "UTA",
+   "pos": "D",
+   "name": "MacKenzie Weegar",
+   "headshot": "https://assets.nhle.com/mugs/nhl/20262027/UTA/8477346.png",
+   "topAreas": [
+    {
+     "area": "points",
+     "share": 0.485
+    },
+    {
+     "area": "circles",
+     "share": 0.333
+    }
+   ],
+   "diet": {
+    "netfront": 0.03,
+    "slot": 0.03,
+    "circles": 0.333,
+    "points": 0.485,
+    "corners": 0.0,
+    "outside": 0.061,
+    "long": 0.061
+   }
+  }
+ }
+}

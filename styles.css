@@ -1290,6 +1290,46 @@ tr.team-row:focus-visible { outline: 2px solid var(--teal); outline-offset: -2px
 .edge-band-delta.up { color: var(--teal); }
 .edge-band-delta.dn { color: var(--gold); }
 .edge-band-vol, .edge-band-lg { font-size: .66rem; color: var(--muted); margin-top: .15rem; }
+/* ---------------- player types + standouts (GMG replication) ----------------
+   Type badge: a small teal-glass letter chip that rides beside a skater's
+   name everywhere it renders. Display only — types feed no price. */
+.type-badge { display: inline-flex; align-items: center; gap: .3rem; vertical-align: middle; margin-left: .45rem; padding: .1rem .45rem .12rem; border-radius: 999px; background: rgba(58, 219, 227, .13); border: 1px solid rgba(58, 219, 227, .5); white-space: nowrap; }
+.type-badge .tb-l { font-size: .72rem; font-weight: 900; color: var(--teal); line-height: 1; }
+.type-badge .tb-n { font-size: .56rem; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; color: #bfeef2; line-height: 1; }
+.type-badge.lean { background: rgba(255, 255, 255, .05); border-color: rgba(255, 255, 255, .22); }
+.type-badge.lean .tb-l { color: var(--muted); }
+.pc-type-strip { margin: .55rem 0 .1rem; padding: .6rem .75rem; border-radius: 12px; background: rgba(58, 219, 227, .07); border: 1px solid rgba(58, 219, 227, .3); font-size: .85rem; }
+.pc-type-strip .pts-lab { font-size: .62rem; font-weight: 800; letter-spacing: .09em; color: var(--teal); display: block; margin-bottom: .15rem; }
+.pc-type-strip .pts-fit { color: var(--muted); font-size: .78rem; }
+/* Types view */
+.types-group { margin: 0 0 1.1rem; }
+.types-head { display: flex; align-items: center; gap: .6rem; margin: .4rem 0 .15rem; }
+.types-head .type-badge { margin-left: 0; padding: .22rem .6rem .26rem; }
+.types-head .type-badge .tb-l { font-size: 1rem; }
+.types-head .type-badge .tb-n { font-size: .66rem; }
+.types-count { color: var(--muted); font-size: .78rem; font-weight: 700; }
+.types-desc { color: var(--muted); font-size: .85rem; margin: 0 0 .5rem; }
+.types-members { display: flex; flex-direction: column; }
+.type-row { display: flex; align-items: center; gap: .55rem; padding: .42rem .2rem; border-bottom: 1px solid rgba(255, 255, 255, .06); }
+.type-row .pname, .type-row .pname-static { flex: 1 1 auto; min-width: 0; }
+.type-row-meta { color: var(--muted); font-size: .76rem; white-space: nowrap; }
+.type-fit { font-size: .72rem; font-weight: 800; color: var(--teal); white-space: nowrap; }
+/* Standouts view */
+.so-cats { display: flex; flex-wrap: wrap; gap: .45rem; margin: .2rem 0 1rem; }
+.so-cat { padding: .42rem .85rem; border-radius: 999px; border: 1px solid rgba(255, 255, 255, .18); background: rgba(255, 255, 255, .04); color: inherit; font-weight: 700; font-size: .85rem; cursor: pointer; }
+.so-cat.on { background: var(--teal); border-color: var(--teal); color: #062a30; }
+.so-h { font-size: .8rem; font-weight: 900; letter-spacing: .1em; color: var(--teal); margin: 1.1rem 0 .35rem; }
+.so-h.tough { color: var(--danger, #f0665e); }
+.so-row { padding: .6rem .2rem .65rem; border-bottom: 1px solid rgba(255, 255, 255, .07); }
+.so-row-head { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
+.so-row-head .pname, .so-row-head .pname-static { font-size: 1.02rem; }
+.so-match { color: var(--muted); font-size: .78rem; font-weight: 700; }
+.so-read { font-size: .88rem; margin-top: .3rem; }
+.so-model { font-size: .92rem; font-weight: 700; color: #bfeef2; margin-top: .15rem; }
+.so-basis { color: var(--muted); font-size: .74rem; margin-top: .2rem; }
+.so-stacked { font-size: .62rem; font-weight: 900; letter-spacing: .08em; color: #231a02; background: var(--gold); border-radius: 6px; padding: .18rem .45rem; }
+.so-flag { font-size: .62rem; font-weight: 800; letter-spacing: .05em; color: var(--gold); border: 1px solid rgba(245, 185, 66, .6); background: rgba(245, 185, 66, .08); border-radius: 6px; padding: .16rem .45rem; }
+.so-foot { color: var(--muted); font-size: .78rem; margin-top: 1rem; }
 /* ---------------- goalie workload (goalies sidecar) ---------------- */
 .gwork-last { font-size: .8rem; font-weight: 700; color: var(--muted); }
 .gwork-chips { display: flex; flex-direction: column; align-items: flex-start; gap: .4rem; margin-top: .55rem; }

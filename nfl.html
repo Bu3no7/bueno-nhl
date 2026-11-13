@@ -341,7 +341,7 @@
   <div class="card featured" id="tdLooks"></div>
   <h2 class="sec">TOP YARDAGE LOOKS <span>fair medians</span></h2>
   <div class="card" id="yardLooks"></div>
-  <h2 class="sec">ON BYE · WEEK 11 <span>no prices this week</span></h2>
+  <h2 class="sec">ON BYE · WEEK 10 <span>no prices this week</span></h2>
   <div class="card" id="byeWrap"></div>
   <h2 class="sec">HOW IT WORKS <span>the short version</span></h2>
   <div class="card">
@@ -364,7 +364,7 @@
 
 <!-- ============ VIEW: SLATE ============ -->
 <section class="view" id="view-slate">
-  <h2 class="sec">WEEK 11 SLATE <span>game model · live tracker</span></h2>
+  <h2 class="sec">WEEK 10 SLATE <span>game model · live tracker</span></h2>
   <div id="slateWrap"></div>
   <h2 class="sec">STANDINGS <span>by division</span></h2>
   <div id="standingsWrap"></div>
@@ -374,7 +374,7 @@
 <section class="view" id="view-game">
   <div class="backbar"><span class="backbtn" id="gameBackBtn">‹ Slate</span></div>
   <div class="phead">
-    <div><h3 id="gTitle">Baltimore at Jacksonville</h3><p id="gMeta">THU 6:15 PM · WEEK 11 · GAME BREAKDOWN</p></div>
+    <div><h3 id="gTitle">Baltimore at Jacksonville</h3><p id="gMeta">THU 6:15 PM · WEEK 10 · GAME BREAKDOWN</p></div>
   </div>
   <div id="gBody"></div>
 </section>
@@ -1263,7 +1263,7 @@ dataFetch("data/nfl-2026-w10.json").then(function(r){ return r.json(); }).then(f
    sheet, playoff picture. Display-only throughout: every leg and number
    below comes from probabilities the bundle already ships, the ESPN
    summary winprobability feed, or the two data/ sidecars. ===== */
-var PARLAY = {}, ZONES = null, PLAYOFF = null, WPSERIES = {}, TP_MKT = "any";
+var PARLAY = {}, ZONES = null, PLAYOFF = null, WPSERIES = {}, TP_MKT = "any", TYPES = null, SO_CAT = "td";
 (function(){
   var css = ""
   + "#view-board .pills{display:none}"
@@ -1357,7 +1357,28 @@ var PARLAY = {}, ZONES = null, PLAYOFF = null, WPSERIES = {}, TP_MKT = "any";
   + ".pl-joint .box b{display:block;font-size:1.15rem;color:#e8b64c}"
   + ".pl-joint .box i{font-style:normal;font-size:.56rem;font-weight:800;letter-spacing:.1em;color:#8b96ab}"
   + ".pl-clear{margin-top:10px;width:100%;font:inherit;font-weight:800;font-size:.74rem;letter-spacing:.06em;color:#ffb3ad;background:rgba(240,102,94,.12);border:1px solid rgba(240,102,94,.4);border-radius:11px;padding:.55rem;cursor:pointer}"
-  + ".pl-rm{margin-left:auto;font:inherit;font-weight:900;color:#ffb3ad;background:none;border:none;font-size:1rem;cursor:pointer;padding:2px 6px}";
+  + ".pl-rm{margin-left:auto;font:inherit;font-weight:900;color:#ffb3ad;background:none;border:none;font-size:1rem;cursor:pointer;padding:2px 6px}"
+  + ".ty-badge{display:inline-flex;align-items:center;gap:5px;vertical-align:2px;margin-left:7px;background:linear-gradient(155deg,rgba(232,182,76,.22),rgba(6,12,26,.5));border:1px solid rgba(232,182,76,.55);border-radius:999px;padding:1px 8px 1px 2px;font-size:.56rem;font-weight:900;letter-spacing:.08em;color:#ffe1a1;white-space:nowrap}"
+  + ".ty-badge i{font-style:normal;background:#e8b64c;color:#0a1526;border-radius:50%;width:15px;height:15px;display:inline-flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:900}"
+  + ".ty-leans{font-size:.6rem;font-weight:800;letter-spacing:.08em;color:#8b96ab;margin-left:6px;white-space:nowrap}"
+  + ".tp-type{margin-top:4px}"
+  + ".tp-type .ty-badge{margin-left:0}"
+  + ".ty-head{display:flex;align-items:center;gap:10px;margin:16px 0 6px}"
+  + ".ty-head:first-child{margin-top:2px}"
+  + ".ty-letter{width:34px;height:34px;flex:none;border-radius:10px;background:#e8b64c;color:#0a1526;font-weight:900;font-size:1.05rem;display:flex;align-items:center;justify-content:center}"
+  + ".ty-mid{min-width:0}"
+  + ".ty-mid b{display:block;font-size:.92rem;color:#eef3f9;letter-spacing:.04em}"
+  + ".ty-mid span{display:block;font-size:.68rem;color:#8b96ab}"
+  + ".ty-count{margin-left:auto;font-size:.7rem;font-weight:900;color:#e8b64c;flex:none}"
+  + ".so-chips{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 4px}"
+  + ".so-chip{font:inherit;font-size:.72rem;font-weight:800;letter-spacing:.05em;color:#dbe7fa;background:rgba(130,170,255,.10);border:1px solid rgba(165,195,255,.28);border-radius:999px;padding:.42rem .8rem;cursor:pointer}"
+  + ".so-chip.on{background:#e8b64c;border-color:#e8b64c;color:#0a1526}"
+  + ".so-read{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px;align-items:center}"
+  + ".so-tag{font-size:.56rem;font-weight:900;letter-spacing:.09em;border-radius:6px;padding:2px 6px;background:rgba(130,170,255,.14);color:#9db1d8;border:1px solid rgba(165,195,255,.25)}"
+  + ".so-tag.stack{background:rgba(232,182,76,.2);color:#ffe1a1;border-color:rgba(232,182,76,.6)}"
+  + ".so-tag.tough{background:rgba(240,102,94,.14);color:#ffb3ad;border-color:rgba(240,102,94,.4)}"
+  + ".so-fact{font-size:.68rem;color:#cfe0ff;background:rgba(13,30,44,.55);border:1px solid rgba(165,195,255,.16);border-radius:6px;padding:2px 6px}"
+  + ".so-model{margin-top:6px;font-size:.72rem;font-weight:800;letter-spacing:.05em;color:#e8b64c}";
   var st = document.createElement("style"); st.textContent = css; document.head.appendChild(st);
 })();
 
@@ -1370,6 +1391,7 @@ function playerLegs(pl){
   if(pl.rush){ add("r50", "50+ rush yds", pl.rush.p50); add("r75", "75+ rush yds", pl.rush.p75); add("r100", "100+ rush yds", pl.rush.p100); }
   if(pl.rec){ add("c50", "50+ rec yds", pl.rec.p50); add("c75", "75+ rec yds", pl.rec.p75); add("c100", "100+ rec yds", pl.rec.p100); }
   if(pl.scr){ add("s75", "75+ scrimmage yds", pl.scr.p75); add("s100", "100+ scrimmage yds", pl.scr.p100); add("s125", "125+ scrimmage yds", pl.scr.p125); }
+  if(pl.recC && pl.recC.p){ add("rc2", "2+ catches", pl.recC.p["2"]); add("rc3", "3+ catches", pl.recC.p["3"]); add("rc4", "4+ catches", pl.recC.p["4"]); add("rc5", "5+ catches", pl.recC.p["5"]); add("rc6", "6+ catches", pl.recC.p["6"]); }
   return out;
 }
 function legBtn(pkey, leg){
@@ -1490,6 +1512,8 @@ function setPlaybookMode(mode){
   if(bn) bn.style.display = mode === "parlay" ? "none" : "";
   if(pp) pp.style.display = mode === "parlay" ? "" : "none";
   if(mode === "parlay") renderParlay();
+  else if(mode === "types") renderTypes();
+  else if(mode === "standouts") renderStandouts();
   else renderBoard(mode);
 }
 
@@ -1502,7 +1526,8 @@ function renderTopPicks(){
   var rows = B.players.filter(function(pl){ return pl.td && pl.td[TP_MKT] != null; })
     .sort(function(a, b){ return b.td[TP_MKT] - a.td[TP_MKT]; }).slice(0, 8);
   strip.innerHTML = rows.map(function(pl, i){
-    return '<div class="tp-card" data-p="' + pl.key + '">' + faceHtml(pl.key, pl.name, i < 3 ? 1 : 0) + "<b>" + pl.name + "</b><span>" + pl.pos + " · " + pl.team + '</span><div class="tp-num">' + pct(pl.td[TP_MKT]) + '</div><div class="tp-odds">' + fmtOdds(pl.td[TP_MKT]) + "</div></div>";
+    var tb = typeBadge(pl.key);
+    return '<div class="tp-card" data-p="' + pl.key + '">' + faceHtml(pl.key, pl.name, i < 3 ? 1 : 0) + "<b>" + pl.name + "</b>" + (tb ? '<div class="tp-type">' + tb + "</div>" : "") + "<span>" + pl.pos + " · " + pl.team + '</span><div class="tp-num">' + pct(pl.td[TP_MKT]) + '</div><div class="tp-odds">' + fmtOdds(pl.td[TP_MKT]) + "</div></div>";
   }).join("");
 }
 
@@ -1520,6 +1545,176 @@ function zonesHtml(z){
   if(z.rzCar > 0) h += '<div class="usg-rolelabel">RED-ZONE CARRY SHARE · ' + z.rzCar + ' RZ CARRIES</div><div class="zn-bar"><i style="width:' + Math.round(z.rzCarShare * 100) + '%"></i></div>';
   h += '<p class="note" style="margin:2px 0 0">Season to date from nflverse play-by-play. Display only — zone matchups were tested for pricing and cut.</p></div>';
   return h;
+}
+
+/* ---------- player types + slate standouts (Nov 12, GMG port) ----------
+   Types come from data/nfl-types.json (gen_nfl_types.py: transparent
+   percentile rules on 2026 nflverse play-by-play; season-to-date, one
+   file covering both week bundles). Display only — a type never moves
+   a price, and the sidecar's defense-vs-position table is a READ layer:
+   it backtested NEUTRAL as a pricing input on this page, so standouts
+   show it labeled CONTEXT ONLY, separately from the model numbers.
+   Thin samples never render: the sidecar only types players who clear
+   its volume floors (the Van Jefferson rule), and standouts also
+   require 3+ games of bundle usage. Faces follow the page's board
+   pattern (ESPN headshot img, onerror removes it, never lazy). */
+function typeOf(key){ return TYPES && TYPES.players ? TYPES.players[key] || null : null; }
+function typeBadge(key){
+  var t = typeOf(key); if(!t || !TYPES.letters) return "";
+  var d = TYPES.letters[t.letter] || {};
+  return '<span class="ty-badge"><i>' + t.letter + "</i>" + (d.name || "").toUpperCase() + "</span>";
+}
+function bfImg(key){
+  return FACES[key] ? '<img class="bface" style="border-color:' + (TEAMCOLOR[key] || "#2b3d66") + ";box-shadow:0 0 9px " + (TEAMCOLOR[key] || "#2b3d66") + '80" src="https://a.espncdn.com/i/headshots/nfl/players/full/' + FACES[key] + '.png" alt="" onerror="this.remove()">' : "";
+}
+function renderTypes(){
+  var wrap = $("boardWrap"), bn = $("boardNote"); if(!wrap || !B) return;
+  if(!TYPES){
+    wrap.innerHTML = '<p class="pl-empty">Player types are still loading — or the types file did not load.</p>';
+    if(bn) bn.textContent = "";
+    return;
+  }
+  var wk = TYPES._meta && TYPES._meta.weeks ? TYPES._meta.weeks : [1, 9];
+  var h = "";
+  ["A", "B", "C", "D", "E", "F", "G", "H", "I"].forEach(function(L){
+    var def = TYPES.letters[L]; if(!def) return;
+    var members = B.players.filter(function(pl){ var t = typeOf(pl.key); return t && t.letter === L; })
+      .sort(function(a, b){ return typeOf(b.key).fit - typeOf(a.key).fit; });
+    if(!members.length) return;
+    h += '<div class="ty-head"><div class="ty-letter">' + L + '</div><div class="ty-mid"><b>' + def.name.toUpperCase() + '</b><span>' + def.blurb + '</span></div><div class="ty-count">' + members.length + "</div></div>";
+    h += '<table class="board"><tr><th>PLAYER</th><th class="r">FIT</th><th class="r">SAMPLE</th></tr>' + members.map(function(pl){
+      var t = typeOf(pl.key);
+      return '<tr data-p="' + pl.key + '"><td>' + bfImg(pl.key) + "<b>" + pl.name + "</b>"
+        + '<span class="sub">' + pl.pos + " · " + pl.team + (t.leans && t.leans.length ? " · LEANS " + t.leans.map(function(x){ return x.letter; }).join(" ") : "") + "<br>" + t.why + "</span></td>"
+        + '<td class="r"><b>' + Math.round(t.fit * 100) + '%</b></td>'
+        + '<td class="r">' + t.n + '<span class="sub">' + (t.nLabel === "targets" ? "tgt" : "opp") + "</span></td></tr>";
+    }).join("") + "</table>";
+  });
+  wrap.innerHTML = h || '<p class="pl-empty">No typed players in this week\'s bundle.</p>';
+  if(bn) bn.textContent = "Player types from 2026 nflverse play-by-play, weeks " + wk[0] + "–" + wk[1] + ": transparent percentile rules on ADOT, target depth, YAC, red-zone share, inside-5 work and explosive rate. Fit is the winning archetype's score; leans are the other archetypes on his heels. Display only — a type never moves a price. Thin samples (under 25 targets / 40 carries) get no type.";
+  applyPosFilter("types");
+}
+/* ----- standouts: read layer + model layer, shown separately ----- */
+var SO_CATS = [["td", "Anytime TD"], ["rec", "Receiving"], ["rush", "Rushing"], ["recc", "Receptions"]];
+function metricVal(pl, label){
+  var m = pl.metrics || [];
+  for(var i = 0; i < m.length; i++) if(m[i][1] === label) return parseFloat(m[i][0]);
+  return null;
+}
+function roleTrend(pl){
+  var gs = (pl.usage && pl.usage.games || []).filter(function(g){ return g.role != null; });
+  if(gs.length < 4) return null;
+  var all = gs.reduce(function(a, g){ return a + g.role; }, 0) / gs.length;
+  var l3 = gs.slice(-3).reduce(function(a, g){ return a + g.role; }, 0) / 3;
+  return all > 0.02 ? l3 / all : null;
+}
+function defInfo(pl){
+  if(!TYPES || !TYPES.defPos || !TYPES.defLeague) return null;
+  var g = gameOf(pl.game); if(!g) return null;
+  var opp = pl.team === g.away ? g.home : g.away;
+  var ng = TYPES.defGames ? TYPES.defGames[opp] : 0;
+  if(!ng || ng < 6) return null;
+  var d = TYPES.defPos[opp] && TYPES.defPos[opp][pl.pos];
+  var lg = TYPES.defLeague[pl.pos];
+  if(!d || !lg) return null;
+  var tdR, ydR, tgtR, tdTxt, ydTxt;
+  if(pl.pos === "RB"){
+    tdR = d[4] / lg[4]; ydR = d[1] / lg[1]; tgtR = d[0] / lg[0];
+    tdTxt = d[4].toFixed(2) + " TD/gm allowed to RBs (league " + lg[4].toFixed(2) + ")";
+    ydTxt = Math.round(d[1]) + " rush yds/gm allowed to RBs (league " + Math.round(lg[1]) + ")";
+  } else {
+    tdR = d[2] / lg[2]; ydR = d[1] / lg[1]; tgtR = d[0] / lg[0];
+    tdTxt = d[2].toFixed(2) + " TD/gm allowed to " + pl.pos + "s (league " + lg[2].toFixed(2) + ")";
+    ydTxt = Math.round(d[1]) + " yds/gm allowed to " + pl.pos + "s (league " + Math.round(lg[1]) + ")";
+  }
+  return { opp: opp, n: ng, tdR: tdR, ydR: ydR, tgtR: tgtR, tdTxt: tdTxt, ydTxt: ydTxt,
+           softTd: tdR >= 1.15, softYd: ydR >= 1.12, softTgt: tgtR >= 1.12, tough: tdR <= 0.8 };
+}
+function soRowData(pl, cat){
+  var t = typeOf(pl.key); if(!t) return null;
+  if(!pl.usage || !pl.usage.games || pl.usage.games.length < 3) return null;
+  var trend = metricVal(pl, "Touch trend (last 3 vs overall)");
+  var rzG = metricVal(pl, "Red-zone touches per game");
+  var rt = roleTrend(pl);
+  var di = defInfo(pl);
+  var pos = [], modelVal = null, modelLine = "", bar = 0;
+  var up = trend != null && trend >= 1.10;
+  var down = trend != null && trend <= 0.90;
+  if(cat === "td"){
+    if(!pl.td || pl.td.any == null) return null;
+    if(up) pos.push("usage " + trend.toFixed(2) + "x last 3");
+    if(rzG != null && rzG >= 1.5) pos.push(rzG.toFixed(1) + " red-zone touches/gm");
+    if(di && di.softTd) pos.push("vs " + di.opp + " · " + di.tdTxt + " · context only");
+    modelVal = pl.td.any; bar = 0.30;
+    modelLine = "ANYTIME TD " + pct(pl.td.any) + " · FAIR " + fmtOdds(pl.td.any) + (pl.td.two != null ? " · 2+ TD " + pct(pl.td.two) : "");
+  } else if(cat === "rec"){
+    if(!pl.rec) return null;
+    if(up) pos.push("usage " + trend.toFixed(2) + "x last 3");
+    if(rt != null && rt >= 1.12) pos.push((pl.pos === "RB" ? "role" : "target share") + " up last 3 (" + rt.toFixed(2) + "x)");
+    if(di && di.softYd) pos.push("vs " + di.opp + " · " + di.ydTxt + " · context only");
+    modelVal = pl.rec.med; bar = 55;
+    modelLine = "REC MEDIAN " + pl.rec.med + " · 75+ " + pct(pl.rec.p75) + (pl.rec.p100 != null ? " · 100+ " + pct(pl.rec.p100) : "");
+  } else if(cat === "rush"){
+    if(pl.pos !== "RB" || !pl.rush) return null;
+    if(up) pos.push("usage " + trend.toFixed(2) + "x last 3");
+    if(rt != null && rt >= 1.12) pos.push("carry share up last 3 (" + rt.toFixed(2) + "x)");
+    if(di && di.softYd) pos.push("vs " + di.opp + " · " + di.ydTxt + " · context only");
+    modelVal = pl.rush.med; bar = 50;
+    modelLine = "RUSH MEDIAN " + pl.rush.med + " · 75+ " + pct(pl.rush.p75) + (pl.rush.p100 != null ? " · 100+ " + pct(pl.rush.p100) : "");
+  } else if(cat === "recc"){
+    if(!pl.recC || !pl.recC.p) return null;
+    if(up) pos.push("usage " + trend.toFixed(2) + "x last 3");
+    if(rt != null && rt >= 1.12) pos.push("target share up last 3 (" + rt.toFixed(2) + "x)");
+    if(di && di.softTgt) pos.push("vs " + di.opp + " · " + (pl.pos === "RB" ? Math.round(di.tgtR * 100) + "% of league carry rate" : "targets/gm allowed to " + pl.pos + "s runs " + Math.round(di.tgtR * 100) + "% of league") + " · context only");
+    modelVal = pl.recC.p["5"]; bar = 0.30;
+    modelLine = "λ " + pl.recC.lam.toFixed(1) + " CATCHES · 5+ " + pct(pl.recC.p["5"]) + " · 3+ " + pct(pl.recC.p["3"]);
+  }
+  if(down) pos.push("usage " + trend.toFixed(2) + "x last 3 — fading");
+  if(modelVal == null) return null;
+  return { pl: pl, factors: pos, nPos: pos.filter(function(f){ return f.indexOf("fading") < 0; }).length,
+           down: down, modelVal: modelVal, modelLine: modelLine, bar: bar,
+           stacked: pos.filter(function(f){ return f.indexOf("fading") < 0; }).length >= 2 && modelVal >= bar };
+}
+function soRowHtml(r, tough){
+  var pl = r.pl, t = typeOf(pl.key);
+  var g = gameOf(pl.game);
+  var match = g ? (pl.team === g.away ? "AT " + g.home : "VS " + g.away) : "";
+  var tag = tough ? '<span class="so-tag tough">TOUGH SPOT</span>' : (r.stacked ? '<span class="so-tag stack">STACKED</span>' : '<span class="so-tag read">READ</span>');
+  return '<tr data-p="' + pl.key + '"><td>' + bfImg(pl.key) + "<b>" + pl.name + "</b>" + typeBadge(pl.key)
+    + '<span class="sub">' + pl.pos + " · " + pl.team + " · " + match + " · n=" + t.stats.games + " gms · " + t.n + " " + t.nLabel + "</span>"
+    + '<div class="so-read">' + tag + r.factors.map(function(f){ return '<span class="so-fact">' + f + "</span>"; }).join("") + "</div>"
+    + '<div class="so-model">MODEL · ' + r.modelLine + "</div></td></tr>";
+}
+function renderStandouts(){
+  var wrap = $("boardWrap"), bn = $("boardNote"); if(!wrap || !B) return;
+  var chips = '<div class="so-chips">' + SO_CATS.map(function(c){
+    return '<button type="button" class="so-chip' + (SO_CAT === c[0] ? " on" : "") + '" data-soc="' + c[0] + '">' + c[1] + "</button>";
+  }).join("") + "</div>";
+  if(!TYPES){
+    wrap.innerHTML = chips + '<p class="pl-empty">Standouts need the types file — still loading, or it did not load.</p>';
+    if(bn) bn.textContent = "";
+    return;
+  }
+  var rows = [];
+  B.players.forEach(function(pl){ var r = soRowData(pl, SO_CAT); if(r) rows.push(r); });
+  var stands = rows.filter(function(r){ return r.nPos >= 2; })
+    .sort(function(a, b){ return (b.nPos - a.nPos) || (b.modelVal - a.modelVal); }).slice(0, 5);
+  if(stands.length < 3){
+    var inStands = {}; stands.forEach(function(r){ inStands[r.pl.key] = 1; });
+    rows.filter(function(r){ return r.nPos === 1 && !inStands[r.pl.key]; })
+      .sort(function(a, b){ return b.modelVal - a.modelVal; })
+      .slice(0, 3 - stands.length).forEach(function(r){ stands.push(r); });
+  }
+  var inStands2 = {}; stands.forEach(function(r){ inStands2[r.pl.key] = 1; });
+  var tough = rows.filter(function(r){ return r.down && r.modelVal >= r.bar && !inStands2[r.pl.key]; })
+    .sort(function(a, b){ return b.modelVal - a.modelVal; }).slice(0, 3);
+  var h = chips + '<h2 class="sec">BIGGEST STANDOUTS <span>read and model, shown separately — never blended</span></h2>'
+    + (stands.length ? '<table class="board">' + stands.map(function(r){ return soRowHtml(r, false); }).join("") + "</table>"
+       : '<p class="pl-empty">No standout clears the read bar in this category this week.</p>');
+  if(tough.length) h += '<h2 class="sec">TOUGH SPOTS <span>priced up, role fading</span></h2><table class="board">' + tough.map(function(r){ return soRowHtml(r, true); }).join("") + "</table>";
+  wrap.innerHTML = h;
+  if(bn) bn.textContent = "Two layers, never blended. READ: usage trend + red-zone role from the bundle, plus defense-vs-position from nflverse play-by-play — labeled context only, because defense-vs-position backtested NEUTRAL as a price input on this page and never moves a number. MODEL: the bundle's own prices. STACKED = the read and the model agree. Every row shows its sample (n); thin samples don't render.";
+  applyPosFilter("standouts");
 }
 
 /* ---------- live win% graph (score & clock calculation) ---------- */
@@ -1637,9 +1832,9 @@ function renderTree(){
     var bar = document.createElement("div");
     bar.className = "pb-bar";
     bar.id = "pbBar";
-    bar.innerHTML = '<select id="pbSelect" aria-label="Choose a Playbook section"><option value="td">Touchdowns</option><option value="rush">Rushing</option><option value="rec">Receiving</option><option value="pass">Passing</option><option value="scr">Rush + Rec</option><option value="kick">Kickers</option><option value="parlay">Parlay</option></select><select id="pbPos" aria-label="Filter by position"><option value="">All positions</option><option value="QB">QB</option><option value="RB">RB</option><option value="WR">WR</option><option value="TE">TE</option></select><span class="pb-ticket">TICKET <span id="plCount"></span></span>';
+    bar.innerHTML = '<select id="pbSelect" aria-label="Choose a Playbook section"><option value="td">Touchdowns</option><option value="rush">Rushing</option><option value="rec">Receiving</option><option value="recc">Receptions</option><option value="pass">Passing</option><option value="scr">Rush + Rec</option><option value="kick">Kickers</option><option value="types">Types</option><option value="standouts">Standouts</option><option value="parlay">Parlay</option></select><select id="pbPos" aria-label="Filter by position"><option value="">All positions</option><option value="QB">QB</option><option value="RB">RB</option><option value="WR">WR</option><option value="TE">TE</option></select><span class="pb-ticket">TICKET <span id="plCount"></span></span>';
     bar.querySelector("select").addEventListener("change", function(){ setPlaybookMode(this.value); });
-    bar.querySelector("#pbPos").addEventListener("change", function(){ PB_POS = this.value; if(PB_MODE !== "parlay" && PB_MODE !== "kick") renderBoard(PB_MODE); });
+    bar.querySelector("#pbPos").addEventListener("change", function(){ PB_POS = this.value; if(PB_MODE !== "parlay" && PB_MODE !== "kick") setPlaybookMode(PB_MODE); });
     boardSec.insertBefore(bar, pillsEl || null);
     var pp = document.createElement("div");
     pp.id = "parlayPanel"; pp.style.display = "none";
@@ -1706,13 +1901,28 @@ function renderTree(){
   renderParlay();
   dataFetch("data/nfl-zones.json").then(function(r){ return r.json(); }).then(function(j){ ZONES = j; }).catch(function(){});
   dataFetch("data/nfl-playoff.json").then(function(r){ return r.json(); }).then(function(j){ PLAYOFF = j; renderTree(); }).catch(function(){});
+  dataFetch("data/nfl-types.json").then(function(r){ return r.json(); }).then(function(j){
+    TYPES = j;
+    if(B){ renderTopPicks(); if(PB_TAB === "markets" && PB_MODE !== "parlay") setPlaybookMode(PB_MODE); }
+  }).catch(function(){});
 })();
 
 /* ---------- wrap existing renders (same names, called everywhere) ---------- */
 buildObjects = (function(orig){ return function(){
   orig();
+  /* Receptions board (Nov 12): built from the bundle's recC blocks
+     (projected targets x shrunk catch rate, NegBin — proven model,
+     WR/TE only). Rows carry the milestone ladder; the fair median
+     line rides in the sub-line. Registered here because BOARDS is
+     rebuilt inside the base buildObjects on every load. */
+  BOARDS.recc = { cols: ["2+", "3+", "4+", "5+"], note: "Receptions price off projected targets and catch rate. Wide receivers and tight ends only — running-back catches tested as noise and are not priced. The o/u in each row is the fair median line; the full ladder is on the card.", rows:
+    B.players.filter(function(pl){ return pl.recC && pl.recC.p && pl.recC.p["2"] >= 0.02; }).map(function(pl){
+      return { p: pl.key, name: pl.name, sub: pl.pos + " · " + pl.team + " · o/u " + pl.recC.line.toFixed(1), cells: [[pct(pl.recC.p["2"]), fmtOdds(pl.recC.p["2"])], pct(pl.recC.p["3"]), pct(pl.recC.p["4"]), pct(pl.recC.p["5"])] };
+    }).sort(function(a, b){ return parseFloat(b.cells[0][0]) - parseFloat(a.cells[0][0]); }) };
   SEARCH_ITEMS.push({ t: "Parlay Builder", s: "PLAYBOOK · YOUR TICKET", v: "view-board" });
   SEARCH_ITEMS.push({ t: "Playoff Picture", s: "PLAYBOOK · STANDINGS · PLAYOFF TREE", v: "view-board" });
+  SEARCH_ITEMS.push({ t: "Player Types", s: "PLAYBOOK · TYPES · A–I ARCHETYPES", v: "view-board" });
+  SEARCH_ITEMS.push({ t: "Standouts", s: "PLAYBOOK · STANDOUTS · READS + MODEL", v: "view-board" });
   SEARCH_ITEMS.forEach(function(it){ if(it.s && it.s.indexOf("ON BYE") === 0) it.v = "view-board"; });
 }; })(buildObjects);
 /* Slate lives on the Playbook's Slate tab now: anything still pointing
@@ -1726,7 +1936,11 @@ renderHome = (function(orig){ return function(){ orig(); renderTopPicks(); }; })
 renderBoard = (function(orig){ return function(key){
   orig(key);
   applyPosFilter(key);
-  var mks = { td: ["any", "two", "first"], rush: ["r75", "r100"], rec: ["c75", "c100"], pass: ["passTd", "p300", "p400"], scr: ["s100", "s125"] }[key];
+  if(TYPES) $("boardWrap").querySelectorAll("tr[data-p]").forEach(function(tr){
+    var bd = typeBadge(tr.getAttribute("data-p")); if(!bd) return;
+    var b = tr.querySelector("td b"); if(b) b.insertAdjacentHTML("afterend", bd);
+  });
+  var mks = { td: ["any", "two", "first"], rush: ["r75", "r100"], rec: ["c75", "c100"], recc: ["rc2", "rc3", "rc4"], pass: ["passTd", "p300", "p400"], scr: ["s100", "s125"] }[key];
   if(!mks) return;
   $("boardWrap").querySelectorAll("tr[data-p]").forEach(function(tr){
     var td0 = tr.querySelector("td"); if(!td0) return;
@@ -1737,10 +1951,28 @@ openPlayer = (function(orig){ return function(key){
   orig(key);
   var d = PLAYERS[key]; if(!d || !d.raw) return;
   var pl = d.raw;
+  /* Type badge in the card header (Nov 12): letter chip + leans,
+     beside the position in the team line. Absent when untyped. */
+  var posEl = $("pPos");
+  if(posEl && posEl.parentNode){
+    var pbadge = $("pTypeBadge");
+    if(!pbadge){ pbadge = document.createElement("span"); pbadge.id = "pTypeBadge"; posEl.parentNode.appendChild(pbadge); }
+    var t0 = typeOf(key);
+    pbadge.innerHTML = t0 ? typeBadge(key) + (t0.leans && t0.leans.length ? '<span class="ty-leans">LEANS ' + t0.leans.map(function(l){ return l.letter; }).join(" · ") + "</span>" : "") : "";
+    pbadge.style.display = t0 ? "" : "none";
+  }
   var tdBody = $("pTdSec") ? $("pTdSec").querySelector(".nfl-sec-body") : null;
   if(tdBody && $("pTdSec").style.display !== "none") tdBody.insertAdjacentHTML("beforeend", legRow(key, ["any", "two", "first", "passTd"]));
+  /* Receptions milestone group (Nov 12): same chip pattern as the
+     base card's groups, from the bundle's recC block; absent (and
+     the group with it) whenever the player carries no recC block. */
+  var milesEl = $("pMiles");
+  if(milesEl && pl.recC && pl.recC.p){
+    var rcs = [2, 3, 4, 5, 6].filter(function(m){ var p = pl.recC.p[String(m)]; return p != null && isFinite(p) && p >= 0.005; }).map(function(m){ return '<span class="ms-chip"><b>' + m + '+</b> CATCHES · <span class="p">' + Math.round(pl.recC.p[String(m)] * 100) + '%</span></span>'; });
+    if(rcs.length){ milesEl.insertAdjacentHTML("beforeend", '<div class="ms-ladder-label">Receptions</div><div class="ms-ladder">' + rcs.join("") + '</div>'); $("pMilesSec").style.display = ""; }
+  }
   var miBody = $("pMilesSec") ? $("pMilesSec").querySelector(".nfl-sec-body") : null;
-  if(miBody && $("pMilesSec").style.display !== "none") miBody.insertAdjacentHTML("beforeend", legRow(key, ["p200", "p300", "p400", "r50", "r75", "r100", "c50", "c75", "c100", "s75", "s100", "s125"]));
+  if(miBody && $("pMilesSec").style.display !== "none") miBody.insertAdjacentHTML("beforeend", legRow(key, ["p200", "p300", "p400", "r50", "r75", "r100", "c50", "c75", "c100", "s75", "s100", "s125", "rc2", "rc3", "rc4", "rc5", "rc6"]));
   var zs = $("pZonesSec"), zb = $("pZones");
   if(zs && zb){
     var z = ZONES && ZONES.players ? ZONES.players[key] : null;
@@ -1789,7 +2021,9 @@ renderGame = (function(orig){ return function(key){
 document.addEventListener("click", function(e){
   if(!e.target || !e.target.closest) return;
   var sr = e.target.closest(".sresult");
-  if(sr){ var sb = sr.querySelector("b"); if(sb && sb.textContent === "Parlay Builder"){ setPbTab("markets"); setPlaybookMode("parlay"); } else if(sb && sb.textContent === "Playoff Picture") setPbTab("standings"); else if(sr.textContent.indexOf("ON BYE") >= 0) setPbTab("slate"); }
+  if(sr){ var sb = sr.querySelector("b"); if(sb && sb.textContent === "Parlay Builder"){ setPbTab("markets"); setPlaybookMode("parlay"); } else if(sb && sb.textContent === "Playoff Picture") setPbTab("standings"); else if(sb && sb.textContent === "Player Types"){ setPbTab("markets"); setPlaybookMode("types"); } else if(sb && sb.textContent === "Standouts"){ setPbTab("markets"); setPlaybookMode("standouts"); } else if(sr.textContent.indexOf("ON BYE") >= 0) setPbTab("slate"); }
+  var soc = e.target.closest("[data-soc]");
+  if(soc){ e.preventDefault(); e.stopPropagation(); SO_CAT = soc.getAttribute("data-soc"); renderStandouts(); return; }
   var add = e.target.closest("[data-addleg]");
   if(add){ e.preventDefault(); e.stopPropagation(); toggleLeg(add.getAttribute("data-addleg")); return; }
   var rm = e.target.closest("[data-rmleg]");

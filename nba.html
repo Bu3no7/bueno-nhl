@@ -435,6 +435,60 @@ details.pc-sec[open ] summary .chev { transform: rotate(90deg); }
 .fl-foot { display:flex; gap:.5rem; margin-top:1.1rem; }
 .fl-foot .ghost { flex:1; background:var(--card2); border:1px solid var(--border); color:var(--text); border-radius:12px; padding:.7rem; font-weight:700; cursor:pointer; font-family:inherit; }
 .fl-foot .go { flex:2; background:#FF7A1A; border:1px solid #FF7A1A; color:#0a0a0e; border-radius:12px; padding:.7rem; font-weight:800; cursor:pointer; font-family:inherit; }
+/* ---- Player Types + Slate Standouts (display only — reads, not prices) ---- */
+.type-badge { display: inline-flex; align-items: center; gap: .32rem; vertical-align: middle; margin-left: .45rem; padding: .1rem .5rem .1rem .34rem; border-radius: 999px; border: 1px solid rgba(255,122,26,.55); background: linear-gradient(155deg, rgba(255,122,26,.20), rgba(6,12,26,.55)); color: #ffb37a; font-size: .66rem; font-weight: 700; letter-spacing: .02em; white-space: nowrap; }
+.type-badge .tb-l { display: inline-flex; align-items: center; justify-content: center; width: 1.05rem; height: 1.05rem; border-radius: 50%; background: #FF7A1A; color: #16090a; font-size: .68rem; font-weight: 900; flex: none; }
+.type-badge .tb-n { max-width: 8.5rem; overflow: hidden; text-overflow: ellipsis; }
+.type-badge.big { font-size: .74rem; padding: .22rem .65rem .22rem .42rem; margin-left: 0; }
+.type-badge.big .tb-l { width: 1.3rem; height: 1.3rem; font-size: .82rem; }
+.type-badge.big .tb-n { max-width: none; }
+.type-badge .tb-lean { color: var(--muted); font-weight: 600; }
+.fb-bplayer .type-badge { margin-left: .35rem; }
+.tp-name .type-badge { margin-left: .3rem; }
+.pc-type-line { margin-top: .45rem; display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
+.pc-type-line .fit { color: var(--muted); font-size: .72rem; }
+.so-toggle { display: flex; gap: .45rem; margin: .2rem 0 .7rem; }
+.so-toggle button { background: #101a2c; border: 1px solid var(--border); color: var(--muted); border-radius: 999px; padding: .38rem .85rem; font-weight: 700; font-size: .85rem; cursor: pointer; font-family: inherit; }
+.so-toggle button.active { color: #FF7A1A; border-color: #FF7A1A; }
+.so-head { font-size: .82rem; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; margin: .85rem 0 .45rem; }
+.so-head.over { color: #4ade80; }
+.so-head.under { color: #f0665e; }
+.so-cards { display: flex; gap: .6rem; overflow-x: auto; padding-bottom: .3rem; scrollbar-width: none; }
+.so-cards::-webkit-scrollbar { display: none; }
+.so-card { flex: none; width: 218px; background: var(--card2, #101a2c); border: 1px solid var(--border); border-radius: 14px; padding: .7rem .7rem .6rem; cursor: pointer; }
+.so-card:active { border-color: #FF7A1A; }
+.so-card .sc-top { display: flex; align-items: center; gap: .5rem; }
+.so-card .sc-top img.hs { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; object-position: top; background: #0e1626; }
+.so-card .sc-name { font-weight: 800; font-size: .88rem; }
+.so-card .sc-sub { color: var(--muted); font-size: .7rem; }
+.so-row { display: flex; gap: .55rem; align-items: flex-start; padding: .5rem .2rem; cursor: pointer; }
+.so-row + .so-row { border-top: 1px solid rgba(31,44,68,.5); }
+.so-row img.hs { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; object-position: top; background: #101a2c; flex: none; }
+.so-row .so-main { flex: 1; min-width: 0; }
+.so-row .so-name { font-weight: 700; font-size: .88rem; }
+.so-read { color: var(--muted); font-size: .76rem; margin-top: .12rem; }
+.so-model { color: #FF7A1A; font-weight: 700; font-size: .78rem; margin-top: .1rem; }
+.so-model .mpct { color: #2dd4bf; }
+.so-stack { display: inline-block; margin-left: .45rem; padding: .08rem .45rem; border-radius: 999px; border: 1px solid rgba(245,185,66,.6); background: rgba(245,185,66,.12); color: #f5b942; font-size: .62rem; font-weight: 800; letter-spacing: .06em; vertical-align: middle; }
+.so-note { color: var(--muted); font-size: .74rem; margin-top: .7rem; }
+.so-game { background: var(--card2, #101a2c); border: 1px solid var(--border); border-radius: 14px; padding: .7rem .8rem; margin-bottom: .7rem; }
+.so-game h4 { margin: 0 0 .3rem; font-size: .92rem; font-weight: 800; }
+.so-game h4 .sub { color: var(--muted); font-weight: 600; font-size: .74rem; margin-left: .4rem; }
+.ty-letter { background: var(--card2, #101a2c); border: 1px solid var(--border); border-radius: 14px; padding: .75rem .85rem; margin-bottom: .65rem; }
+.ty-letter .ty-head { display: flex; align-items: center; gap: .6rem; }
+.ty-letter .ty-desc { color: var(--muted); font-size: .78rem; margin-top: .25rem; }
+.ty-members { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .55rem; }
+.ty-member { display: inline-flex; align-items: center; gap: .4rem; background: #0e1626; border: 1px solid var(--border); border-radius: 999px; padding: .18rem .6rem .18rem .2rem; font-size: .78rem; font-weight: 600; cursor: pointer; color: var(--text); font-family: inherit; }
+.ty-member img.hs { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; object-position: top; background: #101a2c; }
+.ty-member:active { border-color: #FF7A1A; }
+.ty-member .tm-t { color: var(--muted); font-weight: 600; font-size: .7rem; }
+table.ty-def { width: 100%; border-collapse: collapse; font-size: .72rem; font-variant-numeric: tabular-nums; }
+table.ty-def th, table.ty-def td { padding: .28rem .3rem; text-align: center; border-bottom: 1px solid rgba(31,44,68,.5); }
+table.ty-def th { color: var(--muted); font-weight: 700; }
+table.ty-def td.tm { text-align: left; font-weight: 700; white-space: nowrap; }
+table.ty-def td.hot { color: #4ade80; font-weight: 800; }
+table.ty-def td.cold { color: #f0665e; font-weight: 800; }
+
 /* ---- Defensive Matchups (home) ---- */
 .dm-row { display:flex; align-items:center; gap:.6rem; padding:.55rem 0; cursor:pointer; }
 .dm-row + .dm-row { border-top:1px solid rgba(31,44,68,.5); }
@@ -642,12 +696,26 @@ body.sport-glass .pc-overlay,body.sport-glass .gm-overlay{background:rgba(2,5,10
       <span>⚡ The Fast Break</span><span class="fb-menu-cur" id="fbMenuCur">Slate</span><span class="fb-menu-chev" id="fbMenuChev">▴</span>
     </button>
     <div class="fb-menu-body open" id="fbMenuBody">
+      <button class="fb-menu-item" data-fbview="standouts" type="button">Standouts</button>
       <button class="fb-menu-item on" data-fbview="slate" type="button">Slate</button>
       <button class="fb-menu-item" data-fbview="markets" type="button">Markets</button>
+      <button class="fb-menu-item" data-fbview="toppicks" type="button">Top Picks</button>
+      <button class="fb-menu-item" data-fbview="types" type="button">Player Types</button>
       <button class="fb-menu-item" data-fbview="paint" type="button">In the Paint</button>
       <button class="fb-menu-item" data-fbview="parlay" type="button">Parlay builder</button>
     </div>
   </div>
+
+  <section id="nba-view-standouts" class="view">
+    <div class="fb-slim-head"><h2>Standouts</h2><span class="right">Tonight · <span class="fb-slim-date"></span></span></div>
+    <p class="muted small" style="margin:.2rem 0 .6rem">Matchup spots for tonight's slate. Three layers, shown separately: the <b>type read</b> (how his shot-style group has done against this defense — a read, not a price), the <b>model</b> (our projection vs the fair line), and <b>pace</b>. <span class="so-stack" style="margin-left:0">STACKED</span> = the type read and the model lean the same way.</p>
+    <div class="so-toggle" id="nbaSoToggle">
+      <button type="button" data-soview="cat" class="active">By Category</button>
+      <button type="button" data-soview="game">By Game</button>
+    </div>
+    <div class="fb-mkt-pills" id="nbaSoCats"></div>
+    <div id="nbaSoBody"><p class="muted">Pricing tonight's slate…</p></div>
+  </section>
 
   <section id="nba-view-slate" class="view active">
     <div class="fb-slim-head"><h2>Slate</h2><span class="right">Tonight · <span class="fb-slim-date"></span></span></div>
@@ -675,6 +743,28 @@ body.sport-glass .pc-overlay,body.sport-glass .gm-overlay{background:rgba(2,5,10
       <tbody id="nbaMktBody"><tr><td colspan="7" class="muted">Pricing tonight's slate…</td></tr></tbody>
     </table></div>
     <p class="muted small" style="margin-top:.4rem">Tap a player for his full card — fair lines, milestone ladders, form vs tonight's lines, and parlay legs. Hit % is the model's chance of going over the fair line.</p>
+  </section>
+
+  <section id="nba-view-toppicks" class="view">
+    <div class="fb-slim-head"><h2>Top Picks</h2><span class="right">Tonight's projections</span></div>
+    <select id="nbaTpSelectLab" aria-label="Choose a stat">
+      <option value="points">Points</option>
+      <option value="rebounds">Rebounds</option>
+      <option value="assists">Assists</option>
+      <option value="threes">Projected 3s</option>
+      <option value="pra">PRA</option>
+      <option value="ra">Reb + Ast</option>
+    </select>
+    <div class="tp-strip" id="nbaTpStripLab" style="margin-top:.6rem"><p class="muted">Pricing tonight's slate…</p></div>
+  </section>
+
+  <section id="nba-view-types" class="view">
+    <div class="fb-slim-head"><h2>Player Types</h2><span class="right">Shot-style groups · 2026-27</span></div>
+    <p class="muted small" style="margin:.2rem 0 .7rem">Every player typed by <b>how he shoots</b>, not his position — clustered from this season's shot diet (zones + shot kinds). The letter rides beside his name across the site. Types are a style shorthand, redrawn weekly; a second letter is his lean when the fit is borderline. Display only — types never move a price.</p>
+    <div id="nbaTypesBody"><p class="muted">Loading types…</p></div>
+    <h3 class="fb-sec-title" style="margin-top:1rem">Defense vs Type <span class="sub">per-game delta vs the type's own average</span></h3>
+    <p class="muted small" style="margin:.2rem 0 .55rem">How many more (green) or fewer (red) points each defense gives up to each shot-style group, against that group's own baseline. Needs 6+ games of history or the cell stays blank.</p>
+    <div id="nbaTypeDefBody"><p class="muted">Loading…</p></div>
   </section>
 
   <section id="nba-view-paint" class="view">
@@ -969,23 +1059,29 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
   // ---- Top Picks (home): dropdown stat filter + horizontal face-card scroll ----
   let tpStat = 'points';
   function renderTopPicks() {
-    const strip = $('nbaTpStrip'); if (!strip) return;
-    if (!mktRows) { strip.innerHTML = '<p class="muted">Pricing tonight\'s slate…</p>'; return; }
-    if (!mktRows.length) { strip.innerHTML = '<p class="muted">No projections tonight.</p>'; return; }
+    const strips = [$('nbaTpStrip'), $('nbaTpStripLab')].filter(Boolean);
+    if (!strips.length) return;
+    const fill = (html) => strips.forEach((s) => {
+      s.innerHTML = html;
+      s.querySelectorAll('.tp-card').forEach((el) => el.addEventListener('click', () => openPlayerCard(el.dataset.pid)));
+    });
+    if (!mktRows) { fill('<p class="muted">Pricing tonight\'s slate…</p>'); return; }
+    if (!mktRows.length) { fill('<p class="muted">No projections tonight.</p>'); return; }
     const top = [...mktRows].filter((r) => r.markets && r.markets[tpStat] && r.markets[tpStat].mean != null)
       .sort((a, b) => b.markets[tpStat].mean - a.markets[tpStat].mean).slice(0, 5);
-    if (!top.length) { strip.innerHTML = '<p class="muted">No projections for this stat.</p>'; return; }
-    strip.innerHTML = top.map((r) =>
+    if (!top.length) { fill('<p class="muted">No projections for this stat.</p>'); return; }
+    fill(top.map((r) =>
       '<div class="tp-card" data-pid="' + r.id + '" role="button" tabindex="0">'
       + '<img class="tp-head" src="' + headshot(r.id) + '" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">'
-      + '<div class="tp-name">' + esc(r.name) + '</div>'
+      + '<div class="tp-name">' + esc(r.name) + typeBadge(r.id) + '</div>'
       + '<div class="tp-team"><img src="' + logoUrl(r.team) + '" alt="">' + esc(r.team) + '</div>'
       + '<div class="tp-meta">' + esc((r.home ? 'vs ' : '@ ') + r.oppAbbr) + ' · ' + r.min + ' min</div>'
-      + '<div class="tp-num">' + r.markets[tpStat].mean.toFixed(1) + '</div></div>').join('');
-    strip.querySelectorAll('.tp-card').forEach((el) => el.addEventListener('click', () => openPlayerCard(el.dataset.pid)));
+      + '<div class="tp-num">' + r.markets[tpStat].mean.toFixed(1) + '</div></div>').join(''));
   }
   const tpSelect = $('nbaTpSelect');
-  if (tpSelect) tpSelect.addEventListener('change', () => { tpStat = tpSelect.value; renderTopPicks(); });
+  if (tpSelect) tpSelect.addEventListener('change', () => { tpStat = tpSelect.value; const l = $('nbaTpSelectLab'); if (l) l.value = tpStat; renderTopPicks(); });
+  const tpSelectLab = $('nbaTpSelectLab');
+  if (tpSelectLab) tpSelectLab.addEventListener('change', () => { tpStat = tpSelectLab.value; if (tpSelect) tpSelect.value = tpStat; renderTopPicks(); });
 
   // ---- NBA search (home top): players, matchups, lineups, slate ----
   // Mirrors the Center Ice search: live filter, grouped results, 5 per group,
@@ -1030,7 +1126,7 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
     const pRows = rows.filter((r) => nbaNorm(r.name).includes(q) || nbaNorm(r.team).includes(q) || nbaNorm(r.teamName).includes(q)).slice(0, NBA_CAP).map((r) => {
       const b = document.createElement('button'); b.type = 'button'; b.className = 'ci-row';
       const pts = r.markets && r.markets.points ? r.markets.points.mean : null;
-      b.innerHTML = '<span>' + esc(r.name) + ' <span class="muted small">' + esc(r.team) + ' vs ' + esc(r.oppAbbr) + '</span></span>'
+      b.innerHTML = '<span><img class="hs" src="' + headshot(r.id) + '" alt="" onerror="this.style.visibility=\'hidden\'">' + esc(r.name) + typeBadge(r.id) + ' <span class="muted small">' + esc(r.team) + ' vs ' + esc(r.oppAbbr) + '</span></span>'
         + (pts != null ? '<span class="pct">' + pts.toFixed(1) + ' PTS</span>' : '');
       b.addEventListener('click', () => { nbaSearchGoHome(); openPlayerCard(r.id); });
       return b;
@@ -1939,7 +2035,7 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
     mktBody.innerHTML = rows.map((r) => {
       const m = mktOf(r);
       return '<tr class="fb-prow" data-pid="' + r.id + '"><td><span class="fb-bplayer"><img class="hs" src="' + headshot(r.id) + '" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">' +
-        '<span class="bn">' + esc(r.name) + '</span><img class="tl" src="' + logoUrl(r.team) + '" alt=""></span></td>' +
+        '<span class="bn">' + esc(r.name) + '</span>' + typeBadge(r.id) + '<img class="tl" src="' + logoUrl(r.team) + '" alt=""></span></td>' +
         '<td class="num">' + r.min + '</td>' +
         '<td class="num">' + m.mean + '</td>' +
         '<td class="num fb-mkt-line">' + m.line + '</td>' +
@@ -2025,6 +2121,8 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
     if (gameOpenId) renderGame();
     if (cardPid) renderCard(cardPid, true);
     renderTopPicks();
+    renderStandouts();
+    renderTypes();
     tryPendingNba();
   };
 
@@ -2049,15 +2147,20 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
   // ---- NBA.com display sidecars (zones last-20/season + guarded-by) ----
   // Built server-side by data-builder/nba-sidecar.py; display only, and every
   // consumer degrades silently when the file or a player's entry is absent.
-  let nbaZonesSide = null, nbaGuardsSide = null, nbaSideLoading = false;
+  let nbaZonesSide = null, nbaGuardsSide = null, nbaTypesSide = null, nbaSideLoading = false;
   async function loadNbaSidecars() {
     if (nbaSideLoading || (nbaZonesSide && nbaGuardsSide)) return;
     nbaSideLoading = true;
     try { const z = await getJSON('data/nba-zones-' + ymdDash + '.json'); if (z && z.players) nbaZonesSide = z; } catch (e) {}
     try { const g = await getJSON('data/nba-guards-' + ymdDash + '.json'); if (g && g.players) nbaGuardsSide = g; } catch (e) {}
+    try { const ty = await getJSON('data/nba-types.json'); if (ty && ty.players) nbaTypesSide = ty; } catch (e) {}
     nbaSideLoading = false;
-    if (nbaZonesSide || nbaGuardsSide) {
+    if (nbaZonesSide || nbaGuardsSide || nbaTypesSide) {
       renderDefMatch();
+      renderMarkets();
+      renderTopPicks();
+      renderStandouts();
+      renderTypes();
       if (cardPid) renderCard(cardPid, true);
     }
   }
@@ -3117,6 +3220,12 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
       (match ? '<div class="pc-match">' + esc(match) + '</div>' : '') + '</div>' +
       (row ? '<div class="pc-min-chip"><div class="n">' + row.min + '</div><div class="l">Proj min</div></div>' : '') +
       '</div>';
+    const tHead = typeOf(pid);
+    if (tHead) {
+      h += '<div class="pc-type-line">' + typeBadge(pid, true) +
+        '<span class="fit">fit ' + (tHead.fit != null ? Number(tHead.fit).toFixed(2) : '—') + ' · ' + (tHead.fga || 0) + ' FGA this season' +
+        (tHead.lean ? ' · leans ' + esc(tHead.lean) : '') + ' · style only, not in the price</span></div>';
+    }
     if (live) {
       h += '<div class="pc-live-strip"><span class="ls">' + (live.state === 'post' ? 'FINAL' : 'LIVE · ' + esc(live.detail)) + '</span>' +
         '<b>' + esc(live.min) + ' MIN · ' + live.pts + ' PTS · ' + live.reb + ' REB · ' + live.ast + ' AST · ' + live.tpm + ' 3PM</b></div>';
@@ -3157,9 +3266,12 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
     // Shot zones (display only) — last 20 + season when the sidecar has him
     const zSide = (nbaZonesSide && nbaZonesSide.players) ? nbaZonesSide.players[row.id] : null;
     h += sec('zones', zSide ? 'Shot zones · last ' + Math.min(20, zSide.gamesL20 || 20) : 'Shot zones · last 6', zonesHtml(row), false);
-    // Who guards him (display only, NBA.com matchup data)
+    // Who guards him (display only, NBA.com matchup data) + the
+    // type-vs-defense read inside the same matchup surface.
     const guardsBody = guardsHtml(row);
-    if (guardsBody) h += sec('guards', 'Who guards him', guardsBody, false);
+    const typeRead = typeReadHtml(row);
+    if (guardsBody) h += sec('guards', 'Who guards him', guardsBody + typeRead, false);
+    else if (typeRead) h += sec('guards', 'Defensive matchups', typeRead, false);
     // Milestones
     const ladHtml = MKT_KEYS.map((key) => {
       const lad = row.markets[key].ladder || [];
@@ -3231,12 +3343,303 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
     syncParlayUI();
   }
 
+  /* ================= Player Types + Slate Standouts =================
+     Display only. Types come from data/nba-types.json (built by
+     data-builder/nba-types.py — clustered from this season's shot diet).
+     A type read is style history, never a price input; the model % stays
+     visible on every Standouts row that has one. Every surface degrades
+     silently when the types file or a player's entry is absent. */
+  const TYPE_ORDER = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
+  function typeOf(pid) {
+    if (!nbaTypesSide || !nbaTypesSide.players) return null;
+    return nbaTypesSide.players[String(pid)] || null;
+  }
+  function typeBadge(pid, big) {
+    const t = typeOf(pid);
+    if (!t || !t.letter) return '';
+    const meta = (nbaTypesSide.types || {})[t.letter] || {};
+    const lean = t.lean ? '<span class="tb-lean">/' + esc(t.lean) + '</span>' : '';
+    return '<span class="type-badge' + (big ? ' big' : '') + '" title="' + esc(meta.desc || meta.name || '') + '"><span class="tb-l">' + esc(t.letter) + '</span><span class="tb-n">' + esc(meta.name || '') + '</span>' + lean + '</span>';
+  }
+  function typeDefCell(letter, oppAbbr) {
+    if (!nbaTypesSide || !nbaTypesSide.defense || !letter) return null;
+    const byOpp = nbaTypesSide.defense[letter];
+    return byOpp ? (byOpp[oppAbbr] || null) : null;
+  }
+  // Qualification per the design brief: mean delta past the cutoff AND
+  // beat rate on the right side of 50 AND 6+ games of type history.
+  // Returns 1 (standout), -1 (tough spot), 0 (no qualifying read).
+  function soQualify(cell, stat, cut) {
+    const s = cell && cell[stat];
+    if (!s || !cell || cell.games < 6) return 0;
+    if (s.d >= cut && s.beat >= 0.55) return 1;
+    if (s.d <= -cut && s.beat <= 0.45) return -1;
+    return 0;
+  }
+
+  /* ---- Standouts assembly: three layers, parts shown, never blended ---- */
+  let soView = 'cat', soCat = 'points';
+  const SO_CATS = [
+    { key: 'points', label: 'Points', stat: 'pts', cut: 2.5, mkt: 'points', unit: 'PTS', floor: (r) => ((r.seasonAvgs && parseFloat(r.seasonAvgs.ppg)) || r.markets.points.mean) >= 12 },
+    { key: 'threes', label: 'Threes', stat: 'tpm', cut: 0.7, mkt: 'threes', unit: '3PM', floor: (r) => r.markets.threes.mean >= 1.5 },
+    { key: 'rebounds', label: 'Rebounds', stat: 'reb', cut: 1.5, mkt: 'rebounds', unit: 'REB', floor: (r) => r.markets.rebounds.mean >= 5 },
+    { key: 'assists', label: 'Assists', stat: 'ast', cut: 1.2, mkt: 'assists', unit: 'AST', floor: (r) => r.markets.assists.mean >= 4 },
+    { key: 'ft', label: 'Free Throws', stat: 'fta', cut: 1.0, mkt: null, unit: 'FTA', floor: (r) => r.min >= 18 },
+    { key: 'paint', label: 'Paint & Rim', paint: true },
+    { key: 'pace', label: 'Pace & Total', team: true },
+  ];
+  function soCatDef(key) { return SO_CATS.find((c) => c.key === key) || SO_CATS[0]; }
+  function soRowsFor(cat) {
+    if (!mktRows) return [];
+    if (cat.paint) return soPaintRows();
+    if (cat.team) return [];
+    const out = [];
+    for (const r of mktRows) {
+      if (!cat.floor(r)) continue;
+      const t = typeOf(r.id);
+      const cell = t ? typeDefCell(t.letter, r.oppAbbr) : null;
+      const q = cell ? soQualify(cell, cat.stat, cat.cut) : 0;
+      const m = cat.mkt ? r.markets[cat.mkt] : null;
+      const mLean = m ? (m.pOver >= 0.58 ? 1 : m.pOver <= 0.42 ? -1 : 0) : 0;
+      if (!q && !mLean) continue;
+      const side = q || mLean;
+      const stacked = !!q && !!mLean && q === mLean;
+      const read = q ? { d: cell[cat.stat].d, beat: cell[cat.stat].beat, n: cell[cat.stat].n, games: cell.games, letter: t.letter } : null;
+      const score = (stacked ? 100 : 0) + (read ? Math.abs(read.d) * 10 : 0) + (m ? Math.abs(m.pOver - 0.5) * 100 : 0);
+      out.push({ r, side, read, model: m, stacked, score, cat });
+    }
+    return out.sort((a, b) => b.score - a.score);
+  }
+  function soPaintRows() {
+    if (!nbaZonesSide || !nbaZonesSide.players || !nbaZonesSide.opp || !mktRows) return [];
+    let lgAtt = 0, lgMk = 0;
+    for (const ab of Object.keys(nbaZonesSide.opp)) {
+      const b = (nbaZonesSide.opp[ab] || {}).rim || { att: 0, mk: 0 };
+      lgAtt += b.att || 0; lgMk += b.mk || 0;
+    }
+    if (!lgAtt) return [];
+    const lgFg = lgMk / lgAtt;
+    const cat = soCatDef('paint');
+    const out = [];
+    for (const r of mktRows) {
+      const sideP = nbaZonesSide.players[r.id];
+      if (!sideP || !sideP.season) continue;
+      const s = sideP.season;
+      const tot = ['rim', 'paint', 'mid', 'c3', 'ab3'].reduce((a, k) => a + ((s[k] || {}).att || 0), 0);
+      if (tot < 40) continue;
+      const rpShare = (((s.rim || {}).att || 0) + ((s.paint || {}).att || 0)) / tot;
+      if (rpShare < 0.5) continue;
+      const oz = nbaZonesSide.opp[r.oppAbbr];
+      if (!oz || !oz.rim || (oz.rim.att || 0) < 60) continue;
+      const oFg = oz.rim.mk / oz.rim.att;
+      const diff = oFg - lgFg;
+      if (Math.abs(diff) < 0.04) continue;
+      const side = diff > 0 ? 1 : -1;
+      const m = r.markets.points;
+      const mLean = m.pOver >= 0.58 ? 1 : m.pOver <= 0.42 ? -1 : 0;
+      const stacked = mLean === side;
+      out.push({ r, side, read: null, model: m, stacked,
+        paint: { share: rpShare, oFg, lgFg, oAtt: oz.rim.att },
+        score: (stacked ? 100 : 0) + Math.abs(diff) * 200 + Math.abs(m.pOver - 0.5) * 100, cat });
+    }
+    return out.sort((a, b) => b.score - a.score);
+  }
+  function soFooter() {
+    return '<p class="so-note">Type rows are a read — style history, not a price. A row shows its sample or it doesn\'t render. Model lines are the engine\'s fair lines for tonight.</p>';
+  }
+  function soReadLine(x) {
+    if (x.paint) {
+      return 'Paint &amp; rim diet: ' + Math.round(x.paint.share * 100) + '% of his shots · ' + esc(x.r.oppAbbr) +
+        ' allows ' + Math.round(x.paint.oFg * 100) + '% at the rim (league ' + Math.round(x.paint.lgFg * 100) + '%, ' + x.paint.oAtt + ' shots faced)';
+    }
+    if (!x.read) return 'Model-only spot — no qualifying type read vs this defense.';
+    const beatN = Math.round(x.read.beat * x.read.n);
+    return x.read.letter + '-types vs ' + esc(x.r.oppAbbr) + ': ' + (x.read.d > 0 ? '+' : '') + x.read.d.toFixed(1) +
+      ' ' + x.cat.unit + ' vs their own avg · beat it ' + beatN + ' of ' + x.read.n + ' · ' + x.read.games + ' games of type history';
+  }
+  function soModelLine(x) {
+    if (!x.model) return 'No model market for free throws — read only.';
+    return 'Model: o' + x.model.line + ' ' + x.cat.unit + ' · <span class="mpct">' + Math.round(x.model.pOver * 100) + '%</span> over · proj ' + x.model.mean;
+  }
+  function soNameHtml(x) {
+    return esc(x.r.name) + typeBadge(x.r.id) + (x.stacked ? '<span class="so-stack">STACKED</span>' : '');
+  }
+  function soCardHtml(x) {
+    return '<div class="so-card" data-pid="' + x.r.id + '" role="button" tabindex="0">' +
+      '<div class="sc-top"><img class="hs" src="' + headshot(x.r.id) + '" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">' +
+      '<div><div class="sc-name">' + soNameHtml(x) + '</div><div class="sc-sub">' + esc(x.r.team) + ' ' + (x.r.home ? 'vs ' : '@ ') + esc(x.r.oppAbbr) + ' · ' + x.cat.label + '</div></div></div>' +
+      '<div class="so-read">' + soReadLine(x) + '</div><div class="so-model">' + soModelLine(x) + '</div></div>';
+  }
+  function soRowHtml(x, withCat) {
+    return '<div class="so-row" data-pid="' + x.r.id + '" role="button" tabindex="0">' +
+      '<img class="hs" src="' + headshot(x.r.id) + '" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">' +
+      '<div class="so-main"><div class="so-name">' + soNameHtml(x) + (withCat ? ' <span class="muted small">· ' + x.cat.label + '</span>' : '') + '</div>' +
+      '<div class="so-read">' + esc(x.r.team) + ' ' + (x.r.home ? 'vs ' : '@ ') + esc(x.r.oppAbbr) + ' — ' + soReadLine(x) + '</div>' +
+      '<div class="so-model">' + soModelLine(x) + '</div></div></div>';
+  }
+  function bindSoRows(root) {
+    root.querySelectorAll('[data-pid]').forEach((el) => el.addEventListener('click', () => openPlayerCard(el.dataset.pid)));
+    root.querySelectorAll('[data-gid]').forEach((el) => el.addEventListener('click', () => openGame(el.dataset.gid)));
+  }
+  function soPaceHtml() {
+    const gs = (tonightGames || []).map((g) => ({ g, proj: gameProjFor(g) })).filter((x) => x.proj);
+    if (!gs.length) return '<p class="muted">Game projections load with team ratings…</p>' + soFooter();
+    const sorted = [...gs].sort((a, b) => b.proj.total - a.proj.total);
+    const card = (x, note) => '<div class="so-game" data-gid="' + x.g.id + '" role="button" tabindex="0"><h4>' + esc(x.g.away.name) + ' @ ' + esc(x.g.home.name) + '</h4>' +
+      '<div class="so-read">Model total <b style="color:var(--text)">' + x.proj.total + '</b> · pace ' + x.proj.pace + ' · proj score ' + esc(x.g.away.abbr) + ' ' + Math.round(x.proj.expAway) + ' — ' + Math.round(x.proj.expHome) + ' ' + esc(x.g.home.abbr) + '</div>' +
+      '<div class="so-model">' + note + '</div></div>';
+    let h = '';
+    if (sorted.length <= 3) {
+      h += '<div class="so-head over">Tonight\'s totals</div>' + sorted.map((x) => card(x, 'Game environment from the model\'s pace + efficiency projection.')).join('');
+    } else {
+      h += '<div class="so-head over">Shootout environments</div>' + sorted.slice(0, 2).map((x) => card(x, 'Highest-total spot on the slate — the friendliest environment for counting stats.')).join('');
+      h += '<div class="so-head under">Dead spots</div>' + sorted.slice(-2).reverse().map((x) => card(x, 'Lowest-total spot on the slate — counting stats come harder here.')).join('');
+    }
+    return h + soFooter();
+  }
+  function soByGameHtml() {
+    if (!tonightGames || !tonightGames.length) return '<p class="muted">No games on the slate.</p>' + soFooter();
+    let h = '';
+    for (const g of tonightGames) {
+      const rows = [];
+      for (const cat of SO_CATS) {
+        if (cat.team) continue;
+        for (const x of soRowsFor(cat)) {
+          if ((x.r.team === g.away.abbr && x.r.oppAbbr === g.home.abbr) || (x.r.team === g.home.abbr && x.r.oppAbbr === g.away.abbr)) rows.push(x);
+        }
+      }
+      rows.sort((a, b) => b.score - a.score);
+      const proj = gameProjFor(g);
+      h += '<div class="so-game"><h4>' + esc(g.away.name) + ' @ ' + esc(g.home.name) + '<span class="sub">' + (proj ? 'model total ' + proj.total + ' · pace ' + proj.pace : '') + '</span></h4>';
+      if (!rows.length) h += '<p class="muted small">No standout spots in this one tonight.</p>';
+      else h += rows.slice(0, 6).map((x) => soRowHtml(x, true)).join('');
+      h += '</div>';
+    }
+    return h + soFooter();
+  }
+  function renderStandouts() {
+    const body = $('nbaSoBody');
+    if (!body) return;
+    const catsEl = $('nbaSoCats');
+    if (catsEl) {
+      catsEl.innerHTML = SO_CATS.map((c) => '<button class="fb-mkt-pill' + (c.key === soCat ? ' active' : '') + '" data-socat="' + c.key + '" type="button">' + c.label + '</button>').join('');
+      catsEl.querySelectorAll('[data-socat]').forEach((b) => b.addEventListener('click', () => { soCat = b.dataset.socat; renderStandouts(); }));
+    }
+    if (!mktRows) { body.innerHTML = '<p class="muted">Pricing tonight\'s slate…</p>'; return; }
+    if (soView === 'game') { body.innerHTML = soByGameHtml(); bindSoRows(body); return; }
+    const cat = soCatDef(soCat);
+    if (cat.team) { body.innerHTML = soPaceHtml(); bindSoRows(body); return; }
+    const rows = soRowsFor(cat);
+    if (!rows.length) {
+      body.innerHTML = '<p class="muted">No ' + cat.label.toLowerCase() + ' spots clear the bar tonight — a read needs 6+ games of type history past the cutoff, or a model lean of 58%+. Nothing gets forced onto the board.</p>' + soFooter();
+      return;
+    }
+    const sideBlock = (list, title, cls) => {
+      if (!list.length) return '';
+      let s = '<div class="so-head ' + cls + '">' + title + '</div>';
+      s += '<div class="so-cards">' + list.slice(0, 3).map((x) => soCardHtml(x)).join('') + '</div>';
+      if (list.length > 3) s += list.slice(3).map((x) => soRowHtml(x, false)).join('');
+      return s;
+    };
+    body.innerHTML = sideBlock(rows.filter((x) => x.side > 0), 'Biggest Standouts — ' + cat.label, 'over') +
+      sideBlock(rows.filter((x) => x.side < 0), 'Tough Spots — ' + cat.label, 'under') + soFooter();
+    bindSoRows(body);
+  }
+  document.querySelectorAll('#nbaSoToggle [data-soview]').forEach((b) => b.addEventListener('click', () => {
+    soView = b.dataset.soview;
+    document.querySelectorAll('#nbaSoToggle [data-soview]').forEach((x) => x.classList.toggle('active', x === b));
+    renderStandouts();
+  }));
+
+  /* ---- Types view: the letters, their members, Defense vs Type ---- */
+  function renderTypes() {
+    const body = $('nbaTypesBody');
+    if (!body) return;
+    const defBody = $('nbaTypeDefBody');
+    if (!nbaTypesSide) {
+      body.innerHTML = '<p class="muted">Types load with tonight\'s slate data…</p>';
+      if (defBody) defBody.innerHTML = '<p class="muted">—</p>';
+      return;
+    }
+    const players = nbaTypesSide.players || {};
+    const byLetter = {};
+    for (const pid of Object.keys(players)) {
+      const t = players[pid];
+      if (t && t.letter) (byLetter[t.letter] = byLetter[t.letter] || []).push({ pid, t });
+    }
+    let h = '';
+    for (const L of TYPE_ORDER) {
+      const meta = (nbaTypesSide.types || {})[L] || {};
+      const members = (byLetter[L] || []).sort((a, b) => (b.t.fga || 0) - (a.t.fga || 0));
+      h += '<div class="ty-letter"><div class="ty-head"><span class="type-badge big"><span class="tb-l">' + L + '</span><span class="tb-n">' + esc(meta.name || '') + '</span></span>' +
+        '<span class="muted small">' + members.length + ' players</span></div>' +
+        '<div class="ty-desc">' + esc(meta.desc || '') + '</div>';
+      if (members.length) {
+        h += '<div class="ty-members">' + members.map(({ pid, t }) => {
+          const eid = t.espnId ? String(t.espnId) : null;
+          const known = eid && (pricedById[eid] || liveByPid[eid] || knownPlayers[eid]);
+          const img = eid ? '<img class="hs" src="' + headshot(eid) + '" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">' : '';
+          const inner = img + esc(t.name) + '<span class="tm-t">' + esc(t.team || '') + (t.lean ? ' · leans ' + esc(t.lean) : '') + '</span>';
+          return known
+            ? '<button type="button" class="ty-member" data-pid="' + eid + '">' + inner + '</button>'
+            : '<span class="ty-member" style="cursor:default">' + inner + '</span>';
+        }).join('') + '</div>';
+      } else {
+        h += '<p class="muted small" style="margin-top:.4rem">No typed players at the current shot floor.</p>';
+      }
+      h += '</div>';
+    }
+    body.innerHTML = h;
+    body.querySelectorAll('.ty-member[data-pid]').forEach((b) => b.addEventListener('click', () => openPlayerCard(b.dataset.pid)));
+    if (defBody) {
+      const def = nbaTypesSide.defense || {};
+      const teamSet = {};
+      for (const L of Object.keys(def)) for (const ab of Object.keys(def[L] || {})) teamSet[ab] = 1;
+      const teamList = Object.keys(teamSet).sort();
+      if (!teamList.length) {
+        defBody.innerHTML = '<p class="muted">No type-vs-defense history yet — it builds as the season goes.</p>';
+      } else {
+        let t = '<div class="table-wrap"><table class="ty-def"><thead><tr><th style="text-align:left">Defense</th>' + TYPE_ORDER.map((L) => '<th>' + L + '</th>').join('') + '</tr></thead><tbody>';
+        for (const ab of teamList) {
+          t += '<tr><td class="tm">' + esc(ab) + '</td>' + TYPE_ORDER.map((L) => {
+            const cell = def[L] && def[L][ab];
+            const s = cell && cell.pts;
+            if (!s || cell.games < 6) return '<td>·</td>';
+            const cls = s.d >= 1.5 ? 'hot' : s.d <= -1.5 ? 'cold' : '';
+            return '<td class="' + cls + '">' + (s.d > 0 ? '+' : '') + s.d.toFixed(1) + '</td>';
+          }).join('') + '</tr>';
+        }
+        t += '</tbody></table></div><p class="muted small" style="margin-top:.4rem">Points per game vs the type group\'s own average, 2026-27 to date. Threes / rebounds / assists / free-throw splits live in the Standouts reads.</p>';
+        defBody.innerHTML = t;
+      }
+    }
+  }
+
+  /* ---- Card: type-vs-defense read (inside the matchup sections) ---- */
+  function typeReadHtml(row) {
+    const t = typeOf(row.id);
+    if (!t) return '';
+    const cell = typeDefCell(t.letter, row.oppAbbr);
+    if (!cell) return '';
+    const q = soQualify(cell, 'pts', 2.5);
+    if (!q) return '';
+    const s = cell.pts;
+    const beatN = Math.round(s.beat * s.n);
+    const meta = (nbaTypesSide.types || {})[t.letter] || {};
+    return '<div style="margin-top:.6rem;border-top:1px solid rgba(31,44,68,.5);padding-top:.5rem">' +
+      '<p class="muted small" style="margin-bottom:.15rem">Type read — how ' + esc(t.letter) + '-types (' + esc(meta.name || '') + ') have scored against ' + esc(row.oppAbbr) + ' this season.</p>' +
+      '<div class="gd-row"><span class="gd-info"><span class="gd-name">Type ' + esc(t.letter) + ' vs ' + esc(row.oppAbbr) + '</span>' +
+      '<span class="gd-line">' + (s.d > 0 ? '+' : '') + s.d.toFixed(1) + ' PTS vs their own average · beat it ' + beatN + ' of ' + s.n + ' · ' + cell.games + ' games</span></span>' +
+      '<span class="gd-verdict ' + (q > 0 ? 'cooked' : 'held') + '">' + (q > 0 ? 'TYPE EDGE' : 'TYPE FADE') + '</span></div>' +
+      '<p class="muted small" style="margin-top:.45rem">A read — style history, not a price input.</p></div>';
+  }
+
   /* ================= Fast Break views (collapsible menu) ================= */
-  const FB_VIEW_NAMES = { slate: 'Slate', markets: 'Markets', paint: 'In the Paint', parlay: 'Parlay builder' };
+  const FB_VIEW_NAMES = { standouts: 'Standouts', slate: 'Slate', markets: 'Markets', toppicks: 'Top Picks', types: 'Player Types', paint: 'In the Paint', parlay: 'Parlay builder' };
   let fbView = 'slate';
   function setFbView(v) {
     fbView = v;
-    ['slate', 'markets', 'paint', 'parlay'].forEach((x) => {
+    ['standouts', 'slate', 'markets', 'toppicks', 'types', 'paint', 'parlay'].forEach((x) => {
       const el = $('nba-view-' + x);
       if (el) el.classList.toggle('active', x === v);
     });
@@ -3245,6 +3648,9 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
     document.querySelectorAll('.fb-menu-item').forEach((it) => it.classList.toggle('on', it.dataset.fbview === v));
     if (v === 'markets') window.loadMarkets();
     if (v === 'slate') { loadRatings().then(() => renderSlate()); window.loadMarkets(); }
+    if (v === 'standouts') { renderStandouts(); window.loadMarkets(); }
+    if (v === 'toppicks') { renderTopPicks(); window.loadMarkets(); }
+    if (v === 'types') renderTypes();
     if (v === 'paint') renderPaint();
     if (v === 'parlay') { renderParlay(); window.loadMarkets(); }
   }

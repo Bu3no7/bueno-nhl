@@ -146,6 +146,8 @@ body.sport-glass #boardTable tr.scored td:first-child{background:linear-gradient
       <button class="tab" data-view="slate" role="tab">Slate</button>
       <button class="tab" data-view="goals" role="tab"><span class="live-dot" id="liveTabDot"></span>Live</button>
       <button class="tab" data-view="board" role="tab">Board</button>
+      <button class="tab" data-view="standouts" role="tab">Standouts</button>
+      <button class="tab" data-view="types" role="tab">Types</button>
     </div>
   </nav>
 </header>
@@ -445,6 +447,29 @@ body.sport-glass #boardTable tr.scored td:first-child{background:linear-gradient
       </label>
     </div>
     <div id="vigOut" style="margin-top:.8rem"></div>
+  </section>
+
+  <section id="view-standouts" class="view">
+    <div class="view-head">
+      <div>
+        <p class="kicker">Matchup data</p>
+        <h2>Standouts</h2>
+        <p class="view-sub muted">Tonight's slate read against the goalie each skater faces — his priced save % and where he gets beaten. Reads, not prices: the model number is shown beside every read, and any row whose whole case is a soft goalie is flagged as one.</p>
+      </div>
+    </div>
+    <div id="standoutCats" class="so-cats"></div>
+    <div id="standoutsBody"></div>
+  </section>
+
+  <section id="view-types" class="view">
+    <div class="view-head">
+      <div>
+        <p class="kicker">Season</p>
+        <h2>Player types</h2>
+        <p class="view-sub muted">Every skater typed by where his shots come from this season (NHL EDGE shot locations, clustered weekly). The letter rides beside his name across the site; tap a name on tonight's slate for the full card.</p>
+      </div>
+    </div>
+    <div id="typesBody"></div>
   </section>
 </main>
 
