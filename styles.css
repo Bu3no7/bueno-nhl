@@ -1808,3 +1808,78 @@ button.stk-chip { cursor: pointer; }
   .eg-card img.eg-face { width: 72px; height: 72px; }
   .eg-name { font-size: 1.3rem; }
 }
+
+/* ---------------- Player Overview (bottom of Center Ice) ----------------
+   Ported from the approved mocks (overview-mock v1 + v2): glass panel,
+   team search -> roster pills in team colors grouped F/D/G, player
+   search -> pills, tap a pill -> career overview (draft line, teams
+   with season spans, season-by-season table). Data: NHL API via the
+   /nhl-api proxy, display only. */
+.po-head { margin-top: 1.6rem; }
+.po-panel {
+  background: linear-gradient(155deg, rgba(130,170,255,.13), rgba(6,12,26,.55));
+  -webkit-backdrop-filter: blur(14px) saturate(1.35); backdrop-filter: blur(14px) saturate(1.35);
+  border: 1px solid rgba(165,195,255,.22); border-radius: var(--radius);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06), var(--shadow-sm);
+  padding: 1rem 1rem .9rem;
+}
+.po-search { width: 100%; background: rgba(7,11,18,.65); border: 1px solid var(--border); border-radius: var(--radius-sm);
+  color: var(--text); font: inherit; font-size: .95rem; padding: .65rem .8rem; outline: none; }
+.po-search::placeholder { color: var(--muted-2); }
+.po-search:focus { border-color: rgba(58,219,227,.5); }
+.po-hint { color: var(--muted-2); font-size: .78rem; margin: .55rem 0 0; }
+.po-loading { color: var(--muted); font-size: .88rem; margin: .9rem 0 .2rem; }
+.po-nomatch { color: var(--muted); font-size: .88rem; margin: .9rem 0 .2rem; }
+.po-tapnote { color: var(--muted-2); font-size: .78rem; margin: .7rem 0 0; }
+.po-sec-t { font-size: .72rem; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); margin: .95rem 0 .45rem; }
+/* default state: all 32 team logos */
+.po-teamgrid { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .2rem; }
+.po-teamlogo { display: inline-flex; align-items: center; justify-content: center; width: 52px; height: 52px;
+  background: rgba(255,255,255,.04); border: 1px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; padding: .35rem; }
+.po-teamlogo:hover { border-color: rgba(58,219,227,.5); background: rgba(255,255,255,.07); }
+.po-teamlogo img { width: 100%; height: 100%; object-fit: contain; }
+/* roster header + pills */
+.po-teamhead { display: flex; align-items: center; gap: .6rem; margin: 1rem 0 .1rem; }
+.po-teamhead img { width: 30px; height: 30px; }
+.po-thname { font-size: 1.05rem; font-weight: 800; }
+.po-abbr { font-size: .62rem; font-weight: 800; letter-spacing: .08em; border: 1px solid var(--border); border-radius: 99px; padding: .14rem .5rem; color: var(--muted); }
+.po-thcount { margin-left: auto; color: var(--muted); font-size: .8rem; white-space: nowrap; }
+.po-pills { display: flex; flex-wrap: wrap; gap: .45rem; }
+.po-pill { display: inline-flex; align-items: center; gap: .45rem; border-radius: 99px; padding: .28rem .7rem .28rem .3rem;
+  font: inherit; font-size: .85rem; font-weight: 650; color: var(--text); cursor: pointer; background: rgba(255,255,255,.03); }
+.po-pill img.pavatar { width: 26px; height: 26px; border-width: 2px; }
+.po-postag { font-size: .6rem; font-weight: 800; letter-spacing: .06em; border-radius: 99px; padding: .12rem .42rem; white-space: nowrap; }
+/* overview block */
+.po-player { margin-top: .6rem; }
+.po-phead { display: flex; gap: .9rem; align-items: center; }
+.po-phead img.pavatar.po-face { width: 72px; height: 72px; border-width: 3px; }
+.po-pname { margin: 0; font-size: 1.35rem; font-weight: 800; line-height: 1.15; }
+.po-teamline { display: flex; align-items: center; gap: .45rem; color: var(--muted); font-size: .9rem; margin-top: .2rem; }
+.po-logo { width: 20px; height: 20px; }
+.po-logo.md { width: 24px; height: 24px; }
+.po-logo.sm { width: 20px; height: 20px; vertical-align: -5px; }
+.po-draft { margin: .8rem 0 0; color: var(--gold); font-size: .76rem; font-weight: 800; letter-spacing: .1em; }
+.po-sec-note { color: var(--muted-2); letter-spacing: .03em; font-weight: 650; text-transform: none; }
+.po-teamrow { display: flex; align-items: center; gap: .55rem; padding: .42rem 0; border-bottom: 1px solid rgba(255,255,255,.04); }
+.po-teamrow:last-of-type { border-bottom: none; }
+.po-teamname { font-weight: 650; }
+.po-cur { color: var(--gold); background: var(--gold-wash); border: 1px solid rgba(245,185,66,.45);
+  font-size: .6rem; font-weight: 800; letter-spacing: .08em; border-radius: 99px; padding: .12rem .45rem; margin-left: .5rem; vertical-align: 2px; }
+.po-span { margin-left: auto; color: var(--muted); font-variant-numeric: tabular-nums; font-size: .88rem; }
+.po-table { width: 100%; border-collapse: collapse; font-size: .86rem; font-variant-numeric: tabular-nums; }
+.po-table th { font-size: .66rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--muted-2);
+  text-align: right; padding: .3rem .2rem; border-bottom: 1px solid rgba(255,255,255,.09); }
+.po-table th.l { text-align: left; }
+.po-table td { padding: .5rem .2rem; border-bottom: 1px solid rgba(255,255,255,.04); text-align: right; }
+.po-table td.po-season { text-align: left; color: var(--muted); font-weight: 650; white-space: nowrap; }
+.po-table td.po-tcell { text-align: left; }
+.po-table td.po-pts { font-weight: 800; }
+.po-table tr.po-career td { border-bottom: none; border-top: 1px solid rgba(245,185,66,.4); font-weight: 800; color: var(--gold); }
+.po-table tr.po-career td.po-season { color: var(--gold); }
+.po-foot { font-size: .72rem; color: var(--muted); font-style: italic; margin: .7rem 0 0; border-top: 1px solid rgba(255,255,255,.09); padding-top: .5rem; }
+@media (max-width: 480px) {
+  .po-pname { font-size: 1.2rem; }
+  .po-phead img.pavatar.po-face { width: 62px; height: 62px; }
+  .po-table { font-size: .8rem; }
+  .po-teamlogo { width: 46px; height: 46px; }
+}

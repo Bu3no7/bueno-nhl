@@ -614,3 +614,313 @@ async function shareCurrentView() {
 }
 const _shareBtn = $('shareBtn');
 if (_shareBtn) _shareBtn.addEventListener('click', shareCurrentView);
+
+/* ---------------- Player Overview (bottom of Center Ice) ----------------
+   Search a team (name or abbreviation) for its full roster as pills in
+   team colors, grouped Forwards / Defense / Goalies; search a player
+   name for matching pills across the league; tap a pill for that
+   player's career overview — draft line, every team with season spans,
+   and a season-by-season table (goalies get W/L/GAA/SV%/SO columns).
+   All data comes from the NHL API through the /nhl-api proxy and is
+   DISPLAY ONLY. Rosters are fetched per team on demand and cached for
+   the session; the league-wide player index is built lazily ONCE, the
+   first time a player search needs it (home-search.js keeps its own
+   tonight-only index for the home page and isn't reachable from here).
+   Failures fail soft with a quiet line — the panel never breaks. */
+const PO_TEAM_LIST = Object.keys(TEAM_FULL_NAMES);
+const PO_TEAM_NAME_EXTRA = {
+  ARI: 'Arizona Coyotes', PHX: 'Phoenix Coyotes', ATL: 'Atlanta Thrashers',
+  HFD: 'Hartford Whalers', QUE: 'Quebec Nordiques', MNS: 'Minnesota North Stars',
+};
+const PO_NAME_TO_ABBR = (() => {
+  const m = {};
+  for (const [abbr, name] of Object.entries(TEAM_FULL_NAMES)) m[name] = abbr;
+  Object.assign(m, {
+    'Arizona Coyotes': 'ARI', 'Phoenix Coyotes': 'PHX', 'Atlanta Thrashers': 'ATL',
+    'Utah Hockey Club': 'UTA', 'Chicago Black Hawks': 'CHI',
+    'Hartford Whalers': 'HFD', 'Quebec Nordiques': 'QUE', 'Minnesota North Stars': 'MNS',
+  });
+  return m;
+})();
+// Abbrevs with a logo file on the NHL CDN (current 32 + recent defunct).
+const PO_HAS_LOGO = new Set([...PO_TEAM_LIST, 'ARI', 'PHX', 'ATL']);
+const PO_POS_LONG = { C: 'Center', L: 'Left Wing', R: 'Right Wing', D: 'Defenseman', G: 'Goalie' };
+const PO_ALIASES = { MTL: ['habs'], NYI: ['isles'] };
+const poRosterCache = new Map();  // abbr -> Promise<parsed roster|null>
+const poLandingCache = new Map(); // pid  -> Promise<landing json|null>
+let poIndexPromise = null;        // Promise<player[]> built once per session
+let poIndexPlayers = null;        // resolved index (null until built)
+const poState = { token: 0 };
+function poTeamName(abbr) { return TEAM_FULL_NAMES[abbr] || PO_TEAM_NAME_EXTRA[abbr] || abbr; }
+function poNorm(s) {
+  return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '');
+}
+function poRgba(hex, a) {
+  const n = parseInt(String(hex || '#888888').slice(1), 16);
+  return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`;
+}
+function poPosTag(code) {
+  if (code === 'L') return 'LW';
+  if (code === 'R') return 'RW';
+  return code || '';
+}
+/* --- rosters --- */
+function poParseRoster(abbr, d) {
+  const mk = (p) => ({
+    id: p.id,
+    name: `${p.firstName?.default || ''} ${p.lastName?.default || ''}`.trim(),
+    pos: poPosTag(p.positionCode || ''),
+    num: p.sweaterNumber || null,
+    headshot: p.headshot || headshotUrl(abbr, p.id),
+  });
+  const groups = {
+    forwards: (d.forwards || []).map(mk).filter((p) => p.name),
+    defensemen: (d.defensemen || []).map(mk).filter((p) => p.name),
+    goalies: (d.goalies || []).map(mk).filter((p) => p.name),
+  };
+  if (!groups.forwards.length && !groups.defensemen.length && !groups.goalies.length) return null;
+  return { abbr, name: poTeamName(abbr), color: TEAM_COLORS[abbr] || '#8b96ab', groups };
+}
+function poLoadRoster(abbr) {
+  if (!poRosterCache.has(abbr)) {
+    poRosterCache.set(abbr, fetchJSON(`${API}/roster/${abbr}/${SEASON}`)
+      .then((d) => poParseRoster(abbr, d)).catch(() => null));
+  }
+  return poRosterCache.get(abbr);
+}
+function poEnsureIndex() {
+  if (!poIndexPromise) {
+    poIndexPromise = (async () => {
+      const rosters = await limitedMap(PO_TEAM_LIST, 8, (abbr) => poLoadRoster(abbr));
+      const players = [];
+      for (const r of rosters) {
+        if (!r) continue;
+        for (const g of ['forwards', 'defensemen', 'goalies']) {
+          for (const p of r.groups[g]) players.push({ ...p, team: r.abbr });
+        }
+      }
+      poIndexPlayers = players;
+      return players;
+    })();
+  }
+  return poIndexPromise;
+}
+/* --- rendering: search results --- */
+function poPillHtml(teamAbbr, p) {
+  const c = TEAM_COLORS[teamAbbr] || '#8b96ab';
+  return `<button class="po-pill" data-po-pill="${p.id}" data-po-team="${esc(teamAbbr)}" type="button"`
+    + ` style="border:1.5px solid ${c};background:${poRgba(c, .13)}">`
+    + `<img class="pavatar" src="${esc(p.headshot || headshotUrl(teamAbbr, p.id))}" alt="" ${imgFallback} style="border-color:${c}">`
+    + `<span>${esc(p.name)}</span>`
+    + `<span class="po-postag" style="background:${poRgba(c, .22)};color:${c}">${esc(p.pos)}</span></button>`;
+}
+function poRosterHtml(r) {
+  const labels = { forwards: 'Forwards', defensemen: 'Defense', goalies: 'Goalies' };
+  let total = 0, out = '';
+  for (const g of ['forwards', 'defensemen', 'goalies']) {
+    const ps = r.groups[g];
+    if (!ps.length) continue;
+    total += ps.length;
+    out += `<div class="po-sec-t">${labels[g]}</div><div class="po-pills">`
+      + ps.map((p) => poPillHtml(r.abbr, p)).join('') + '</div>';
+  }
+  return `<div class="po-teamhead"><img src="${teamLogoUrl(r.abbr)}" alt="" ${imgFallback}>`
+    + `<span class="po-thname">${esc(r.name)}</span><span class="po-abbr">${esc(r.abbr)}</span>`
+    + `<span class="po-thcount">${total} players</span></div>`
+    + out + '<p class="po-tapnote">Tap a player for his overview.</p>';
+}
+function poRenderDefault() {
+  const box = $('poResults');
+  if (!box) return;
+  box.innerHTML = '<div class="po-sec-t">Teams</div><div class="po-teamgrid">'
+    + PO_TEAM_LIST.map((abbr) => `<button class="po-teamlogo" data-po-team="${abbr}" type="button" title="${esc(poTeamName(abbr))}" aria-label="${esc(poTeamName(abbr))}"><img src="${teamLogoUrl(abbr)}" alt="" ${imgFallback}></button>`).join('')
+    + '</div><p class="po-tapnote">Tap a team for its roster, or search a player by name.</p>';
+}
+async function poRenderTeam(abbr, token) {
+  const box = $('poResults');
+  if (!box) return;
+  box.innerHTML = `<p class="po-loading">Loading the ${esc(poTeamName(abbr))} roster…</p>`;
+  const r = await poLoadRoster(abbr);
+  if (token !== poState.token) return;
+  box.innerHTML = r ? poRosterHtml(r)
+    : '<p class="po-nomatch">Couldn\'t load that roster right now.</p>';
+}
+function poFindTeam(q) {
+  if (q.length < 2) return null;
+  // pass 1: abbreviation exact / prefix wins over any name match
+  for (const abbr of PO_TEAM_LIST) {
+    const a = poNorm(abbr);
+    if (a === q || a.indexOf(q) === 0) return abbr;
+  }
+  // pass 2: full team name or nickname alias contains the query
+  for (const abbr of PO_TEAM_LIST) {
+    if (poNorm(poTeamName(abbr)).indexOf(q) >= 0) return abbr;
+    for (const al of PO_ALIASES[abbr] || []) if (poNorm(al).indexOf(q) >= 0) return abbr;
+  }
+  return null;
+}
+async function poOnSearch() {
+  const input = $('poSearch');
+  const box = $('poResults');
+  if (!input || !box) return;
+  const token = ++poState.token;
+  const q = poNorm(input.value);
+  if (!q) { poRenderDefault(); return; }
+  const team = poFindTeam(q);
+  if (team) { poRenderTeam(team, token); return; }
+  if (q.length < 3) {
+    box.innerHTML = '<p class="po-hint">Keep typing — a team name, its abbreviation, or a player name.</p>';
+    return;
+  }
+  if (!poIndexPlayers) box.innerHTML = '<p class="po-loading">Loading players…</p>';
+  const players = await poEnsureIndex();
+  if (token !== poState.token) return;
+  const hits = players.filter((p) => poNorm(p.name).indexOf(q) >= 0)
+    .sort((a, b) => a.name.localeCompare(b.name)).slice(0, 30);
+  box.innerHTML = hits.length
+    ? '<div class="po-sec-t">Players</div><div class="po-pills">'
+      + hits.map((p) => poPillHtml(p.team, p)).join('') + '</div>'
+      + '<p class="po-tapnote">Pills wear their team colors. Tap a player for his overview.</p>'
+    : `<p class="po-nomatch">No match for &ldquo;${esc(input.value.trim())}&rdquo; — try a team like NSH or a player name.</p>`;
+}
+/* --- overview --- */
+function poLoadLanding(pid) {
+  const key = String(pid);
+  if (!poLandingCache.has(key)) {
+    poLandingCache.set(key, fetchJSON(`${API}/player/${pid}/landing`).catch(() => null));
+  }
+  return poLandingCache.get(key);
+}
+function poOrd(n) { return n + ({ 1: 'ST', 2: 'ND', 3: 'RD' }[n] || 'TH'); }
+function poSeasonLabel(s) { return `${Math.floor(s / 10000)}–${String(s % 10000).slice(2)}`; }
+function poGaa(v) { return v == null ? '—' : Number(v).toFixed(2); }
+function poSvp(v) { return v == null ? '—' : Number(v).toFixed(3).replace(/^0/, ''); }
+function poAbbrForSplit(split) {
+  const name = split.teamName?.default || '';
+  if (name === 'Winnipeg Jets' && split.season < 19961997) return null; // original Jets (now ARI/UTA line)
+  return PO_NAME_TO_ABBR[name] || null;
+}
+function poLogoCell(split) {
+  const abbr = poAbbrForSplit(split);
+  if (abbr && PO_HAS_LOGO.has(abbr)) {
+    return `<img class="po-logo sm" src="${teamLogoUrl(abbr)}" alt="" ${imgFallback}>`;
+  }
+  return `<span class="muted small">${esc(split.teamCommonName?.default || split.teamName?.default || '')}</span>`;
+}
+function poOverviewHtml(d, tapped) {
+  const pid = d.playerId || tapped.id;
+  const name = `${d.firstName?.default || ''} ${d.lastName?.default || ''}`.trim() || tapped.name;
+  const curAbbr = d.currentTeamAbbrev || tapped.team;
+  const curName = d.fullTeamName?.default || poTeamName(curAbbr);
+  const color = TEAM_COLORS[curAbbr] || '#f5b942';
+  const isGoalie = d.position === 'G' || tapped.pos === 'G';
+  const hs = d.headshot || headshotUrl(curAbbr, pid);
+  let h = '<div class="po-player"><div class="po-phead">'
+    + `<img class="pavatar po-face" src="${esc(hs)}" alt="" ${imgFallback} style="border-color:${color};box-shadow:0 0 18px ${color}55">`
+    + `<div><h3 class="po-pname">${esc(name)}</h3>`
+    + `<div class="po-teamline">${PO_HAS_LOGO.has(curAbbr) ? `<img class="po-logo md" src="${teamLogoUrl(curAbbr)}" alt="" ${imgFallback}>` : ''}<span>${esc(curName)} · ${esc(PO_POS_LONG[d.position] || tapped.pos || '')}</span></div>`
+    + '</div></div>';
+  const dd = d.draftDetails;
+  h += '<p class="po-draft">' + (dd && dd.year
+    ? `DRAFTED ${dd.year} · ${poOrd(dd.round)} ROUND${dd.overallPick ? ` · #${dd.overallPick} OVERALL` : ''} · ${esc(poTeamName(dd.teamAbbrev).toUpperCase())}`
+    : 'UNDRAFTED') + '</p>';
+  // NHL regular-season splits only
+  const splits = (d.seasonTotals || [])
+    .filter((s) => s.leagueAbbrev === 'NHL' && s.gameTypeId === 2)
+    .slice()
+    .sort((a, b) => (a.season - b.season) || ((a.sequence || 0) - (b.sequence || 0)));
+  if (splits.length) {
+    const maxSeason = Math.max(...splits.map((s) => s.season));
+    // teams list: contiguous runs per team, chronological
+    const runs = [];
+    for (const s of splits) {
+      const nm = s.teamName?.default || '';
+      const last = runs[runs.length - 1];
+      if (last && last.name === nm && (s.season === last.lastSeason || s.season === last.lastSeason + 10001)) {
+        last.lastSeason = s.season;
+      } else {
+        runs.push({ name: nm, abbr: poAbbrForSplit(s), firstSeason: s.season, lastSeason: s.season });
+      }
+    }
+    h += '<div class="po-sec-t">Teams</div>' + runs.map((r) => {
+      const span = r.firstSeason === r.lastSeason
+        ? poSeasonLabel(r.firstSeason)
+        : `${Math.floor(r.firstSeason / 10000)}–${r.lastSeason % 10000}`;
+      const cur = r.abbr && r.abbr === curAbbr && r.lastSeason === maxSeason;
+      return `<div class="po-teamrow">${r.abbr && PO_HAS_LOGO.has(r.abbr) ? `<img class="po-logo" src="${teamLogoUrl(r.abbr)}" alt="" ${imgFallback}>` : ''}`
+        + `<span class="po-teamname">${esc(r.name)}${cur ? ' <span class="po-cur">CURRENT</span>' : ''}</span>`
+        + `<span class="po-span">${span}</span></div>`;
+    }).join('');
+    // season table: last 8 distinct seasons, newest first; within a
+    // season the later stint (higher sequence) sits on top
+    const seasonsDesc = [...new Set(splits.map((s) => s.season))].sort((a, b) => b - a).slice(0, 8);
+    const rows = splits.filter((s) => seasonsDesc.includes(s.season))
+      .sort((a, b) => (b.season - a.season) || ((b.sequence || 0) - (a.sequence || 0)));
+    const head = isGoalie
+      ? '<th class="l">Season</th><th class="l">Team</th><th>GP</th><th>W</th><th>L</th><th>GAA</th><th>SV%</th><th>SO</th>'
+      : '<th class="l">Season</th><th class="l">Team</th><th>GP</th><th>G</th><th>A</th><th>PTS</th>';
+    const cells = (s) => isGoalie
+      ? `<td>${s.gamesPlayed ?? '—'}</td><td>${s.wins ?? '—'}</td><td>${s.losses ?? '—'}</td><td>${poGaa(s.goalsAgainstAvg)}</td><td>${poSvp(s.savePctg)}</td><td>${s.shutouts ?? '—'}</td>`
+      : `<td>${s.gamesPlayed ?? '—'}</td><td>${s.goals ?? '—'}</td><td>${s.assists ?? '—'}</td><td class="po-pts">${s.points ?? '—'}</td>`;
+    let body = rows.map((s) => `<tr><td class="po-season">${poSeasonLabel(s.season)}</td><td class="po-tcell">${poLogoCell(s)}</td>${cells(s)}</tr>`).join('');
+    const ct = d.careerTotals?.regularSeason;
+    if (ct && ct.gamesPlayed) {
+      body += `<tr class="po-career"><td class="po-season">CAREER</td><td></td>${cells(ct)}</tr>`;
+    }
+    h += `<div class="po-sec-t">Season by season <span class="po-sec-note">last 8 seasons</span></div>`
+      + `<table class="po-table"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`;
+  } else {
+    h += '<p class="po-nomatch">No NHL seasons yet.</p>';
+  }
+  h += '<p class="po-foot">Career data · NHL</p></div>';
+  return h;
+}
+async function poOpenPlayer(pid, teamAbbr, pillEl) {
+  const box = $('poOverview');
+  if (!box) return;
+  const token = ++poState.token;
+  document.querySelectorAll('.po-pill').forEach((x) => {
+    const c = TEAM_COLORS[x.dataset.poTeam] || '#8b96ab';
+    x.style.background = poRgba(c, .13); x.style.boxShadow = '';
+  });
+  if (pillEl) {
+    const c = TEAM_COLORS[teamAbbr] || '#8b96ab';
+    pillEl.style.background = poRgba(c, .30);
+    pillEl.style.boxShadow = `0 0 14px ${poRgba(c, .45)}`;
+  }
+  // find the tapped player's basics from the roster cache / index
+  let tapped = { id: pid, name: '', team: teamAbbr, pos: '' };
+  const roster = await poLoadRoster(teamAbbr).catch(() => null);
+  if (roster) {
+    for (const g of ['forwards', 'defensemen', 'goalies']) {
+      const hit = roster.groups[g].find((p) => String(p.id) === String(pid));
+      if (hit) { tapped = { ...hit, team: teamAbbr }; break; }
+    }
+  }
+  if (token !== poState.token) return;
+  box.innerHTML = `<p class="po-loading">Loading ${esc(tapped.name || 'player')} overview…</p>`;
+  const d = await poLoadLanding(pid);
+  if (token !== poState.token) return;
+  box.innerHTML = d ? poOverviewHtml(d, tapped)
+    : '<p class="po-nomatch">Couldn\'t load that right now.</p>';
+  try { box.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } catch (e) { /* jsdom */ }
+}
+(function initPlayerOverview() {
+  const panel = $('poPanel');
+  if (!panel) return;
+  poRenderDefault();
+  const input = $('poSearch');
+  if (input) input.addEventListener('input', poOnSearch);
+  panel.addEventListener('click', (ev) => {
+    const logoBtn = ev.target.closest('[data-po-team]:not([data-po-pill])');
+    if (logoBtn) {
+      const abbr = logoBtn.dataset.poTeam;
+      const token = ++poState.token;
+      if (input) input.value = poTeamName(abbr);
+      poRenderTeam(abbr, token);
+      return;
+    }
+    const pill = ev.target.closest('[data-po-pill]');
+    if (pill) poOpenPlayer(pill.dataset.poPill, pill.dataset.poTeam, pill);
+  });
+})();
