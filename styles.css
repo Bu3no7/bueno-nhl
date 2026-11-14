@@ -1664,3 +1664,147 @@ button.stk-chip { cursor: pointer; }
 .stk-why { color: var(--muted); font-size: .72rem; font-weight: 600; }
 .stk-headline { font-weight: 600; color: #d9e6f7; font-size: .8rem; }
 .stk-headline b { color: #fff; }
+
+/* ---------- EVERY GOAL live visual (header of the Live goal feed) ---------- */
+.eg-wrap {
+  background: linear-gradient(155deg, rgba(130,170,255,.13), rgba(6,12,26,.55));
+  -webkit-backdrop-filter: blur(14px) saturate(1.35);
+  backdrop-filter: blur(14px) saturate(1.35);
+  border: 1px solid rgba(165,195,255,.22);
+  border-radius: var(--radius);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06), var(--shadow-sm);
+  padding: 1rem 1rem .9rem;
+  margin-bottom: 1rem;
+}
+.eg-head { margin-bottom: .7rem; }
+.eg-title {
+  margin: 0; font-size: 1.55rem; font-weight: 800; letter-spacing: .04em;
+  color: var(--text);
+}
+.eg-sub {
+  margin: .15rem 0 0; color: var(--muted); font-size: .8rem; font-weight: 650;
+  letter-spacing: .08em;
+}
+.eg-main {
+  display: grid; grid-template-columns: minmax(0, 1fr) 218px;
+  gap: .9rem; align-items: start;
+}
+.eg-rink { width: 100%; height: auto; display: block; }
+.eg-dot { fill: var(--gold); stroke: #141c2c; stroke-width: .5; cursor: pointer; }
+.eg-dot:hover { fill: #ffd97a; }
+.eg-ring {
+  fill: none; stroke: var(--gold); stroke-width: .55;
+  animation: egPulse 2s ease-in-out infinite; pointer-events: none;
+}
+@keyframes egPulse { 0%, 100% { opacity: .95; } 50% { opacity: .3; } }
+.eg-path {
+  fill: none; stroke: var(--gold); stroke-width: .9; stroke-linecap: round;
+  stroke-dasharray: 100; stroke-dashoffset: 100; opacity: .95;
+  animation: egDraw .9s ease-out .1s forwards;
+}
+@keyframes egDraw { to { stroke-dashoffset: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .eg-path { animation: none; stroke-dashoffset: 0; }
+  .eg-ring { animation: none; }
+}
+/* scores rail */
+.eg-rail-h {
+  color: var(--muted); font-size: .7rem; font-weight: 800;
+  letter-spacing: .14em; margin: .1rem 0 .35rem;
+}
+.eg-rail-row {
+  display: grid; grid-template-columns: 30px 1fr 30px;
+  align-items: center; gap: .45rem;
+  padding: .38rem .5rem; border-radius: 10px;
+}
+.eg-rail-row.on { background: rgba(58,219,227,.13); }
+.eg-rail-logo { width: 28px; height: 28px; }
+.eg-rail-score {
+  font-size: 1.12rem; font-weight: 800; text-align: center;
+  font-variant-numeric: tabular-nums; color: var(--text); white-space: nowrap;
+}
+.eg-rail-status {
+  grid-column: 1 / -1; color: var(--muted-2); font-size: .7rem;
+  font-weight: 650; letter-spacing: .06em; margin-top: -.15rem;
+}
+/* spotlight card */
+.eg-card {
+  display: flex; gap: 1rem; align-items: center;
+  margin-top: .9rem; padding: .85rem 1rem;
+  background: rgba(10,18,32,.45);
+  border: 1px solid rgba(165,195,255,.16); border-radius: var(--radius-sm);
+}
+.eg-card img.eg-face {
+  width: 88px; height: 88px; border-width: 3px; flex-shrink: 0;
+}
+.eg-card-main { flex: 1; min-width: 0; }
+.eg-kicker {
+  color: var(--gold); font-size: .76rem; font-weight: 800; letter-spacing: .12em;
+}
+.eg-name {
+  font-size: 1.55rem; font-weight: 800; text-transform: uppercase;
+  letter-spacing: .01em; line-height: 1.12; margin: .1rem 0;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.eg-line { color: var(--muted); font-size: .88rem; font-variant-numeric: tabular-nums; }
+.eg-chips { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .5rem; }
+.eg-chip {
+  font-size: .68rem; font-weight: 800; letter-spacing: .5px; text-transform: uppercase;
+  padding: .28rem .6rem; border-radius: 99px; border: 1px solid; white-space: nowrap;
+}
+.eg-chip-mut { color: var(--muted); border-color: var(--border); background: rgba(255,255,255,.03); }
+.eg-chip-gold { color: var(--gold); border-color: rgba(245,185,66,.45); background: var(--gold-wash); }
+.eg-chip-teal { color: var(--teal); border-color: rgba(58,219,227,.4); background: var(--teal-wash); }
+.eg-edge-slot { display: contents; }
+/* playback */
+.eg-progress {
+  display: flex; align-items: center; gap: .7rem; margin-top: .85rem;
+}
+.eg-navbtn {
+  width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+  background: var(--panel2); border: 1px solid var(--border); color: var(--text);
+  font-size: .8rem; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  font-family: inherit; padding: 0;
+}
+.eg-navbtn:hover { border-color: #2c3a52; color: var(--gold); }
+.eg-pdots {
+  flex: 1; display: flex; flex-wrap: wrap; gap: .42rem; align-items: center;
+}
+.eg-pdot {
+  width: 9px; height: 9px; border-radius: 50%; border: 0; padding: 0;
+  background: rgba(255,255,255,.16); cursor: pointer; flex-shrink: 0;
+}
+.eg-pdot.seen { background: var(--gold); }
+.eg-pdot.cur { box-shadow: 0 0 0 3px rgba(245,185,66,.25); transform: scale(1.15); }
+.eg-order {
+  margin: .45rem 0 0; color: var(--muted-2); font-size: .72rem;
+  font-weight: 650; letter-spacing: .1em;
+}
+.eg-quiet { color: var(--muted); text-align: center; padding: .9rem 0 .3rem; margin: 0; }
+/* goal feed (the visual's own — tapping a row spotlights the goal) */
+.eg-feed { display: flex; flex-direction: column; gap: .5rem; margin-top: .9rem; }
+.eg-frow {
+  display: flex; align-items: center; gap: .7rem; width: 100%;
+  background: var(--panel2); border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm); padding: .5rem .7rem;
+  color: inherit; font: inherit; text-align: left; cursor: pointer;
+  transition: border-color .15s ease;
+}
+.eg-frow:hover { border-color: #2c3a52; }
+.eg-frow.on { border-color: rgba(245,185,66,.55); background: rgba(245,185,66,.06); }
+.eg-frow-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.eg-frow-name { font-weight: 700; font-size: .95rem; }
+.eg-frow-meta { color: var(--muted); font-size: .78rem; font-variant-numeric: tabular-nums; }
+.eg-frow-teams { display: flex; align-items: center; gap: .45rem; flex-shrink: 0; }
+.eg-frow-teams img { width: 20px; height: 20px; }
+.eg-frow-score { font-weight: 800; font-variant-numeric: tabular-nums; }
+@media (max-width: 760px) {
+  .eg-main { grid-template-columns: 1fr; }
+  .eg-rail {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: .2rem .6rem;
+  }
+  .eg-rail-h { grid-column: 1 / -1; }
+  .eg-card img.eg-face { width: 72px; height: 72px; }
+  .eg-name { font-size: 1.3rem; }
+}

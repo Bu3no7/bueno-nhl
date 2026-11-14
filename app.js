@@ -780,6 +780,368 @@ function renderGoals() {
     badge._goal = allGoals[i];
   });
 }
+/* ---------------- EVERY GOAL — live visual (header of the goal feed) ----------------
+   The Every Goal video's look, live: a rink map of EVERY goal tonight
+   (not just card calls), a scores rail, and a spotlight card that plays
+   the night back in the order the goals went in. It renders into
+   #egWrap, inserted at the top of this view directly above #goalsFeed;
+   the feed below it is untouched. Data is the play-by-play the page
+   already keeps live in state.games through the /nhl-api proxy (the
+   two-tier refresh below) — the only fetch this visual adds is the
+   scorer's EDGE season shot-speed chip, via the same edgeFetch route
+   and explicit season form the player card uses. Factual only: shot
+   type, distance, assists, season goal #, EDGE season hardest/average.
+   No model probabilities, no call labels, no prices. */
+const egState = {
+  goals: [],        // chronological; shootout goals excluded
+  idx: -1,          // spotlight index into goals
+  spotKey: null,    // key of the spotlighted goal (stable across refreshes)
+  follow: true,     // spotlight rides the latest goal until a manual jump
+  playing: true,    // autoplay until a manual jump pauses it
+  timer: null,
+  sig: '',          // last rendered signature — skip no-change renders
+  edge: new Map(),  // pid -> Promise<{top, avg} | null>
+};
+const EG_PER = { 1: '1ST', 2: '2ND', 3: '3RD', 4: 'OT' };
+function egPerLabel(gl) {
+  return gl.periodType === 'OT' ? 'OT' : (EG_PER[gl.period] || ('P' + gl.period));
+}
+function egWrapEl() {
+  let w = $('egWrap');
+  if (w) return w;
+  const view = $('view-goals'), feed = $('goalsFeed');
+  if (!view || !feed) return null;
+  w = document.createElement('div');
+  w.id = 'egWrap';
+  w.className = 'eg-wrap';
+  view.insertBefore(w, feed);
+  w.addEventListener('click', (ev) => {
+    const t = ev.target.closest('[data-eg]');
+    if (!t) return;
+    const n = egState.goals.length;
+    const act = t.dataset.eg;
+    if (act === 'jump') egJump(+t.dataset.i);
+    else if (act === 'prev' && n) egJump((egState.idx - 1 + n) % n);
+    else if (act === 'next' && n) egJump((egState.idx + 1) % n);
+    else if (act === 'play') { egState.playing = !egState.playing; egRender(); }
+  });
+  return w;
+}
+function egJump(i) {
+  const n = egState.goals.length;
+  if (!n || i < 0 || i >= n) return;
+  egState.idx = i;
+  egState.spotKey = egState.goals[i].key;
+  egState.follow = i === n - 1;
+  egState.playing = false; // a manual jump pauses autoplay; ▶ resumes
+  egRender();
+}
+/* Every non-shootout goal on tonight's slate, oldest first. Shot
+   coordinates are normalized exactly like the video renderer's: if
+   x < 0, negate x and y so every goal attacks the right net, and the
+   distance is the feet from (x, y) to the goal line at x = 89. */
+function egCollect() {
+  const out = [];
+  for (const g of state.games) {
+    const pbp = g.pbp;
+    if (!pbp || !Array.isArray(pbp.plays) || !pbp.homeTeam || !pbp.awayTeam) continue;
+    const names = {}, shots = {};
+    for (const r of (pbp.rosterSpots || [])) {
+      names[r.playerId] = `${r.firstName.default} ${r.lastName.default}`;
+      if (r.headshot) shots[r.playerId] = r.headshot;
+    }
+    const homeId = pbp.homeTeam.id;
+    const startMs = g.startUTC ? Date.parse(g.startUTC) : NaN;
+    for (const p of pbp.plays) {
+      if (p.typeDescKey !== 'goal') continue;
+      const pd = p.periodDescriptor || {};
+      if (pd.periodType === 'SO') continue; // shootout goals never count
+      const det = p.details || {};
+      const byHome = det.eventOwnerTeamId === homeId;
+      const tp = String(p.timeInPeriod || '0:00').split(':');
+      const tsec = (+tp[0] || 0) * 60 + (+tp[1] || 0);
+      let x = det.xCoord != null ? det.xCoord : null;
+      let y = det.yCoord != null ? det.yCoord : null;
+      let dist = null;
+      if (x != null && y != null) {
+        if (x < 0) { x = -x; y = -y; }
+        dist = Math.round(Math.hypot(89 - x, y));
+      }
+      out.push({
+        key: `${g.id}:${p.sortOrder != null ? p.sortOrder : (p.eventId || '')}`,
+        gameId: g.id, away: g.away, home: g.home,
+        scorerId: det.scoringPlayerId,
+        scorer: names[det.scoringPlayerId] || 'Unknown',
+        team: byHome ? g.home : g.away,
+        headshot: shots[det.scoringPlayerId] || '',
+        assists: [det.assist1PlayerId, det.assist2PlayerId].filter(Boolean)
+          .map((id) => names[id]).filter(Boolean),
+        period: pd.number || 0, periodType: pd.periodType || 'REG',
+        time: p.timeInPeriod || '',
+        type: goalTypeFromSituation(p.situationCode, byHome, false, !!det.penaltyShot),
+        shotType: (det.shotType || '').toUpperCase(),
+        x, y, dist,
+        seasonGoal: det.scoringPlayerTotal || null,
+        aScore: det.awayScore != null ? det.awayScore : null,
+        hScore: det.homeScore != null ? det.homeScore : null,
+        // approximate wall-clock: game start + elapsed periods (45 min
+        // blocks incl. intermission) — orders goals across games.
+        wall: (isFinite(startMs) ? startMs : 0) + ((pd.number || 1) - 1) * 2700000 + tsec * 1000,
+        order: p.sortOrder || 0,
+      });
+    }
+  }
+  out.sort((a, b) => (a.wall - b.wall) || (a.order - b.order));
+  return out;
+}
+function egRailData() {
+  return state.games.map((g) => {
+    let a = 0, h = 0, status = '';
+    const pbp = g.pbp;
+    if (pbp && pbp.awayTeam && pbp.homeTeam) {
+      a = pbp.awayTeam.score || 0;
+      h = pbp.homeTeam.score || 0;
+    }
+    const fin = g.state === 'OFF' || g.state === 'FINAL'
+      || (pbp && (pbp.gameState === 'OFF' || pbp.gameState === 'FINAL'));
+    const live = g.state === 'LIVE' || g.state === 'CRIT'
+      || (pbp && (pbp.gameState === 'LIVE' || pbp.gameState === 'CRIT'));
+    if (fin) status = 'FINAL';
+    else if (live && pbp && pbp.periodDescriptor) {
+      const pd = pbp.periodDescriptor;
+      const per = pd.periodType === 'SO' ? 'SO' : (EG_PER[pd.number] || ('P' + (pd.number || '')));
+      status = per + (pbp.clock && pbp.clock.timeRemaining ? ` · ${pbp.clock.timeRemaining}` : '');
+    } else if (g.startUTC) {
+      try { status = new Date(g.startUTC).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }); }
+      catch (e) { status = ''; }
+    }
+    return { a, h, status };
+  });
+}
+function egRailHtml(spotGameId) {
+  const data = egRailData();
+  const rows = state.games.map((g, i) => {
+    const on = spotGameId != null && String(g.id) === String(spotGameId) ? ' on' : '';
+    return `<div class="eg-rail-row${on}">
+      <img class="eg-rail-logo" src="${teamLogoUrl(g.away)}" alt="${esc(g.away)}" ${imgFallback}>
+      <span class="eg-rail-score">${data[i].a} – ${data[i].h}</span>
+      <img class="eg-rail-logo" src="${teamLogoUrl(g.home)}" alt="${esc(g.home)}" ${imgFallback}>
+      <span class="eg-rail-status">${esc(data[i].status)}</span>
+    </div>`;
+  }).join('');
+  return `<div class="eg-rail"><div class="eg-rail-h">SCORES</div>${rows}</div>`;
+}
+/* Clock-only rail updates land in place, so the 10s fast tier never
+   restarts the rink's draw-in animation. */
+function egUpdateRail() {
+  const wrap = $('egWrap');
+  if (!wrap || wrap.style.display === 'none') return;
+  const rows = wrap.querySelectorAll('.eg-rail-row');
+  const data = egRailData();
+  if (!rows.length || rows.length !== data.length) return;
+  rows.forEach((row, i) => {
+    const sc = row.querySelector('.eg-rail-score');
+    const st = row.querySelector('.eg-rail-status');
+    const sTxt = `${data[i].a} – ${data[i].h}`;
+    if (sc && sc.textContent !== sTxt) sc.textContent = sTxt;
+    if (st && st.textContent !== data[i].status) st.textContent = data[i].status;
+  });
+}
+/* Half-rink in the video's geometry: window x in [-15, 100], y in
+   [-42.5, 42.5]; red line x=0, blue line x=25, goal line x=89, crease
+   at (89, 0), faceoff circles at (69, ±22). Attacks the right net. */
+function egRinkSvg() {
+  const goals = egState.goals, idx = egState.idx;
+  const X = (fx) => (fx + 15).toFixed(1);
+  const Y = (fy) => (42.5 - fy).toFixed(1);
+  let s = '<svg class="eg-rink" viewBox="0 0 115 85" role="img" aria-label="Map of tonight\'s goals">';
+  s += '<defs><linearGradient id="egIce" x1="0" y1="0" x2="0" y2="1">'
+    + '<stop offset="0" stop-color="#172941"/><stop offset="1" stop-color="#0c1626"/></linearGradient></defs>';
+  s += '<rect x="0.4" y="0.4" width="114.2" height="84.2" rx="4" fill="url(#egIce)" stroke="rgba(165,195,255,.35)" stroke-width="0.5"/>';
+  s += `<line x1="${X(0)}" y1="1" x2="${X(0)}" y2="84" stroke="rgba(255,110,110,.45)" stroke-width="0.8"/>`;
+  s += `<line x1="${X(25)}" y1="1" x2="${X(25)}" y2="84" stroke="rgba(110,160,255,.5)" stroke-width="1.4"/>`;
+  s += `<line x1="${X(89)}" y1="1" x2="${X(89)}" y2="84" stroke="rgba(255,110,110,.5)" stroke-width="0.5"/>`;
+  for (const fy of [22, -22]) {
+    s += `<circle cx="${X(69)}" cy="${Y(fy)}" r="15" fill="none" stroke="rgba(160,200,255,.4)" stroke-width="0.5"/>`;
+    s += `<circle cx="${X(69)}" cy="${Y(fy)}" r="1.1" fill="rgba(255,110,110,.85)"/>`;
+  }
+  s += `<path d="M ${X(89)} ${Y(6)} A 6 6 0 0 0 ${X(89)} ${Y(-6)} Z" fill="rgba(110,170,255,.30)" stroke="rgba(255,110,110,.7)" stroke-width="0.4"/>`;
+  s += `<rect x="${X(88.2)}" y="${Y(3)}" width="2.4" height="6" fill="rgba(255,80,80,.18)" stroke="#ff5050" stroke-width="0.6"/>`;
+  const spot = goals[idx];
+  if (spot && spot.x != null && spot.y != null) {
+    const sx = spot.x + 15, sy = 42.5 - spot.y;
+    const nx = 88.2 + 15, ny = 42.5;
+    const mx = (sx + nx) / 2, my = (sy + ny) / 2;
+    const d = Math.max(1, Math.hypot(nx - sx, ny - sy));
+    // the video's bend: bow toward center ice, gentler near the middle
+    const bend = d * 0.14 * (Math.abs(spot.y) > 4 ? 1 : 0.4);
+    const cy = my + (spot.y >= 0 ? bend : -bend);
+    s += `<path class="eg-path" pathLength="100" d="M ${sx.toFixed(1)} ${sy.toFixed(1)} Q ${mx.toFixed(1)} ${cy.toFixed(1)} ${nx.toFixed(1)} ${ny.toFixed(1)}"/>`;
+    s += `<circle class="eg-ring" cx="${sx.toFixed(1)}" cy="${sy.toFixed(1)}" r="3.6"/>`;
+  }
+  goals.forEach((gl, i) => {
+    if (gl.x == null || gl.y == null) return;
+    s += `<circle class="eg-dot${i === idx ? ' on' : ''}" data-eg="jump" data-i="${i}" cx="${(gl.x + 15).toFixed(1)}" cy="${(42.5 - gl.y).toFixed(1)}" r="${i === idx ? 2.1 : 1.5}"/>`;
+  });
+  return s + '</svg>';
+}
+function egHeadHtml(nGoals) {
+  const d = new Date(state.date + 'T12:00:00');
+  const dl = isNaN(d) ? '' : d.toLocaleDateString('en-US',
+    { weekday: 'long', month: 'long', day: 'numeric' }).toUpperCase();
+  const g = state.games.length;
+  const parts = [dl, `${g} GAME${g === 1 ? '' : 'S'}`, `${nGoals} GOAL${nGoals === 1 ? '' : 'S'}`]
+    .filter(Boolean);
+  return `<div class="eg-head"><h3 class="eg-title">EVERY GOAL</h3>`
+    + `<p class="eg-sub">${esc(parts.join(' · '))}</p></div>`;
+}
+function egCardHtml() {
+  const goals = egState.goals, i = egState.idx, gl = goals[i];
+  if (!gl) return '';
+  const hs = gl.headshot ? esc(gl.headshot) : headshotUrl(gl.team, gl.scorerId);
+  const ring = TEAM_COLORS[gl.team] || '#f5b942';
+  let line = `${gl.away} @ ${gl.home} · ${egPerLabel(gl)} ${gl.time}`;
+  if (gl.assists.length) line += ` · ASSISTS ${gl.assists.join(', ')}`;
+  const chips = [];
+  const shotBits = [gl.shotType, gl.dist != null ? `${gl.dist} FT` : ''].filter(Boolean).join(' · ');
+  if (shotBits) chips.push(`<span class="eg-chip eg-chip-mut">${esc(shotBits)}</span>`);
+  if (gl.type === 'PP') chips.push('<span class="eg-chip eg-chip-gold">POWER PLAY</span>');
+  else if (gl.type === 'SH') chips.push('<span class="eg-chip eg-chip-gold">SHORT-HANDED</span>');
+  else if (gl.type === 'EN') chips.push('<span class="eg-chip eg-chip-gold">EMPTY NET</span>');
+  else if (gl.type === 'PS') chips.push('<span class="eg-chip eg-chip-gold">PENALTY SHOT</span>');
+  if (gl.seasonGoal) chips.push(`<span class="eg-chip eg-chip-teal">SEASON GOAL #${gl.seasonGoal}</span>`);
+  return `<div class="eg-card">
+    <img class="pavatar eg-face" src="${hs}" alt="" ${imgFallback} style="border-color:${ring}">
+    <div class="eg-card-main">
+      <div class="eg-kicker">GOAL ${i + 1} OF ${goals.length}</div>
+      <div class="eg-name">${esc(gl.scorer)}</div>
+      <div class="eg-line">${esc(line)}</div>
+      <div class="eg-chips">${chips.join('')}<span class="eg-edge-slot"></span></div>
+    </div>
+  </div>`;
+}
+function egProgressHtml() {
+  const goals = egState.goals;
+  const dots = goals.map((gl, i) =>
+    `<button type="button" class="eg-pdot${i <= egState.idx ? ' seen' : ''}${i === egState.idx ? ' cur' : ''}" data-eg="jump" data-i="${i}" aria-label="Goal ${i + 1}"></button>`).join('');
+  return `<div class="eg-progress">
+    <button type="button" class="eg-navbtn" data-eg="prev" aria-label="Previous goal">‹</button>
+    <div class="eg-pdots">${dots}</div>
+    <button type="button" class="eg-navbtn" data-eg="play" aria-label="${egState.playing ? 'Pause' : 'Play'}">${egState.playing ? '❚❚' : '▶'}</button>
+    <button type="button" class="eg-navbtn" data-eg="next" aria-label="Next goal">›</button>
+  </div>
+  <p class="eg-order">${goals.length} GOALS · IN THE ORDER THEY WENT IN</p>`;
+}
+function egFeedHtml() {
+  const goals = egState.goals;
+  const rows = goals.map((gl, i) => ({ gl, i })).reverse().map(({ gl, i }) => {
+    const hs = gl.headshot ? esc(gl.headshot) : headshotUrl(gl.team, gl.scorerId);
+    const shot = gl.shotType
+      ? gl.shotType.charAt(0) + gl.shotType.slice(1).toLowerCase() : '';
+    const parts = [`${egPerLabel(gl)} ${gl.time}`, shot,
+      gl.dist != null ? `${gl.dist} ft` : ''].filter(Boolean);
+    return `<button type="button" class="eg-frow${i === egState.idx ? ' on' : ''}" data-eg="jump" data-i="${i}">
+      <img class="pavatar" src="${hs}" alt="" ${imgFallback}>
+      <span class="eg-frow-main">
+        <span class="eg-frow-name">${esc(gl.scorer)}</span>
+        <span class="eg-frow-meta">${esc(parts.join(' · '))}</span>
+      </span>
+      <span class="eg-frow-teams">
+        <img src="${teamLogoUrl(gl.away)}" alt="${esc(gl.away)}" ${imgFallback}>
+        <span class="eg-frow-score">${gl.aScore != null ? gl.aScore : 0} – ${gl.hScore != null ? gl.hScore : 0}</span>
+        <img src="${teamLogoUrl(gl.home)}" alt="${esc(gl.home)}" ${imgFallback}>
+      </span>
+    </button>`;
+  }).join('');
+  return `<div class="eg-feed">${rows}</div>`;
+}
+/* EDGE season shot speed for the spotlighted scorer — same endpoint
+   and season form as the player card's EDGE section, fail-soft: no
+   chip when the scorer has no EDGE record. */
+function egEdgePromise(pid) {
+  if (!egState.edge.has(pid)) {
+    egState.edge.set(pid, edgeFetch(`skater-shot-speed-detail/${pid}/${EDGE_PATH}`)
+      .then((d) => {
+        const sd = d && d.shotSpeedDetails;
+        const top = sd && sd.topShotSpeed ? edgeNum(sd.topShotSpeed.imperial) : null;
+        const avg = sd && sd.avgShotSpeed ? edgeNum(sd.avgShotSpeed.imperial) : null;
+        return (top != null && avg != null && top > 0 && avg > 0) ? { top, avg } : null;
+      })
+      .catch(() => null));
+  }
+  return egState.edge.get(pid);
+}
+function egFillEdge() {
+  const gl = egState.goals[egState.idx];
+  const wrap = $('egWrap');
+  if (!gl || !gl.scorerId || !wrap) return;
+  const key = gl.key;
+  egEdgePromise(gl.scorerId).then((res) => {
+    if (!res) return;
+    const cur = egState.goals[egState.idx];
+    if (!cur || cur.key !== key) return; // spotlight moved on
+    const slot = wrap.querySelector('.eg-edge-slot');
+    if (slot) slot.innerHTML = `<span class="eg-chip eg-chip-gold">SEASON HARDEST ${res.top.toFixed(1)} MPH · AVG ${res.avg.toFixed(1)}</span>`;
+  });
+}
+function egRender() {
+  const wrap = egWrapEl();
+  if (!wrap) return;
+  const goals = egState.goals;
+  const spot = goals[egState.idx];
+  const railSig = state.games.map((g) => {
+    const pbp = g.pbp;
+    return `${g.id}:${pbp && pbp.awayTeam ? pbp.awayTeam.score : ''}-${pbp && pbp.homeTeam ? pbp.homeTeam.score : ''}:${g.state}`;
+  }).join('|');
+  const sig = goals.map((x) => x.key).join(',') + '#' + egState.idx + '#'
+    + (egState.playing ? 1 : 0) + '#' + railSig + '#' + (spot ? spot.gameId : '');
+  if (sig === egState.sig) return;
+  egState.sig = sig;
+  if (!goals.length) {
+    wrap.innerHTML = egHeadHtml(0)
+      + `<div class="eg-main">${egRinkSvg()}${egRailHtml(null)}</div>`
+      + '<p class="eg-quiet">The first goal tonight will light this up.</p>';
+    return;
+  }
+  wrap.innerHTML = egHeadHtml(goals.length)
+    + `<div class="eg-main">${egRinkSvg()}${egRailHtml(spot ? spot.gameId : null)}</div>`
+    + egCardHtml() + egProgressHtml() + egFeedHtml();
+  egFillEdge();
+}
+function egStartTimer() {
+  if (egState.timer) return;
+  egState.timer = setInterval(() => {
+    if (typeof document !== 'undefined' && document.hidden) return;
+    if (state.view !== 'goals' || !egState.playing) return;
+    const n = egState.goals.length;
+    if (n < 2 || egState.idx < 0) return;
+    egState.idx = (egState.idx + 1) % n;
+    egState.spotKey = egState.goals[egState.idx].key;
+    egState.follow = egState.idx === n - 1;
+    egRender();
+  }, 2500);
+}
+function renderLiveGoals() {
+  const wrap = egWrapEl();
+  if (!wrap) return;
+  if (!state.games.length) { // no slate today: the visual hides
+    wrap.style.display = 'none';
+    if (egState.sig !== 'hidden') { wrap.innerHTML = ''; egState.sig = 'hidden'; }
+    egState.goals = [];
+    egState.spotKey = null;
+    return;
+  }
+  wrap.style.display = '';
+  const goals = egCollect();
+  let idx = goals.findIndex((x) => x.key === egState.spotKey);
+  if (egState.follow || idx < 0) idx = goals.length - 1; // default: latest goal
+  egState.goals = goals;
+  egState.idx = idx;
+  egState.spotKey = idx >= 0 ? goals[idx].key : null;
+  egStartTimer();
+  egRender();
+  egUpdateRail();
+}
 /* ---------------- first-goal & brace views ----------------
    First goal: competing scoring rates within a matchup —
      P(first goal by i) = λ_i / Σ_j λ_j   (all skaters in that game)
@@ -4055,6 +4417,7 @@ function renderAll() {
   syncLiveBadge();
   renderSlate();
   renderGoals();
+  renderLiveGoals();
   renderBoard();
   renderLongshots();
   renderStandouts();
@@ -4108,6 +4471,7 @@ function rerenderLiveViews() {
   syncLiveBadge();
   if (state.view === 'slate') renderSlate();
   if (state.view === 'goals') renderGoals();
+  if (state.view === 'goals') renderLiveGoals();
   if (state.view === 'board') renderBoard();
   if (state.view === 'home') renderHomeTonight(); // keep Tonight scores/clock fresh on Center Ice
   if (state.section === 'lab') shelfSyncNav(); // keep Live dot + bar label fresh on ticks
