@@ -1016,8 +1016,9 @@ function egCardHtml() {
       <div class="eg-kicker">GOAL ${i + 1} OF ${goals.length}</div>
       <div class="eg-name">${esc(gl.scorer)}</div>
       <div class="eg-line">${esc(line)}</div>
-      <div class="eg-chips">${chips.join('')}<span class="eg-edge-slot"></span></div>
+      <div class="eg-chips">${chips.join('')}</div>
     </div>
+    <span class="eg-edge-slot"></span>
   </div>`;
 }
 function egProgressHtml() {

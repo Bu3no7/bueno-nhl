@@ -1729,7 +1729,7 @@ button.stk-chip { cursor: pointer; }
 }
 /* spotlight card */
 .eg-card {
-  display: flex; gap: 1rem; align-items: center;
+  display: flex; flex-wrap: wrap; gap: 1rem; align-items: center;
   margin-top: .9rem; padding: .85rem 1rem;
   background: rgba(10,18,32,.45);
   border: 1px solid rgba(165,195,255,.16); border-radius: var(--radius-sm);
@@ -1755,7 +1755,7 @@ button.stk-chip { cursor: pointer; }
 .eg-chip-mut { color: var(--muted); border-color: var(--border); background: rgba(255,255,255,.03); }
 .eg-chip-gold { color: var(--gold); border-color: rgba(245,185,66,.45); background: var(--gold-wash); }
 .eg-chip-teal { color: var(--teal); border-color: rgba(58,219,227,.4); background: var(--teal-wash); }
-.eg-edge-slot { display: contents; }
+.eg-edge-slot { flex: 1 1 100%; display: flex; justify-content: center; }
 /* playback */
 .eg-progress {
   display: flex; align-items: center; gap: .7rem; margin-top: .85rem;
