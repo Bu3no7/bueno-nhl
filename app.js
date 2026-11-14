@@ -809,12 +809,12 @@ function egPerLabel(gl) {
 function egWrapEl() {
   let w = $('egWrap');
   if (w) return w;
-  const view = $('view-goals'), feed = $('goalsFeed');
-  if (!view || !feed) return null;
+  const view = $('view-goals');
+  if (!view) return null;
   w = document.createElement('div');
   w.id = 'egWrap';
   w.className = 'eg-wrap';
-  view.insertBefore(w, feed);
+  view.appendChild(w);
   w.addEventListener('click', (ev) => {
     const t = ev.target.closest('[data-eg]');
     if (!t) return;
