@@ -909,17 +909,58 @@ function renderStandings(){
   });
   $("standingsWrap").innerHTML = h;
 }
+function liveNowCard(g){
+  var L = LIVE[g.espnId], wp = WP[g.espnId];
+  return '<div class="card featured" data-game="'+slug(g.key)+'" style="cursor:pointer">'
+    + teamScoreRow(g.away, L.awayScore, L.awayScore>L.homeScore) + teamScoreRow(g.home, L.homeScore, L.homeScore>L.awayScore)
+    + (L.situation? '<div class="live-situation"><span class="live-dot"></span><b>'+L.clock+'</b> · '+L.situation+'</div>' : "")
+    + (wp!=null? '<div class="winbar"><span class="away" style="width:'+Math.round((1-wp)*100)+'%"></span><span class="home" style="width:'+Math.round(wp*100)+'%"></span></div><div class="winlabels"><span>'+g.away+' <b>'+Math.round((1-wp)*100)+'%</b></span><span>LIVE WIN %</span><span><b>'+Math.round(wp*100)+'%</b> '+g.home+'</span></div>' : "")
+    + '<p class="note" style="margin:8px 0 0">Following the ESPN feed. The game sheet has scoring plays, scoring by quarter and team stats.</p></div>';
+}
+var _lsCssDone = false;
+function ensureLiveStackCss(){
+  if(_lsCssDone) return; _lsCssDone = true;
+  var st = document.createElement("style");
+  st.textContent = ".live-head{display:flex;align-items:center;justify-content:space-between;gap:10px}"
+    + ".live-count{display:flex;align-items:center;gap:7px;flex:none}"
+    + ".live-count .n{font-size:.78rem;font-weight:800;color:#e8b64c;font-variant-numeric:tabular-nums}"
+    + ".ldot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.25)}"
+    + ".ldot.on{background:#e8b64c}"
+    + ".live-stack-wrap{position:relative}"
+    + ".live-stack{height:362px;overflow-y:auto;scroll-snap-type:y mandatory;scrollbar-width:none;border-radius:16px}"
+    + ".live-stack::-webkit-scrollbar{display:none}"
+    + ".live-stack .card{scroll-snap-align:start;min-height:350px;margin:0 0 12px}"
+    + ".live-fade{position:absolute;left:0;right:0;bottom:0;height:34px;pointer-events:none;background:linear-gradient(to bottom,rgba(7,11,18,0),rgba(7,11,18,.85))}";
+  document.head.appendChild(st);
+}
+function updLiveCount(stack){
+  var wrap = $("liveNowWrap"); if(!wrap || !stack) return;
+  var n = wrap.querySelector(".live-count .n"); if(!n) return;
+  var total = stack.children.length; if(!total) return;
+  var i = Math.max(0, Math.min(total - 1, Math.round(stack.scrollTop / 362)));
+  n.textContent = (i + 1) + " / " + total;
+  var dots = wrap.querySelectorAll(".ldot");
+  for(var j = 0; j < dots.length; j++) dots[j].classList.toggle("on", j === i);
+}
 function renderLiveNow(){
   var wrap = $("liveNowWrap");
-  var liveGame = B.games.filter(function(g){ return LIVE[g.espnId] && LIVE[g.espnId].state==="in"; })[0];
-  if(!liveGame){ wrap.style.display = "none"; wrap.innerHTML = ""; return; }
-  var L = LIVE[liveGame.espnId], wp = WP[liveGame.espnId];
+  var liveGames = B.games.filter(function(g){ return LIVE[g.espnId] && LIVE[g.espnId].state==="in"; });
+  if(!liveGames.length){ wrap.style.display = "none"; wrap.innerHTML = ""; return; }
   wrap.style.display = "";
-  wrap.innerHTML = '<h2 class="sec"><span class="live-dot"></span>LIVE NOW <span>tap the game for the full tracker</span></h2><div class="card featured" data-game="'+slug(liveGame.key)+'" style="cursor:pointer">'
-    + teamScoreRow(liveGame.away, L.awayScore, L.awayScore>L.homeScore) + teamScoreRow(liveGame.home, L.homeScore, L.homeScore>L.awayScore)
-    + (L.situation? '<div class="live-situation"><span class="live-dot"></span><b>'+L.clock+'</b> · '+L.situation+'</div>' : "")
-    + (wp!=null? '<div class="winbar"><span class="away" style="width:'+Math.round((1-wp)*100)+'%"></span><span class="home" style="width:'+Math.round(wp*100)+'%"></span></div><div class="winlabels"><span>'+liveGame.away+' <b>'+Math.round((1-wp)*100)+'%</b></span><span>LIVE WIN %</span><span><b>'+Math.round(wp*100)+'%</b> '+liveGame.home+'</span></div>' : "")
-    + '<p class="note" style="margin:8px 0 0">Following the ESPN feed. The game sheet has scoring plays, scoring by quarter and team stats.</p></div>';
+  if(liveGames.length === 1){
+    wrap.innerHTML = '<h2 class="sec"><span class="live-dot"></span>LIVE NOW <span>tap the game for the full tracker</span></h2>' + liveNowCard(liveGames[0]);
+    return;
+  }
+  ensureLiveStackCss();
+  var prev = wrap.querySelector(".live-stack");
+  var prevTop = prev ? prev.scrollTop : 0;
+  var dots = liveGames.map(function(_, i){ return '<span class="ldot'+(i===0?" on":"")+'"></span>'; }).join("");
+  wrap.innerHTML = '<div class="live-head"><h2 class="sec"><span class="live-dot"></span>LIVE NOW <span>tap the game for the full tracker</span></h2><div class="live-count"><span class="n">1 / '+liveGames.length+'</span>'+dots+'</div></div>'
+    + '<div class="live-stack-wrap"><div class="live-stack">' + liveGames.map(liveNowCard).join("") + '</div><div class="live-fade"></div></div>';
+  var stack = wrap.querySelector(".live-stack");
+  stack.scrollTop = prevTop;
+  updLiveCount(stack);
+  stack.addEventListener("scroll", function(){ updLiveCount(stack); }, { passive: true });
 }
 /* ---------- game sheet ---------- */
 function liveTeamRow2(abbr, score, win){ return teamScoreRow(abbr, score, win); }
@@ -1278,6 +1319,14 @@ var PARLAY = {}, ZONES = null, PLAYOFF = null, WPSERIES = {}, TP_MKT = "any", TY
   + ".pb-tabs{display:flex;gap:8px;margin:0 0 12px}"
   + ".pb-tab{font:inherit;font-size:.78rem;font-weight:900;letter-spacing:.12em;color:#8b96ab;background:rgba(13,30,44,.6);border:1px solid rgba(165,195,255,.28);border-radius:999px;padding:.52rem .95rem;cursor:pointer}"
   + ".pb-tab.on{background:#e8b64c;border-color:#e8b64c;color:#0a1526}"
+  + ".fb-menu{border-top:1px solid rgba(165,195,255,.16);border-bottom:1px solid rgba(165,195,255,.16);margin:0 0 .8rem}"
+  + ".fb-menu-head{display:flex;align-items:center;gap:.5rem;width:100%;text-align:left;background:none;border:none;color:#eef3f9;padding:.8rem .25rem;font-size:1rem;font-weight:800;cursor:pointer;font-family:inherit}"
+  + ".fb-menu-cur{color:#e8b64c;font-weight:700}"
+  + ".fb-menu-chev{margin-left:auto;color:#8b96ab;font-size:.85rem}"
+  + ".fb-menu-body{display:none}"
+  + ".fb-menu-body.open{display:block}"
+  + ".fb-menu-item{display:block;width:100%;text-align:left;background:none;border:none;border-top:1px solid rgba(165,195,255,.16);color:#eef3f9;padding:.7rem .25rem;font-size:.98rem;font-weight:600;cursor:pointer;font-family:inherit}"
+  + ".fb-menu-item.on{color:#e8b64c;box-shadow:inset 2px 0 0 #e8b64c;padding-left:.6rem}"
   + ".tk-confhead{display:flex;justify-content:space-between;align-items:baseline;margin:14px 0 6px}"
   + ".tk-confhead b{font-size:1.05rem;color:#e8b64c;letter-spacing:.06em}"
   + ".tk-confhead span{font-size:.6rem;font-weight:700;letter-spacing:.06em;color:#8b96ab}"
@@ -1470,6 +1519,41 @@ function renderParlay(){
    SLATE (the week's games + the On Bye card), STANDINGS (the division
    tables + the playoff tree). ---------- */
 var PB_TAB = "markets";
+/* Fast Break menu (Nov 15, Basketball pattern): one menu at the top of
+   the Playbook switches SECTIONS — Markets (the stat boards), Slate,
+   Standings, Player Types, Standouts, Model vs Market, Parlay Builder.
+   The tab/mode machinery underneath is unchanged; the menu derives its
+   state from PB_TAB + PB_MODE and routes through the same setters, so
+   search results and deep links keep landing in the right section. */
+var PB_SEC = "markets";
+var PB_LAST_STAT = "td";
+var PB_SEC_LABELS = { markets: "Markets", slate: "Slate", standings: "Standings", types: "Player Types", standouts: "Standouts", mvm: "Model vs Market", parlay: "Parlay Builder" };
+function pbSectionNow(){
+  if(PB_TAB === "slate") return "slate";
+  if(PB_TAB === "standings") return "standings";
+  if(PB_MODE === "types" || PB_MODE === "standouts" || PB_MODE === "mvm" || PB_MODE === "parlay") return PB_MODE;
+  return "markets";
+}
+function syncPbMenu(){
+  var sec = pbSectionNow(); PB_SEC = sec;
+  document.querySelectorAll(".fb-menu-item").forEach(function(it){ it.classList.toggle("on", it.getAttribute("data-pbsec") === sec); });
+  var cur = $("pbMenuCur"); if(cur) cur.textContent = PB_SEC_LABELS[sec] || sec;
+  if(PB_TAB === "markets"){
+    var bar = $("pbBar"); if(bar) bar.style.display = sec === "markets" ? "" : "none";
+  }
+}
+function setPbSection(sec){
+  if(sec === "slate") setPbTab("slate");
+  else if(sec === "standings") setPbTab("standings");
+  else if(sec === "markets"){ setPbTab("markets"); setPlaybookMode(PB_LAST_STAT); }
+  else { setPbTab("markets"); setPlaybookMode(sec); }
+}
+function pbMenuSet(open){
+  var body = $("pbMenuBody"), head = $("pbMenuHead"), chev = $("pbMenuChev");
+  if(body) body.classList.toggle("open", open);
+  if(head) head.setAttribute("aria-expanded", open ? "true" : "false");
+  if(chev) chev.textContent = open ? "▴" : "▾";
+}
 function setPbTab(tab){
   PB_TAB = tab;
   document.querySelectorAll("[data-pbtab]").forEach(function(b){ b.classList.toggle("on", b.getAttribute("data-pbtab") === tab); });
@@ -1487,6 +1571,7 @@ function setPbTab(tab){
   if(ps) ps.style.display = tab === "slate" ? "" : "none";
   if(pt) pt.style.display = tab === "standings" ? "" : "none";
   if(tab === "standings") renderTree();
+  syncPbMenu();
 }
 
 /* ---------- playbook dropdown: one select switches Markets between
@@ -1527,6 +1612,7 @@ function applyPosFilter(key){
 }
 function setPlaybookMode(mode){
   PB_MODE = mode;
+  if(["td","rush","rec","recc","pass","scr","kick"].indexOf(mode) >= 0) PB_LAST_STAT = mode;
   var sel = $("pbSelect"); if(sel) sel.value = mode;
   syncPosSelect(mode);
   var bw = $("boardWrap"), bn = $("boardNote"), pp = $("parlayPanel");
@@ -1538,6 +1624,7 @@ function setPlaybookMode(mode){
   else if(mode === "standouts") renderStandouts();
   else if(mode === "mvm") renderMvm();
   else renderBoard(mode);
+  syncPbMenu();
 }
 
 /* ---------- top picks strip (home) ---------- */
@@ -1957,15 +2044,24 @@ function renderTree(){
   var boardSec = $("view-board");
   if(boardSec){
     var pillsEl = boardSec.querySelector(".pills");
-    var tabs = document.createElement("div");
-    tabs.className = "pb-tabs";
-    tabs.innerHTML = '<button type="button" class="pb-tab on" data-pbtab="markets">MARKETS</button><button type="button" class="pb-tab" data-pbtab="slate">SLATE</button><button type="button" class="pb-tab" data-pbtab="standings">STANDINGS</button>';
-    tabs.querySelectorAll("[data-pbtab]").forEach(function(b){ b.addEventListener("click", function(){ setPbTab(b.getAttribute("data-pbtab")); }); });
-    boardSec.insertBefore(tabs, pillsEl || null);
+    var menu = document.createElement("div");
+    menu.className = "fb-menu";
+    menu.id = "pbMenu";
+    menu.innerHTML = '<button class="fb-menu-head" id="pbMenuHead" type="button" aria-expanded="true"><span>📋 The Playbook</span><span class="fb-menu-cur" id="pbMenuCur">Markets</span><span class="fb-menu-chev" id="pbMenuChev">▴</span></button><div class="fb-menu-body open" id="pbMenuBody">'
+      + '<button class="fb-menu-item on" data-pbsec="markets" type="button">Markets</button>'
+      + '<button class="fb-menu-item" data-pbsec="slate" type="button">Slate</button>'
+      + '<button class="fb-menu-item" data-pbsec="standings" type="button">Standings</button>'
+      + '<button class="fb-menu-item" data-pbsec="types" type="button">Player Types</button>'
+      + '<button class="fb-menu-item" data-pbsec="standouts" type="button">Standouts</button>'
+      + '<button class="fb-menu-item" data-pbsec="mvm" type="button">Model vs Market</button>'
+      + '<button class="fb-menu-item" data-pbsec="parlay" type="button">Parlay Builder</button></div>';
+    menu.querySelector("#pbMenuHead").addEventListener("click", function(){ pbMenuSet(!($("pbMenuBody") && $("pbMenuBody").classList.contains("open"))); });
+    menu.querySelectorAll(".fb-menu-item").forEach(function(it){ it.addEventListener("click", function(){ setPbSection(it.getAttribute("data-pbsec")); pbMenuSet(false); }); });
+    boardSec.insertBefore(menu, pillsEl || null);
     var bar = document.createElement("div");
     bar.className = "pb-bar";
     bar.id = "pbBar";
-    bar.innerHTML = '<select id="pbSelect" aria-label="Choose a Playbook section"><option value="td">Touchdowns</option><option value="rush">Rushing</option><option value="rec">Receiving</option><option value="recc">Receptions</option><option value="pass">Passing</option><option value="scr">Rush + Rec</option><option value="kick">Kickers</option><option value="types">Types</option><option value="standouts">Standouts</option><option value="mvm">Model vs Market</option><option value="parlay">Parlay</option></select><select id="pbPos" aria-label="Filter by position"><option value="">All positions</option><option value="QB">QB</option><option value="RB">RB</option><option value="WR">WR</option><option value="TE">TE</option></select><span class="pb-ticket">TICKET <span id="plCount"></span></span>';
+    bar.innerHTML = '<select id="pbSelect" aria-label="Choose a Playbook section"><option value="td">Touchdowns</option><option value="rush">Rushing</option><option value="rec">Receiving</option><option value="recc">Receptions</option><option value="pass">Passing</option><option value="scr">Rush + Rec</option><option value="kick">Kickers</option></select><select id="pbPos" aria-label="Filter by position"><option value="">All positions</option><option value="QB">QB</option><option value="RB">RB</option><option value="WR">WR</option><option value="TE">TE</option></select><span class="pb-ticket">TICKET <span id="plCount"></span></span>';
     bar.querySelector("select").addEventListener("change", function(){ setPlaybookMode(this.value); });
     bar.querySelector("#pbPos").addEventListener("change", function(){ PB_POS = this.value; if(PB_MODE !== "parlay" && PB_MODE !== "kick") setPlaybookMode(PB_MODE); });
     boardSec.insertBefore(bar, pillsEl || null);
