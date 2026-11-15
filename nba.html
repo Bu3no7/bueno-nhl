@@ -363,6 +363,18 @@ details.pc-sec[open ] summary .chev { transform: rotate(90deg); }
 .pc-pr-line { font-size: 1.12rem; font-weight: 800; }
 .pc-pr-hit { color: #2dd4bf; font-weight: 800; font-size: .84rem; }
 .pc-pr-odds { margin-left: auto; color: var(--muted); font-size: .8rem; font-weight: 600; text-align: right; }
+/* Best book (SmartPicks feed, display only) + Model vs Market board */
+.bb-book { color: var(--muted); font-size: .8rem; font-weight: 600; white-space: nowrap; }
+.bb-gap { flex: none; font-weight: 800; font-size: .78rem; border-radius: 999px; padding: .14rem .5rem; background: rgba(45,212,191,.13); color: #2dd4bf; border: 1px solid rgba(45,212,191,.35); font-variant-numeric: tabular-nums; }
+.bb-gap.neg { background: rgba(240,102,94,.10); color: #f0665e; border-color: rgba(240,102,94,.35); }
+.bb-hit { color: var(--muted); font-size: .76rem; font-weight: 600; margin: -.18rem 0 .3rem; }
+.bb-note { color: var(--muted); font-size: .76rem; margin-top: .5rem; }
+.mvm-sec { font-size: .74rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin: .85rem 0 .25rem; }
+.mvm-row { display: flex; align-items: center; gap: .55rem; width: 100%; text-align: left; background: none; border: none; border-top: 1px solid rgba(31,44,68,.45); padding: .5rem 0; cursor: pointer; color: inherit; font: inherit; font-variant-numeric: tabular-nums; }
+.mvm-sec + .mvm-row { border-top: none; }
+.mvm-line { font-weight: 800; font-size: .95rem; white-space: nowrap; }
+.mvm-our { color: #2dd4bf; font-weight: 800; font-size: .84rem; white-space: nowrap; }
+.mvm-book { margin-left: auto; color: var(--muted); font-size: .8rem; font-weight: 600; text-align: right; white-space: nowrap; }
 .pc-ladder { display: flex; flex-wrap: wrap; gap: .35rem; margin: .3rem 0 .55rem; }
 .pc-chip2 { background: var(--card2); border: 1px solid var(--border); border-radius: 999px; padding: .26rem .6rem; font-size: .76rem; font-weight: 600; color: var(--muted); }
 .pc-chip2 b { color: var(--text); }
@@ -624,6 +636,60 @@ body.sport-glass .snap,body.sport-glass .goal-item,body.sport-glass .pc-bio{box-
 body.sport-glass .pc-sheet,body.sport-glass .gm-sheet,body.sport-glass .sl-gcard,body.sport-glass .pt-board,body.sport-glass .fl-sheet{background:linear-gradient(155deg,rgba(130,170,255,.15),rgba(6,12,26,.58));border-color:rgba(165,195,255,.22);backdrop-filter:blur(16px) saturate(1.4);-webkit-backdrop-filter:blur(16px) saturate(1.4);box-shadow:inset 0 1px 0 rgba(255,255,255,.13)}
 body.sport-glass .pc-overlay,body.sport-glass .gm-overlay{background:rgba(2,5,10,.5);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
 </style>
+<style id="bov-css">
+/* Player Overview (bottom of Home) — ported from the approved NHL mock v2 */
+.bov-wrap{margin-top:1.2rem}
+.bov-head{margin-bottom:.7rem}
+.bov-kicker{margin:0 0 .35rem;font-size:.78rem;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:#FF7A1A}
+.bov-head h2{margin:0;font-size:1.6rem;font-weight:800;letter-spacing:-.01em}
+.bov-sub{margin:.3rem 0 0;font-size:.9rem}
+.bov-panel{background:linear-gradient(155deg,rgba(130,170,255,.13),rgba(6,12,26,.55));-webkit-backdrop-filter:blur(14px) saturate(1.35);backdrop-filter:blur(14px) saturate(1.35);border:1px solid rgba(165,195,255,.22);border-radius:14px;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 2px 10px rgba(0,0,0,.4);padding:1rem 1rem .9rem}
+.bov-search{width:100%;background:rgba(7,11,18,.65);border:1px solid #1d2839;border-radius:10px;color:#f2f5f9;font:inherit;font-size:.95rem;padding:.65rem .8rem;outline:none}
+.bov-search::placeholder{color:#5f6b82}
+.bov-search:focus{border-color:rgba(255,122,26,.55)}
+.bov-hint{color:#5f6b82;font-size:.78rem;margin:.55rem 0 0}
+.bov-teamgrid{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.8rem}
+.bov-tgbtn{display:inline-flex;align-items:center;gap:.45rem;background:rgba(255,255,255,.04);border:1px solid #1d2839;border-radius:99px;color:#8b96ab;font:inherit;font-weight:650;font-size:.82rem;padding:.3rem .75rem .3rem .45rem;cursor:pointer}
+.bov-tgbtn img{width:24px;height:24px}
+.bov-tgbtn:hover{color:#f2f5f9;border-color:rgba(255,122,26,.5)}
+.bov-teamhead{display:flex;align-items:center;gap:.6rem;margin:1rem 0 .1rem}
+.bov-teamhead img{width:30px;height:30px}
+.bov-thname{font-size:1.05rem;font-weight:800}
+.bov-abbr{font-size:.62rem;font-weight:800;letter-spacing:.08em;border:1px solid #1d2839;border-radius:99px;padding:.14rem .5rem;color:#8b96ab}
+.bov-thcount{margin-left:auto;color:#8b96ab;font-size:.8rem;white-space:nowrap}
+.bov-pills{display:flex;flex-wrap:wrap;gap:.45rem}
+.bov-pill{display:inline-flex;align-items:center;gap:.45rem;border-radius:99px;padding:.28rem .7rem .28rem .3rem;font:inherit;font-size:.85rem;font-weight:650;color:#f2f5f9;cursor:pointer;background:rgba(255,255,255,.03)}
+.bov-pill img{width:26px;height:26px;border-radius:50%;object-fit:cover;background:#111a2a}
+.bov-postag{font-size:.6rem;font-weight:800;letter-spacing:.06em;border-radius:99px;padding:.12rem .42rem;white-space:nowrap}
+.bov-nomatch{color:#8b96ab;font-size:.88rem;margin:.9rem 0 .2rem}
+.bov-tapnote{color:#5f6b82;font-size:.78rem;margin:.7rem 0 0}
+.bov-player{margin-top:.6rem}
+.bov-phead{display:flex;gap:.9rem;align-items:center}
+.bov-face{width:72px;height:72px;border-radius:50%;object-fit:cover;background:#111a2a;border:3px solid #f5b942;flex-shrink:0}
+.bov-pname{margin:0;font-size:1.35rem;font-weight:800;line-height:1.15}
+.bov-teamline{display:flex;align-items:center;gap:.45rem;color:#8b96ab;font-size:.9rem;margin-top:.2rem}
+.bov-logo{width:20px;height:20px}
+.bov-logo.md{width:24px;height:24px}
+.bov-logo.sm{width:20px;height:20px;vertical-align:-5px}
+.bov-draft{margin:.8rem 0 0;color:#f5b942;font-size:.76rem;font-weight:800;letter-spacing:.1em}
+.bov-sec-t{font-size:.72rem;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:#8b96ab;margin:.95rem 0 .45rem}
+.bov-sec-note{color:#5f6b82;letter-spacing:.03em;font-weight:650;text-transform:none}
+.bov-teamrow{display:flex;align-items:center;gap:.55rem;padding:.42rem 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.bov-teamrow:last-of-type{border-bottom:none}
+.bov-teamname{font-weight:650}
+.bov-cur{color:#f5b942;background:rgba(245,185,66,.12);border:1px solid rgba(245,185,66,.45);font-size:.6rem;font-weight:800;letter-spacing:.08em;border-radius:99px;padding:.12rem .45rem;margin-left:.5rem;vertical-align:2px}
+.bov-span{margin-left:auto;color:#8b96ab;font-variant-numeric:tabular-nums;font-size:.88rem}
+.bov-table{width:100%;border-collapse:collapse;font-size:.86rem;font-variant-numeric:tabular-nums}
+.bov-table th{font-size:.66rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#5f6b82;text-align:right;padding:.3rem .2rem;border-bottom:1px solid rgba(255,255,255,.09)}
+.bov-table th.l{text-align:left}
+.bov-table td{padding:.5rem .2rem;border-bottom:1px solid rgba(255,255,255,.04);text-align:right}
+.bov-table td.bov-season{text-align:left;color:#8b96ab;font-weight:650;white-space:nowrap}
+.bov-table td.bov-tcell{text-align:left}
+.bov-table tr.bov-career td{border-bottom:none;border-top:1px solid rgba(245,185,66,.4);font-weight:800;color:#f5b942}
+.bov-table tr.bov-career td.bov-season{color:#f5b942}
+.bov-foot{font-size:.72rem;color:#8b96ab;font-style:italic;margin:.7rem 0 0;border-top:1px solid rgba(255,255,255,.09);padding-top:.5rem}
+@media (max-width:480px){.bov-pname{font-size:1.2rem}.bov-face{width:62px;height:62px}.bov-table{font-size:.8rem}}
+</style>
 </head>
 <body class="sport-glass">
 <svg class="sportbg" viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
@@ -708,6 +774,18 @@ body.sport-glass .pc-overlay,body.sport-glass .gm-overlay{background:rgba(2,5,10
       <div id="nbaStandingsBody"><p class="muted">Loading…</p></div>
     </details>
   </div>
+  <div class="bov-wrap">
+    <div class="bov-head">
+      <p class="bov-kicker">Player Lookup</p>
+      <h2>Player Overview</h2>
+      <p class="bov-sub muted">Search a team for its full roster, or a player for his story — draft, every team, and his season-by-season numbers.</p>
+    </div>
+    <section class="bov-panel" id="bovPanel">
+      <input class="bov-search" id="bovSearch" type="search" placeholder="Search a team or player… try PHI, Lakers, Curry" aria-label="Search a team or player" autocomplete="off">
+      <div id="bovResults"><p class="bov-hint">Loading teams…</p></div>
+      <div id="bovOverview"></div>
+    </section>
+  </div>
 </section>
 
 <section id="view-lab" class="view">
@@ -719,6 +797,7 @@ body.sport-glass .pc-overlay,body.sport-glass .gm-overlay{background:rgba(2,5,10
       <button class="fb-menu-item" data-fbview="standouts" type="button">Standouts</button>
       <button class="fb-menu-item on" data-fbview="slate" type="button">Slate</button>
       <button class="fb-menu-item" data-fbview="markets" type="button">Markets</button>
+      <button class="fb-menu-item" data-fbview="mvm" type="button">Model vs Market</button>
       <button class="fb-menu-item" data-fbview="toppicks" type="button">Top Picks</button>
       <button class="fb-menu-item" data-fbview="types" type="button">Player Types</button>
       <button class="fb-menu-item" data-fbview="paint" type="button">In the Paint</button>
@@ -763,6 +842,18 @@ body.sport-glass .pc-overlay,body.sport-glass .gm-overlay{background:rgba(2,5,10
       <tbody id="nbaMktBody"><tr><td colspan="7" class="muted">Pricing tonight's slate…</td></tr></tbody>
     </table></div>
     <p class="muted small" style="margin-top:.4rem">Tap a player for his full card — fair lines, milestone ladders, form vs tonight's lines, and parlay legs. Hit % is the model's chance of going over the fair line.</p>
+  </section>
+
+  <section id="nba-view-mvm" class="view">
+    <div class="fb-slim-head"><h2>Model vs Market</h2><span class="right">Best book vs Bueno engine</span></div>
+    <p class="muted small" style="margin:.2rem 0 .6rem">Where our price disagrees most with the best book price out there. <b>Our %</b> is the model's chance of going over the book's exact line — the chip is our edge in points over the price's implied %. Book prices via SmartPicks, display only — not a price input.</p>
+    <div class="fb-mkt-pills" id="nbaMvmPills">
+      <button class="fb-mkt-pill active" data-mkt="PTS" type="button">Points</button>
+      <button class="fb-mkt-pill" data-mkt="REB" type="button">Rebounds</button>
+      <button class="fb-mkt-pill" data-mkt="AST" type="button">Assists</button>
+      <button class="fb-mkt-pill" data-mkt="3PM" type="button">Threes</button>
+    </div>
+    <div id="nbaMvmBody"><p class="muted">Loading the market check…</p></div>
   </section>
 
   <section id="nba-view-toppicks" class="view">
@@ -1695,7 +1786,7 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
           { pace: ratings[t.id].pace, offRtg: ratings[t.id].offRtg, defRtg: ratings[t.id].defRtg },
           { pace: ratings[opp.id].pace, offRtg: ratings[opp.id].offRtg, defRtg: ratings[opp.id].defRtg },
           { pace: lgPace, rtg: 115.6 });
-        const paceAdj = side === 'away' ? env.a : env.b;
+        const paceAdj = env.a;
         for (const [pid, lines] of Object.entries(rec.byPlayer)) {
           const mins = lines.map((l) => l.min);
           const mins3 = mins.slice(0, 3);
@@ -2185,6 +2276,81 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
       if (cardPid) renderCard(cardPid, true);
     }
   }
+
+  /* ================= Best book + Model vs Market =================
+     Display only. Sidecar data/nba-bestbook.json is built daily by
+     data-builder/nba-bestbook.py from the SmartPicks (Checkd) best-odds
+     feed: per player/market, the best OVER price + line, plus OUR
+     probability of clearing that exact line (priced by the site engine
+     at build time). Only price + line are taken from the feed — its
+     hit-rate stats are never stored or shown. Every surface degrades
+     silently when the file is missing or stale. */
+  const BB_MKTS = [['PTS', 'Points'], ['REB', 'Rebounds'], ['AST', 'Assists'], ['3PM', 'Threes']];
+  let nbaBbSide = null;   // null = not loaded yet, false = absent/stale
+  let nbaBbLoading = false;
+  let mvmMkt = 'PTS';
+  async function loadBestBook() {
+    if (nbaBbSide !== null || nbaBbLoading) return;
+    nbaBbLoading = true;
+    try {
+      const bb = await getJSON('data/nba-bestbook.json');
+      // A stale file would show yesterday's lines as tonight's — refuse it.
+      nbaBbSide = (bb && bb.players && (!bb.date || bb.date === ymdDash)) ? bb : false;
+    } catch (e) { nbaBbSide = false; }
+    nbaBbLoading = false;
+    renderMvm();
+    if (cardPid) renderCard(cardPid, true);
+  }
+  function mvmRowsFor(mkt) {
+    const out = [];
+    if (!nbaBbSide || !nbaBbSide.players) return out;
+    const who = nbaBbSide.who || {};
+    for (const pid of Object.keys(nbaBbSide.players)) {
+      const e = nbaBbSide.players[pid][mkt];
+      if (!e || !(e.dec > 1)) continue;
+      const w = who[pid] || {};
+      const implied = 1 / e.dec;
+      out.push({ pid, name: w.name || 'Player', team: w.team || '', line: e.line,
+        book: e.book, odds: e.odds, our: e.our, implied, gap: e.our - implied });
+    }
+    return out.sort((a, b) => b.gap - a.gap);
+  }
+  function renderMvm() {
+    const el = $('nbaMvmBody');
+    if (!el) return;
+    if (nbaBbSide === null) { el.innerHTML = '<p class="muted">Loading the market check…</p>'; loadBestBook(); return; }
+    if (nbaBbSide === false) { el.innerHTML = '<p class="muted">No market check tonight — the book feed is quiet.</p>'; return; }
+    const rows = mvmRowsFor(mvmMkt);
+    if (!rows.length) {
+      const lbl = (BB_MKTS.find(([k]) => k === mvmMkt) || [])[1] || mvmMkt;
+      el.innerHTML = '<p class="muted">No ' + esc(lbl.toLowerCase()) + ' prices in the market check tonight.</p>';
+      return;
+    }
+    const rowHtml = (r) =>
+      '<button type="button" class="mvm-row" data-pid="' + r.pid + '">' +
+      '<span class="fb-bplayer"><img class="hs" src="' + headshot(r.pid) + '" alt="" onerror="this.style.visibility=\'hidden\'">' +
+      '<span class="bn">' + esc(r.name) + '</span>' +
+      (r.team ? '<img class="tl" src="' + logoUrl(r.team) + '" alt="">' : '') + '</span>' +
+      '<span class="mvm-line">O ' + r.line + '</span>' +
+      '<span class="mvm-our">' + Math.round(r.our * 100) + '% us</span>' +
+      '<span class="mvm-book">' + esc(r.book) + ' ' + esc(r.odds) + ' · ' + Math.round(r.implied * 100) + '%</span>' +
+      '<span class="bb-gap' + (r.gap < 0 ? ' neg' : '') + '">' + (r.gap >= 0 ? '+' : '') + (r.gap * 100).toFixed(1) + '</span></button>';
+    const pos = rows.filter((r) => r.gap > 0).slice(0, 15);
+    const neg = rows.filter((r) => r.gap <= 0).slice(-5).reverse();
+    let h = '';
+    if (pos.length) h += '<div class="mvm-sec">We price it higher</div>' + pos.map(rowHtml).join('');
+    if (neg.length) h += '<div class="mvm-sec">Market prices it higher</div>' + neg.map(rowHtml).join('');
+    el.innerHTML = h || '<p class="muted">No market check for this stat tonight.</p>';
+    el.querySelectorAll('.mvm-row').forEach((b) => b.addEventListener('click', () => openPlayerCard(b.dataset.pid)));
+  }
+  document.querySelectorAll('#nbaMvmPills .fb-mkt-pill').forEach((b) =>
+    b.addEventListener('click', () => {
+      document.querySelectorAll('#nbaMvmPills .fb-mkt-pill').forEach((x) => x.classList.remove('active'));
+      b.classList.add('active');
+      mvmMkt = b.dataset.mkt;
+      renderMvm();
+    }));
+  loadBestBook();
 
   // ---- injuries (for the Markets filter's OUT/questionable toggle) ----
   let injuryByPid = {};
@@ -3224,9 +3390,10 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
     if (preserve) cardSheet.querySelectorAll('details.pc-sec').forEach((d) => { openSecs[d.dataset.sec] = d.open; });
     const row = pricedById[pid] || null;
     const live = liveByPid[pid] || null;
+    const bbWho = (nbaBbSide && nbaBbSide.who) ? nbaBbSide.who[pid] : null;
     const names = teamNameByAbbr();
-    const name = (row && row.name) || (live && live.name) || (knownPlayers[pid] && knownPlayers[pid].name) || 'Player';
-    const teamAbbr = (row && row.team) || (live && live.team) || (knownPlayers[pid] && knownPlayers[pid].team) || '';
+    const name = (row && row.name) || (live && live.name) || (knownPlayers[pid] && knownPlayers[pid].name) || (bbWho && bbWho.name) || 'Player';
+    const teamAbbr = (row && row.team) || (live && live.team) || (knownPlayers[pid] && knownPlayers[pid].team) || (bbWho && bbWho.team) || '';
     const teamName = (row && row.teamName) || names[teamAbbr] || teamAbbr;
     let match = '';
     if (row) match = (row.home ? 'vs ' : '@ ') + (row.oppName || row.oppAbbr) + ' · tonight';
@@ -3276,6 +3443,31 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
         '<span class="pc-pr-odds">Fair ' + nbaFairOdds(row.dd.p) + '</span></div>';
     }
     h += sec('lines', "Tonight's fair lines", linesHtml, true);
+    // Best book (display only) — the best OVER price the books offer on
+    // the four core markets, from data/nba-bestbook.json (SmartPicks
+    // feed, built by data-builder/nba-bestbook.py). Our % is priced at
+    // the book's exact line. Hides cleanly when the sidecar or the
+    // player's entry is absent. The "cleared it" line underneath is
+    // from OUR OWN game logs, never the feed's hit rates.
+    const bbEntry = (nbaBbSide && nbaBbSide.players) ? nbaBbSide.players[pid] : null;
+    if (bbEntry) {
+      const bbRows = BB_MKTS.filter(([k]) => bbEntry[k]).map(([k, label]) => {
+        const e = bbEntry[k];
+        const gap = e.our - 1 / e.dec;
+        const chip = '<span class="bb-gap' + (gap < 0 ? ' neg' : '') + '">' + (gap >= 0 ? '+' : '') + (gap * 100).toFixed(1) + '</span>';
+        let r = '<div class="pc-price-row">' +
+          '<span class="pc-pr-label">' + label + '</span>' +
+          '<span class="pc-pr-line">' + e.line + '</span>' +
+          '<span class="bb-book">' + esc(e.book) + ' ' + esc(e.odds) + '</span>' +
+          '<span class="pc-pr-odds">Us ' + Math.round(e.our * 100) + '%</span>' + chip + '</div>';
+        if (e.hit10 && e.hit10.n >= 5) {
+          r += '<div class="bb-hit">Cleared this ' + label.toLowerCase() + ' line in ' + e.hit10.x + ' of last ' + e.hit10.n + ' (our game logs)</div>';
+        }
+        return r;
+      }).join('');
+      if (bbRows) h += sec('bestbook', 'Best book', bbRows +
+        '<p class="bb-note">Best book price · via SmartPicks — display only, not a price input</p>', true);
+    }
     // Minutes · last 6 (open by default — the on/off visual)
     const minGames = (row.recentLines || []).slice(0, 6);
     if (minGames.length) h += sec('minutes', 'Minutes · last ' + minGames.length, minutesHtml(row), true);
@@ -3667,11 +3859,11 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
   }
 
   /* ================= Fast Break views (collapsible menu) ================= */
-  const FB_VIEW_NAMES = { standouts: 'Standouts', slate: 'Slate', markets: 'Markets', toppicks: 'Top Picks', types: 'Player Types', paint: 'In the Paint', parlay: 'Parlay builder' };
+  const FB_VIEW_NAMES = { standouts: 'Standouts', slate: 'Slate', markets: 'Markets', mvm: 'Model vs Market', toppicks: 'Top Picks', types: 'Player Types', paint: 'In the Paint', parlay: 'Parlay builder' };
   let fbView = 'slate';
   function setFbView(v) {
     fbView = v;
-    ['standouts', 'slate', 'markets', 'toppicks', 'types', 'paint', 'parlay'].forEach((x) => {
+    ['standouts', 'slate', 'markets', 'mvm', 'toppicks', 'types', 'paint', 'parlay'].forEach((x) => {
       const el = $('nba-view-' + x);
       if (el) el.classList.toggle('active', x === v);
     });
@@ -3679,6 +3871,7 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
     if (cur) cur.textContent = FB_VIEW_NAMES[v];
     document.querySelectorAll('.fb-menu-item').forEach((it) => it.classList.toggle('on', it.dataset.fbview === v));
     if (v === 'markets') window.loadMarkets();
+    if (v === 'mvm') { loadBestBook(); renderMvm(); }
     if (v === 'slate') { loadRatings().then(() => renderSlate()); window.loadMarkets(); }
     if (v === 'standouts') { renderStandouts(); window.loadMarkets(); }
     if (v === 'toppicks') { renderTopPicks(); window.loadMarkets(); }
@@ -3696,6 +3889,264 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
   document.querySelectorAll('.fb-menu-item').forEach((it) =>
     it.addEventListener('click', () => { setFbView(it.dataset.fbview); fbMenuSet(false); }));
   window.fbOnLabOpen = function() { setFbView(fbView); };
+
+  // ---- Player Overview (bottom of Home) ----
+  // Live ESPN route: site API teams + rosters, core API athlete / statisticslog /
+  // statistics. Both APIs send Access-Control-Allow-Origin: * (verified) — the
+  // same client-side pattern the rest of this page already uses. Rosters are
+  // cached per team for the session; the league player index is built lazily
+  // on first player search and cached in localStorage for the day.
+  const bov = { teams: null, byId: {}, rosters: {}, index: null, indexP: null, overs: {}, teamInfoP: {} };
+  const bovNorm = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  const bovRefId = (ref, kind) => { const m = String((ref && ref.$ref) || '').match(new RegExp('/' + kind + '/(\\d+)')); return m ? m[1] : null; };
+  const bovHttps = (u) => String(u || '').replace(/^http:\/\//, 'https://');
+  const bovSeasonLabel = (y) => (y - 1) + '-' + String(y).slice(2);
+  const bovRgb = (t) => teamColorRgb({ color: t && t.color, alternateColor: t && t.altColor });
+  const bovOrd = (n) => n + ({ 1: 'ST', 2: 'ND', 3: 'RD' }[n] || 'TH');
+  const bovAvg = (v) => (v == null || isNaN(v)) ? '—' : (Math.round(v * 10) / 10).toFixed(1);
+  const bovPosGroup = (pos) => { const c = String(pos || '').toUpperCase().charAt(0); return c === 'G' ? 0 : (c === 'C' ? 2 : 1); };
+  const BOV_GROUPS = ['Guards', 'Forwards', 'Centers'];
+  const bovEl = () => $('bovResults'), bovOvEl = () => $('bovOverview');
+
+  async function bovLoadTeams() {
+    if (bov.teams) return bov.teams;
+    const d = await getJSON(API + '/teams?limit=100');
+    const raw = (((d.sports || [])[0] || {}).leagues || [])[0] || {};
+    bov.teams = ((raw.teams || []).map((x) => x.team).filter((t) => t && t.id)).map((t) => ({
+      id: String(t.id), abbr: t.abbreviation || '', name: t.displayName || t.name || '',
+      color: t.color || '', altColor: t.alternateColor || '',
+    }));
+    for (const t of bov.teams) bov.byId[t.id] = t;
+    return bov.teams;
+  }
+  async function bovRoster(tid) {
+    if (bov.rosters[tid]) return bov.rosters[tid];
+    const d = await getJSON(API + '/teams/' + tid + '/roster');
+    const rows = (d.athletes || []).map((a) => ({
+      id: String(a.id), name: a.displayName || a.fullName || '',
+      pos: (a.position && a.position.abbreviation) || '', jersey: a.jersey || '',
+    })).filter((p) => p.id && p.name);
+    bov.rosters[tid] = rows;
+    return rows;
+  }
+  async function bovBuildIndex() {
+    if (bov.index) return bov.index;
+    const cacheKey = 'bovIndex-' + ymdDash;
+    const cached = lsGet(cacheKey);
+    if (cached && Array.isArray(cached.rows) && cached.rows.length > 100) { bov.index = cached.rows; return bov.index; }
+    if (bov.indexP) return bov.indexP;
+    bov.indexP = (async () => {
+      const teams = await bovLoadTeams();
+      const per = await pool(teams, 6, async (t) => {
+        try { const r = await bovRoster(t.id); return r.map((p) => ({ id: p.id, name: p.name, pos: p.pos, tid: t.id })); }
+        catch (e) { return []; }
+      });
+      bov.index = per.reduce((acc, r) => acc.concat(r || []), []);
+      lsSet(cacheKey, { at: Date.now(), rows: bov.index });
+      bov.indexP = null;
+      return bov.index;
+    })();
+    return bov.indexP;
+  }
+  function bovFindTeam(q) {
+    const qn = bovNorm(q);
+    if (!bov.teams || qn.length < 2) return null;
+    for (const t of bov.teams) if (bovNorm(t.abbr) === qn) return t;
+    for (const t of bov.teams) if (bovNorm(t.abbr).indexOf(qn) === 0) return t;
+    for (const t of bov.teams) if (bovNorm(t.name).indexOf(qn) >= 0) return t;
+    return null;
+  }
+  function bovPillHtml(team, p) {
+    const rgb = bovRgb(team) || [245, 185, 66];
+    const c = (a) => rgbCss(rgb, a);
+    return '<button type="button" class="bov-pill" data-bov-pid="' + p.id + '" data-bov-tid="' + team.id + '"' +
+      ' style="border:1.5px solid ' + c(1) + ';background:' + c(0.13) + '">' +
+      '<img src="' + headshot(p.id) + '" alt="" style="border:2px solid ' + c(1) + '" onerror="this.style.display=\'none\'">' +
+      '<span>' + esc(p.name) + '</span>' +
+      (p.pos ? '<span class="bov-postag" style="background:' + c(0.22) + ';color:' + c(1) + '">' + esc(p.pos) + '</span>' : '') + '</button>';
+  }
+  function bovTeamHeadHtml(team, count) {
+    return '<div class="bov-teamhead"><img src="' + logoUrl(team.abbr) + '" alt="" onerror="this.style.display=\'none\'">' +
+      '<span class="bov-thname">' + esc(team.name) + '</span><span class="bov-abbr">' + esc(team.abbr) + '</span>' +
+      '<span class="bov-thcount">' + count + ' players</span></div>';
+  }
+  function bovRenderTeamGrid() {
+    const box = bovEl(); if (!box) return;
+    if (!bov.teams) { box.innerHTML = '<p class="bov-hint">Loading teams…</p>'; return; }
+    box.innerHTML = '<div class="bov-sec-t">Teams</div><div class="bov-teamgrid">' +
+      bov.teams.map((t) => '<button type="button" class="bov-tgbtn" data-bov-team="' + t.id + '"><img src="' + logoUrl(t.abbr) + '" alt="" onerror="this.style.display=\'none\'"><span>' + esc(t.name) + '</span></button>').join('') +
+      '</div><p class="bov-hint">Tap a team for its roster, or search a player name.</p>';
+  }
+  async function bovShowTeam(team) {
+    const box = bovEl(); if (!box) return;
+    box.innerHTML = bovTeamHeadHtml(team, '…') + '<p class="bov-hint">Loading roster…</p>';
+    try {
+      const roster = await bovRoster(team.id);
+      let out = bovTeamHeadHtml(team, roster.length);
+      for (let g = 0; g < 3; g++) {
+        const ps = roster.filter((p) => bovPosGroup(p.pos) === g);
+        if (!ps.length) continue;
+        out += '<div class="bov-sec-t">' + BOV_GROUPS[g] + '</div><div class="bov-pills">' +
+          ps.map((p) => bovPillHtml(team, p)).join('') + '</div>';
+      }
+      box.innerHTML = out + '<p class="bov-tapnote">Tap a player for his overview.</p>';
+    } catch (e) {
+      box.innerHTML = bovTeamHeadHtml(team, 0) + '<p class="bov-nomatch">Couldn\'t load that roster right now — try again.</p>';
+    }
+  }
+  let bovSearchTimer = null;
+  async function bovRenderSearch() {
+    const inp = $('bovSearch'); const box = bovEl(); if (!inp || !box) return;
+    const q = inp.value.trim();
+    if (!q) { bovRenderTeamGrid(); return; }
+    const team = bovFindTeam(q);
+    if (team) { bovShowTeam(team); return; }
+    const qn = bovNorm(q);
+    if (qn.length < 3) { box.innerHTML = '<p class="bov-hint">Keep typing — a team name, its abbreviation, or a player name.</p>'; return; }
+    if (!bov.index) box.innerHTML = '<p class="bov-hint">Building the player index…</p>';
+    try {
+      const idx = await bovBuildIndex();
+      if (($('bovSearch') || {}).value.trim() !== q) return; // query moved on
+      const hits = idx.filter((p) => bovNorm(p.name).indexOf(qn) >= 0).slice(0, 24);
+      if (!hits.length) { box.innerHTML = '<p class="bov-nomatch">No match for \'' + esc(q) + '\' — try a team name, abbreviation, or player.</p>'; return; }
+      box.innerHTML = '<div class="bov-sec-t">Players</div><div class="bov-pills">' +
+        hits.map((p) => bovPillHtml(bov.byId[p.tid] || { id: p.tid, abbr: '', color: '', altColor: '' }, p)).join('') + '</div>' +
+        '<p class="bov-tapnote">Pills wear their team colors. Tap a player for his overview.</p>';
+    } catch (e) {
+      box.innerHTML = '<p class="bov-nomatch">Player search is unavailable right now — try a team instead.</p>';
+    }
+  }
+  function bovStatMap(payload) {
+    const out = {};
+    let sp = payload && payload.splits;
+    if (sp && !sp.categories && sp['0']) sp = sp['0'];
+    const cats = (sp && sp.categories) || (payload && payload.categories) || [];
+    for (const c of cats) for (const s of (c.stats || [])) out[s.name] = s.value;
+    return out;
+  }
+  async function bovTeamInfo(tid, yearHint) {
+    if (!tid) return null;
+    if (bov.byId[tid]) return bov.byId[tid];
+    const key = tid + '@' + (yearHint || '');
+    if (!bov.teamInfoP[key]) {
+      bov.teamInfoP[key] = getJSON(CORE + '/seasons/' + (yearHint || 2027) + '/teams/' + tid)
+        .then((d) => { const t = { id: String(tid), abbr: d.abbreviation || '', name: d.displayName || d.name || '', color: d.color || '', altColor: d.alternateColor || '' }; bov.byId[tid] = t; return t; })
+        .catch(() => null);
+    }
+    return bov.teamInfoP[key];
+  }
+  async function bovOpenPlayer(pid, tidHint) {
+    const ov = bovOvEl(); if (!ov) return;
+    bov.selPid = pid;
+    ov.innerHTML = '<p class="bov-hint">Loading his overview…</p>';
+    try {
+      let data = bov.overs[pid];
+      if (!data) {
+        const [ath, log, career] = await Promise.all([
+          getJSON(CORE + '/athletes/' + pid),
+          getJSON(CORE + '/athletes/' + pid + '/statisticslog'),
+          getJSON(CORE + '/athletes/' + pid + '/statistics').catch(() => null),
+        ]);
+        const entries = ((log && log.entries) || []).map((e) => ({
+          year: parseInt(bovRefId(e.season, 'seasons'), 10),
+          stints: (e.statistics || []).filter((s) => s.type === 'team').map((s) => ({ tid: bovRefId(s.team, 'teams'), ref: s.statistics && s.statistics.$ref })),
+          totalRef: ((e.statistics || []).find((s) => s.type === 'total') || {}).statistics,
+        })).filter((e) => e.year).sort((a, b) => b.year - a.year);
+        for (const e of entries) {
+          e.totalRef = e.totalRef && e.totalRef.$ref;
+          if (!e.stints.length && e.totalRef) e.stints = [{ tid: null, ref: e.totalRef, stats: null }];
+        }
+        data = { ath, entries, careerStats: bovStatMap(career), curTid: bovRefId(ath.team, 'teams') || tidHint || null };
+        // season rows: last 10 seasons, one row per team stint
+        const jobs = [];
+        for (const e of entries.slice(0, 10)) {
+          for (const s of e.stints) if (s.ref) jobs.push({ e, s });
+        }
+        await pool(jobs, 6, async (j) => {
+          try { j.s.stats = bovStatMap(await getJSON(bovHttps(j.s.ref))); } catch (err) { j.s.stats = null; }
+        });
+        bov.overs[pid] = data;
+      }
+      if (bov.selPid !== pid) return; // a newer tap superseded this one
+      const ath = data.ath, entries = data.entries;
+      const curTeam = await bovTeamInfo(data.curTid, entries.length ? entries[0].year : null);
+      const rgb = bovRgb(curTeam) || [245, 185, 66];
+      const posTxt = (ath.position && (ath.position.displayName || ath.position.abbreviation)) || '';
+      let html = '<div class="bov-player"><div class="bov-phead">' +
+        '<img class="bov-face" src="' + headshot(pid) + '" alt="" style="border-color:' + rgbCss(rgb, 1) + ';box-shadow:0 0 18px ' + rgbCss(rgb, 0.35) + '" onerror="this.style.display=\'none\'">' +
+        '<div><h3 class="bov-pname">' + esc(ath.displayName || ath.fullName || '') + '</h3>' +
+        '<div class="bov-teamline">' + (curTeam ? '<img class="bov-logo md" src="' + logoUrl(curTeam.abbr) + '" alt="" onerror="this.style.display=\'none\'"><span>' + esc(curTeam.name) + (posTxt ? ' · ' + esc(posTxt) : '') + (ath.jersey ? ' · #' + esc(ath.jersey) : '') + '</span>' : '<span>' + esc(posTxt) + '</span>') + '</div></div></div>';
+      // draft line
+      if (ath.draft && ath.draft.year) {
+        const dTid = bovRefId(ath.draft.team, 'teams');
+        const dTeam = await bovTeamInfo(dTid, ath.draft.year);
+        html += '<p class="bov-draft">DRAFTED ' + ath.draft.year + ' · ' + bovOrd(ath.draft.round) + ' ROUND · #' + ath.draft.selection + ' OVERALL' + (dTeam ? ' · ' + esc(dTeam.name.toUpperCase()) : '') + '</p>';
+      } else {
+        html += '<p class="bov-draft">UNDRAFTED</p>';
+      }
+      // teams list (chronological spans from the log)
+      const chrono = entries.slice().sort((a, b) => a.year - b.year);
+      const spans = [];
+      for (const e of chrono) for (const s of e.stints) {
+        const last = spans[spans.length - 1];
+        if (last && last.tid === s.tid && e.year - last.end <= 1) last.end = e.year;
+        else spans.push({ tid: s.tid, start: e.year, end: e.year });
+      }
+      if (spans.length) {
+        html += '<div class="bov-sec-t">Teams</div>';
+        for (const sp of spans) {
+          const t = await bovTeamInfo(sp.tid, sp.end);
+          const label = sp.start === sp.end ? bovSeasonLabel(sp.start) : (sp.start - 1) + '–' + sp.end;
+          html += '<div class="bov-teamrow">' + (t ? '<img class="bov-logo" src="' + logoUrl(t.abbr) + '" alt="" onerror="this.style.display=\'none\'">' : '') +
+            '<span class="bov-teamname">' + esc(t ? t.name : '—') + (data.curTid && sp.tid === data.curTid && sp.end === (chrono.length ? chrono[chrono.length - 1].year : sp.end) ? '<span class="bov-cur">CURRENT</span>' : '') + '</span>' +
+            '<span class="bov-span">' + label + '</span></div>';
+        }
+      }
+      // season table
+      const rows = [];
+      for (const e of entries.slice(0, 10)) {
+        for (const s of e.stints) rows.push({ year: e.year, tid: s.tid, stats: s.stats });
+      }
+      html += '<div class="bov-sec-t">Season by season' + (entries.length > 10 ? ' <span class="bov-sec-note">last 10 seasons</span>' : '') + '</div>';
+      html += '<table class="bov-table"><thead><tr><th class="l">Season</th><th class="l">Team</th><th>GP</th><th>PPG</th><th>RPG</th><th>APG</th></tr></thead><tbody>';
+      for (const r of rows) {
+        const t = r.tid ? await bovTeamInfo(r.tid, r.year) : null;
+        const st = r.stats || {};
+        html += '<tr><td class="bov-season">' + bovSeasonLabel(r.year) + '</td>' +
+          '<td class="bov-tcell">' + (t ? '<img class="bov-logo sm" src="' + logoUrl(t.abbr) + '" alt="" onerror="this.style.display=\'none\'">' : '—') + '</td>' +
+          '<td>' + (st.gamesPlayed == null ? '—' : Math.round(st.gamesPlayed)) + '</td>' +
+          '<td>' + bovAvg(st.avgPoints) + '</td><td>' + bovAvg(st.avgRebounds) + '</td><td>' + bovAvg(st.avgAssists) + '</td></tr>';
+      }
+      const cs = data.careerStats || {};
+      if (cs.gamesPlayed != null) {
+        html += '<tr class="bov-career"><td class="bov-season">CAREER</td><td></td><td>' + Math.round(cs.gamesPlayed) + '</td><td>' + bovAvg(cs.avgPoints) + '</td><td>' + bovAvg(cs.avgRebounds) + '</td><td>' + bovAvg(cs.avgAssists) + '</td></tr>';
+      }
+      html += '</tbody></table><p class="bov-foot">Career data · ESPN</p></div>';
+      ov.innerHTML = html;
+      if (ov.scrollIntoView) ov.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    } catch (e) {
+      ov.innerHTML = '<p class="bov-nomatch">Couldn\'t load his overview right now — try again.</p>';
+    }
+  }
+  (function bovInit() {
+    const panel = $('bovPanel'); if (!panel) return;
+    const inp = $('bovSearch');
+    if (inp) inp.addEventListener('input', () => { clearTimeout(bovSearchTimer); bovSearchTimer = setTimeout(bovRenderSearch, 180); });
+    panel.addEventListener('click', (ev) => {
+      const tBtn = ev.target.closest('[data-bov-team]');
+      if (tBtn) { const t = bov.byId[tBtn.dataset.bovTeam]; if (t) bovShowTeam(t); return; }
+      const pill = ev.target.closest('[data-bov-pid]');
+      if (pill) {
+        panel.querySelectorAll('.bov-pill').forEach((x) => { x.style.boxShadow = ''; });
+        const team = bov.byId[pill.dataset.bovTid];
+        const rgb = bovRgb(team) || [245, 185, 66];
+        pill.style.boxShadow = '0 0 14px ' + rgbCss(rgb, 0.45);
+        bovOpenPlayer(pill.dataset.bovPid, pill.dataset.bovTid);
+      }
+    });
+    bovLoadTeams().then(() => { const inpNow = $('bovSearch'); if (!inpNow || !inpNow.value.trim()) bovRenderTeamGrid(); })
+      .catch(() => { const box = bovEl(); if (box) box.innerHTML = '<p class="bov-nomatch">Couldn\'t load the team list right now — try searching again in a moment.</p>'; });
+  })();
 
   // ---- kickoff ----
   renderPaint();

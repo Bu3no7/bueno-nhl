@@ -1348,6 +1348,51 @@ tr.team-row:focus-visible { outline: 2px solid var(--teal); outline-offset: -2px
 .type-row .pname, .type-row .pname-static { flex: 1 1 auto; min-width: 0; }
 .type-row-meta { color: var(--muted); font-size: .76rem; white-space: nowrap; }
 .type-fit { font-size: .72rem; font-weight: 800; color: var(--teal); white-space: nowrap; }
+/* ---------------- streaks (nhl-streaks sidecar) ---------------- */
+.streaks-pills { display: flex; flex-wrap: wrap; gap: .45rem; margin: .2rem 0 1rem; }
+.streaks-pill { padding: .42rem .85rem; border-radius: 999px; border: 1px solid rgba(255, 255, 255, .18); background: rgba(255, 255, 255, .04); color: inherit; font-weight: 700; font-size: .85rem; cursor: pointer; }
+.streaks-pill.on { background: var(--teal); border-color: var(--teal); color: #062a30; }
+.streaks-group { margin: 0 0 1.1rem; padding: .65rem .8rem .35rem; border-radius: 14px; background: linear-gradient(155deg, rgba(130, 170, 255, .10), rgba(6, 12, 26, .5)); border: 1px solid rgba(165, 195, 255, .20); }
+.streaks-head { display: flex; align-items: baseline; gap: .6rem; margin: .4rem 0 .15rem; }
+.streaks-title { font-size: .8rem; font-weight: 900; letter-spacing: .1em; color: var(--teal); }
+.streaks-count { color: var(--muted); font-size: .78rem; font-weight: 700; }
+.streaks-desc { color: var(--muted); font-size: .85rem; margin: 0 0 .5rem; }
+.streaks-row { display: flex; align-items: center; gap: .55rem; padding: .5rem .2rem; border-bottom: 1px solid rgba(255, 255, 255, .06); cursor: pointer; }
+.streaks-group .streaks-row:last-child { border-bottom: none; }
+.streaks-who { flex: 1 1 auto; min-width: 0; display: flex; align-items: center; gap: .45rem; }
+.streaks-name { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.streaks-tag { flex: none; font-size: .6rem; font-weight: 800; letter-spacing: .06em; color: var(--gold); border: 1px solid rgba(245, 185, 66, .6); background: rgba(245, 185, 66, .08); border-radius: 6px; padding: .14rem .4rem; }
+.streaks-tlogo { width: 22px; height: 22px; flex: none; }
+.streaks-dots { display: flex; gap: 3px; flex: none; }
+.streaks-dots i { width: 8px; height: 8px; border-radius: 50%; background: #39445a; display: block; }
+.streaks-dots i.on { background: var(--teal); }
+.streaks-nums { text-align: right; flex: none; min-width: 3.9rem; }
+.streaks-pct { font-size: 1.05rem; font-weight: 800; }
+.streaks-sample { font-size: .72rem; color: var(--muted); white-space: nowrap; }
+.streaks-cardrow .pc-line-row { border-bottom: none; padding-bottom: .1rem; }
+.streaks-card-vals b { color: var(--teal); }
+.streaks-foot { margin: .15rem 0 .3rem; }
+/* ---------------- best book + model vs market (nhl-bestbook sidecar) ---------------- */
+.bb-chip { flex: none; font-size: .72rem; font-weight: 800; color: var(--teal); border: 1px solid rgba(58, 219, 227, .5); background: rgba(58, 219, 227, .10); border-radius: 999px; padding: .16rem .5rem; white-space: nowrap; }
+.bb-chip.neg { color: var(--danger, #f0665e); border-color: rgba(240, 102, 94, .45); background: rgba(240, 102, 94, .08); }
+.bb-cardrow .pc-line-row { border-bottom: none; padding-bottom: .1rem; }
+.bb-cardrow .bb-chip { margin-left: auto; }
+.bb-foot { margin: .15rem 0 .3rem; }
+.mvm-group { margin: 0 0 1.1rem; padding: .65rem .8rem .35rem; border-radius: 14px; background: linear-gradient(155deg, rgba(130, 170, 255, .10), rgba(6, 12, 26, .5)); border: 1px solid rgba(165, 195, 255, .20); }
+.mvm-head { display: flex; align-items: baseline; gap: .6rem; margin: .4rem 0 .15rem; }
+.mvm-title { font-size: .8rem; font-weight: 900; letter-spacing: .1em; color: var(--teal); }
+.mvm-title.neg { color: var(--danger, #f0665e); }
+.mvm-count { color: var(--muted); font-size: .78rem; font-weight: 700; }
+.mvm-row { display: flex; align-items: center; gap: .55rem; padding: .5rem .2rem; border-bottom: 1px solid rgba(255, 255, 255, .06); cursor: pointer; }
+.mvm-group .mvm-row:last-child { border-bottom: none; }
+.mvm-who { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; }
+.mvm-name { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mvm-bookline { font-size: .74rem; color: var(--muted); white-space: nowrap; }
+.mvm-bookline b { color: var(--gold); font-weight: 700; }
+.mvm-tlogo { width: 22px; height: 22px; flex: none; }
+.mvm-nums { text-align: right; flex: none; min-width: 3.9rem; }
+.mvm-pct { font-size: 1.05rem; font-weight: 800; }
+.mvm-fair { font-size: .72rem; color: var(--muted); white-space: nowrap; }
 /* Standouts view */
 .so-cats { display: flex; flex-wrap: wrap; gap: .45rem; margin: .2rem 0 1rem; }
 .so-cat { padding: .42rem .85rem; border-radius: 999px; border: 1px solid rgba(255, 255, 255, .18); background: rgba(255, 255, 255, .04); color: inherit; font-weight: 700; font-size: .85rem; cursor: pointer; }

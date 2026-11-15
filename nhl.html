@@ -148,6 +148,8 @@ body.sport-glass #boardTable tr.scored td:first-child{background:linear-gradient
       <button class="tab" data-view="board" role="tab">Board</button>
       <button class="tab" data-view="standouts" role="tab">Standouts</button>
       <button class="tab" data-view="types" role="tab">Types</button>
+      <button class="tab" data-view="streaks" role="tab">Streaks</button>
+      <button class="tab" data-view="mvm" role="tab">Model vs Market</button>
     </div>
   </nav>
 </header>
@@ -482,6 +484,30 @@ body.sport-glass #boardTable tr.scored td:first-child{background:linear-gradient
       </div>
     </div>
     <div id="typesBody"></div>
+  </section>
+
+  <section id="view-streaks" class="view">
+    <div class="view-head">
+      <div>
+        <p class="kicker">Season</p>
+        <h2>Streaks</h2>
+        <p class="view-sub muted">How often tonight's skaters have actually scored — games with a goal over games played, by window. A streak sheet, not a projection: raw hit rates from NHL game logs, samples always shown and thin ones tagged.</p>
+        <details class="how-works"><summary>How it works</summary><p class="muted small">Built from official NHL game logs (data-builder/nhl-streaks.py): every skater's games this season, counted by whether he scored in them — season, last 20, last 10, last 5, home and away. Dots are his last 5 games, teal when he scored. Tap a row for the full card. Streaks are display only — they never move a price, a probability or a sort.</p></details>
+      </div>
+    </div>
+    <div id="streaksBody"></div>
+  </section>
+
+  <section id="view-mvm" class="view">
+    <div class="view-head">
+      <div>
+        <p class="kicker">Market check</p>
+        <h2>Model vs Market</h2>
+        <p class="view-sub muted">Tonight's slate: our anytime-goal price against the best book price out there — bet365, BetMGM, DraftKings, Fanatics via SmartPicks. The gap is our probability minus the book's implied probability: a disagreement board, not a tip sheet.</p>
+        <details class="how-works"><summary>How it works</summary><p class="muted small">For each skater we take the single best anytime-goalscorer price across the four books and convert it to an implied probability, then line it up against the model's own number. Prices are a display-only market reference — they never move a price, a probability or a sort anywhere on the site.</p></details>
+      </div>
+    </div>
+    <div id="mvmBody"></div>
   </section>
 </main>
 

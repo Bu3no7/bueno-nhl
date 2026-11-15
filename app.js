@@ -3657,6 +3657,216 @@ function renderTypes() {
   el.querySelectorAll('[data-typepill]').forEach((b) => b.addEventListener('click', () => { typeSel = b.dataset.typepill; renderTypes(); }));
   wirePnameClicks(el);
 }
+/* ---------------- streaks (nhl-streaks sidecar) ----------------
+   data/nhl-streaks.json is built by data-builder/nhl-streaks.py from
+   OUR OWN NHL API game logs: for every skater on the slate, games
+   with a goal over games played — season, last 20, last 10, last 5,
+   home, away — plus his last-5 form. A streak sheet (raw scored-in
+   rates), NOT a projection. DISPLAY ONLY — streaks feed no price,
+   probability or sort anywhere. A missing sidecar or a player with
+   no entry renders exactly as before. */
+let streaksSidecar = null, streaksState = 'idle', streaksPromise = null; // idle | loading | ok | fail
+function loadStreaks() {
+  if (!streaksPromise) {
+    streaksState = 'loading';
+    streaksPromise = dataFetch('data/nhl-streaks.json', { headers: { 'Accept': 'application/json' } })
+      .then((r) => { if (!r.ok) throw new Error('no streaks sidecar'); return r.json(); })
+      .then((j) => { streaksSidecar = j; streaksState = 'ok'; renderStreaks(); return j; })
+      .catch(() => { streaksSidecar = null; streaksState = 'fail'; renderStreaks(); return null; });
+  }
+  return streaksPromise;
+}
+function streakOf(pid) {
+  if (streaksState !== 'ok' || !streaksSidecar || !streaksSidecar.players) return null;
+  return streaksSidecar.players[String(pid)] || null;
+}
+const STREAK_WINS = [
+  { key: 'season', label: 'Season' },
+  { key: 'l20', label: 'Last 20' },
+  { key: 'l10', label: 'Last 10' },
+  { key: 'l5', label: 'Last 5' },
+  { key: 'home', label: 'Home' },
+  { key: 'away', label: 'Away' },
+];
+let streakWin = 'season';
+const streakPctOf = (w) => (w && w.gp ? w.scored / w.gp : 0);
+function streakDotsHtml(form) {
+  if (!form || !form.length) return '';
+  return `<span class="streaks-dots">${form.map((hit) => `<i class="${hit ? 'on' : ''}"></i>`).join('')}</span>`;
+}
+/* Streaks view: window pills over ONE glass board — only the selected
+   window renders. Population is tonight's slate (state.skaters) joined
+   to the sidecar; ranked by the window's scored-in rate, ties broken
+   by more games scored, then more games played. Every row prints its
+   sample ("9 of 21"); a window under 10 games is tagged small sample.
+   Rows show the ring face and the TEAM LOGO (logos, not abbreviations,
+   per Alex's site-wide rule); tapping a row opens the player card. */
+function renderStreaks() {
+  const el = $('streaksBody');
+  if (!el) return;
+  if (streaksState !== 'ok' || !streaksSidecar) {
+    el.innerHTML = '<p class="muted">Streaks have not loaded for this slate yet.</p>';
+    return;
+  }
+  if (!STREAK_WINS.some((w) => w.key === streakWin)) streakWin = 'season';
+  let html = '<div class="streaks-pills">' + STREAK_WINS.map((w) =>
+    `<button type="button" class="streaks-pill${w.key === streakWin ? ' on' : ''}" data-streakwin="${esc(w.key)}" aria-pressed="${w.key === streakWin}">${esc(w.label)}</button>`
+  ).join('') + '</div>';
+  const rows = [];
+  for (const r of state.skaters || []) {
+    const s = streakOf(r.pid);
+    if (!s || !s.windows) continue;
+    const w = s.windows[streakWin];
+    if (!w || !w.gp) continue;
+    rows.push({ r, s, w });
+  }
+  rows.sort((a, b) => (streakPctOf(b.w) - streakPctOf(a.w)) || (b.w.scored - a.w.scored) || (b.w.gp - a.w.gp));
+  const winLabel = (STREAK_WINS.find((w) => w.key === streakWin) || {}).label || '';
+  html += `<div class="streaks-group"><div class="streaks-head"><span class="streaks-title">${esc(winLabel.toUpperCase())}</span><span class="streaks-count">${rows.length} skaters on tonight's slate</span></div>`
+    + '<p class="streaks-desc">Scored-in rate for the window — dots are his last 5 games, teal when he scored.</p>';
+  if (!rows.length) {
+    html += '<p class="muted">No streak data for tonight\'s slate yet.</p>';
+  } else {
+    html += rows.map(({ r, s, w }) => {
+      const hs = r.headshot || headshotUrl(r.team, r.pid);
+      const tag = w.gp < 10 ? '<span class="streaks-tag">SMALL SAMPLE</span>' : '';
+      return `<div class="streaks-row" data-pid="${esc(String(r.pid))}" data-gid="${esc(String(r.gameId))}" role="button" tabindex="0">`
+        + `<img class="pavatar" src="${esc(hs)}" alt="" ${imgFallback}>`
+        + `<span class="streaks-who"><span class="streaks-name">${esc(r.name)}</span>${tag}</span>`
+        + `<img class="streaks-tlogo" src="${esc(teamLogoUrl(r.team))}" alt="" ${imgFallback}>`
+        + streakDotsHtml(s.form)
+        + `<span class="streaks-nums"><span class="streaks-pct">${Math.round(streakPctOf(w) * 100)}%</span><br><span class="streaks-sample">${w.scored} of ${w.gp}</span></span></div>`;
+    }).join('');
+  }
+  html += '</div>';
+  el.innerHTML = html;
+  el.querySelectorAll('[data-streakwin]').forEach((b) => b.addEventListener('click', () => { streakWin = b.dataset.streakwin; renderStreaks(); }));
+  el.querySelectorAll('.streaks-row').forEach((row) => row.addEventListener('click', () => openPlayer(row.dataset.pid, row.dataset.gid)));
+}
+/* Player card SCORED IN row (inside Tonight's lines): season and
+   last-10 scored-in rates with their samples, from the same sidecar.
+   Slot pattern like the goalie workload: if the sidecar is already
+   in, the row renders inline; otherwise a placeholder slot is filled
+   (or removed) by ensureStreaks once the fetch settles. A player with
+   no sidecar entry gets no row. */
+function pcStreaksHtml(r) {
+  const s = streakOf(r.pid);
+  if (!s || !s.windows) return '';
+  const sw = s.windows.season, lw = s.windows.l10;
+  if (!sw || !sw.gp) return '';
+  const pct = (w) => Math.round((w.scored / w.gp) * 100);
+  const l10 = lw && lw.gp ? ` · Last 10 <b>${pct(lw)}%</b> <span class="muted">(${lw.scored} of ${lw.gp})</span>` : '';
+  return `<div class="streaks-cardrow"><div class="pc-line-row"><span class="pc-line-lab">Scored in</span><span class="streaks-card-vals">Season <b>${pct(sw)}%</b> <span class="muted">(${sw.scored} of ${sw.gp})</span>${l10}</span></div><p class="streaks-foot muted small">Bueno game logs · display only, not a price input</p></div>`;
+}
+function pcStreaksSlotHtml(r) {
+  if (streaksSidecar) return pcStreaksHtml(r);
+  return `<div data-streaks-slot="${esc(String(r.pid))}"><p class="muted small" style="margin:.35rem 0 0">Loading scoring rates…</p></div>`;
+}
+async function ensureStreaks(r) {
+  await loadStreaks();
+  const body = $('modalBody');
+  if (!body) return;
+  const slot = body.querySelector(`[data-streaks-slot="${esc(String(r.pid))}"]`);
+  if (!slot) return;
+  const html = streaksSidecar ? pcStreaksHtml(r) : '';
+  if (html) slot.outerHTML = html; else slot.remove();
+}
+/* ---------------- best book (nhl-bestbook sidecar) ----------------
+   data/nhl-bestbook.json is built by data-builder/nhl-bestbook.py
+   from the SmartPicks feed: the single best anytime-goalscorer price
+   per skater across bet365 / BetMGM / DraftKings / Fanatics (book
+   name + odds only — no hit rates; our streaks sidecar covers those
+   from our own game logs). DISPLAY ONLY — a market reference beside
+   our own fair price; it feeds no price, probability or sort
+   anywhere. A missing sidecar or a player with no entry renders
+   exactly as before. */
+let bbSidecar = null, bbState = 'idle', bbPromise = null; // idle | loading | ok | fail
+function loadBestBook() {
+  if (!bbPromise) {
+    bbState = 'loading';
+    bbPromise = dataFetch('data/nhl-bestbook.json', { headers: { 'Accept': 'application/json' } })
+      .then((r) => { if (!r.ok) throw new Error('no bestbook sidecar'); return r.json(); })
+      .then((j) => { bbSidecar = j; bbState = 'ok'; renderMvm(); return j; })
+      .catch(() => { bbSidecar = null; bbState = 'fail'; renderMvm(); return null; });
+  }
+  return bbPromise;
+}
+function bbOf(pid) {
+  if (bbState !== 'ok' || !bbSidecar || !bbSidecar.players) return null;
+  return bbSidecar.players[String(pid)] || null;
+}
+const bbImplied = (bb) => (bb && bb.dec > 1 ? 100 / bb.dec : null);
+const bbGap = (r, bb) => r.p * 100 - bbImplied(bb);
+function bbChipHtml(gap) {
+  return `<span class="bb-chip${gap < 0 ? ' neg' : ''}">${gap >= 0 ? '+' : ''}${gap.toFixed(1)} vs us</span>`;
+}
+/* Player card BEST BOOK row (inside Tonight's lines, under SCORED
+   IN): best price + implied % + the signed gap against our model.
+   Same slot pattern as the streaks row. */
+function pcBbHtml(r) {
+  const bb = bbOf(r.pid);
+  if (!bb || bbImplied(bb) == null) return '';
+  return `<div class="bb-cardrow"><div class="pc-line-row"><span class="pc-line-lab">Best book</span><span class="bb-card-vals"><b>${esc(bb.book)} ${esc(bb.odds)}</b> <span class="muted">· ${Math.round(bbImplied(bb))}% implied</span></span>${bbChipHtml(bbGap(r, bb))}</div><p class="bb-foot muted small">Best book price · via SmartPicks — display only</p></div>`;
+}
+function pcBbSlotHtml(r) {
+  if (bbSidecar) return pcBbHtml(r);
+  return `<div data-bb-slot="${esc(String(r.pid))}"><p class="muted small" style="margin:.35rem 0 0">Loading best book…</p></div>`;
+}
+async function ensureBestBook(r) {
+  await loadBestBook();
+  const body = $('modalBody');
+  if (!body) return;
+  const slot = body.querySelector(`[data-bb-slot="${esc(String(r.pid))}"]`);
+  if (!slot) return;
+  const html = bbSidecar ? pcBbHtml(r) : '';
+  if (html) slot.outerHTML = html; else slot.remove();
+}
+/* Model vs Market view: tonight's slate ranked by the gap between
+   our anytime-goal probability and the best book's implied
+   probability. Biggest positive gaps first (top 15), then a short
+   "market prices higher than us" section (top 5 the other way).
+   Rows carry the ring face and the TEAM LOGO; tap opens the card. */
+function renderMvm() {
+  const el = $('mvmBody');
+  if (!el) return;
+  if (bbState !== 'ok' || !bbSidecar) {
+    el.innerHTML = '<p class="muted">Best-book prices have not loaded for this slate yet.</p>';
+    return;
+  }
+  const rows = [];
+  for (const r of state.skaters || []) {
+    const bb = bbOf(r.pid);
+    if (!bb || bbImplied(bb) == null) continue;
+    rows.push({ r, bb, implied: bbImplied(bb), ours: r.p * 100, gap: bbGap(r, bb) });
+  }
+  rows.sort((a, b) => b.gap - a.gap);
+  const pos = rows.filter((x) => x.gap > 0).slice(0, 15);
+  const neg = rows.filter((x) => x.gap < 0).slice(-5).reverse();
+  const rowHtml = ({ r, bb, implied, ours, gap }) => {
+    const hs = r.headshot || headshotUrl(r.team, r.pid);
+    return `<div class="mvm-row" data-pid="${esc(String(r.pid))}" data-gid="${esc(String(r.gameId))}" role="button" tabindex="0">`
+      + `<img class="pavatar" src="${esc(hs)}" alt="" ${imgFallback}>`
+      + `<span class="mvm-who"><span class="mvm-name">${esc(r.name)}</span><span class="mvm-bookline"><b>${esc(bb.book)} ${esc(bb.odds)}</b> · ${Math.round(implied)}% implied</span></span>`
+      + `<img class="mvm-tlogo" src="${esc(teamLogoUrl(r.team))}" alt="" ${imgFallback}>`
+      + `<span class="mvm-nums"><span class="mvm-pct">${Math.round(ours)}%</span><br><span class="mvm-fair">fair ${esc(r.fair)}</span></span>`
+      + bbChipHtml(gap) + '</div>';
+  };
+  let html = '';
+  if (!rows.length) {
+    html = '<p class="muted">No book prices for tonight\'s slate yet.</p>';
+  } else {
+    if (pos.length) {
+      html += `<div class="mvm-group"><div class="mvm-head"><span class="mvm-title">WE PRICE HIGHER</span><span class="mvm-count">top ${pos.length} gaps</span></div>`
+        + pos.map(rowHtml).join('') + '</div>';
+    }
+    if (neg.length) {
+      html += `<div class="mvm-group"><div class="mvm-head"><span class="mvm-title neg">MARKET PRICES HIGHER THAN US</span><span class="mvm-count">top ${neg.length} the other way</span></div>`
+        + neg.map(rowHtml).join('') + '</div>';
+    }
+  }
+  el.innerHTML = html;
+  el.querySelectorAll('.mvm-row').forEach((row) => row.addEventListener('click', () => openPlayer(row.dataset.pid, row.dataset.gid)));
+}
 /* ---------------- standouts (goalie-matchup reads) ----------------
    Tonight's slate read against the goalie each skater faces, computed
    client-side from the day's bundle. READ layer: the opposing priced
@@ -4080,6 +4290,8 @@ function openPlayer(pid, gameId) {
   const fgP = gameLam > 0 ? lamPos / gameLam : 0;
   const lineRow = (label, p, fair) => `<div class="pc-line-row"><span class="pc-line-lab">${label}</span><span class="pc-line-pct">${pct1(p)}</span><span class="pc-line-fair">${fair} fair</span></div>`;
   const linesBody = `<div class="pc-lines">${lineRow('Anytime goal', r.p, r.fair)}${lineRow('Brace · 2+ goals', tpP, fairOddsSafe(tpP))}${lineRow('First goal', fgP, fairOddsSafe(fgP))}</div>`
+    + pcStreaksSlotHtml(r)
+    + pcBbSlotHtml(r)
     + `<div class="sec-title" style="margin-top:.7rem">Poisson over/under</div>${marketsHtml}`;
   // Milestones ladder (NBA chip pattern; display-only). Rungs come from
   // the SAME lambdas as Tonight's lines: goals from r.lam (1+ is the
@@ -4161,6 +4373,8 @@ function openPlayer(pid, gameId) {
     ${pcAccSec('parlay', 'Add to parlay', parlayBody, false)}`;
   $('playerModal').classList.remove('hidden');
   wireMinutes(r);
+  ensureStreaks(r);
+  ensureBestBook(r);
   // Lazy sidecars (minutes/chem/finish): their sections start folded, so
   // the fetch fires on the section's first open rather than at card open.
   // If a card is re-opened with the sidecar already cached, the slot html
@@ -4614,7 +4828,7 @@ async function refreshScores() {
    so a fresh session sees it expanded again. No burger icon: the sports
    switcher already owns ☰. View switching itself is untouched. */
 let shelfNavFirstVisit = true; // session only
-const SHELF_LABELS = { markets: 'Markets', leaders: 'Leaders', longshots: 'Longshots', parlay: 'Parlay', slate: 'Slate', goals: 'Live', board: 'Board', standouts: 'Standouts', types: 'Types' };
+const SHELF_LABELS = { markets: 'Markets', leaders: 'Leaders', longshots: 'Longshots', parlay: 'Parlay', slate: 'Slate', goals: 'Live', board: 'Board', standouts: 'Standouts', types: 'Types', streaks: 'Streaks', mvm: 'Model vs Market' };
 function shelfSetExpanded(expanded) {
   const stack = $('shelfStack'), bar = $('shelfBar');
   if (!stack || !bar) return;
@@ -4631,7 +4845,7 @@ function shelfSyncNav() {
   if (dot) dot.classList.toggle('on', anyLive);
 }
 const HOME_VIEWS = ['home', 'standings', 'teamlineup', 'playoffodds'];
-const LAB_VIEWS = ['markets', 'leaders', 'longshots', 'parlay', 'slate', 'goals', 'board', 'standouts', 'types'];
+const LAB_VIEWS = ['markets', 'leaders', 'longshots', 'parlay', 'slate', 'goals', 'board', 'standouts', 'types', 'streaks', 'mvm'];
 function setView(v) {
   state.view = v;
   // Keep the section in sync with the view
@@ -4653,6 +4867,8 @@ function setView(v) {
   if (v === 'teamlineup') renderTeamLineup();
   if (v === 'playoffodds') renderPlayoffOdds();
   if (v === 'types') renderTypes();
+  if (v === 'streaks') renderStreaks();
+  if (v === 'mvm') renderMvm();
   if (v === 'standouts') renderStandouts();
   window.scrollTo(0, 0);
 }
@@ -4937,5 +5153,7 @@ startAutoRefresh();
   if (dp && t >= dp.min && t <= dp.max) dp.value = t;
 })();
 loadTypes();
+loadStreaks();
+loadBestBook();
 boot(false, $('datePicker').value);
 

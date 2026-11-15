@@ -1258,6 +1258,7 @@ dataFetch("data/nfl-2026-w10.json").then(function(r){ return r.json(); }).then(f
 
 
 
+
 /* ===== NFL polish (Nov 11): parlay builder + quick-add, top picks strip,
    target-zone card section, live win% graph, tappable standings team
    sheet, playoff picture. Display-only throughout: every leg and number
@@ -1388,7 +1389,18 @@ var PARLAY = {}, ZONES = null, PLAYOFF = null, WPSERIES = {}, TP_MKT = "any", TY
   + ".so-tag.stack{background:rgba(232,182,76,.2);color:#ffe1a1;border-color:rgba(232,182,76,.6)}"
   + ".so-tag.tough{background:rgba(240,102,94,.14);color:#ffb3ad;border-color:rgba(240,102,94,.4)}"
   + ".so-fact{font-size:.68rem;color:#cfe0ff;background:rgba(13,30,44,.55);border:1px solid rgba(165,195,255,.16);border-radius:6px;padding:2px 6px}"
-  + ".so-model{margin-top:6px;font-size:.72rem;font-weight:800;letter-spacing:.05em;color:#e8b64c}";
+  + ".so-model{margin-top:6px;font-size:.72rem;font-weight:800;letter-spacing:.05em;color:#e8b64c}"
+  + ".bb-block{margin-top:10px;border-top:1px solid rgba(165,195,255,.14);padding-top:8px}"
+  + ".bb-head{font-size:.58rem;font-weight:900;letter-spacing:.13em;color:#8b96ab;margin-bottom:5px}"
+  + ".bb-row{display:flex;align-items:center;gap:7px;padding:4px 0;font-size:.78rem;color:#dbe7fa}"
+  + ".bb-mkt{flex:0 0 33%;font-weight:800;letter-spacing:.03em;color:#eef3f9}"
+  + ".bb-book{flex:1;min-width:0;color:#9db1d8}"
+  + ".bb-book b{color:#eef3f9}"
+  + ".bb-our{flex:none;font-weight:800;color:#e8b64c}"
+  + ".bb-gap{flex:none;font-size:.62rem;font-weight:900;letter-spacing:.05em;border-radius:6px;padding:2px 6px;background:rgba(130,170,255,.14);color:#9db1d8;border:1px solid rgba(165,195,255,.25)}"
+  + ".bb-gap.pos{background:rgba(58,219,227,.14);color:#3adbe3;border-color:rgba(58,219,227,.45)}"
+  + ".bb-gap.neg{background:rgba(240,102,94,.12);color:#ffb3ad;border-color:rgba(240,102,94,.4)}"
+  + ".bb-foot{font-size:.62rem;color:#8b96ab;margin:6px 0 0}";
   var st = document.createElement("style"); st.textContent = css; document.head.appendChild(st);
 })();
 
@@ -1524,6 +1536,7 @@ function setPlaybookMode(mode){
   if(mode === "parlay") renderParlay();
   else if(mode === "types") renderTypes();
   else if(mode === "standouts") renderStandouts();
+  else if(mode === "mvm") renderMvm();
   else renderBoard(mode);
 }
 
@@ -1755,6 +1768,88 @@ function renderStandouts(){
   applyPosFilter("standouts");
 }
 
+/* ---------- best book + model vs market (Nov 15) ----------
+   Best book price per player from the SmartPicks feed, pulled weekly
+   into data/nfl-bestbook.json by gen_nfl_bestbook.py and joined to the
+   bundle by ESPN id. Only the best price + line come from the feed —
+   never its hit rates — and only for bets our bundle prices exactly:
+   anytime TD / 2+ TDs (binary), and over/under lines that land on a
+   shipped milestone (receptions via recC, yards via the pXX fields,
+   passing TDs at the 0.5 line). The sidecar carries its week; a week
+   mismatch (or a missing file) hides everything below, quietly. */
+var BESTBOOK = null;
+var BB_LABELS = { ATD: "Anytime TD", P2TD: "2+ TDs", REC: "Receptions", PY: "Passing yards", RUY: "Rushing yards", REY: "Receiving yards", RURY: "Rush + Rec yards", PTD: "Passing TDs" };
+var BB_ORDER = ["ATD", "P2TD", "REC", "REY", "RUY", "RURY", "PY", "PTD"];
+var BB_BOOKNAMES = { betmgm: "BetMGM", fanduel: "FanDuel", draftkings: "DraftKings", bet365: "bet365", fanatics: "Fanatics" };
+function bbBookName(b){ return BB_BOOKNAMES[String(b || "").toLowerCase()] || b || ""; }
+function bbData(){ return (BESTBOOK && B && BESTBOOK.week === B.week && BESTBOOK.players) ? BESTBOOK.players : null; }
+function bbOf(key){
+  var all = bbData(); if(!all) return null;
+  var d = PLAYERS[key]; if(!d || !d.raw) return null;
+  return all[d.raw.espnId] || null;
+}
+function bbImplied(dec){ return (dec && isFinite(dec)) ? 1 / dec : null; }
+function bbGapChip(gap){
+  var cls = gap > 0.005 ? "pos" : (gap < -0.005 ? "neg" : "");
+  return '<span class="bb-gap ' + cls + '">' + (gap >= 0 ? "+" : "−") + Math.abs(Math.round(gap * 100)) + "</span>";
+}
+function bestBookHtml(key){
+  var bb = bbOf(key); if(!bb) return "";
+  var rows = [];
+  BB_ORDER.forEach(function(mk){
+    var e = bb[mk]; if(!e) return;
+    if(mk === "ATD" || mk === "P2TD"){
+      var imp = bbImplied(e.dec); if(imp == null || e.our == null) return;
+      rows.push({ label: BB_LABELS[mk], book: e.book, odds: e.odds, imp: imp, our: e.our });
+    } else {
+      ["over", "under"].forEach(function(side){
+        var s = e[side]; if(!s) return;
+        var imp2 = bbImplied(s.dec); if(imp2 == null || s.our == null) return;
+        rows.push({ label: BB_LABELS[mk] + " " + (side === "over" ? "o" : "u") + " " + e.line, book: s.book, odds: s.odds, imp: imp2, our: s.our });
+      });
+    }
+  });
+  if(!rows.length) return "";
+  return '<div class="bb-block"><div class="bb-head">BEST BOOK · MARKET VS MODEL</div>' + rows.map(function(r){
+    return '<div class="bb-row"><span class="bb-mkt">' + r.label + '</span><span class="bb-book"><b>' + r.odds + "</b> " + bbBookName(r.book) + " · " + pct(r.imp) + ' implied</span><span class="bb-our">OURS ' + pct(r.our) + "</span>" + bbGapChip(r.our - r.imp) + "</div>";
+  }).join("") + '<p class="bb-foot">Best book price · via SmartPicks — display only, not a price input. Gap = our model % minus the market\'s implied %.</p></div>';
+}
+function mvmRow(r){
+  var pl = r.pl, g = gameOf(pl.game);
+  var match = g ? (pl.team === g.away ? "AT " + g.home : "VS " + g.away) : "";
+  return '<tr data-p="' + pl.key + '"><td>' + bfImg(pl.key) + "<b>" + pl.name + "</b>" + typeBadge(pl.key, true)
+    + '<span class="sub">' + pl.pos + " · " + pl.team + " · " + match + "</span></td>"
+    + '<td class="r"><b>' + pct(r.e.our) + '</b><span class="sub">' + fmtOdds(r.e.our) + " fair</span></td>"
+    + '<td class="r"><b>' + r.e.odds + '</b><span class="sub">' + bbBookName(r.e.book) + " · " + pct(r.imp) + " impl</span></td>"
+    + '<td class="r">' + bbGapChip(r.gap) + "</td></tr>";
+}
+function renderMvm(){
+  var wrap = $("boardWrap"), bn = $("boardNote"); if(!wrap || !B) return;
+  var all = bbData();
+  if(!all){
+    wrap.innerHTML = '<p class="pl-empty">Best-book prices have not loaded for this week yet — the board fills in when the weekly best-book file lands.</p>';
+    if(bn) bn.textContent = "";
+    return;
+  }
+  var rows = [];
+  B.players.forEach(function(pl){
+    var e = all[pl.espnId] && all[pl.espnId].ATD; if(!e) return;
+    var imp = bbImplied(e.dec); if(imp == null || e.our == null) return;
+    rows.push({ pl: pl, e: e, imp: imp, gap: e.our - imp });
+  });
+  rows.sort(function(x, y){ return y.gap - x.gap; });
+  var pos = rows.filter(function(r){ return r.gap > 0; }).slice(0, 15);
+  var neg = rows.filter(function(r){ return r.gap < 0; }).sort(function(x, y){ return x.gap - y.gap; }).slice(0, 5);
+  var head = '<tr><th>PLAYER</th><th class="r">OURS</th><th class="r">BEST BOOK</th><th class="r">GAP</th></tr>';
+  var h = '<h2 class="sec">MODEL VS MARKET <span>anytime TD · our price vs the best book price</span></h2>'
+    + (pos.length ? '<table class="board">' + head + pos.map(mvmRow).join("") + "</table>"
+       : '<p class="pl-empty">No player\'s model price beats the best book this week.</p>');
+  if(neg.length) h += '<h2 class="sec">MARKET PRICES HIGHER <span>the book\'s implied % sits above our model</span></h2><table class="board">' + head + neg.map(mvmRow).join("") + "</table>";
+  wrap.innerHTML = h;
+  if(bn) bn.textContent = "Best book price per player from the SmartPicks feed (bet365 / BetMGM / DraftKings / FanDuel / Fanatics), pulled with the weekly bundle. Gap = our anytime-TD % minus the market's implied %. Display only — market prices never move the model. Receptions and yardage best-book lines ride on the player cards, and only where the book's line matches a price we ship.";
+  applyPosFilter("mvm");
+}
+
 /* ---------- live win% graph (score & clock calculation) ---------- */
 function wpGraphHtml(espnId, g){
   var s = WPSERIES[espnId];
@@ -1870,7 +1965,7 @@ function renderTree(){
     var bar = document.createElement("div");
     bar.className = "pb-bar";
     bar.id = "pbBar";
-    bar.innerHTML = '<select id="pbSelect" aria-label="Choose a Playbook section"><option value="td">Touchdowns</option><option value="rush">Rushing</option><option value="rec">Receiving</option><option value="recc">Receptions</option><option value="pass">Passing</option><option value="scr">Rush + Rec</option><option value="kick">Kickers</option><option value="types">Types</option><option value="standouts">Standouts</option><option value="parlay">Parlay</option></select><select id="pbPos" aria-label="Filter by position"><option value="">All positions</option><option value="QB">QB</option><option value="RB">RB</option><option value="WR">WR</option><option value="TE">TE</option></select><span class="pb-ticket">TICKET <span id="plCount"></span></span>';
+    bar.innerHTML = '<select id="pbSelect" aria-label="Choose a Playbook section"><option value="td">Touchdowns</option><option value="rush">Rushing</option><option value="rec">Receiving</option><option value="recc">Receptions</option><option value="pass">Passing</option><option value="scr">Rush + Rec</option><option value="kick">Kickers</option><option value="types">Types</option><option value="standouts">Standouts</option><option value="mvm">Model vs Market</option><option value="parlay">Parlay</option></select><select id="pbPos" aria-label="Filter by position"><option value="">All positions</option><option value="QB">QB</option><option value="RB">RB</option><option value="WR">WR</option><option value="TE">TE</option></select><span class="pb-ticket">TICKET <span id="plCount"></span></span>';
     bar.querySelector("select").addEventListener("change", function(){ setPlaybookMode(this.value); });
     bar.querySelector("#pbPos").addEventListener("change", function(){ PB_POS = this.value; if(PB_MODE !== "parlay" && PB_MODE !== "kick") setPlaybookMode(PB_MODE); });
     boardSec.insertBefore(bar, pillsEl || null);
@@ -1943,6 +2038,10 @@ function renderTree(){
     TYPES = j;
     if(B){ renderTopPicks(); if(PB_TAB === "markets" && PB_MODE !== "parlay") setPlaybookMode(PB_MODE); }
   }).catch(function(){});
+  dataFetch("data/nfl-bestbook.json").then(function(r){ return r.json(); }).then(function(j){
+    BESTBOOK = j;
+    if(B && PB_TAB === "markets" && PB_MODE === "mvm") renderMvm();
+  }).catch(function(){});
 })();
 
 /* ---------- wrap existing renders (same names, called everywhere) ---------- */
@@ -1961,6 +2060,7 @@ buildObjects = (function(orig){ return function(){
   SEARCH_ITEMS.push({ t: "Playoff Picture", s: "PLAYBOOK · STANDINGS · PLAYOFF TREE", v: "view-board" });
   SEARCH_ITEMS.push({ t: "Player Types", s: "PLAYBOOK · TYPES · A–I ARCHETYPES", v: "view-board" });
   SEARCH_ITEMS.push({ t: "Standouts", s: "PLAYBOOK · STANDOUTS · READS + MODEL", v: "view-board" });
+  SEARCH_ITEMS.push({ t: "Model vs Market", s: "PLAYBOOK · MODEL VS MARKET · BEST BOOK", v: "view-board" });
   SEARCH_ITEMS.forEach(function(it){ if(it.s && it.s.indexOf("ON BYE") === 0) it.v = "view-board"; });
 }; })(buildObjects);
 /* Slate lives on the Playbook's Slate tab now: anything still pointing
@@ -2001,6 +2101,20 @@ openPlayer = (function(orig){ return function(key){
   }
   var tdBody = $("pTdSec") ? $("pTdSec").querySelector(".nfl-sec-body") : null;
   if(tdBody && $("pTdSec").style.display !== "none") tdBody.insertAdjacentHTML("beforeend", legRow(key, ["any", "two", "first", "passTd"]));
+  /* Best book block (Nov 15): one stable mount, replaced on every
+     open — rides in TONIGHT'S LINES (the card's lines area), falling
+     back to TOUCHDOWNS when the lines section is hidden. Absent
+     whenever the weekly best-book sidecar has nothing for him. */
+  var oldBb = $("pBestBook"); if(oldBb) oldBb.remove();
+  var bbHtml = bestBookHtml(key);
+  if(bbHtml){
+    var bbMount = document.createElement("div");
+    bbMount.id = "pBestBook";
+    bbMount.innerHTML = bbHtml;
+    var lnBody = $("pLinesSec") ? $("pLinesSec").querySelector(".nfl-sec-body") : null;
+    if(lnBody && $("pLinesSec").style.display !== "none") lnBody.appendChild(bbMount);
+    else if(tdBody && $("pTdSec").style.display !== "none") tdBody.appendChild(bbMount);
+  }
   /* Receptions milestone group (Nov 12): same chip pattern as the
      base card's groups, from the bundle's recC block; absent (and
      the group with it) whenever the player carries no recC block. */
@@ -2059,7 +2173,7 @@ renderGame = (function(orig){ return function(key){
 document.addEventListener("click", function(e){
   if(!e.target || !e.target.closest) return;
   var sr = e.target.closest(".sresult");
-  if(sr){ var sb = sr.querySelector("b"); if(sb && sb.textContent === "Parlay Builder"){ setPbTab("markets"); setPlaybookMode("parlay"); } else if(sb && sb.textContent === "Playoff Picture") setPbTab("standings"); else if(sb && sb.textContent === "Player Types"){ setPbTab("markets"); setPlaybookMode("types"); } else if(sb && sb.textContent === "Standouts"){ setPbTab("markets"); setPlaybookMode("standouts"); } else if(sr.textContent.indexOf("ON BYE") >= 0) setPbTab("slate"); }
+  if(sr){ var sb = sr.querySelector("b"); if(sb && sb.textContent === "Parlay Builder"){ setPbTab("markets"); setPlaybookMode("parlay"); } else if(sb && sb.textContent === "Playoff Picture") setPbTab("standings"); else if(sb && sb.textContent === "Player Types"){ setPbTab("markets"); setPlaybookMode("types"); } else if(sb && sb.textContent === "Standouts"){ setPbTab("markets"); setPlaybookMode("standouts"); } else if(sb && sb.textContent === "Model vs Market"){ setPbTab("markets"); setPlaybookMode("mvm"); } else if(sr.textContent.indexOf("ON BYE") >= 0) setPbTab("slate"); }
   var soc = e.target.closest("[data-soc]");
   if(soc){ e.preventDefault(); e.stopPropagation(); SO_CAT = soc.getAttribute("data-soc"); renderStandouts(); return; }
   var tyl = e.target.closest("[data-tyl]");
@@ -2075,6 +2189,509 @@ document.addEventListener("click", function(e){
   var tr = e.target.closest("[data-teamrow]");
   if(tr){ openTeamSheet(tr.getAttribute("data-teamrow")); return; }
   if(e.target.closest("#teamSheet [data-p]") || e.target.closest("#teamSheet [data-k]")) closeTeamSheet();
+}, true);
+
+
+/* ===== Player Overview (Nov 14): search + roster pills + career
+   overview at the BOTTOM of the Football home page — the NFL port of
+   the Hockey Player Overview Alex approved (mock v2). Search a team
+   (full name or abbreviation) for its full roster as pills in team
+   colors, grouped OFFENSE / DEFENSE / SPECIAL TEAMS; search a player
+   name for matching pills across the league; tap a pill for his
+   overview: draft line, every team with season spans, and a
+   season-by-season table (position-family columns) with a career row.
+   Data route: ESPN's public APIs, live from the browser — both hosts
+   serve Access-Control-Allow-Origin: *, the same ESPN access the
+   page's scoreboard / summary fetches already rely on:
+     teams list  site.api.espn.com/apis/site/v2/sports/football/nfl/teams
+     roster      .../nfl/teams/{espnId}/roster        (per team, cached)
+     athlete     sports.core.api.espn.com/v2/.../athletes/{id}  (draft)
+     seasons     the athlete's statisticslog $refs -> per-stint stats
+   Core-API $refs arrive as http:// and are rewritten to https://
+   (the page is https; mixed content would be blocked). Everything is
+   cached per session: rosters per team, overviews per player, and
+   the league-wide player index built lazily ONCE, the first time a
+   player search needs it. DISPLAY ONLY — nothing here feeds a price.
+   Failures fail soft with a quiet line; the panel never breaks. ===== */
+var FOV = { teams: null, teamsP: null, rosters: {}, overviews: {}, indexP: null, index: null, token: 0, mode: "strip" };
+var FOV_ID2ABBR = {1:"ATL",2:"BUF",3:"CHI",4:"CIN",5:"CLE",6:"DAL",7:"DEN",8:"DET",9:"GB",10:"TEN",11:"IND",12:"KC",13:"LV",14:"LAR",15:"MIA",16:"MIN",17:"NE",18:"NO",19:"NYG",20:"NYJ",21:"PHI",22:"ARI",23:"PIT",24:"LAC",25:"SF",26:"SEA",27:"TB",28:"WSH",29:"CAR",30:"JAX",33:"BAL",34:"HOU"};
+var FOV_GROUPS = [["offense", "OFFENSE"], ["defense", "DEFENSE"], ["specialTeam", "SPECIAL TEAMS"]];
+var FOV_CORE = "https://sports.core.api.espn.com/v2/sports/football/leagues/nfl";
+(function(){
+  var css = ""
+  + ".fov-card{padding:14px}"
+  + ".fov-search{width:100%;background:rgba(7,11,18,.65);border:1px solid rgba(165,195,255,.24);border-radius:10px;color:#f2f5f9;font:inherit;font-size:.95rem;padding:.65rem .8rem;outline:none}"
+  + ".fov-search::placeholder{color:#5f6b82}"
+  + ".fov-search:focus{border-color:rgba(232,182,76,.55)}"
+  + ".fov-sec-t{font-size:.72rem;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:#8b96ab;margin:.95rem 0 .45rem}"
+  + ".fov-sec-note{color:#5f6b82;letter-spacing:.03em;font-weight:650;text-transform:none}"
+  + ".fov-teamgrid{display:flex;flex-wrap:wrap;gap:8px;margin-top:2px}"
+  + ".fov-teamlogo{width:46px;height:46px;display:flex;align-items:center;justify-content:center;background:linear-gradient(155deg,rgba(130,170,255,.13),rgba(6,12,26,.55));border:1px solid rgba(165,195,255,.22);border-radius:12px;cursor:pointer;padding:0}"
+  + ".fov-teamlogo img{width:32px;height:32px;object-fit:contain}"
+  + ".fov-teamhead{display:flex;align-items:center;gap:.6rem;margin:1rem 0 .1rem}"
+  + ".fov-thlogo{width:30px;height:30px;object-fit:contain}"
+  + ".fov-thname{font-size:1.05rem;font-weight:800;color:#f2f5f9}"
+  + ".fov-abbr{font-size:.62rem;font-weight:800;letter-spacing:.08em;border:1px solid rgba(165,195,255,.24);border-radius:99px;padding:.14rem .5rem;color:#8b96ab}"
+  + ".fov-thcount{margin-left:auto;color:#8b96ab;font-size:.8rem;white-space:nowrap}"
+  + ".fov-pills{display:flex;flex-wrap:wrap;gap:.45rem}"
+  + ".fov-pill{display:inline-flex;align-items:center;gap:.45rem;border-radius:99px;padding:.28rem .7rem .28rem .3rem;font:inherit;font-size:.85rem;font-weight:650;color:#f2f5f9;cursor:pointer;border:1px solid}"
+  + ".fov-face{width:26px;height:26px;border-radius:50%;object-fit:cover;object-position:top center;border:2px solid;background:#16264a;flex:none}"
+  + ".fov-postag{font-size:.6rem;font-weight:800;letter-spacing:.06em;border-radius:99px;padding:.12rem .42rem;white-space:nowrap}"
+  + ".fov-tapnote{color:#5f6b82;font-size:.78rem;margin:.7rem 0 0}"
+  + ".fov-hint{color:#5f6b82;font-size:.78rem;margin:.55rem 0 0}"
+  + ".fov-loading{color:#8b96ab;font-size:.88rem;margin:.9rem 0 .2rem}"
+  + ".fov-nomatch{color:#8b96ab;font-size:.88rem;margin:.9rem 0 .2rem}"
+  + ".fov-player{margin-top:.6rem}"
+  + ".fov-phead{display:flex;gap:.9rem;align-items:center}"
+  + ".fov-bigface{width:72px;height:72px;border-radius:50%;object-fit:cover;object-position:top center;border:3px solid;background:#16264a;flex:none}"
+  + ".fov-pname{margin:0;font-size:1.35rem;font-weight:800;line-height:1.15;color:#f2f5f9}"
+  + ".fov-teamline{display:flex;align-items:center;gap:.45rem;color:#8b96ab;font-size:.9rem;margin-top:.2rem}"
+  + ".fov-logo{width:20px;height:20px;object-fit:contain}"
+  + ".fov-logo.md{width:24px;height:24px}"
+  + ".fov-draft{margin:.8rem 0 0;color:#e8b64c;font-size:.76rem;font-weight:800;letter-spacing:.1em}"
+  + ".fov-teamrow{display:flex;align-items:center;gap:.55rem;padding:.42rem 0;border-bottom:1px solid rgba(255,255,255,.04)}"
+  + ".fov-teamname{font-weight:650;color:#f2f5f9}"
+  + ".fov-cur{color:#e8b64c;background:rgba(232,182,76,.12);border:1px solid rgba(232,182,76,.45);font-size:.6rem;font-weight:800;letter-spacing:.08em;border-radius:99px;padding:.12rem .45rem;margin-left:.5rem;vertical-align:2px}"
+  + ".fov-span{margin-left:auto;color:#8b96ab;font-variant-numeric:tabular-nums;font-size:.88rem}"
+  + ".fov-table{width:100%;border-collapse:collapse;font-size:.86rem;font-variant-numeric:tabular-nums}"
+  + ".fov-table th{font-size:.66rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#5f6b82;text-align:right;padding:.3rem .2rem;border-bottom:1px solid rgba(255,255,255,.09)}"
+  + ".fov-table th.l{text-align:left}"
+  + ".fov-table td{padding:.5rem .2rem;border-bottom:1px solid rgba(255,255,255,.04);text-align:right;color:#f2f5f9}"
+  + ".fov-table td.fov-season{text-align:left;color:#8b96ab;font-weight:650;white-space:nowrap}"
+  + ".fov-table td.fov-tcell{text-align:left}"
+  + ".fov-table tr.fov-career td{border-bottom:none;border-top:1px solid rgba(232,182,76,.4);font-weight:800;color:#e8b64c}"
+  + ".fov-table tr.fov-career td.fov-season{color:#e8b64c}"
+  + ".fov-foot{font-size:.72rem;color:#8b96ab;font-style:italic;margin:.7rem 0 0;border-top:1px solid rgba(255,255,255,.09);padding-top:.5rem}"
+  + "@media (max-width:480px){.fov-pname{font-size:1.2rem}.fov-bigface{width:62px;height:62px}.fov-table{font-size:.8rem}}";
+  var st = document.createElement("style"); st.textContent = css; document.head.appendChild(st);
+})();
+
+function fovEsc(s){ return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+function fovNorm(s){ return String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, ""); }
+function fovRgba(hex, a){
+  var n = parseInt(String(hex || "#888888").replace("#", "").slice(0, 6), 16);
+  if(!isFinite(n)) n = 0x888888;
+  return "rgba(" + ((n >> 16) & 255) + "," + ((n >> 8) & 255) + "," + (n & 255) + "," + a + ")";
+}
+function fovJson(url){ return fetch(url).then(function(r){ if(!r.ok) throw new Error("http " + r.status); return r.json(); }); }
+function fovHttps(u){ return String(u || "").replace(/^http:\/\//, "https://"); }
+function fovRefNum(ref, key){
+  var m = String((ref && ref.$ref) || ref || "").match(new RegExp(key + "/(\\d+)"));
+  return m ? m[1] : null;
+}
+function fovFmt(v, fmt){
+  if(v == null || !isFinite(v)) return "—";
+  if(fmt === "pct" || fmt === "avg") return (Math.round(v * 10) / 10).toFixed(1);
+  if(fmt === "half") return v % 1 ? (Math.round(v * 10) / 10).toFixed(1) : String(Math.round(v));
+  return String(Math.round(v)).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+/* ---------- teams ---------- */
+function fovLoadTeams(){
+  if(FOV.teamsP) return FOV.teamsP;
+  FOV.teamsP = fovJson("https://site.api.espn.com/apis/site/v2/sports/football/nfl/teams").then(function(d){
+    var leagues = (d && d.sports && d.sports[0] && d.sports[0].leagues) || [];
+    var raw = (leagues[0] && leagues[0].teams) || [];
+    var out = [];
+    raw.forEach(function(x){
+      var t = x && x.team;
+      if(!t || !t.id || !t.abbreviation) return;
+      out.push({ id: String(t.id), abbr: t.abbreviation, name: t.displayName || t.name || t.abbreviation,
+        short: t.name || "", color: t.color ? "#" + t.color : (t.alternateColor ? "#" + t.alternateColor : "#8b96ab") });
+    });
+    out.sort(function(a, b){ return a.name < b.name ? -1 : 1; });
+    FOV.teams = out;
+    return out;
+  }).catch(function(){ FOV.teams = []; return []; });
+  return FOV.teamsP;
+}
+function fovTeamById(id){
+  if(!FOV.teams || id == null) return null;
+  for(var i = 0; i < FOV.teams.length; i++) if(FOV.teams[i].id === String(id)) return FOV.teams[i];
+  return null;
+}
+function fovTeamByAbbr(abbr){
+  if(!FOV.teams) return null;
+  for(var i = 0; i < FOV.teams.length; i++) if(FOV.teams[i].abbr === abbr) return FOV.teams[i];
+  return null;
+}
+function fovTeamName(id){
+  var t = fovTeamById(id);
+  if(t) return t.name;
+  var ab = FOV_ID2ABBR[id];
+  return (ab && typeof TEAMNAME !== "undefined" && TEAMNAME[ab]) || ab || "";
+}
+
+/* ---------- rosters ---------- */
+function fovParseRoster(team, d){
+  var groups = { offense: [], defense: [], specialTeam: [] };
+  ((d && d.athletes) || []).forEach(function(g){
+    if(!g || !Object.prototype.hasOwnProperty.call(groups, g.position)) return;
+    (g.items || []).forEach(function(a){
+      if(!a || !a.id) return;
+      groups[g.position].push({ id: String(a.id), name: a.displayName || a.fullName || "",
+        pos: (a.position && a.position.abbreviation) || "", num: a.jersey || null,
+        headshot: (a.headshot && a.headshot.href) || ("https://a.espncdn.com/i/headshots/nfl/players/full/" + a.id + ".png") });
+    });
+  });
+  var n = groups.offense.length + groups.defense.length + groups.specialTeam.length;
+  if(!n) return null;
+  return { team: team, groups: groups, count: n };
+}
+function fovLoadRoster(abbr){
+  if(FOV.rosters[abbr]) return FOV.rosters[abbr];
+  var team = fovTeamByAbbr(abbr);
+  if(!team) return Promise.resolve(null);
+  FOV.rosters[abbr] = fovJson("https://site.api.espn.com/apis/site/v2/sports/football/nfl/teams/" + team.id + "/roster")
+    .then(function(d){ return fovParseRoster(team, d); })
+    .catch(function(){ return null; });
+  return FOV.rosters[abbr];
+}
+function fovEnsureIndex(){
+  if(FOV.indexP) return FOV.indexP;
+  FOV.indexP = fovLoadTeams().then(function(teams){
+    var players = [], i = 0;
+    function next(){
+      if(i >= teams.length){ FOV.index = players; return players; }
+      var batch = teams.slice(i, i + 6); i += 6;
+      return Promise.all(batch.map(function(t){ return fovLoadRoster(t.abbr); })).then(function(rs){
+        rs.forEach(function(r){
+          if(!r) return;
+          FOV_GROUPS.forEach(function(g){
+            r.groups[g[0]].forEach(function(p){ players.push({ id: p.id, name: p.name, pos: p.pos, num: p.num, headshot: p.headshot, team: r.team.abbr }); });
+          });
+        });
+        return next();
+      });
+    }
+    return next();
+  }).catch(function(){ FOV.index = []; return []; });
+  return FOV.indexP;
+}
+
+/* ---------- results rendering ---------- */
+function fovPill(p, team){
+  var c = team.color || "#8b96ab";
+  return '<button class="fov-pill" data-fov-pill="' + p.id + '" data-fov-team="' + team.abbr + '" data-fov-pos="' + fovEsc(p.pos) + '" type="button" style="border-color:' + fovRgba(c, .55) + ";background:" + fovRgba(c, .10) + '">'
+    + '<img class="fov-face" src="' + fovEsc(p.headshot) + '" alt="" onerror="this.remove()" style="border-color:' + c + ";box-shadow:0 0 9px " + fovRgba(c, .5) + '">'
+    + "<span>" + fovEsc(p.name) + "</span>"
+    + '<span class="fov-postag" style="background:' + fovRgba(c, .22) + ";color:" + c + '">' + fovEsc(p.pos) + "</span></button>";
+}
+function fovRenderStrip(){
+  var box = $("fovResults");
+  if(!box) return;
+  if(!FOV.teams){
+    box.innerHTML = '<p class="fov-loading">Loading teams…</p>';
+    fovLoadTeams().then(function(){ if(FOV.mode === "strip") fovRenderStrip(); });
+    return;
+  }
+  if(!FOV.teams.length){ box.innerHTML = ""; return; }
+  box.innerHTML = '<div class="fov-sec-t">Teams</div><div class="fov-teamgrid">'
+    + FOV.teams.map(function(t){
+        return '<button class="fov-teamlogo" data-fov-team="' + t.abbr + '" type="button" title="' + fovEsc(t.name) + '" aria-label="' + fovEsc(t.name) + '">' + logoImg(t.abbr, "fov-tlogo") + "</button>";
+      }).join("")
+    + '</div><p class="fov-tapnote">Tap a team for its roster, or search a player by name.</p>';
+}
+function fovRenderRoster(abbr){
+  var box = $("fovResults");
+  if(!box) return;
+  var team = fovTeamByAbbr(abbr);
+  if(!team){ box.innerHTML = ""; return; }
+  var tok = ++FOV.token;
+  FOV.mode = "roster";
+  box.innerHTML = '<p class="fov-loading">Loading the ' + fovEsc(team.name) + " roster…</p>";
+  fovLoadRoster(abbr).then(function(r){
+    if(tok !== FOV.token) return;
+    if(!r){ box.innerHTML = '<p class="fov-nomatch">Couldn\'t load that roster right now.</p>'; return; }
+    var h = '<div class="fov-teamhead">' + logoImg(team.abbr, "fov-thlogo")
+      + '<span class="fov-thname">' + fovEsc(team.name) + "</span>"
+      + '<span class="fov-abbr">' + fovEsc(team.abbr) + "</span>"
+      + '<span class="fov-thcount">' + r.count + " players</span></div>";
+    FOV_GROUPS.forEach(function(g){
+      var ps = r.groups[g[0]];
+      if(!ps.length) return;
+      h += '<div class="fov-sec-t">' + g[1] + '</div><div class="fov-pills">'
+        + ps.map(function(p){ return fovPill(p, team); }).join("") + "</div>";
+    });
+    h += '<p class="fov-tapnote">Tap a player for his overview.</p>';
+    box.innerHTML = h;
+  });
+}
+function fovRenderPlayers(list){
+  var box = $("fovResults");
+  if(!box) return;
+  if(!list.length){ box.innerHTML = '<p class="fov-nomatch">No match — try a team like KC or a player name.</p>'; return; }
+  var h = '<div class="fov-sec-t">Players</div><div class="fov-pills">';
+  list.forEach(function(p){
+    var t = fovTeamByAbbr(p.team);
+    if(t) h += fovPill(p, t);
+  });
+  h += '</div><p class="fov-tapnote">Pills wear their team colors. Tap a player for his overview.</p>';
+  box.innerHTML = h;
+}
+function fovSearch(){
+  var inp = $("fovSearch");
+  if(!inp) return;
+  var nq = fovNorm(inp.value);
+  var box = $("fovResults");
+  if(!box) return;
+  if(!nq){ FOV.mode = "strip"; FOV.token++; fovRenderStrip(); return; }
+  function run(){
+    var teams = FOV.teams || [];
+    var exact = null, named = [];
+    teams.forEach(function(t){
+      if(fovNorm(t.abbr) === nq) exact = t;
+      else if(fovNorm(t.name).indexOf(nq) >= 0 || fovNorm(t.short).indexOf(nq) >= 0) named.push(t);
+    });
+    if(exact){ fovRenderRoster(exact.abbr); return; }
+    if(named.length === 1){ fovRenderRoster(named[0].abbr); return; }
+    if(named.length > 1){
+      FOV.mode = "picker"; FOV.token++;
+      box.innerHTML = '<div class="fov-sec-t">Teams</div><div class="fov-pills">'
+        + named.map(function(t){
+            return '<button class="fov-pill" data-fov-team="' + t.abbr + '" type="button" style="border-color:' + fovRgba(t.color, .55) + ";background:" + fovRgba(t.color, .10) + '">'
+              + logoImg(t.abbr, "fov-logo") + "<span>" + fovEsc(t.name) + "</span></button>";
+          }).join("") + "</div>";
+      return;
+    }
+    if(nq.length >= 3){
+      var tok = ++FOV.token;
+      FOV.mode = "players";
+      if(!FOV.index) box.innerHTML = '<p class="fov-loading">Loading players…</p>';
+      fovEnsureIndex().then(function(){
+        if(tok !== FOV.token) return;
+        var hits = (FOV.index || []).filter(function(p){ return fovNorm(p.name).indexOf(nq) >= 0; }).slice(0, 24);
+        fovRenderPlayers(hits);
+      });
+      return;
+    }
+    FOV.mode = "hint"; FOV.token++;
+    box.innerHTML = '<p class="fov-hint">Keep typing — a team name, its abbreviation, or a player name.</p>';
+  }
+  if(!FOV.teams){
+    FOV.mode = "search";
+    box.innerHTML = '<p class="fov-loading">Loading teams…</p>';
+    fovLoadTeams().then(run);
+    return;
+  }
+  run();
+}
+
+/* ---------- overview ---------- */
+function fovFlatStats(payload){
+  var out = {};
+  var cats = (payload && payload.splits && payload.splits.categories) || [];
+  cats.forEach(function(cat){
+    (cat.stats || []).forEach(function(st){
+      if(!st || !st.name) return;
+      var v = parseFloat(String(st.displayValue == null ? "" : st.displayValue).replace(/,/g, ""));
+      out[cat.name + "." + st.name] = isFinite(v) ? v : null;
+    });
+  });
+  return out;
+}
+function fovLoadOverview(id){
+  if(FOV.overviews[id]) return FOV.overviews[id];
+  FOV.overviews[id] = fovLoadTeams().then(function(){
+    return fovJson(FOV_CORE + "/athletes/" + id);
+  }).then(function(a){
+    if(!a || !a.id) return null;
+    var logRef = a.statisticslog && a.statisticslog.$ref;
+    if(!logRef) return { athlete: a, stints: [] };
+    return fovJson(fovHttps(logRef)).then(function(log){
+      var stints = [];
+      ((log && log.entries) || []).forEach(function(e){
+        var yr = fovRefNum(e.season && e.season.$ref, "seasons");
+        (e.statistics || []).forEach(function(v){
+          if(v && v.type === "team" && v.team && v.statistics)
+            stints.push({ season: yr ? parseInt(yr, 10) : null, teamId: fovRefNum(v.team.$ref, "teams"), ref: v.statistics.$ref, stats: null });
+        });
+      });
+      var i = 0;
+      function next(){
+        if(i >= stints.length) return { athlete: a, stints: stints };
+        var batch = stints.slice(i, i + 6); i += 6;
+        return Promise.all(batch.map(function(s){
+          return fovJson(fovHttps(s.ref)).then(function(p){ s.stats = fovFlatStats(p); }).catch(function(){ s.stats = {}; });
+        })).then(next);
+      }
+      return next();
+    }).catch(function(){ return { athlete: a, stints: [] }; });
+  }).catch(function(){ return null; });
+  return FOV.overviews[id];
+}
+function fovCols(pos){
+  function C(label, key, fmt){ return { label: label, key: key, fmt: fmt || "int" }; }
+  var GP = C("GP", "general.gamesPlayed");
+  if(pos === "QB") return [GP, C("PASS YDS", "passing.passingYards"), C("PASS TD", "passing.passingTouchdowns"), C("RUSH YDS", "rushing.rushingYards")];
+  if(pos === "RB" || pos === "FB") return [GP, C("RUSH YDS", "rushing.rushingYards"), C("RUSH TD", "rushing.rushingTouchdowns"), C("REC YDS", "receiving.receivingYards")];
+  if(pos === "WR" || pos === "TE") return [GP, C("REC", "receiving.receptions"), C("REC YDS", "receiving.receivingYards"), C("REC TD", "receiving.receivingTouchdowns")];
+  if(pos === "PK" || pos === "K") return [GP, C("FGM", "kicking.fieldGoalsMade"), C("FGA", "kicking.fieldGoalAttempts"),
+    { label: "FG%", key: "kicking.fieldGoalPct", fmt: "pct", made: "kicking.fieldGoalsMade", att: "kicking.fieldGoalAttempts" }];
+  if(pos === "P") return [GP, C("PUNTS", "punting.punts"),
+    { label: "AVG", key: "punting.grossAvgPuntYards", fmt: "avg", yds: "punting.puntYards", n: "punting.punts" }];
+  if(["DE", "DT", "NT", "DL", "LB", "ILB", "OLB", "MLB", "CB", "S", "SS", "FS", "DB"].indexOf(pos) >= 0)
+    return [GP, C("TKL", "defensive.totalTackles"), { label: "SACKS", key: "defensive.sacks", fmt: "half" }, C("INT", "defensiveInterceptions.interceptions")];
+  return [GP];
+}
+function fovSum(stints, key){
+  var s = null;
+  stints.forEach(function(st){
+    var v = st.stats ? st.stats[key] : null;
+    if(v != null && isFinite(v)) s = (s || 0) + v;
+  });
+  return s;
+}
+function fovCell(stats, col){
+  return fovFmt(stats ? stats[col.key] : null, col.fmt);
+}
+function fovCareerCell(stints, col){
+  if(col.fmt === "pct"){
+    var m = fovSum(stints, col.made), at = fovSum(stints, col.att);
+    return (m == null || !at) ? "—" : fovFmt(100 * m / at, "pct");
+  }
+  if(col.fmt === "avg"){
+    var y = fovSum(stints, col.yds), n = fovSum(stints, col.n);
+    return (y == null || !n) ? "—" : fovFmt(y / n, "avg");
+  }
+  return fovFmt(fovSum(stints, col.key), col.fmt);
+}
+function fovSpans(stints){
+  var byTeam = {};
+  stints.forEach(function(s){
+    if(s.teamId == null || s.season == null) return;
+    (byTeam[s.teamId] = byTeam[s.teamId] || []).push(s.season);
+  });
+  var runs = [];
+  Object.keys(byTeam).forEach(function(tid){
+    var seen = {}, yrs = [];
+    byTeam[tid].forEach(function(y){ if(!seen[y]){ seen[y] = 1; yrs.push(y); } });
+    yrs.sort(function(a, b){ return a - b; });
+    var from = yrs[0], prev = yrs[0];
+    for(var i = 1; i <= yrs.length; i++){
+      if(i === yrs.length || yrs[i] !== prev + 1){
+        runs.push({ teamId: tid, from: from, to: prev });
+        if(i < yrs.length){ from = yrs[i]; prev = yrs[i]; }
+      } else prev = yrs[i];
+    }
+  });
+  runs.sort(function(a, b){ return a.from - b.from; });
+  return runs;
+}
+function fovOverviewHtml(ov, tappedTeam, posHint){
+  var a = ov.athlete;
+  var name = a.displayName || a.fullName || "";
+  var curId = fovRefNum(a.team && a.team.$ref, "teams");
+  var curTeam = fovTeamById(curId) || tappedTeam || null;
+  var curAbbr = curTeam ? curTeam.abbr : (curId ? (FOV_ID2ABBR[curId] || "") : "");
+  var color = curTeam ? curTeam.color : "#e8b64c";
+  var pos = posHint || "";
+  var h = '<div class="fov-player"><div class="fov-phead">'
+    + '<img class="fov-bigface" src="https://a.espncdn.com/i/headshots/nfl/players/full/' + a.id + '.png" alt="" onerror="this.remove()" style="border-color:' + color + ";box-shadow:0 0 18px " + fovRgba(color, .35) + '">'
+    + '<div class="fov-phead-main"><h3 class="fov-pname">' + fovEsc(name) + "</h3>"
+    + '<div class="fov-teamline">' + (curAbbr ? logoImg(curAbbr, "fov-logo md") : "")
+    + "<span>" + fovEsc(curTeam ? curTeam.name : fovTeamName(curId)) + (pos ? " · " + fovEsc(pos) : "") + (a.jersey != null && a.jersey !== "" ? " · #" + fovEsc(a.jersey) : "") + "</span></div></div></div>";
+  var d = a.draft;
+  if(d && d.year){
+    var dName = fovTeamName(fovRefNum(d.team && d.team.$ref, "teams"));
+    h += '<p class="fov-draft">DRAFTED ' + d.year + " · ROUND " + d.round + " · #" + d.selection + " OVERALL"
+      + (dName ? " · " + fovEsc(String(dName).toUpperCase()) : "") + "</p>";
+  } else {
+    h += '<p class="fov-draft">UNDRAFTED</p>';
+  }
+  var stints = ov.stints || [];
+  var latest = null;
+  stints.forEach(function(s){ if(s.season != null && (latest == null || s.season > latest)) latest = s.season; });
+  var runs = fovSpans(stints);
+  if(runs.length){
+    h += '<div class="fov-sec-t">Teams</div>';
+    runs.forEach(function(r){
+      var t = fovTeamById(r.teamId);
+      var ab = t ? t.abbr : (FOV_ID2ABBR[r.teamId] || "");
+      var nm = t ? t.name : fovTeamName(r.teamId);
+      var cur = String(r.teamId) === String(curId) && r.to === latest;
+      var span = r.from === r.to ? String(r.from) : (r.from + "–" + r.to);
+      h += '<div class="fov-teamrow">' + (ab ? logoImg(ab, "fov-logo") : "")
+        + '<span class="fov-teamname">' + fovEsc(nm) + (cur ? '<span class="fov-cur">CURRENT</span>' : "") + "</span>"
+        + '<span class="fov-span">' + span + "</span></div>";
+    });
+  }
+  if(stints.length){
+    var cols = fovCols(pos);
+    var seenS = {}, seasons = [];
+    stints.forEach(function(s){ if(s.season != null && !seenS[s.season]){ seenS[s.season] = 1; seasons.push(s.season); } });
+    seasons.sort(function(x, y){ return y - x; });
+    var show = {};
+    seasons.slice(0, 8).forEach(function(y){ show[y] = 1; });
+    var rows = stints.filter(function(s){ return s.season != null && show[s.season]; })
+      .slice().sort(function(x, y){ return y.season - x.season; });
+    h += '<div class="fov-sec-t">Season by season' + (seasons.length > 8 ? ' <span class="fov-sec-note">last 8 seasons</span>' : "") + "</div>"
+      + '<table class="fov-table"><tr><th class="l">Season</th><th class="l">Team</th>'
+      + cols.map(function(c){ return "<th>" + c.label + "</th>"; }).join("") + "</tr>";
+    rows.forEach(function(s){
+      var t = fovTeamById(s.teamId);
+      var ab = t ? t.abbr : (FOV_ID2ABBR[s.teamId] || "");
+      h += '<tr><td class="fov-season">' + s.season + '</td><td class="fov-tcell">' + (ab ? logoImg(ab, "fov-logo") : "") + "</td>"
+        + cols.map(function(c){ return "<td>" + fovCell(s.stats, c) + "</td>"; }).join("") + "</tr>";
+    });
+    h += '<tr class="fov-career"><td class="fov-season">CAREER</td><td class="fov-tcell"></td>'
+      + cols.map(function(c){ return "<td>" + fovCareerCell(stints, c) + "</td>"; }).join("") + "</tr></table>";
+  } else {
+    h += '<p class="fov-nomatch">No NFL seasons yet.</p>';
+  }
+  h += '<p class="fov-foot">Career data · ESPN</p></div>';
+  return h;
+}
+function fovOpenPlayer(id, teamAbbr, posHint){
+  var box = $("fovOverview");
+  if(!box) return;
+  var tok = ++FOV.token;
+  box.innerHTML = '<p class="fov-loading">Loading his overview…</p>';
+  fovLoadOverview(id).then(function(ov){
+    if(tok !== FOV.token) return;
+    if(!ov){ box.innerHTML = '<p class="fov-nomatch">Couldn\'t load his overview right now.</p>'; return; }
+    box.innerHTML = fovOverviewHtml(ov, fovTeamByAbbr(teamAbbr), posHint);
+  });
+}
+
+/* ---------- boot + clicks ---------- */
+(function fovBoot(){
+  var home = $("view-football");
+  if(!home || $("fovPanel")) return;
+  var wrap = document.createElement("div");
+  wrap.innerHTML = '<h2 class="sec">PLAYER OVERVIEW <span>draft · every team · season by season</span></h2>'
+    + '<div class="card fov-card" id="fovPanel">'
+    + '<input class="fov-search" id="fovSearch" type="search" placeholder="Search a team or player… try KC, Chiefs, Mahomes" aria-label="Search a team or player" autocomplete="off">'
+    + '<div id="fovResults"></div><div id="fovOverview"></div></div>';
+  home.appendChild(wrap);
+  var inp = $("fovSearch"), deb = null;
+  if(inp){
+    inp.addEventListener("input", function(){
+      if(deb) clearTimeout(deb);
+      deb = setTimeout(fovSearch, 130);
+    });
+    inp.addEventListener("focus", function(){ if(!inp.value && FOV.mode === "strip") fovRenderStrip(); });
+  }
+  FOV.mode = "strip";
+  fovLoadTeams().then(function(){
+    if(FOV.mode === "strip" && (!inp || !inp.value)) fovRenderStrip();
+  });
+})();
+document.addEventListener("click", function(e){
+  if(!e.target || !e.target.closest) return;
+  var pill = e.target.closest("[data-fov-pill]");
+  if(pill){
+    e.preventDefault();
+    e.stopPropagation();
+    fovOpenPlayer(pill.getAttribute("data-fov-pill"), pill.getAttribute("data-fov-team"), pill.getAttribute("data-fov-pos"));
+    return;
+  }
+  var tb = e.target.closest("[data-fov-team]");
+  if(tb){
+    e.preventDefault();
+    e.stopPropagation();
+    fovRenderRoster(tb.getAttribute("data-fov-team"));
+  }
 }, true);
 </script>
 

@@ -337,6 +337,43 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
 .fm-face{width:32px;height:32px;border-radius:50%;overflow:hidden;flex:none;position:relative;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--volt);background:linear-gradient(150deg, rgba(185,227,86,0.30), rgba(6,12,26,0.55));border:1px solid rgba(185,227,86,.35)}
 .fm-face img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 .soc-row.fm-plain{cursor:default}
+/* player overview panel (per-league, bottom of the league view; FotMob career data, display only) */
+.sov-sec-t{font-size:.68rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin:.95rem 0 .45rem}
+.sov-sec-note{color:#5f6b82;letter-spacing:.03em;font-weight:650;text-transform:none}
+.sov-teamhead{display:flex;align-items:center;gap:.6rem;margin:.9rem 0 .1rem}
+.sov-teamhead .tlogo{width:30px;height:30px}
+.sov-thname{font-size:1.02rem;font-weight:800}
+.sov-thsub{color:var(--muted);font-size:.76rem;margin-top:1px}
+.sov-pills{display:flex;flex-wrap:wrap;gap:.45rem}
+.sov-pill{display:inline-flex;align-items:center;gap:.45rem;border-radius:99px;padding:.26rem .7rem .26rem .3rem;font:inherit;font-size:.84rem;font-weight:650;color:var(--ink);cursor:pointer;background:rgba(185,227,86,.08);border:1.5px solid rgba(185,227,86,.55)}
+.sov-pill.on{background:rgba(185,227,86,.24)}
+.sov-postag{font-size:.58rem;font-weight:800;letter-spacing:.06em;border-radius:99px;padding:.12rem .42rem;white-space:nowrap;background:rgba(185,227,86,.2);color:var(--volt);border:1px solid rgba(185,227,86,.35)}
+.sov-nomatch{color:var(--muted);font-size:.86rem;margin:.9rem 0 .2rem}
+.sov-tapnote{color:#5f6b82;font-size:.76rem;margin:.7rem 0 0}
+.sov-player{margin-top:1rem;border-top:1px solid rgba(255,255,255,.09);padding-top:.9rem}
+.sov-phead{display:flex;gap:.8rem;align-items:center}
+.sov-pname{margin:0;font-size:1.25rem;font-weight:800;line-height:1.15}
+.sov-teamline{display:flex;align-items:center;gap:.45rem;color:var(--muted);font-size:.88rem;margin-top:.2rem}
+.sov-teamline .tlogo{width:22px;height:22px}
+.sov-info{margin:.75rem 0 0;color:var(--volt);font-size:.74rem;font-weight:800;letter-spacing:.1em}
+.sov-teamrow{display:flex;align-items:center;gap:.55rem;padding:.42rem 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.sov-teamrow:last-of-type{border-bottom:none}
+.sov-logo{width:20px;height:20px;object-fit:contain;flex:0 0 auto}
+.sov-logo.sm{vertical-align:-5px}
+.sov-tname{font-weight:650}
+.sov-tsub{color:var(--muted);font-size:.74rem;display:block}
+.sov-cur{color:#0B1730;background:var(--volt);font-size:.58rem;font-weight:800;letter-spacing:.08em;border-radius:99px;padding:.12rem .45rem;margin-left:.5rem;vertical-align:2px}
+.sov-span{margin-left:auto;color:var(--muted);font-variant-numeric:tabular-nums;font-size:.86rem;white-space:nowrap}
+.sov-table{width:100%;border-collapse:collapse;font-size:.85rem;font-variant-numeric:tabular-nums}
+.sov-table th{font-size:.64rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#5f6b82;text-align:right;padding:.3rem .2rem;border-bottom:1px solid rgba(255,255,255,.09)}
+.sov-table th.l{text-align:left}
+.sov-table td{padding:.48rem .2rem;border-bottom:1px solid rgba(255,255,255,.04);text-align:right}
+.sov-table td.sov-season{text-align:left;color:var(--muted);font-weight:650;white-space:nowrap}
+.sov-table td.sov-tcell{text-align:left}
+.sov-table td.sov-g{font-weight:800}
+.sov-table tr.sov-career td{border-bottom:none;border-top:1px solid rgba(185,227,86,.4);font-weight:800;color:var(--volt)}
+.sov-table tr.sov-career td.sov-season{color:var(--volt)}
+.sov-foot{font-size:.72rem;color:var(--muted);font-style:italic;margin:.7rem 0 0;border-top:1px solid rgba(255,255,255,.09);padding-top:.5rem}
 .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:12px 16px 4px}
 .stat{background:rgba(6,12,26,0.4);border:1px solid rgba(165,195,255,0.14);border-radius:12px;padding:9px 4px;text-align:center}
 .stat .sv{font-weight:800;font-size:16px;color:var(--volt)}
@@ -498,6 +535,18 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
     <div id="lgPane-fixtures" hidden></div>
     <div id="lgPane-table" hidden></div>
     <div id="lgPane-leaders" hidden></div>
+    <div id="lgOverview" hidden>
+      <div class="sec-label">PLAYER OVERVIEW</div>
+      <div class="soc-panel" style="padding:6px 0 12px">
+        <div class="board-head"><span class="b-title">🧭 Player Overview</span><span class="fm-src">FOTMOB</span></div>
+        <div style="padding:0 16px">
+          <div class="searchbar" style="margin-top:2px"><span aria-hidden="true">🔍</span><input id="sovSearch" type="search" placeholder="Search a club or player in this league…" autocomplete="off" aria-label="Search a club or player in this league"></div>
+          <p class="search-hint" id="sovHint" style="padding-left:2px">Search a club to see its priced squad, or a player for his career overview.</p>
+        </div>
+        <div id="sovResults" style="padding:0 16px"></div>
+        <div id="sovDetail" style="padding:0 16px"></div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -589,6 +638,7 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
     fmFx: {}, fmFxP: {}, fmRes: {}, fmResP: {}, fmPd: {}, fmPdP: {}, fmBoards: {}, fmBoardUrls: {}, fmRev: null,
     torneoFm: {}, torneoFmP: {}, torneoType: {},
     brk: {}, brkLoading: {}, brkEvents: {}, brkView: {}, cupFm: {}, cupFmP: {}, cupTypes: {}, cupTypesP: {},
+    ovQ: {}, ovSel: {}, teamColors: {},
     parlay: [], curLeague: null, curTab: 'markets', curMarket: 'anytime', slateSort: 'kickoff',
     searchPrimed: false
   };
@@ -718,6 +768,9 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
           id: String(t.id), name: t.displayName || '', short: t.shortDisplayName || t.displayName || '',
           abbr: t.abbreviation || '', logo: t.logo || ((t.logos || [])[0] || {}).href || teamLogoUrl(t.id)
         };
+        /* ESPN's teams payload carries club colours; the parsed team map drops
+           them, so keep them in a side map for the overview panel's pills. */
+        (S.teamColors[baseSlug(slug)] = S.teamColors[baseSlug(slug)] || {})[String(t.id)] = { color: t.color || '', alt: t.alternateColor || '' };
       });
       map.__full = true; S.teams[slug] = map;
       return map;
@@ -1490,6 +1543,222 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
     });
   }
 
+  /* ---------- Player Overview panel (bottom of the league view) ----------
+     Scoped to the current league's model bundle: search a club for its priced
+     squad as colour-coded pills grouped by position, or a player name for
+     matching pills; a tap opens the player's career overview (FotMob
+     playerData via fmPlayerData — display only, never feeds a price).
+     Falls back to the bundle's own season line when FotMob has nothing. */
+  var SOV_GROUPS = [['Goalkeeper', 'GOALKEEPERS'], ['Defender', 'DEFENDERS'], ['Midfielder', 'MIDFIELDERS'], ['Forward', 'FORWARDS']];
+  var SOV_POS_SHORT = { Goalkeeper: 'GK', Defender: 'DEF', Midfielder: 'MID', Forward: 'FWD' };
+  function ovBase() { return S.curLeague ? baseSlug(S.curLeague) : null; }
+  function ovHasPanel(slug) {
+    var base = baseSlug(slug);
+    return LEAGUES.some(function (L) { return L.slug === base; });
+  }
+  function ovRgba(hex, a) {
+    var n = parseInt(hex.slice(1), 16);
+    return 'rgba(' + ((n >> 16) & 255) + ',' + ((n >> 8) & 255) + ',' + (n & 255) + ',' + a + ')';
+  }
+  function ovHexOk(hex) {
+    if (!hex) return null;
+    var h = String(hex).replace('#', '');
+    if (!/^[0-9a-f]{6}$/i.test(h)) return null;
+    var r = parseInt(h.slice(0, 2), 16) / 255, g = parseInt(h.slice(2, 4), 16) / 255, b = parseInt(h.slice(4, 6), 16) / 255;
+    var lum = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    return (lum >= 0.06 && lum <= 0.82) ? '#' + h.toLowerCase() : null;
+  }
+  /* Club colour from the ESPN teams payload (kept in S.teamColors by
+     loadTeams); null when ESPN has no usable colour -> volt accent. */
+  function ovClubColor(base, teamId) {
+    var c = (S.teamColors[base] || {})[String(teamId)];
+    if (!c) return null;
+    return ovHexOk(c.color) || ovHexOk(c.alt);
+  }
+  function ovClubs(b) {
+    var map = {}, out = [];
+    (b.players || []).forEach(function (p) {
+      var k = fold(p.team || '');
+      if (!map[k]) { map[k] = { name: p.team || '', teamId: p.teamId, players: [] }; out.push(map[k]); }
+      map[k].players.push(p);
+    });
+    return out;
+  }
+  function ovClubMatch(base, club, q) {
+    var tm = (S.teams[base] || {})[String(club.teamId)];
+    var names = [club.name, tm ? tm.name : '', tm ? tm.short : '', tm ? tm.abbr : ''];
+    for (var i = 0; i < names.length; i++) {
+      var fn = fold(names[i] || '');
+      if (!fn) continue;
+      if (fn.indexOf(q) >= 0) return true;
+      var toks = fn.split(/[^a-z0-9]+/).filter(function (w) { return w.length >= 3; });
+      for (var j = 0; j < toks.length; j++) {
+        if (toks[j].indexOf(q) === 0 || (q.length >= 3 && q.indexOf(toks[j]) === 0)) return true;
+      }
+    }
+    return false;
+  }
+  function ovPillHtml(base, p) {
+    var c = ovClubColor(base, p.teamId);
+    var on = S.ovSel[base] === String(p.id) ? ' on' : '';
+    var style = c ? ' style="border-color:' + c + ';background:' + ovRgba(c, S.ovSel[base] === String(p.id) ? 0.3 : 0.13) + '"' : '';
+    var tag = c ? ' style="background:' + ovRgba(c, 0.22) + ';color:' + c + ';border-color:transparent"' : '';
+    return '<button class="sov-pill' + on + '" type="button" data-act="ovpill" data-pid="' + esc(p.id) + '"' + style + '>' +
+      faceHtml(p.id, p.name, 'xs') +
+      '<span>' + esc(p.name) + '</span>' +
+      '<span class="sov-postag"' + tag + '>' + (SOV_POS_SHORT[p.pos] || esc(p.pos || '')) + '</span></button>';
+  }
+  function ovSquadHtml(base, club) {
+    var tm = (S.teams[base] || {})[String(club.teamId)];
+    var logo = tm ? logoImg(tm) : imgFb(teamLogoUrl(club.teamId), club.teamId, 'tlogo');
+    var html = '<div class="sov-teamhead">' + logo + '<div><div class="sov-thname">' + esc(club.name) + '</div>' +
+      '<div class="sov-thsub">Priced squad · ' + club.players.length + ' players with model prices in this league</div></div></div>';
+    SOV_GROUPS.forEach(function (g) {
+      var ps = club.players.filter(function (p) { return p.pos === g[0]; });
+      if (!ps.length) return;
+      html += '<div class="sov-sec-t">' + g[1] + '</div><div class="sov-pills">' +
+        ps.map(function (p) { return ovPillHtml(base, p); }).join('') + '</div>';
+    });
+    return html + '<p class="sov-tapnote">Tap a player for his career overview.</p>';
+  }
+  function ovRenderResults() {
+    var base = ovBase(), box = $('sovResults');
+    if (!base || !box) return;
+    var b = S.bundles[base];
+    if (!b) { box.innerHTML = ''; return; }
+    var q = fold(S.ovQ[base] || '').trim();
+    if (!q) { box.innerHTML = ''; return; }
+    var clubHit = null;
+    ovClubs(b).forEach(function (c) { if (!clubHit && ovClubMatch(base, c, q)) clubHit = c; });
+    if (clubHit) { box.innerHTML = ovSquadHtml(base, clubHit); return; }
+    var hits = (b.players || []).filter(function (p) { return fold(p.name).indexOf(q) >= 0; }).slice(0, 24);
+    box.innerHTML = hits.length
+      ? '<div class="sov-sec-t">PLAYERS</div><div class="sov-pills">' + hits.map(function (p) { return ovPillHtml(base, p); }).join('') + '</div><p class="sov-tapnote">Pills wear their club colours. Tap a player for his career overview.</p>'
+      : '<p class="sov-nomatch">No club or player matches that search in this league.</p>';
+  }
+  function renderOvPanel() {
+    var wrap = $('lgOverview');
+    if (!wrap) return;
+    if (!S.curLeague || !ovHasPanel(S.curLeague)) { wrap.hidden = true; return; }
+    wrap.hidden = false;
+    var base = ovBase();
+    var input = $('sovSearch');
+    if (input && input.value !== (S.ovQ[base] || '')) input.value = S.ovQ[base] || '';
+    if (S.bundles[base] === undefined) {
+      $('sovResults').innerHTML = '';
+      $('sovHint').textContent = 'Loading league data…';
+      loadBundle(base).then(function () {
+        if (S.curLeague && ovBase() === base) { $('sovHint').textContent = 'Search a club to see its priced squad, or a player for his career overview.'; ovRenderResults(); }
+      });
+    } else {
+      $('sovHint').textContent = 'Search a club to see its priced squad, or a player for his career overview.';
+      ovRenderResults();
+    }
+    /* Colours arrive with the ESPN teams payload; repaint once they land. */
+    loadTeams(base).then(function () { if (S.curLeague && ovBase() === base) ovRenderResults(); }).catch(function () {});
+  }
+  function ovNum(v) { var n = parseInt(v, 10); return isNaN(n) ? 0 : n; }
+  function ovSpanTxt(e) {
+    var sy = e.startDate ? String(e.startDate).slice(0, 4) : '';
+    if (!sy) return '';
+    if (e.active || !e.endDate) return sy + '–present';
+    var ey = String(e.endDate).slice(0, 4);
+    return sy === ey ? sy : sy + '–' + ey;
+  }
+  function ovInfoLine(pd, p) {
+    var bits = [], info = {};
+    (pd.playerInformation || []).forEach(function (e) { if (e && e.title) info[e.title] = (e.value || {}).fallback; });
+    if (info.Age) bits.push('AGE ' + info.Age);
+    if (info.Country) bits.push(String(info.Country).toUpperCase());
+    var pos = null;
+    ((pd.positionDescription || {}).positions || []).forEach(function (x) { if (x.isMainPosition && x.strPos) pos = x.strPos.label; });
+    if (!pos) { var pp = ((pd.positionDescription || {}).positions || [])[0]; if (pp && pp.strPos) pos = pp.strPos.label; }
+    bits.push(String(pos || p.pos || '').toUpperCase());
+    return bits.filter(Boolean).join(' · ');
+  }
+  function ovFmLogo(teamId) {
+    return '<img class="sov-logo" src="https://images.fotmob.com/image_resources/logo/teamlogo/' + esc(teamId) + '.png" alt="" onerror="this.style.display=\'none\'">';
+  }
+  function ovShirt(pd) {
+    var s = null;
+    ((pd && pd.playerInformation) || []).forEach(function (e) {
+      if (e && e.title === 'Shirt' && e.value) s = e.value.numberValue != null ? e.value.numberValue : e.value.fallback;
+    });
+    return (s === null || s === undefined || s === '') ? null : s;
+  }
+  function ovDetailHtml(base, p, pd) {
+    var L = leagueOf(base);
+    var tm = (S.teams[base] || {})[String(p.teamId)];
+    var logo = tm ? logoImg(tm) : imgFb(teamLogoUrl(p.teamId), p.teamId, 'tlogo');
+    var shirt = ovShirt(pd);
+    var head = '<div class="sov-player"><div class="sov-phead">' + faceHtml(p.id, p.name) +
+      '<div><h3 class="sov-pname">' + esc((pd && pd.name) || p.name) + '</h3>' +
+      '<div class="sov-teamline">' + logo + '<span>' + esc(p.team || '') + ' · ' + esc(p.pos || '') + (shirt != null ? ' · #' + esc(shirt) : '') + '</span></div></div></div>';
+    var senior = pd && pd.careerHistory && pd.careerHistory.careerItems ? pd.careerHistory.careerItems.senior : null;
+    var teamEntries = (senior && senior.teamEntries) || [];
+    var seasonEntries = (senior && senior.seasonEntries) || [];
+    if (!teamEntries.length && !seasonEntries.length) {
+      /* Fallback: the bundle's own season line — real data, honestly thinner. */
+      var stat = function (v, k) { return '<div class="stat"><div class="sv">' + esc(v == null ? '—' : v) + '</div><div class="sl">' + k + '</div></div>'; };
+      var grids = '';
+      if (p.role) grids += '<div class="grid3">' + stat(p.role.apps, 'APPS') + stat(p.role.started, 'STARTS') + stat(p.role.avgMin, 'AVG MIN') + '</div>';
+      if (p.per90) grids += '<div class="grid3">' + stat(p.per90.g, 'GOALS /90') + stat(p.per90.a, 'ASSISTS /90') + stat(p.per90.sh, 'SHOTS /90') + '</div>';
+      return head +
+        '<p class="sov-info">' + esc(String(p.pos || '').toUpperCase()) + '</p>' +
+        '<div class="sov-sec-t">THIS SEASON · ' + esc(L ? L.name : '') + '</div>' + grids +
+        '<p class="sov-nomatch">Full career history is unavailable for this player right now — showing the season line from the model bundle.</p>' +
+        '<p class="sov-foot">Season data · model bundle</p></div>';
+    }
+    var html = head + '<p class="sov-info">' + esc(ovInfoLine(pd, p)) + '</p>';
+    if (teamEntries.length) {
+      html += '<div class="sov-sec-t">CAREER PATH</div>' + teamEntries.map(function (e) {
+        var sub = [];
+        if (e.appearances != null && e.appearances !== '') sub.push(e.appearances + ' apps');
+        if (e.goals != null && e.goals !== '') sub.push(e.goals + ' goals');
+        if (e.assists != null && e.assists !== '') sub.push(e.assists + ' assists');
+        return '<div class="sov-teamrow">' + ovFmLogo(e.teamId) +
+          '<span><span class="sov-tname">' + esc(e.team || '') + '</span>' + (e.active ? '<span class="sov-cur">CURRENT</span>' : '') +
+          (sub.length ? '<span class="sov-tsub">' + esc(sub.join(' · ')) + '</span>' : '') + '</span>' +
+          '<span class="sov-span">' + esc(ovSpanTxt(e)) + '</span></div>';
+      }).join('');
+    }
+    if (seasonEntries.length) {
+      var tot = { a: 0, g: 0, s: 0 };
+      seasonEntries.forEach(function (e) { tot.a += ovNum(e.appearances); tot.g += ovNum(e.goals); tot.s += ovNum(e.assists); });
+      var rows = seasonEntries.slice(0, 12).map(function (e) {
+        return '<tr><td class="sov-season">' + esc(e.seasonName || '') + '</td>' +
+          '<td class="sov-tcell">' + ovFmLogo(e.teamId) + '</td>' +
+          '<td>' + ovNum(e.appearances) + '</td><td class="sov-g">' + ovNum(e.goals) + '</td><td>' + ovNum(e.assists) + '</td></tr>';
+      }).join('');
+      html += '<div class="sov-sec-t">SEASON BY SEASON <span class="sov-sec-note">all competitions' + (seasonEntries.length > 12 ? ' · last 12 shown' : '') + '</span></div>' +
+        '<table class="sov-table"><thead><tr><th class="l">Season</th><th class="l">Club</th><th>Apps</th><th>Goals</th><th>Assists</th></tr></thead><tbody>' +
+        rows + '<tr class="sov-career"><td class="sov-season">CAREER</td><td></td><td>' + tot.a + '</td><td>' + tot.g + '</td><td>' + tot.s + '</td></tr></tbody></table>';
+    }
+    return html + '<p class="sov-foot">Career data · FotMob — display only</p></div>';
+  }
+  function openOvPlayer(pid) {
+    var base = ovBase();
+    if (!base) return;
+    var p = bundlePlayerFor(base, pid, null);
+    if (!p) return;
+    S.ovSel[base] = String(pid);
+    ovRenderResults();
+    var box = $('sovDetail');
+    if (!box) return;
+    box.innerHTML = '<div class="sov-player"><p class="muted-note">Loading ' + esc(p.name) + '…</p></div>';
+    try { box.scrollIntoView({ block: 'nearest' }); } catch (e) {}
+    loadFaces().then(function () {
+      var fmId = S.faces ? S.faces[String(p.id)] : null;
+      return fmPlayerData(fmId);
+    }).then(function (pd) {
+      if (!S.curLeague || ovBase() !== base || S.ovSel[base] !== String(pid)) return;
+      box.innerHTML = ovDetailHtml(base, p, pd);
+    }).catch(function () {
+      if (!S.curLeague || ovBase() !== base || S.ovSel[base] !== String(pid)) return;
+      box.innerHTML = ovDetailHtml(base, p, null);
+    });
+  }
+
   function teamScorersHtml(ev, tm) {
     var mine = ev.scorers.filter(function (sc) { return String(sc.teamId) === String(tm.id); });
     if (!mine.length) return '';
@@ -1689,6 +1958,9 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
     $('lgSub').textContent = L.country;
     applyTabVisibility(slug);
     showView('league');
+    var ovd = $('sovDetail'); if (ovd) ovd.innerHTML = '';
+    var ovr = $('sovResults'); if (ovr) ovr.innerHTML = '';
+    renderOvPanel();
     setTab(tab || defaultTab(slug));
     loadBundle(slug).then(function () { if (S.curLeague === slug && S.curTab === 'markets') renderMarkets(); });
     if (compKind(slug) === 'torneo') loadBracket(slug);
@@ -2813,6 +3085,12 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
       : '<p class="search-hint">No matches in the seven leagues — try a surname.</p>';
   }
   $('socSearch').addEventListener('input', runSearch);
+  $('sovSearch').addEventListener('input', function () {
+    var base = ovBase();
+    if (!base) return;
+    S.ovQ[base] = this.value;
+    ovRenderResults();
+  });
   $('socSearch').addEventListener('focus', primeSearch);
   /* ---------- ticker (top row of the bottom nav; .stk-* styles are shared) ---------- */
   function loadTickerLeader(slug) {
@@ -2910,6 +3188,7 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
     else if (act === 'bplayer') openBundlePlayer(t.dataset.slug, t.dataset.pid);
     else if (act === 'eplayer') openEspnPlayer(t.dataset.slug, t.dataset.pid);
     else if (act === 'fmplayer') openFmPlayer(t.dataset.slug, t.dataset.fmid);
+    else if (act === 'ovpill') openOvPlayer(t.dataset.pid);
     else if (act === 'market') { S.curMarket = t.dataset.mk; renderMarkets(); }
     else if (act === 'brkview') { S.brkView[S.curLeague] = t.dataset.v; renderBracket(); }
     else if (act === 'smview') { S.smView = t.dataset.v; refreshSmBox(); }
