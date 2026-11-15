@@ -5127,6 +5127,11 @@ const _today = (() => {
   const n = new Date();
   return `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, '0')}-${String(n.getDate()).padStart(2, '0')}`;
 })();
+const _dp = $('datePicker');
+if (_dp) {
+  _dp.value = _today;
+  _dp.addEventListener('change', (e) => boot(true, e.target.value || state.date));
+}
 loadTypes();
 loadStreaks();
 loadBestBook();

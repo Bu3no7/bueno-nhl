@@ -241,7 +241,10 @@ body.sport-glass #boardTable tr.scored td:first-child{background:linear-gradient
         <p class="kicker">Schedule</p>
         <h2 id="slateTitle">Tonight's slate</h2>
       </div>
-      <span id="autoRefreshNote" class="muted small">Auto-refreshes every 30s while open</span>
+      <div class="slate-tools">
+        <input type="date" id="datePicker" min="2026-10-01" max="2027-06-30" aria-label="Slate date">
+        <span id="autoRefreshNote" class="muted small">Auto-refreshes every 30s while open</span>
+      </div>
     </div>
     <div id="gamesGrid" class="games-grid"></div>
   </section>

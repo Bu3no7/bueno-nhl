@@ -77,6 +77,8 @@ a:hover { text-decoration: underline; }
   transition: color .12s ease;
 }
 .refresh-link:hover { color: var(--teal); }
+.slate-tools { display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; }
+.slate-tools input[type="date"] { padding: .2rem .5rem; font-size: .85rem; line-height: 1.25; border-radius: 99px; }
 
 /* grouped navigation */
 .nav-groups {
