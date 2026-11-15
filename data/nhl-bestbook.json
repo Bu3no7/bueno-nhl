@@ -1,5 +1,5 @@
 {
- "builtAt": "2026-11-15T14:21:26Z",
+ "builtAt": "2026-11-15T17:53:33Z",
  "bundleDate": "2026-11-15",
  "source": "Best anytime-goalscorer odds (bet365/BetMGM/DraftKings/Fanatics) via SmartPicks - display only",
  "gamesMatched": 5,
@@ -12,9 +12,9 @@
    "dec": 2.25
   },
   "8478402": {
-   "book": "BetMGM",
-   "odds": "+150",
-   "dec": 2.5
+   "book": "bet365",
+   "odds": "+135",
+   "dec": 2.35
   },
   "8480803": {
    "book": "BetMGM",
@@ -32,9 +32,9 @@
    "dec": 4.25
   },
   "8476454": {
-   "book": "BetMGM",
-   "odds": "+300",
-   "dec": 4.0
+   "book": "bet365",
+   "odds": "+280",
+   "dec": 3.8
   },
   "8477953": {
    "book": "BetMGM",
@@ -52,9 +52,9 @@
    "dec": 3.2
   },
   "8482159": {
-   "book": "Fanatics",
-   "odds": "+340",
-   "dec": 4.4
+   "book": "BetMGM",
+   "odds": "+320",
+   "dec": 4.2
   },
   "8478439": {
    "book": "bet365",
@@ -62,9 +62,9 @@
    "dec": 4.1
   },
   "8477450": {
-   "book": "Fanatics",
-   "odds": "+800",
-   "dec": 9.0
+   "book": "bet365",
+   "odds": "+750",
+   "dec": 8.5
   },
   "8477499": {
    "book": "Fanatics",
@@ -83,8 +83,8 @@
   },
   "8485406": {
    "book": "BetMGM",
-   "odds": "+360",
-   "dec": 4.6
+   "odds": "+300",
+   "dec": 4.0
   },
   "8477989": {
    "book": "bet365",
@@ -92,9 +92,9 @@
    "dec": 5.25
   },
   "8478569": {
-   "book": "DraftKings",
-   "odds": "+750",
-   "dec": 8.5
+   "book": "Fanatics",
+   "odds": "+800",
+   "dec": 9.0
   },
   "8477948": {
    "book": "bet365",
@@ -107,14 +107,14 @@
    "dec": 13.0
   },
   "8480015": {
-   "book": "Fanatics",
+   "book": "BetMGM",
    "odds": "+360",
    "dec": 4.6
   },
   "8482703": {
    "book": "bet365",
-   "odds": "+575",
-   "dec": 6.75
+   "odds": "+600",
+   "dec": 7.0
   },
   "8480029": {
    "book": "bet365",
@@ -122,7 +122,7 @@
    "dec": 11.0
   },
   "8486161": {
-   "book": "DraftKings",
+   "book": "Fanatics",
    "odds": "+1000",
    "dec": 11.0
   },
@@ -158,8 +158,8 @@
   },
   "8482142": {
    "book": "bet365",
-   "odds": "+850",
-   "dec": 9.5
+   "odds": "+800",
+   "dec": 9.0
   },
   "8478854": {
    "book": "bet365",
@@ -167,12 +167,12 @@
    "dec": 14.0
   },
   "8476372": {
-   "book": "DraftKings",
-   "odds": "+2200",
-   "dec": 23.0
+   "book": "Fanatics",
+   "odds": "+2500",
+   "dec": 26.0
   },
   "8476473": {
-   "book": "bet365",
+   "book": "Fanatics",
    "odds": "+1800",
    "dec": 19.0
   },
@@ -183,8 +183,8 @@
   },
   "8481546": {
    "book": "Fanatics",
-   "odds": "+1800",
-   "dec": 19.0
+   "odds": "+1700",
+   "dec": 18.0
   },
   "8477933": {
    "book": "bet365",
@@ -197,9 +197,9 @@
    "dec": 2.15
   },
   "8484762": {
-   "book": "BetMGM",
-   "odds": "+180",
-   "dec": 2.8
+   "book": "bet365",
+   "odds": "+160",
+   "dec": 2.6
   },
   "8482766": {
    "book": "bet365",
@@ -208,8 +208,8 @@
   },
   "8478420": {
    "book": "BetMGM",
-   "odds": "+230",
-   "dec": 3.3
+   "odds": "+200",
+   "dec": 3.0
   },
   "8478449": {
    "book": "BetMGM",
@@ -218,8 +218,8 @@
   },
   "8480797": {
    "book": "BetMGM",
-   "odds": "+230",
-   "dec": 3.3
+   "odds": "+200",
+   "dec": 3.0
   },
   "8480027": {
    "book": "BetMGM",
@@ -247,9 +247,9 @@
    "dec": 3.6
   },
   "8484860": {
-   "book": "BetMGM",
-   "odds": "+250",
-   "dec": 3.5
+   "book": "bet365",
+   "odds": "+235",
+   "dec": 3.35
   },
   "8480028": {
    "book": "BetMGM",
@@ -257,14 +257,14 @@
    "dec": 4.0
   },
   "8482740": {
-   "book": "Fanatics",
-   "odds": "+180",
-   "dec": 2.8
+   "book": "DraftKings",
+   "odds": "+185",
+   "dec": 2.85
   },
   "8484234": {
-   "book": "BetMGM",
-   "odds": "+450",
-   "dec": 5.5
+   "book": "DraftKings",
+   "odds": "+475",
+   "dec": 5.75
   },
   "8481754": {
    "book": "DraftKings",
@@ -283,8 +283,8 @@
   },
   "8484938": {
    "book": "DraftKings",
-   "odds": "+750",
-   "dec": 8.5
+   "odds": "+600",
+   "dec": 7.0
   },
   "8482679": {
    "book": "BetMGM",
@@ -297,9 +297,9 @@
    "dec": 4.75
   },
   "8482113": {
-   "book": "BetMGM",
-   "odds": "+425",
-   "dec": 5.25
+   "book": "bet365",
+   "odds": "+400",
+   "dec": 5.0
   },
   "8483609": {
    "book": "bet365",
@@ -307,7 +307,7 @@
    "dec": 6.5
   },
   "8483482": {
-   "book": "Fanatics",
+   "book": "bet365",
    "odds": "+800",
    "dec": 9.0
   },
@@ -322,14 +322,14 @@
    "dec": 3.5
   },
   "8477935": {
-   "book": "Fanatics",
-   "odds": "+325",
-   "dec": 4.25
+   "book": "DraftKings",
+   "odds": "+330",
+   "dec": 4.3
   },
   "8481538": {
-   "book": "bet365",
-   "odds": "+425",
-   "dec": 5.25
+   "book": "DraftKings",
+   "odds": "+475",
+   "dec": 5.75
   },
   "8474102": {
    "book": "bet365",
@@ -337,29 +337,29 @@
    "dec": 7.5
   },
   "8475794": {
-   "book": "Fanatics",
+   "book": "BetMGM",
    "odds": "+360",
    "dec": 4.6
   },
   "8482408": {
    "book": "bet365",
-   "odds": "+750",
-   "dec": 8.5
+   "odds": "+800",
+   "dec": 9.0
   },
   "8476458": {
-   "book": "Fanatics",
+   "book": "bet365",
    "odds": "+450",
    "dec": 5.5
   },
   "8481028": {
-   "book": "BetMGM",
-   "odds": "+600",
-   "dec": 7.0
+   "book": "DraftKings",
+   "odds": "+650",
+   "dec": 7.5
   },
   "8485512": {
    "book": "DraftKings",
-   "odds": "+700",
-   "dec": 8.0
+   "odds": "+750",
+   "dec": 8.5
   },
   "8474189": {
    "book": "DraftKings",
@@ -368,8 +368,8 @@
   },
   "8477495": {
    "book": "bet365",
-   "odds": "+750",
-   "dec": 8.5
+   "odds": "+800",
+   "dec": 9.0
   },
   "8485400": {
    "book": "BetMGM",
@@ -377,14 +377,14 @@
    "dec": 6.0
   },
   "8481641": {
-   "book": "DraftKings",
+   "book": "Fanatics",
    "odds": "+850",
    "dec": 9.5
   },
   "8481581": {
-   "book": "bet365",
-   "odds": "+550",
-   "dec": 6.5
+   "book": "Fanatics",
+   "odds": "+575",
+   "dec": 6.75
   },
   "8484829": {
    "book": "BetMGM",
@@ -392,9 +392,9 @@
    "dec": 7.0
   },
   "8474150": {
-   "book": "Fanatics",
-   "odds": "+475",
-   "dec": 5.75
+   "book": "DraftKings",
+   "odds": "+400",
+   "dec": 5.0
   },
   "8483771": {
    "book": "BetMGM",
@@ -408,13 +408,13 @@
   },
   "8473986": {
    "book": "bet365",
-   "odds": "+375",
-   "dec": 4.75
+   "odds": "+390",
+   "dec": 4.9
   },
   "8484768": {
    "book": "BetMGM",
-   "odds": "+650",
-   "dec": 7.5
+   "odds": "+550",
+   "dec": 6.5
   },
   "8478055": {
    "book": "bet365",
@@ -432,34 +432,34 @@
    "dec": 10.0
   },
   "8483490": {
-   "book": "bet365",
+   "book": "BetMGM",
    "odds": "+1100",
    "dec": 12.0
   },
   "8480185": {
    "book": "DraftKings",
-   "odds": "+800",
-   "dec": 9.0
-  },
-  "8481605": {
-   "book": "BetMGM",
    "odds": "+650",
    "dec": 7.5
   },
+  "8481605": {
+   "book": "DraftKings",
+   "odds": "+750",
+   "dec": 8.5
+  },
   "8478136": {
    "book": "Fanatics",
-   "odds": "+1600",
-   "dec": 17.0
+   "odds": "+1800",
+   "dec": 19.0
   },
   "8480727": {
    "book": "Fanatics",
-   "odds": "+1600",
-   "dec": 17.0
+   "odds": "+1800",
+   "dec": 19.0
   },
   "8475179": {
    "book": "Fanatics",
-   "odds": "+2200",
-   "dec": 23.0
+   "odds": "+2500",
+   "dec": 26.0
   },
   "8477932": {
    "book": "Fanatics",
@@ -482,14 +482,14 @@
    "dec": 9.5
   },
   "8483521": {
-   "book": "BetMGM",
-   "odds": "+1600",
-   "dec": 17.0
+   "book": "Fanatics",
+   "odds": "+1700",
+   "dec": 18.0
   },
   "8482165": {
    "book": "DraftKings",
-   "odds": "+1900",
-   "dec": 20.0
+   "odds": "+1700",
+   "dec": 18.0
   },
   "8480878": {
    "book": "bet365",
@@ -502,9 +502,9 @@
    "dec": 26.0
   },
   "8484154": {
-   "book": "bet365",
-   "odds": "+850",
-   "dec": 9.5
+   "book": "DraftKings",
+   "odds": "+1000",
+   "dec": 11.0
   },
   "8476889": {
    "book": "bet365",
@@ -532,9 +532,9 @@
    "dec": 19.0
   },
   "8481563": {
-   "book": "bet365",
-   "odds": "+1600",
-   "dec": 17.0
+   "book": "Fanatics",
+   "odds": "+1700",
+   "dec": 18.0
   },
   "8481655": {
    "book": "bet365",
@@ -548,13 +548,13 @@
   },
   "8478873": {
    "book": "DraftKings",
-   "odds": "+310",
-   "dec": 4.1
+   "odds": "+330",
+   "dec": 4.3
   },
   "8477335": {
    "book": "Fanatics",
-   "odds": "+2800",
-   "dec": 29.0
+   "odds": "+2500",
+   "dec": 26.0
   },
   "8478109": {
    "book": "bet365",
@@ -563,13 +563,13 @@
   },
   "8474564": {
    "book": "bet365",
-   "odds": "+140",
-   "dec": 2.4
+   "odds": "+145",
+   "dec": 2.45
   },
   "8478403": {
-   "book": "BetMGM",
-   "odds": "+165",
-   "dec": 2.65
+   "book": "caesars",
+   "odds": "+145",
+   "dec": 2.45
   },
   "8475913": {
    "book": "BetMGM",
@@ -587,9 +587,9 @@
    "dec": 3.2
   },
   "8484803": {
-   "book": "BetMGM",
-   "odds": "+300",
-   "dec": 4.0
+   "book": "DraftKings",
+   "odds": "+250",
+   "dec": 3.5
   },
   "8478444": {
    "book": "BetMGM",
@@ -597,7 +597,7 @@
    "dec": 4.2
   },
   "8483499": {
-   "book": "bet365",
+   "book": "BetMGM",
    "odds": "+700",
    "dec": 8.0
   },
@@ -628,8 +628,8 @@
   },
   "8475726": {
    "book": "DraftKings",
-   "odds": "+390",
-   "dec": 4.9
+   "odds": "+400",
+   "dec": 5.0
   },
   "8476887": {
    "book": "BetMGM",
@@ -637,9 +637,9 @@
    "dec": 2.65
   },
   "8479525": {
-   "book": "Fanatics",
-   "odds": "+450",
-   "dec": 5.5
+   "book": "DraftKings",
+   "odds": "+390",
+   "dec": 4.9
   },
   "8481726": {
    "book": "BetMGM",
@@ -662,19 +662,19 @@
    "dec": 4.25
   },
   "8483524": {
-   "book": "bet365",
-   "odds": "+350",
-   "dec": 4.5
+   "book": "DraftKings",
+   "odds": "+360",
+   "dec": 4.6
   },
   "8483890": {
    "book": "bet365",
-   "odds": "+500",
-   "dec": 6.0
+   "odds": "+525",
+   "dec": 6.25
   },
   "8481024": {
    "book": "DraftKings",
-   "odds": "+550",
-   "dec": 6.5
+   "odds": "+650",
+   "dec": 7.5
   },
   "8485402": {
    "book": "BetMGM",
@@ -683,8 +683,8 @@
   },
   "8484421": {
    "book": "BetMGM",
-   "odds": "+1700",
-   "dec": 18.0
+   "odds": "+1400",
+   "dec": 15.0
   },
   "8478483": {
    "book": "BetMGM",
@@ -701,30 +701,30 @@
    "odds": "+1700",
    "dec": 18.0
   },
+  "8481535": {
+   "book": "BetMGM",
+   "odds": "+500",
+   "dec": 6.0
+  },
   "8481032": {
    "book": "bet365",
    "odds": "+700",
    "dec": 8.0
   },
-  "8481535": {
-   "book": "BetMGM",
-   "odds": "+700",
-   "dec": 8.0
-  },
   "8475200": {
-   "book": "bet365",
-   "odds": "+1100",
-   "dec": 12.0
+   "book": "DraftKings",
+   "odds": "+1200",
+   "dec": 13.0
+  },
+  "8476448": {
+   "book": "Fanatics",
+   "odds": "+275",
+   "dec": 3.75
   },
   "8477964": {
    "book": "BetMGM",
    "odds": "+280",
    "dec": 3.8
-  },
-  "8476448": {
-   "book": "BetMGM",
-   "odds": "+300",
-   "dec": 4.0
   },
   "8478397": {
    "book": "bet365",
@@ -732,7 +732,7 @@
    "dec": 7.5
   },
   "8483678": {
-   "book": "Fanatics",
+   "book": "bet365",
    "odds": "+2000",
    "dec": 21.0
   },
@@ -747,32 +747,32 @@
    "dec": 7.0
   },
   "8480246": {
-   "book": "Fanatics",
+   "book": "bet365",
    "odds": "+1400",
    "dec": 15.0
   },
   "8476467": {
-   "book": "DraftKings",
+   "book": "Fanatics",
    "odds": "+2800",
    "dec": 29.0
   },
   "8477447": {
-   "book": "DraftKings",
-   "odds": "+600",
-   "dec": 7.0
+   "book": "Fanatics",
+   "odds": "+700",
+   "dec": 8.0
   },
   "8482055": {
-   "book": "DraftKings",
+   "book": "Fanatics",
    "odds": "+800",
    "dec": 9.0
   },
   "8474600": {
-   "book": "DraftKings",
+   "book": "BetMGM",
    "odds": "+400",
    "dec": 5.0
   },
   "8477021": {
-   "book": "BetMGM",
+   "book": "bet365",
    "odds": "+525",
    "dec": 6.25
   },
@@ -792,14 +792,14 @@
    "dec": 5.25
   },
   "8484911": {
-   "book": "bet365",
-   "odds": "+525",
-   "dec": 6.25
+   "book": "DraftKings",
+   "odds": "+550",
+   "dec": 6.5
   },
   "8476885": {
-   "book": "bet365",
-   "odds": "+950",
-   "dec": 10.5
+   "book": "DraftKings",
+   "odds": "+1000",
+   "dec": 11.0
   },
   "8486189": {
    "book": "DraftKings",
@@ -808,13 +808,13 @@
   },
   "8481534": {
    "book": "Fanatics",
-   "odds": "+800",
-   "dec": 9.0
+   "odds": "+700",
+   "dec": 8.0
   },
   "8483513": {
-   "book": "BetMGM",
-   "odds": "+750",
-   "dec": 8.5
+   "book": "DraftKings",
+   "odds": "+800",
+   "dec": 9.0
   },
   "8483553": {
    "book": "bet365",
@@ -822,7 +822,7 @@
    "dec": 9.0
   },
   "8479425": {
-   "book": "BetMGM",
+   "book": "DraftKings",
    "odds": "+950",
    "dec": 10.5
   },
@@ -833,8 +833,8 @@
   },
   "8484806": {
    "book": "BetMGM",
-   "odds": "+1600",
-   "dec": 17.0
+   "odds": "+1300",
+   "dec": 14.0
   },
   "8482482": {
    "book": "bet365",
@@ -842,9 +842,9 @@
    "dec": 17.5
   },
   "8476624": {
-   "book": "Fanatics",
-   "odds": "+1400",
-   "dec": 15.0
+   "book": "DraftKings",
+   "odds": "+1200",
+   "dec": 13.0
   },
   "8480891": {
    "book": "bet365",
@@ -852,64 +852,64 @@
    "dec": 21.0
   },
   "8475343": {
-   "book": "bet365",
-   "odds": "+700",
-   "dec": 8.0
+   "book": "DraftKings",
+   "odds": "+800",
+   "dec": 9.0
   },
   "8475188": {
-   "book": "BetMGM",
+   "book": "DraftKings",
    "odds": "+1100",
    "dec": 12.0
   },
   "8478468": {
-   "book": "Fanatics",
-   "odds": "+1400",
-   "dec": 15.0
+   "book": "DraftKings",
+   "odds": "+1300",
+   "dec": 14.0
   },
   "8484798": {
-   "book": "BetMGM",
+   "book": "DraftKings",
    "odds": "+1500",
    "dec": 16.0
   },
   "8482094": {
    "book": "Fanatics",
-   "odds": "+1800",
-   "dec": 19.0
+   "odds": "+2000",
+   "dec": 21.0
   },
   "8476869": {
-   "book": "DraftKings",
-   "odds": "+950",
-   "dec": 10.5
-  },
-  "8475848": {
-   "book": "DraftKings",
+   "book": "Fanatics",
    "odds": "+1000",
    "dec": 11.0
   },
-  "8484240": {
+  "8475848": {
    "book": "DraftKings",
-   "odds": "+2500",
-   "dec": 26.0
+   "odds": "+1100",
+   "dec": 12.0
+  },
+  "8484240": {
+   "book": "Fanatics",
+   "odds": "+2800",
+   "dec": 29.0
   },
   "8482145": {
-   "book": "bet365",
+   "book": "DraftKings",
    "odds": "+270",
    "dec": 3.7
   },
   "8480848": {
    "book": "DraftKings",
-   "odds": "+1200",
-   "dec": 13.0
+   "odds": "+1100",
+   "dec": 12.0
   },
   "8479639": {
-   "book": "bet365",
-   "odds": "+1650",
-   "dec": 17.5
+   "book": "DraftKings",
+   "odds": "+1700",
+   "dec": 18.0
   },
   "8477505": {
    "book": "bet365",
-   "odds": "+450",
-   "dec": 5.5
+   "odds": "+475",
+   "dec": 5.75
   },
   "8480078": {
    "book": "bet365",
@@ -917,14 +917,14 @@
    "dec": 5.5
   },
   "8478450": {
-   "book": "DraftKings",
-   "odds": "+1700",
-   "dec": 18.0
+   "book": "Fanatics",
+   "odds": "+2200",
+   "dec": 23.0
   },
   "8480075": {
    "book": "Fanatics",
-   "odds": "+2500",
-   "dec": 26.0
+   "odds": "+3500",
+   "dec": 36.0
   }
  }
 }
