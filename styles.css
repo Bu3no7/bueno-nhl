@@ -1383,14 +1383,14 @@ tr.team-row:focus-visible { outline: 2px solid var(--teal); outline-offset: -2px
 .mvm-title { font-size: .8rem; font-weight: 900; letter-spacing: .1em; color: var(--teal); }
 .mvm-title.neg { color: var(--danger, #f0665e); }
 .mvm-count { color: var(--muted); font-size: .78rem; font-weight: 700; }
-.mvm-row { display: flex; align-items: center; gap: .55rem; padding: .5rem .2rem; border-bottom: 1px solid rgba(255, 255, 255, .06); cursor: pointer; }
+.mvm-row { display: flex; align-items: center; gap: .45rem; padding: .5rem .2rem; border-bottom: 1px solid rgba(255, 255, 255, .06); cursor: pointer; }
 .mvm-group .mvm-row:last-child { border-bottom: none; }
 .mvm-who { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; }
 .mvm-name { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.mvm-bookline { font-size: .74rem; color: var(--muted); white-space: nowrap; }
+.mvm-bookline { font-size: .74rem; color: var(--muted); line-height: 1.3; }
 .mvm-bookline b { color: var(--gold); font-weight: 700; }
-.mvm-tlogo { width: 22px; height: 22px; flex: none; }
-.mvm-nums { text-align: right; flex: none; min-width: 3.9rem; }
+.mvm-tlogo { width: 15px; height: 15px; vertical-align: -2px; margin-right: .3rem; }
+.mvm-nums { text-align: right; flex: none; min-width: 3.3rem; }
 .mvm-pct { font-size: 1.05rem; font-weight: 800; }
 .mvm-fair { font-size: .72rem; color: var(--muted); white-space: nowrap; }
 /* Standouts view */

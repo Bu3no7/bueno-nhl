@@ -3846,8 +3846,7 @@ function renderMvm() {
     const hs = r.headshot || headshotUrl(r.team, r.pid);
     return `<div class="mvm-row" data-pid="${esc(String(r.pid))}" data-gid="${esc(String(r.gameId))}" role="button" tabindex="0">`
       + `<img class="pavatar" src="${esc(hs)}" alt="" ${imgFallback}>`
-      + `<span class="mvm-who"><span class="mvm-name">${esc(r.name)}</span><span class="mvm-bookline"><b>${esc(bb.book)} ${esc(bb.odds)}</b> · ${Math.round(implied)}% implied</span></span>`
-      + `<img class="mvm-tlogo" src="${esc(teamLogoUrl(r.team))}" alt="" ${imgFallback}>`
+      + `<span class="mvm-who"><span class="mvm-name">${esc(r.name)}</span><span class="mvm-bookline"><img class="mvm-tlogo" src="${esc(teamLogoUrl(r.team))}" alt="" ${imgFallback}><b>${esc(bb.book)} ${esc(bb.odds)}</b> · ${Math.round(implied)}% implied</span></span>`
       + `<span class="mvm-nums"><span class="mvm-pct">${Math.round(ours)}%</span><br><span class="mvm-fair">fair ${esc(r.fair)}</span></span>`
       + bbChipHtml(gap) + '</div>';
   };

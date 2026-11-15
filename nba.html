@@ -370,7 +370,9 @@ details.pc-sec[open ] summary .chev { transform: rotate(90deg); }
 .bb-hit { color: var(--muted); font-size: .76rem; font-weight: 600; margin: -.18rem 0 .3rem; }
 .bb-note { color: var(--muted); font-size: .76rem; margin-top: .5rem; }
 .mvm-sec { font-size: .74rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin: .85rem 0 .25rem; }
-.mvm-row { display: flex; align-items: center; gap: .55rem; width: 100%; text-align: left; background: none; border: none; border-top: 1px solid rgba(31,44,68,.45); padding: .5rem 0; cursor: pointer; color: inherit; font: inherit; font-variant-numeric: tabular-nums; }
+.mvm-row { display: flex; align-items: center; flex-wrap: wrap; gap: .55rem; row-gap: .15rem; width: 100%; text-align: left; background: none; border: none; border-top: 1px solid rgba(31,44,68,.45); padding: .5rem 0; cursor: pointer; color: inherit; font: inherit; font-variant-numeric: tabular-nums; }
+.mvm-row .fb-bplayer { flex: 1 1 auto; min-width: 0; }
+.mvm-row .fb-bplayer .bn { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .mvm-sec + .mvm-row { border-top: none; }
 .mvm-line { font-weight: 800; font-size: .95rem; white-space: nowrap; }
 .mvm-our { color: #2dd4bf; font-weight: 800; font-size: .84rem; white-space: nowrap; }
