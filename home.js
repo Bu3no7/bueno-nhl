@@ -818,7 +818,7 @@ function poOverviewHtml(d, tapped) {
   let h = '<div class="po-player"><div class="po-phead">'
     + `<img class="pavatar po-face" src="${esc(hs)}" alt="" ${imgFallback} style="border-color:${color};box-shadow:0 0 18px ${color}55">`
     + `<div><h3 class="po-pname">${esc(name)}</h3>`
-    + `<div class="po-teamline">${PO_HAS_LOGO.has(curAbbr) ? `<img class="po-logo md" src="${teamLogoUrl(curAbbr)}" alt="" ${imgFallback}>` : ''}<span>${esc(curName)} · ${esc(PO_POS_LONG[d.position] || tapped.pos || '')}</span></div>`
+    + `<div class="po-teamline">${PO_HAS_LOGO.has(curAbbr) ? `<img class="po-logo md" src="${teamLogoUrl(curAbbr)}" alt="" ${imgFallback}>` : ''}<span>${esc(curName)} · ${esc(PO_POS_LONG[d.position] || tapped.pos || '')}${d.sweaterNumber != null && d.sweaterNumber !== '' ? ` · #${esc(d.sweaterNumber)}` : ''}</span></div>`
     + '</div></div>';
   const dd = d.draftDetails;
   h += '<p class="po-draft">' + (dd && dd.year
