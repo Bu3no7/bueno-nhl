@@ -69,36 +69,13 @@ a:hover { text-decoration: underline; }
 }
 .brand h1 { margin: 0; font-size: 1.2rem; font-weight: 800; letter-spacing: -.01em; }
 .tagline { margin: 0; font-size: .76rem; color: var(--muted); }
-.header-toggle {
-  margin-left: auto; background: none; border: 1px solid var(--border-soft);
-  border-radius: 8px; color: var(--muted); cursor: pointer;
-  width: 2rem; height: 2rem; font-size: 1rem; line-height: 1;
-  align-self: center; transition: transform .15s ease, color .12s ease;
-}
-.header-toggle:hover { color: var(--teal); }
-.site-header.header-collapsed .header-toggle { transform: rotate(-90deg); }
-.site-header.header-collapsed .util-bar,
-.site-header.header-collapsed .lab-nav { display: none; }
-.site-header.header-collapsed .brand-bar { padding-bottom: .55rem; }
 
-/* utility header: date + count left, refresh right */
-.util-bar {
-  max-width: 1120px; margin: 0 auto; padding: .3rem 1rem .35rem;
-  display: flex; justify-content: space-between; align-items: center; gap: .5rem;
-  border-bottom: 1px solid var(--border-soft);
-}
-.util-left { display: flex; align-items: baseline; gap: .5rem; min-width: 0; }
-.util-date { font-weight: 800; font-size: .95rem; line-height: 1.15; letter-spacing: -.01em; white-space: nowrap; }
-.util-games { color: var(--muted); font-size: .8rem; font-weight: 600; white-space: nowrap; }
-.util-right { display: flex; align-items: center; gap: .5rem; }
-.util-right input[type="date"] { padding: .2rem .5rem; font-size: .85rem; line-height: 1.25; border-radius: 99px; }
 .refresh-link {
   background: none; border: 0; padding: .1rem 0 .28rem; cursor: pointer;
   color: var(--text); font-family: inherit; font-size: 1rem; font-weight: 700;
   border-bottom: 3px solid var(--teal);
   transition: color .12s ease;
 }
-.util-right .refresh-link { font-size: .88rem; padding: .05rem 0 .16rem; border-bottom-width: 2px; }
 .refresh-link:hover { color: var(--teal); }
 
 /* grouped navigation */
@@ -687,9 +664,6 @@ canvas.rink {
 @media (max-width: 640px) {
   .brand-bar { padding: .7rem .8rem .05rem; }
   .brand h1 { font-size: 1.08rem; }
-  .util-bar { padding: .28rem .8rem .32rem; flex-wrap: wrap; gap: .3rem .5rem; }
-  .util-date { font-size: .9rem; }
-  .util-right input[type="date"] { flex: none; }
   .nav-groups { padding: .6rem .8rem .7rem; }
   .nav-group { gap: .55rem; }
   .nav-grid { gap: .35rem; padding: .35rem; }
