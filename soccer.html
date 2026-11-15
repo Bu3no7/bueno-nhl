@@ -1346,7 +1346,7 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
     if (S.fmPdP[fmId]) return S.fmPdP[fmId];
     S.fmPdP[fmId] = fmGet(FM_API + 'playerData?id=' + fmId).then(function (j) {
       S.fmPd[fmId] = j; return j;
-    }).catch(function () { return null; });
+    }).catch(function () { delete S.fmPdP[fmId]; return null; });
     return S.fmPdP[fmId];
   }
   function fmInjuryText(pd) {
@@ -1579,7 +1579,12 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
     var map = {}, out = [];
     (b.players || []).forEach(function (p) {
       var k = fold(p.team || '');
-      if (!map[k]) { map[k] = { name: p.team || '', teamId: p.teamId, players: [] }; out.push(map[k]); }
+      if (!map[k]) { map[k] = { name: p.team || '', teamId: p.teamId, players: [], seen: {} }; out.push(map[k]); }
+      /* The bundle carries one row per player per fixture — dedupe by id
+         or every squad lists each player once per fixture (Nov 15 fix). */
+      var pid = String(p.id);
+      if (map[k].seen[pid]) return;
+      map[k].seen[pid] = 1;
       map[k].players.push(p);
     });
     return out;
@@ -1631,7 +1636,13 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
     var clubHit = null;
     ovClubs(b).forEach(function (c) { if (!clubHit && ovClubMatch(base, c, q)) clubHit = c; });
     if (clubHit) { box.innerHTML = ovSquadHtml(base, clubHit); return; }
-    var hits = (b.players || []).filter(function (p) { return fold(p.name).indexOf(q) >= 0; }).slice(0, 24);
+    var seenH = {}, hits = (b.players || []).filter(function (p) {
+      if (fold(p.name).indexOf(q) < 0) return false;
+      var pid = String(p.id);
+      if (seenH[pid]) return false;
+      seenH[pid] = 1;
+      return true;
+    }).slice(0, 24);
     box.innerHTML = hits.length
       ? '<div class="sov-sec-t">PLAYERS</div><div class="sov-pills">' + hits.map(function (p) { return ovPillHtml(base, p); }).join('') + '</div><p class="sov-tapnote">Pills wear their club colours. Tap a player for his career overview.</p>'
       : '<p class="sov-nomatch">No club or player matches that search in this league.</p>';
