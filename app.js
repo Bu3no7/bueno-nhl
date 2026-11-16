@@ -3771,6 +3771,86 @@ async function ensureStreaks(r) {
   const html = streaksSidecar ? pcStreaksHtml(r) : '';
   if (html) slot.outerHTML = html; else slot.remove();
 }
+/* ---------------- lines (nhl-lines sidecar) ----------------
+   data/nhl-lines.json is built by data-builder/nhl-lines.py from the
+   NHL's official Time On Ice reports: distinct 5v5 forward lines and
+   defence pairs used (a unit counts in a game at 5+ minutes together)
+   and how often a counted unit stayed together the next game in which
+   every player from it dressed again. DISPLAY ONLY — a read layer;
+   feeds no price, probability or sort. */
+let linesSidecar = null, linesState = 'idle', linesPromise = null;
+let linesTeam = null; // selected team for the detail block
+function loadLines() {
+  if (!linesPromise) {
+    linesState = 'loading';
+    linesPromise = dataFetch('data/nhl-lines.json', { headers: { 'Accept': 'application/json' } })
+      .then((r) => { if (!r.ok) throw new Error('no lines sidecar'); return r.json(); })
+      .then((j) => { linesSidecar = j; linesState = 'ok'; renderLines(); return j; })
+      .catch(() => { linesSidecar = null; linesState = 'fail'; renderLines(); return null; });
+  }
+  return linesPromise;
+}
+// small pixel nudges so clustered logos stay readable (settled defence
+// pairs all pile up near 100% kept)
+const LINES_NUDGE = { FLA: [14, 12], NYR: [24, -12], BOS: [12, -8], NJD: [-10, -4], CAR: [-18, -4], SEA: [12, 2], MIN: [14, 8], SJS: [-12, 4], VGK: [-14, -2], CGY: [-4, 12], UTA: [8, -10], NYI: [-6, -10], CBJ: [-2, 10] };
+function linesPanel(kind, title, unitWord) {
+  const rows = Object.entries(linesSidecar[kind] || {}).filter(([, r]) => r && r.keptPct != null);
+  if (!rows.length) return '';
+  const lg = (linesSidecar.league || {})[kind] || {};
+  const xs = rows.map(([, r]) => r.units), ys = rows.map(([, r]) => r.keptPct);
+  const x0 = Math.max(0, Math.floor(Math.min(...xs) * 0.75)), x1 = Math.ceil(Math.max(...xs) * 1.06);
+  const y0 = Math.max(0, Math.floor((Math.min(...ys) - 7) / 5) * 5), y1 = 102;
+  const X = (v) => ((v - x0) / (x1 - x0) * 100).toFixed(2) + '%';
+  const Y = (v) => (100 - (v - y0) / (y1 - y0) * 100).toFixed(2) + '%';
+  const sorted = [...rows].sort((a, b) => b[1].units - a[1].units);
+  const chip = ([t, r]) => `<button type="button" class="lines-chip" data-lineteam="${esc(t)}"><img src="${esc(teamLogoUrl(t))}" alt="" ${imgFallback}><b>${r.units}</b><span>${Math.round(r.keptPct)}% kept</span></button>`;
+  const logos = rows.map(([t, r]) => {
+    const n = LINES_NUDGE[t] || [0, 0];
+    return `<button type="button" class="lines-dot${linesTeam === t ? ' on' : ''}" data-lineteam="${esc(t)}" title="${esc(t)} — ${r.units} ${unitWord}, ${Math.round(r.keptPct)}% kept" style="left:calc(${X(r.units)} + ${n[0]}px);top:calc(${Y(r.keptPct)} + ${n[1]}px)"><img src="${esc(teamLogoUrl(t))}" alt="${esc(t)}" ${imgFallback}></button>`;
+  }).join('');
+  const yTicks = [];
+  for (let v = Math.ceil(y0 / 10) * 10; v <= 100; v += 10) yTicks.push(v);
+  const medians = lg.unitsAvg != null && lg.keptAvg != null
+    ? `<span class="lines-median-x" style="left:${X(lg.unitsAvg)}"></span><span class="lines-median-y" style="top:${Y(lg.keptAvg)}"></span>` : '';
+  return `<div class="lines-group">
+    <div class="lines-head"><span class="lines-title">${title}</span><span class="lines-count">League avg: ${lg.unitsAvg ?? '—'} ${unitWord} · ${lg.keptAvg ?? '—'}% kept</span></div>
+    <p class="lines-desc"><span class="lines-settled">Top left settled</span> · <span class="lines-juggle">bottom right juggling</span></p>
+    <div class="lines-plot">
+      ${medians}
+      ${yTicks.map((v) => `<span class="lines-ytick" style="top:${Y(v)}">${v}%</span>`).join('')}
+      ${logos}
+    </div>
+    <div class="lines-axis">Different ${unitWord} used →</div>
+    <div class="lines-chips"><span class="lines-chiplab">MOST</span>${sorted.slice(0, 3).map(chip).join('')}</div>
+    <div class="lines-chips"><span class="lines-chiplab">FEWEST</span>${sorted.slice(-3).reverse().map(chip).join('')}</div>
+  </div>`;
+}
+function renderLines() {
+  const el = $('linesBody');
+  if (!el) return;
+  if (linesState !== 'ok' || !linesSidecar) {
+    el.innerHTML = '<p class="muted">Lines have not loaded yet.</p>';
+    return;
+  }
+  let html = linesPanel('fwd', 'FORWARD LINES', 'lines') + linesPanel('def', 'DEFENCE PAIRS', 'pairs');
+  const t = linesTeam && linesSidecar.fwd[linesTeam] ? linesTeam : null;
+  if (t) {
+    const f = linesSidecar.fwd[t], d = linesSidecar.def[t];
+    const unitRow = (u) => `<div class="lines-unit"><span class="lines-unit-names">${u.players.map(esc).join(' · ')}</span><span class="lines-unit-meta">${u.toiMin} min together · ${u.games} games</span></div>`;
+    html += `<div class="lines-group lines-detail"><div class="lines-head"><img class="lines-dlogo" src="${esc(teamLogoUrl(t))}" alt="" ${imgFallback}><span class="lines-title">${esc(t)}</span><span class="lines-count">${f.units} lines · ${Math.round(f.keptPct)}% kept — ${d.units} pairs · ${Math.round(d.keptPct)}% kept</span></div>`
+      + '<p class="lines-desc">Most-used forward lines at 5v5 this season</p>'
+      + f.top.map(unitRow).join('')
+      + (d.top.length ? '<p class="lines-desc lines-sub">Defence pairs</p>' + d.top.map(unitRow).join('') : '')
+      + '</div>';
+  } else {
+    html += '<p class="muted small">Tap a team logo or a chip for its most-used lines and pairs.</p>';
+  }
+  el.innerHTML = html;
+  el.querySelectorAll('[data-lineteam]').forEach((b) => b.addEventListener('click', () => {
+    linesTeam = linesTeam === b.dataset.lineteam ? null : b.dataset.lineteam;
+    renderLines();
+  }));
+}
 /* ---------------- best book (nhl-bestbook sidecar) ----------------
    data/nhl-bestbook.json is built by data-builder/nhl-bestbook.py
    from the SmartPicks feed: the single best anytime-goalscorer price
@@ -4827,7 +4907,7 @@ async function refreshScores() {
    so a fresh session sees it expanded again. No burger icon: the sports
    switcher already owns ☰. View switching itself is untouched. */
 let shelfNavFirstVisit = true; // session only
-const SHELF_LABELS = { markets: 'Markets', leaders: 'Leaders', longshots: 'Longshots', parlay: 'Parlay', slate: 'Slate', goals: 'Live', board: 'Board', standouts: 'Standouts', types: 'Types', streaks: 'Streaks', mvm: 'Model vs Market' };
+const SHELF_LABELS = { markets: 'Markets', leaders: 'Leaders', longshots: 'Longshots', parlay: 'Parlay', slate: 'Slate', goals: 'Live', board: 'Board', standouts: 'Standouts', types: 'Types', streaks: 'Streaks', lines: 'Lines', mvm: 'Model vs Market' };
 function shelfSetExpanded(expanded) {
   const stack = $('shelfStack'), bar = $('shelfBar');
   if (!stack || !bar) return;
@@ -4844,7 +4924,7 @@ function shelfSyncNav() {
   if (dot) dot.classList.toggle('on', anyLive);
 }
 const HOME_VIEWS = ['home', 'standings', 'teamlineup', 'playoffodds'];
-const LAB_VIEWS = ['markets', 'leaders', 'longshots', 'parlay', 'slate', 'goals', 'board', 'standouts', 'types', 'streaks', 'mvm'];
+const LAB_VIEWS = ['markets', 'leaders', 'longshots', 'parlay', 'slate', 'goals', 'board', 'standouts', 'types', 'streaks', 'lines', 'mvm'];
 function setView(v) {
   state.view = v;
   // Keep the section in sync with the view
@@ -4867,6 +4947,7 @@ function setView(v) {
   if (v === 'playoffodds') renderPlayoffOdds();
   if (v === 'types') renderTypes();
   if (v === 'streaks') renderStreaks();
+  if (v === 'lines') renderLines();
   if (v === 'mvm') renderMvm();
   if (v === 'standouts') renderStandouts();
   window.scrollTo(0, 0);
@@ -5134,6 +5215,7 @@ if (_dp) {
 }
 loadTypes();
 loadStreaks();
+loadLines();
 loadBestBook();
 boot(false, _today);
 

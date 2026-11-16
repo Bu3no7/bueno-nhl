@@ -135,6 +135,7 @@ body.sport-glass #boardTable tr.scored td:first-child{background:linear-gradient
       <button class="tab" data-view="standouts" role="tab">Standouts</button>
       <button class="tab" data-view="types" role="tab">Types</button>
       <button class="tab" data-view="streaks" role="tab">Streaks</button>
+      <button class="tab" data-view="lines" role="tab">Lines</button>
       <button class="tab" data-view="mvm" role="tab">Model vs Market</button>
     </div>
   </nav>
@@ -485,6 +486,18 @@ body.sport-glass #boardTable tr.scored td:first-child{background:linear-gradient
       </div>
     </div>
     <div id="streaksBody"></div>
+  </section>
+
+  <section id="view-lines" class="view">
+    <div class="view-head">
+      <div>
+        <p class="kicker">Season</p>
+        <h2>Lines</h2>
+        <p class="view-sub muted">Which team juggles their lines the most — distinct 5v5 forward lines and defence pairs used this season, and how often a unit stayed together the next game. A stability sheet, not a projection.</p>
+        <details class="how-works"><summary>How it works</summary><p class="muted small">Built from the NHL's official Time On Ice reports (data-builder/nhl-lines.py): a line or pair counts in a game once it plays 5+ minutes together at 5v5. Kept = that unit was together again the next game, counted only when every player from it dressed again — injuries and scratches don't count against a team. Lines are display only — they never move a price, a probability or a sort.</p></details>
+      </div>
+    </div>
+    <div id="linesBody"></div>
   </section>
 
   <section id="view-mvm" class="view">

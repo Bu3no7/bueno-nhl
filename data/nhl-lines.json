@@ -1,0 +1,3475 @@
+{
+ "builtAt": "2026-11-16T03:50:34Z",
+ "through": "2026-11-14",
+ "games": 286,
+ "fwd": {
+  "ANA": {
+   "units": 22,
+   "kept": 19,
+   "opps": 34,
+   "keptPct": 55.9,
+   "top": [
+    {
+     "names": [
+      "Granlund",
+      "Gauthier",
+      "Sennecke"
+     ],
+     "players": [
+      "Mikael Granlund",
+      "Cutter Gauthier",
+      "Beckett Sennecke"
+     ],
+     "toiMin": 66,
+     "games": 7
+    },
+    {
+     "names": [
+      "Killorn",
+      "Caulfield",
+      "Carlsson"
+     ],
+     "players": [
+      "Alex Killorn",
+      "Judd Caulfield",
+      "Leo Carlsson"
+     ],
+     "toiMin": 59,
+     "games": 6
+    },
+    {
+     "names": [
+      "Caulfield",
+      "Malott",
+      "Washe"
+     ],
+     "players": [
+      "Judd Caulfield",
+      "Jeff Malott",
+      "Tim Washe"
+     ],
+     "toiMin": 26,
+     "games": 3
+    },
+    {
+     "names": [
+      "Caulfield",
+      "Gauthier",
+      "Carlsson"
+     ],
+     "players": [
+      "Judd Caulfield",
+      "Cutter Gauthier",
+      "Leo Carlsson"
+     ],
+     "toiMin": 25,
+     "games": 3
+    }
+   ]
+  },
+  "BOS": {
+   "units": 12,
+   "kept": 41,
+   "opps": 46,
+   "keptPct": 89.1,
+   "top": [
+    {
+     "names": [
+      "Pastrnak",
+      "Zacha",
+      "Peterka"
+     ],
+     "players": [
+      "David Pastrnak",
+      "Pavel Zacha",
+      "JJ Peterka"
+     ],
+     "toiMin": 127,
+     "games": 11
+    },
+    {
+     "names": [
+      "Lindholm",
+      "Mittelstadt",
+      "Hagens"
+     ],
+     "players": [
+      "Elias Lindholm",
+      "Casey Mittelstadt",
+      "James Hagens"
+     ],
+     "toiMin": 105,
+     "games": 13
+    },
+    {
+     "names": [
+      "Jeannot",
+      "Kastelic",
+      "Poitras"
+     ],
+     "players": [
+      "Tanner Jeannot",
+      "Mark Kastelic",
+      "Matthew Poitras"
+     ],
+     "toiMin": 68,
+     "games": 5
+    },
+    {
+     "names": [
+      "Geekie",
+      "Khusnutdinov",
+      "Minten"
+     ],
+     "players": [
+      "Morgan Geekie",
+      "Marat Khusnutdinov",
+      "Fraser Minten"
+     ],
+     "toiMin": 61,
+     "games": 7
+    }
+   ]
+  },
+  "BUF": {
+   "units": 25,
+   "kept": 31,
+   "opps": 43,
+   "keptPct": 72.1,
+   "top": [
+    {
+     "names": [
+      "Quinn",
+      "Ostlund",
+      "Benson"
+     ],
+     "players": [
+      "Jack Quinn",
+      "Noah Ostlund",
+      "Zach Benson"
+     ],
+     "toiMin": 77,
+     "games": 8
+    },
+    {
+     "names": [
+      "Thompson",
+      "Krebs",
+      "Benson"
+     ],
+     "players": [
+      "Tage Thompson",
+      "Peyton Krebs",
+      "Zach Benson"
+     ],
+     "toiMin": 73,
+     "games": 8
+    },
+    {
+     "names": [
+      "Quinn",
+      "Doan",
+      "Ostlund"
+     ],
+     "players": [
+      "Jack Quinn",
+      "Josh Doan",
+      "Noah Ostlund"
+     ],
+     "toiMin": 49,
+     "games": 5
+    },
+    {
+     "names": [
+      "Carrick",
+      "Malenstyn",
+      "Kozak"
+     ],
+     "players": [
+      "Sam Carrick",
+      "Beck Malenstyn",
+      "Tyson Kozak"
+     ],
+     "toiMin": 35,
+     "games": 3
+    }
+   ]
+  },
+  "CAR": {
+   "units": 12,
+   "kept": 39,
+   "opps": 43,
+   "keptPct": 90.7,
+   "top": [
+    {
+     "names": [
+      "Carrier",
+      "Aho",
+      "Svechnikov"
+     ],
+     "players": [
+      "William Carrier",
+      "Sebastian Aho",
+      "Andrei Svechnikov"
+     ],
+     "toiMin": 161,
+     "games": 17
+    },
+    {
+     "names": [
+      "Ehlers",
+      "Stankoven",
+      "Blake"
+     ],
+     "players": [
+      "Nikolaj Ehlers",
+      "Logan Stankoven",
+      "Jackson Blake"
+     ],
+     "toiMin": 112,
+     "games": 10
+    },
+    {
+     "names": [
+      "Jankowski",
+      "Martinook",
+      "Jarvis"
+     ],
+     "players": [
+      "Mark Jankowski",
+      "Jordan Martinook",
+      "Seth Jarvis"
+     ],
+     "toiMin": 39,
+     "games": 4
+    },
+    {
+     "names": [
+      "Deslauriers",
+      "Robinson",
+      "Kotkaniemi"
+     ],
+     "players": [
+      "Nicolas Deslauriers",
+      "Eric Robinson",
+      "Jesperi Kotkaniemi"
+     ],
+     "toiMin": 34,
+     "games": 4
+    }
+   ]
+  },
+  "CBJ": {
+   "units": 11,
+   "kept": 27,
+   "opps": 32,
+   "keptPct": 84.4,
+   "top": [
+    {
+     "names": [
+      "Coyle",
+      "Olivier",
+      "Sillinger"
+     ],
+     "players": [
+      "Charlie Coyle",
+      "Mathieu Olivier",
+      "Cole Sillinger"
+     ],
+     "toiMin": 95,
+     "games": 9
+    },
+    {
+     "names": [
+      "Johnson",
+      "Knies",
+      "Fantilli"
+     ],
+     "players": [
+      "Kent Johnson",
+      "Matthew Knies",
+      "Adam Fantilli"
+     ],
+     "toiMin": 78,
+     "games": 7
+    },
+    {
+     "names": [
+      "Coyle",
+      "Olivier",
+      "Knies"
+     ],
+     "players": [
+      "Charlie Coyle",
+      "Mathieu Olivier",
+      "Matthew Knies"
+     ],
+     "toiMin": 39,
+     "games": 3
+    },
+    {
+     "names": [
+      "Nichushkin",
+      "Johnson",
+      "Fantilli"
+     ],
+     "players": [
+      "Valeri Nichushkin",
+      "Kent Johnson",
+      "Adam Fantilli"
+     ],
+     "toiMin": 37,
+     "games": 4
+    }
+   ]
+  },
+  "CGY": {
+   "units": 12,
+   "kept": 35,
+   "opps": 40,
+   "keptPct": 87.5,
+   "top": [
+    {
+     "names": [
+      "Backlund",
+      "Farabee",
+      "Coronato"
+     ],
+     "players": [
+      "Mikael Backlund",
+      "Joel Farabee",
+      "Matt Coronato"
+     ],
+     "toiMin": 122,
+     "games": 11
+    },
+    {
+     "names": [
+      "Strome",
+      "Pospisil",
+      "Gridin"
+     ],
+     "players": [
+      "Ryan Strome",
+      "Martin Pospisil",
+      "Matvei Gridin"
+     ],
+     "toiMin": 119,
+     "games": 13
+    },
+    {
+     "names": [
+      "Frost",
+      "Sharangovich",
+      "Suniev"
+     ],
+     "players": [
+      "Morgan Frost",
+      "Yegor Sharangovich",
+      "Aydar Suniev"
+     ],
+     "toiMin": 64,
+     "games": 5
+    },
+    {
+     "names": [
+      "Backlund",
+      "Farabee",
+      "Sharangovich"
+     ],
+     "players": [
+      "Mikael Backlund",
+      "Joel Farabee",
+      "Yegor Sharangovich"
+     ],
+     "toiMin": 45,
+     "games": 3
+    }
+   ]
+  },
+  "CHI": {
+   "units": 25,
+   "kept": 25,
+   "opps": 37,
+   "keptPct": 67.6,
+   "top": [
+    {
+     "names": [
+      "Bertuzzi",
+      "Bedard",
+      "Kantserov"
+     ],
+     "players": [
+      "Tyler Bertuzzi",
+      "Connor Bedard",
+      "Roman Kantserov"
+     ],
+     "toiMin": 68,
+     "games": 5
+    },
+    {
+     "names": [
+      "Greenway",
+      "Smith",
+      "Greene"
+     ],
+     "players": [
+      "Jordan Greenway",
+      "Cole Smith",
+      "Ryan Greene"
+     ],
+     "toiMin": 67,
+     "games": 6
+    },
+    {
+     "names": [
+      "Kane",
+      "Bedard",
+      "Kantserov"
+     ],
+     "players": [
+      "Patrick Kane",
+      "Connor Bedard",
+      "Roman Kantserov"
+     ],
+     "toiMin": 54,
+     "games": 5
+    },
+    {
+     "names": [
+      "Donato",
+      "Nazar",
+      "Moore"
+     ],
+     "players": [
+      "Ryan Donato",
+      "Frank Nazar",
+      "Oliver Moore"
+     ],
+     "toiMin": 48,
+     "games": 5
+    }
+   ]
+  },
+  "COL": {
+   "units": 15,
+   "kept": 36,
+   "opps": 48,
+   "keptPct": 75.0,
+   "top": [
+    {
+     "names": [
+      "Lehkonen",
+      "MacKinnon",
+      "Necas"
+     ],
+     "players": [
+      "Artturi Lehkonen",
+      "Nathan MacKinnon",
+      "Martin Necas"
+     ],
+     "toiMin": 155,
+     "games": 14
+    },
+    {
+     "names": [
+      "Kelly",
+      "O'Connor",
+      "Svechkov"
+     ],
+     "players": [
+      "Parker Kelly",
+      "Logan O'Connor",
+      "Fedor Svechkov"
+     ],
+     "toiMin": 57,
+     "games": 7
+    },
+    {
+     "names": [
+      "Kadri",
+      "Nelson",
+      "Landeskog"
+     ],
+     "players": [
+      "Nazem Kadri",
+      "Brock Nelson",
+      "Gabriel Landeskog"
+     ],
+     "toiMin": 54,
+     "games": 5
+    },
+    {
+     "names": [
+      "Schwartz",
+      "Svechkov",
+      "Hughes"
+     ],
+     "players": [
+      "Jaden Schwartz",
+      "Fedor Svechkov",
+      "T.J. Hughes"
+     ],
+     "toiMin": 49,
+     "games": 4
+    }
+   ]
+  },
+  "DAL": {
+   "units": 18,
+   "kept": 30,
+   "opps": 38,
+   "keptPct": 78.9,
+   "top": [
+    {
+     "names": [
+      "Rantanen",
+      "Steel",
+      "Johnston"
+     ],
+     "players": [
+      "Mikko Rantanen",
+      "Sam Steel",
+      "Wyatt Johnston"
+     ],
+     "toiMin": 63,
+     "games": 8
+    },
+    {
+     "names": [
+      "Seguin",
+      "Hintz",
+      "Robertson"
+     ],
+     "players": [
+      "Tyler Seguin",
+      "Roope Hintz",
+      "Jason Robertson"
+     ],
+     "toiMin": 56,
+     "games": 6
+    },
+    {
+     "names": [
+      "Benn",
+      "Rantanen",
+      "Johnston"
+     ],
+     "players": [
+      "Jamie Benn",
+      "Mikko Rantanen",
+      "Wyatt Johnston"
+     ],
+     "toiMin": 46,
+     "games": 4
+    },
+    {
+     "names": [
+      "Hintz",
+      "Robertson",
+      "Hyry"
+     ],
+     "players": [
+      "Roope Hintz",
+      "Jason Robertson",
+      "Arttu Hyry"
+     ],
+     "toiMin": 37,
+     "games": 3
+    }
+   ]
+  },
+  "DET": {
+   "units": 11,
+   "kept": 32,
+   "opps": 35,
+   "keptPct": 91.4,
+   "top": [
+    {
+     "names": [
+      "Arvidsson",
+      "DeBrincat",
+      "Finnie"
+     ],
+     "players": [
+      "Viktor Arvidsson",
+      "Alex DeBrincat",
+      "Emmitt Finnie"
+     ],
+     "toiMin": 100,
+     "games": 10
+    },
+    {
+     "names": [
+      "Copp",
+      "Raymond",
+      "Brandsegg-Nyg\u00e5rd"
+     ],
+     "players": [
+      "Andrew Copp",
+      "Lucas Raymond",
+      "Michael Brandsegg-Nyg\u00e5rd"
+     ],
+     "toiMin": 95,
+     "games": 8
+    },
+    {
+     "names": [
+      "DeBrincat",
+      "Finnie",
+      "Brandsegg-Nyg\u00e5rd"
+     ],
+     "players": [
+      "Alex DeBrincat",
+      "Emmitt Finnie",
+      "Michael Brandsegg-Nyg\u00e5rd"
+     ],
+     "toiMin": 54,
+     "games": 6
+    },
+    {
+     "names": [
+      "Kolesar",
+      "Dries",
+      "Mazur"
+     ],
+     "players": [
+      "Keegan Kolesar",
+      "Sheldon Dries",
+      "Carter Mazur"
+     ],
+     "toiMin": 35,
+     "games": 4
+    }
+   ]
+  },
+  "EDM": {
+   "units": 12,
+   "kept": 39,
+   "opps": 43,
+   "keptPct": 90.7,
+   "top": [
+    {
+     "names": [
+      "Draisaitl",
+      "McDavid",
+      "Podkolzin"
+     ],
+     "players": [
+      "Leon Draisaitl",
+      "Connor McDavid",
+      "Vasily Podkolzin"
+     ],
+     "toiMin": 217,
+     "games": 17
+    },
+    {
+     "names": [
+      "Joseph",
+      "Formenton",
+      "Michaels"
+     ],
+     "players": [
+      "Mathieu Joseph",
+      "Alex Formenton",
+      "Owen Michaels"
+     ],
+     "toiMin": 76,
+     "games": 9
+    },
+    {
+     "names": [
+      "Hyman",
+      "Nugent-Hopkins",
+      "Kapanen"
+     ],
+     "players": [
+      "Zach Hyman",
+      "Ryan Nugent-Hopkins",
+      "Kasperi Kapanen"
+     ],
+     "toiMin": 57,
+     "games": 5
+    },
+    {
+     "names": [
+      "Dickinson",
+      "Joseph",
+      "Formenton"
+     ],
+     "players": [
+      "Jason Dickinson",
+      "Mathieu Joseph",
+      "Alex Formenton"
+     ],
+     "toiMin": 54,
+     "games": 6
+    }
+   ]
+  },
+  "FLA": {
+   "units": 11,
+   "kept": 38,
+   "opps": 43,
+   "keptPct": 88.4,
+   "top": [
+    {
+     "names": [
+      "Bennett",
+      "Tkachuk",
+      "Tkachuk"
+     ],
+     "players": [
+      "Sam Bennett",
+      "Matthew Tkachuk",
+      "Brady Tkachuk"
+     ],
+     "toiMin": 127,
+     "games": 13
+    },
+    {
+     "names": [
+      "Eller",
+      "Verhaeghe",
+      "Reinhart"
+     ],
+     "players": [
+      "Lars Eller",
+      "Carter Verhaeghe",
+      "Sam Reinhart"
+     ],
+     "toiMin": 76,
+     "games": 8
+    },
+    {
+     "names": [
+      "Hathaway",
+      "Imama",
+      "Schwindt"
+     ],
+     "players": [
+      "Garnet Hathaway",
+      "Bokondji Imama",
+      "Cole Schwindt"
+     ],
+     "toiMin": 64,
+     "games": 6
+    },
+    {
+     "names": [
+      "Luostarinen",
+      "Lundell",
+      "Vilmanis"
+     ],
+     "players": [
+      "Eetu Luostarinen",
+      "Anton Lundell",
+      "Sandis Vilmanis"
+     ],
+     "toiMin": 62,
+     "games": 8
+    }
+   ]
+  },
+  "LAK": {
+   "units": 15,
+   "kept": 25,
+   "opps": 34,
+   "keptPct": 73.5,
+   "top": [
+    {
+     "names": [
+      "Kempe",
+      "Panarin",
+      "Laferriere"
+     ],
+     "players": [
+      "Adrian Kempe",
+      "Artemi Panarin",
+      "Alex Laferriere"
+     ],
+     "toiMin": 119,
+     "games": 11
+    },
+    {
+     "names": [
+      "Perry",
+      "Moore",
+      "Byfield"
+     ],
+     "players": [
+      "Corey Perry",
+      "Trevor Moore",
+      "Quinton Byfield"
+     ],
+     "toiMin": 46,
+     "games": 5
+    },
+    {
+     "names": [
+      "Kempe",
+      "Panarin",
+      "Byfield"
+     ],
+     "players": [
+      "Adrian Kempe",
+      "Artemi Panarin",
+      "Quinton Byfield"
+     ],
+     "toiMin": 39,
+     "games": 4
+    },
+    {
+     "names": [
+      "Haula",
+      "Armia",
+      "Laughton"
+     ],
+     "players": [
+      "Erik Haula",
+      "Joel Armia",
+      "Scott Laughton"
+     ],
+     "toiMin": 36,
+     "games": 3
+    }
+   ]
+  },
+  "MIN": {
+   "units": 10,
+   "kept": 38,
+   "opps": 41,
+   "keptPct": 92.7,
+   "top": [
+    {
+     "names": [
+      "Eriksson Ek",
+      "Kaprizov",
+      "Boldy"
+     ],
+     "players": [
+      "Joel Eriksson Ek",
+      "Kirill Kaprizov",
+      "Matt Boldy"
+     ],
+     "toiMin": 204,
+     "games": 19
+    },
+    {
+     "names": [
+      "Trenin",
+      "Yurov",
+      "Shabanov"
+     ],
+     "players": [
+      "Yakov Trenin",
+      "Danila Yurov",
+      "Maxim Shabanov"
+     ],
+     "toiMin": 103,
+     "games": 10
+    },
+    {
+     "names": [
+      "Coleman",
+      "McCarron",
+      "Brink"
+     ],
+     "players": [
+      "Blake Coleman",
+      "Michael McCarron",
+      "Bobby Brink"
+     ],
+     "toiMin": 84,
+     "games": 9
+    },
+    {
+     "names": [
+      "Coleman",
+      "Hartman",
+      "Brink"
+     ],
+     "players": [
+      "Blake Coleman",
+      "Ryan Hartman",
+      "Bobby Brink"
+     ],
+     "toiMin": 35,
+     "games": 2
+    }
+   ]
+  },
+  "MTL": {
+   "units": 13,
+   "kept": 43,
+   "opps": 47,
+   "keptPct": 91.5,
+   "top": [
+    {
+     "names": [
+      "Danault",
+      "Texier",
+      "Bolduc"
+     ],
+     "players": [
+      "Phillip Danault",
+      "Alexandre Texier",
+      "Zachary Bolduc"
+     ],
+     "toiMin": 146,
+     "games": 15
+    },
+    {
+     "names": [
+      "Suzuki",
+      "Caufield",
+      "Slafkovsk\u00fd"
+     ],
+     "players": [
+      "Nick Suzuki",
+      "Cole Caufield",
+      "Juraj Slafkovsk\u00fd"
+     ],
+     "toiMin": 124,
+     "games": 10
+    },
+    {
+     "names": [
+      "Kreider",
+      "Anderson",
+      "Newhook"
+     ],
+     "players": [
+      "Chris Kreider",
+      "Josh Anderson",
+      "Alex Newhook"
+     ],
+     "toiMin": 64,
+     "games": 8
+    },
+    {
+     "names": [
+      "Kreider",
+      "Anderson",
+      "Evans"
+     ],
+     "players": [
+      "Chris Kreider",
+      "Josh Anderson",
+      "Jake Evans"
+     ],
+     "toiMin": 40,
+     "games": 5
+    }
+   ]
+  },
+  "NJD": {
+   "units": 11,
+   "kept": 46,
+   "opps": 49,
+   "keptPct": 93.9,
+   "top": [
+    {
+     "names": [
+      "Bratt",
+      "Hughes",
+      "Gritsyuk"
+     ],
+     "players": [
+      "Jesper Bratt",
+      "Jack Hughes",
+      "Arseny Gritsyuk"
+     ],
+     "toiMin": 158,
+     "games": 16
+    },
+    {
+     "names": [
+      "Meier",
+      "Hischier",
+      "Evangelista"
+     ],
+     "players": [
+      "Timo Meier",
+      "Nico Hischier",
+      "Luke Evangelista"
+     ],
+     "toiMin": 152,
+     "games": 16
+    },
+    {
+     "names": [
+      "Brown",
+      "Glass",
+      "Lombardi"
+     ],
+     "players": [
+      "Connor Brown",
+      "Cody Glass",
+      "Amadeus Lombardi"
+     ],
+     "toiMin": 51,
+     "games": 5
+    },
+    {
+     "names": [
+      "Glass",
+      "Boqvist",
+      "Lombardi"
+     ],
+     "players": [
+      "Cody Glass",
+      "Jesper Boqvist",
+      "Amadeus Lombardi"
+     ],
+     "toiMin": 44,
+     "games": 3
+    }
+   ]
+  },
+  "NSH": {
+   "units": 12,
+   "kept": 32,
+   "opps": 38,
+   "keptPct": 84.2,
+   "top": [
+    {
+     "names": [
+      "Colton",
+      "Drury",
+      "Edstrom"
+     ],
+     "players": [
+      "Ross Colton",
+      "Jack Drury",
+      "Adam Edstrom"
+     ],
+     "toiMin": 119,
+     "games": 13
+    },
+    {
+     "names": [
+      "Stamkos",
+      "O'Reilly",
+      "Bourque"
+     ],
+     "players": [
+      "Steven Stamkos",
+      "Ryan O'Reilly",
+      "Mavrik Bourque"
+     ],
+     "toiMin": 92,
+     "games": 10
+    },
+    {
+     "names": [
+      "Forsberg",
+      "Hoglander",
+      "Wright"
+     ],
+     "players": [
+      "Filip Forsberg",
+      "Nils Hoglander",
+      "Shane Wright"
+     ],
+     "toiMin": 50,
+     "games": 6
+    },
+    {
+     "names": [
+      "Kerfoot",
+      "Schaefer",
+      "Pinchuk"
+     ],
+     "players": [
+      "Alexander Kerfoot",
+      "Reid Schaefer",
+      "Vitali Pinchuk"
+     ],
+     "toiMin": 38,
+     "games": 6
+    }
+   ]
+  },
+  "NYI": {
+   "units": 15,
+   "kept": 38,
+   "opps": 45,
+   "keptPct": 84.4,
+   "top": [
+    {
+     "names": [
+      "Palmieri",
+      "Horvat",
+      "Holmstrom"
+     ],
+     "players": [
+      "Kyle Palmieri",
+      "Bo Horvat",
+      "Simon Holmstrom"
+     ],
+     "toiMin": 118,
+     "games": 12
+    },
+    {
+     "names": [
+      "Schenn",
+      "Heineman",
+      "Eklund"
+     ],
+     "players": [
+      "Brayden Schenn",
+      "Emil Heineman",
+      "Victor Eklund"
+     ],
+     "toiMin": 97,
+     "games": 10
+    },
+    {
+     "names": [
+      "Palat",
+      "Pageau",
+      "Duclair"
+     ],
+     "players": [
+      "Ondrej Palat",
+      "Jean-Gabriel Pageau",
+      "Anthony Duclair"
+     ],
+     "toiMin": 94,
+     "games": 10
+    },
+    {
+     "names": [
+      "Palmieri",
+      "Horvat",
+      "Heineman"
+     ],
+     "players": [
+      "Kyle Palmieri",
+      "Bo Horvat",
+      "Emil Heineman"
+     ],
+     "toiMin": 40,
+     "games": 4
+    }
+   ]
+  },
+  "NYR": {
+   "units": 15,
+   "kept": 34,
+   "opps": 47,
+   "keptPct": 72.3,
+   "top": [
+    {
+     "names": [
+      "Zibanejad",
+      "Lafreni\u00e8re",
+      "Perreault"
+     ],
+     "players": [
+      "Mika Zibanejad",
+      "Alexis Lafreni\u00e8re",
+      "Gabe Perreault"
+     ],
+     "toiMin": 127,
+     "games": 11
+    },
+    {
+     "names": [
+      "Miller",
+      "Dorofeyev",
+      "Kartye"
+     ],
+     "players": [
+      "J.T. Miller",
+      "Pavel Dorofeyev",
+      "Tye Kartye"
+     ],
+     "toiMin": 90,
+     "games": 8
+    },
+    {
+     "names": [
+      "Tolvanen",
+      "Cuylle",
+      "Laba"
+     ],
+     "players": [
+      "Eeli Tolvanen",
+      "Will Cuylle",
+      "Noah Laba"
+     ],
+     "toiMin": 68,
+     "games": 8
+    },
+    {
+     "names": [
+      "Zibanejad",
+      "Dorofeyev",
+      "Perreault"
+     ],
+     "players": [
+      "Mika Zibanejad",
+      "Pavel Dorofeyev",
+      "Gabe Perreault"
+     ],
+     "toiMin": 35,
+     "games": 3
+    }
+   ]
+  },
+  "OTT": {
+   "units": 17,
+   "kept": 27,
+   "opps": 36,
+   "keptPct": 75.0,
+   "top": [
+    {
+     "names": [
+      "Giroux",
+      "Amadio",
+      "Greig"
+     ],
+     "players": [
+      "Claude Giroux",
+      "Michael Amadio",
+      "Ridly Greig"
+     ],
+     "toiMin": 53,
+     "games": 5
+    },
+    {
+     "names": [
+      "Zetterlund",
+      "Cozens",
+      "St\u00fctzle"
+     ],
+     "players": [
+      "Fabian Zetterlund",
+      "Dylan Cozens",
+      "Tim St\u00fctzle"
+     ],
+     "toiMin": 47,
+     "games": 5
+    },
+    {
+     "names": [
+      "Amadio",
+      "Pinto",
+      "Greig"
+     ],
+     "players": [
+      "Michael Amadio",
+      "Shane Pinto",
+      "Ridly Greig"
+     ],
+     "toiMin": 42,
+     "games": 5
+    },
+    {
+     "names": [
+      "Giroux",
+      "Zetterlund",
+      "St\u00fctzle"
+     ],
+     "players": [
+      "Claude Giroux",
+      "Fabian Zetterlund",
+      "Tim St\u00fctzle"
+     ],
+     "toiMin": 40,
+     "games": 5
+    }
+   ]
+  },
+  "PHI": {
+   "units": 24,
+   "kept": 25,
+   "opps": 39,
+   "keptPct": 64.1,
+   "top": [
+    {
+     "names": [
+      "Cates",
+      "Michkov",
+      "Martone"
+     ],
+     "players": [
+      "Noah Cates",
+      "Matvei Michkov",
+      "Porter Martone"
+     ],
+     "toiMin": 87,
+     "games": 10
+    },
+    {
+     "names": [
+      "Couturier",
+      "Acciari",
+      "Barkey"
+     ],
+     "players": [
+      "Sean Couturier",
+      "Noel Acciari",
+      "Denver Barkey"
+     ],
+     "toiMin": 43,
+     "games": 4
+    },
+    {
+     "names": [
+      "Dvorak",
+      "Konecny",
+      "Zegras"
+     ],
+     "players": [
+      "Christian Dvorak",
+      "Travis Konecny",
+      "Trevor Zegras"
+     ],
+     "toiMin": 30,
+     "games": 3
+    },
+    {
+     "names": [
+      "Konecny",
+      "Zegras",
+      "Foerster"
+     ],
+     "players": [
+      "Travis Konecny",
+      "Trevor Zegras",
+      "Tyson Foerster"
+     ],
+     "toiMin": 30,
+     "games": 3
+    }
+   ]
+  },
+  "PIT": {
+   "units": 21,
+   "kept": 33,
+   "opps": 44,
+   "keptPct": 75.0,
+   "top": [
+    {
+     "names": [
+      "Dewar",
+      "Lizotte",
+      "Robertson"
+     ],
+     "players": [
+      "Connor Dewar",
+      "Blake Lizotte",
+      "Nick Robertson"
+     ],
+     "toiMin": 75,
+     "games": 9
+    },
+    {
+     "names": [
+      "Crosby",
+      "Rust",
+      "Rakell"
+     ],
+     "players": [
+      "Sidney Crosby",
+      "Bryan Rust",
+      "Rickard Rakell"
+     ],
+     "toiMin": 60,
+     "games": 5
+    },
+    {
+     "names": [
+      "Crosby",
+      "Rakell",
+      "Novak"
+     ],
+     "players": [
+      "Sidney Crosby",
+      "Rickard Rakell",
+      "Tommy Novak"
+     ],
+     "toiMin": 56,
+     "games": 6
+    },
+    {
+     "names": [
+      "Malkin",
+      "Crosby",
+      "Rakell"
+     ],
+     "players": [
+      "Evgeni Malkin",
+      "Sidney Crosby",
+      "Rickard Rakell"
+     ],
+     "toiMin": 45,
+     "games": 4
+    }
+   ]
+  },
+  "SEA": {
+   "units": 13,
+   "kept": 26,
+   "opps": 35,
+   "keptPct": 74.3,
+   "top": [
+    {
+     "names": [
+      "Eberle",
+      "McMann",
+      "Beniers"
+     ],
+     "players": [
+      "Jordan Eberle",
+      "Bobby McMann",
+      "Matty Beniers"
+     ],
+     "toiMin": 74,
+     "games": 6
+    },
+    {
+     "names": [
+      "Gaudreau",
+      "Winterton",
+      "Meyers"
+     ],
+     "players": [
+      "Frederick Gaudreau",
+      "Ryan Winterton",
+      "Ben Meyers"
+     ],
+     "toiMin": 60,
+     "games": 5
+    },
+    {
+     "names": [
+      "Eberle",
+      "Stephenson",
+      "McMann"
+     ],
+     "players": [
+      "Jordan Eberle",
+      "Chandler Stephenson",
+      "Bobby McMann"
+     ],
+     "toiMin": 57,
+     "games": 6
+    },
+    {
+     "names": [
+      "McCann",
+      "Beniers",
+      "Samoskevich"
+     ],
+     "players": [
+      "Jared McCann",
+      "Matty Beniers",
+      "Mackie Samoskevich"
+     ],
+     "toiMin": 54,
+     "games": 6
+    }
+   ]
+  },
+  "SJS": {
+   "units": 22,
+   "kept": 25,
+   "opps": 38,
+   "keptPct": 65.8,
+   "top": [
+    {
+     "names": [
+      "Smith",
+      "Celebrini",
+      "Chernyshov"
+     ],
+     "players": [
+      "Will Smith",
+      "Macklin Celebrini",
+      "Igor Chernyshov"
+     ],
+     "toiMin": 51,
+     "games": 4
+    },
+    {
+     "names": [
+      "Smith",
+      "Celebrini",
+      "Misa"
+     ],
+     "players": [
+      "Will Smith",
+      "Macklin Celebrini",
+      "Michael Misa"
+     ],
+     "toiMin": 46,
+     "games": 4
+    },
+    {
+     "names": [
+      "Sherwood",
+      "Misa",
+      "Stenberg"
+     ],
+     "players": [
+      "Kiefer Sherwood",
+      "Michael Misa",
+      "Ivar Stenberg"
+     ],
+     "toiMin": 45,
+     "games": 4
+    },
+    {
+     "names": [
+      "Smith",
+      "Celebrini",
+      "Graf"
+     ],
+     "players": [
+      "Will Smith",
+      "Macklin Celebrini",
+      "Collin Graf"
+     ],
+     "toiMin": 32,
+     "games": 3
+    }
+   ]
+  },
+  "STL": {
+   "units": 11,
+   "kept": 21,
+   "opps": 25,
+   "keptPct": 84.0,
+   "top": [
+    {
+     "names": [
+      "Thomas",
+      "Holloway",
+      "Snuggerud"
+     ],
+     "players": [
+      "Robert Thomas",
+      "Dylan Holloway",
+      "Jimmy Snuggerud"
+     ],
+     "toiMin": 124,
+     "games": 11
+    },
+    {
+     "names": [
+      "Berggren",
+      "McMichael",
+      "McTavish"
+     ],
+     "players": [
+      "Jonatan Berggren",
+      "Connor McMichael",
+      "Mason McTavish"
+     ],
+     "toiMin": 52,
+     "games": 3
+    },
+    {
+     "names": [
+      "Buchnevich",
+      "Neighbours",
+      "Dvorsky"
+     ],
+     "players": [
+      "Pavel Buchnevich",
+      "Jake Neighbours",
+      "Dalibor Dvorsky"
+     ],
+     "toiMin": 47,
+     "games": 5
+    },
+    {
+     "names": [
+      "Johnston",
+      "Toropchenko",
+      "Suter"
+     ],
+     "players": [
+      "Ross Johnston",
+      "Alexey Toropchenko",
+      "Pius Suter"
+     ],
+     "toiMin": 39,
+     "games": 4
+    }
+   ]
+  },
+  "TBL": {
+   "units": 12,
+   "kept": 32,
+   "opps": 36,
+   "keptPct": 88.9,
+   "top": [
+    {
+     "names": [
+      "Girgensons",
+      "Holmberg",
+      "Mikheyev"
+     ],
+     "players": [
+      "Zemgus Girgensons",
+      "Pontus Holmberg",
+      "Ilya Mikheyev"
+     ],
+     "toiMin": 145,
+     "games": 15
+    },
+    {
+     "names": [
+      "Kucherov",
+      "Guentzel",
+      "Point"
+     ],
+     "players": [
+      "Nikita Kucherov",
+      "Jake Guentzel",
+      "Brayden Point"
+     ],
+     "toiMin": 70,
+     "games": 5
+    },
+    {
+     "names": [
+      "Kucherov",
+      "Cirelli",
+      "Hagel"
+     ],
+     "players": [
+      "Nikita Kucherov",
+      "Anthony Cirelli",
+      "Brandon Hagel"
+     ],
+     "toiMin": 57,
+     "games": 4
+    },
+    {
+     "names": [
+      "Guentzel",
+      "Cirelli",
+      "Hagel"
+     ],
+     "players": [
+      "Jake Guentzel",
+      "Anthony Cirelli",
+      "Brandon Hagel"
+     ],
+     "toiMin": 45,
+     "games": 4
+    }
+   ]
+  },
+  "TOR": {
+   "units": 18,
+   "kept": 30,
+   "opps": 43,
+   "keptPct": 69.8,
+   "top": [
+    {
+     "names": [
+      "Roslovic",
+      "Matthews",
+      "Cowan"
+     ],
+     "players": [
+      "Jack Roslovic",
+      "Auston Matthews",
+      "Easton Cowan"
+     ],
+     "toiMin": 106,
+     "games": 10
+    },
+    {
+     "names": [
+      "Blueger",
+      "Duhaime",
+      "MacEwen"
+     ],
+     "players": [
+      "Teddy Blueger",
+      "Brandon Duhaime",
+      "Zack MacEwen"
+     ],
+     "toiMin": 87,
+     "games": 11
+    },
+    {
+     "names": [
+      "Nylander",
+      "Roslovic",
+      "Matthews"
+     ],
+     "players": [
+      "William Nylander",
+      "Jack Roslovic",
+      "Auston Matthews"
+     ],
+     "toiMin": 56,
+     "games": 4
+    },
+    {
+     "names": [
+      "Paul",
+      "Nylander",
+      "Marchenko"
+     ],
+     "players": [
+      "Nick Paul",
+      "William Nylander",
+      "Kirill Marchenko"
+     ],
+     "toiMin": 45,
+     "games": 4
+    }
+   ]
+  },
+  "UTA": {
+   "units": 17,
+   "kept": 39,
+   "opps": 48,
+   "keptPct": 81.3,
+   "top": [
+    {
+     "names": [
+      "Lee",
+      "Yamamoto",
+      "Hayton"
+     ],
+     "players": [
+      "Anders Lee",
+      "Kailer Yamamoto",
+      "Barrett Hayton"
+     ],
+     "toiMin": 83,
+     "games": 10
+    },
+    {
+     "names": [
+      "Trocheck",
+      "Guenther",
+      "Cooley"
+     ],
+     "players": [
+      "Vincent Trocheck",
+      "Dylan Guenther",
+      "Logan Cooley"
+     ],
+     "toiMin": 66,
+     "games": 6
+    },
+    {
+     "names": [
+      "Schmaltz",
+      "Crouse",
+      "Keller"
+     ],
+     "players": [
+      "Nick Schmaltz",
+      "Lawson Crouse",
+      "Clayton Keller"
+     ],
+     "toiMin": 63,
+     "games": 5
+    },
+    {
+     "names": [
+      "Stenlund",
+      "McBain",
+      "But"
+     ],
+     "players": [
+      "Kevin Stenlund",
+      "Jack McBain",
+      "Daniil But"
+     ],
+     "toiMin": 55,
+     "games": 6
+    }
+   ]
+  },
+  "VAN": {
+   "units": 26,
+   "kept": 17,
+   "opps": 36,
+   "keptPct": 47.2,
+   "top": [
+    {
+     "names": [
+      "Boeser",
+      "DeBrusk",
+      "Pettersson"
+     ],
+     "players": [
+      "Brock Boeser",
+      "Jake DeBrusk",
+      "Elias Pettersson"
+     ],
+     "toiMin": 61,
+     "games": 6
+    },
+    {
+     "names": [
+      "DeBrusk",
+      "Pettersson",
+      "Lekkerim\u00e4ki"
+     ],
+     "players": [
+      "Jake DeBrusk",
+      "Elias Pettersson",
+      "Jonathan Lekkerim\u00e4ki"
+     ],
+     "toiMin": 46,
+     "games": 5
+    },
+    {
+     "names": [
+      "Karlsson",
+      "Rossi",
+      "Ohgren"
+     ],
+     "players": [
+      "Linus Karlsson",
+      "Marco Rossi",
+      "Liam Ohgren"
+     ],
+     "toiMin": 33,
+     "games": 3
+    },
+    {
+     "names": [
+      "Boeser",
+      "Chytil",
+      "Cotter"
+     ],
+     "players": [
+      "Brock Boeser",
+      "Filip Chytil",
+      "Paul Cotter"
+     ],
+     "toiMin": 23,
+     "games": 3
+    }
+   ]
+  },
+  "VGK": {
+   "units": 12,
+   "kept": 40,
+   "opps": 48,
+   "keptPct": 83.3,
+   "top": [
+    {
+     "names": [
+      "Stone",
+      "Barbashev",
+      "Eichel"
+     ],
+     "players": [
+      "Mark Stone",
+      "Ivan Barbashev",
+      "Jack Eichel"
+     ],
+     "toiMin": 130,
+     "games": 13
+    },
+    {
+     "names": [
+      "Karlsson",
+      "Marner",
+      "Howden"
+     ],
+     "players": [
+      "William Karlsson",
+      "Mitch Marner",
+      "Brett Howden"
+     ],
+     "toiMin": 116,
+     "games": 12
+    },
+    {
+     "names": [
+      "Dowd",
+      "Gatcomb",
+      "Bowman"
+     ],
+     "players": [
+      "Nic Dowd",
+      "Marc Gatcomb",
+      "Braeden Bowman"
+     ],
+     "toiMin": 74,
+     "games": 8
+    },
+    {
+     "names": [
+      "Hertl",
+      "Lavoie",
+      "Connelly"
+     ],
+     "players": [
+      "Tomas Hertl",
+      "Raphael Lavoie",
+      "Trevor Connelly"
+     ],
+     "toiMin": 51,
+     "games": 6
+    }
+   ]
+  },
+  "WPG": {
+   "units": 18,
+   "kept": 31,
+   "opps": 39,
+   "keptPct": 79.5,
+   "top": [
+    {
+     "names": [
+      "Scheifele",
+      "Connor",
+      "Perfetti"
+     ],
+     "players": [
+      "Mark Scheifele",
+      "Kyle Connor",
+      "Cole Perfetti"
+     ],
+     "toiMin": 109,
+     "games": 10
+    },
+    {
+     "names": [
+      "Scheifele",
+      "Connor",
+      "Vilardi"
+     ],
+     "players": [
+      "Mark Scheifele",
+      "Kyle Connor",
+      "Gabriel Vilardi"
+     ],
+     "toiMin": 79,
+     "games": 7
+    },
+    {
+     "names": [
+      "Lowry",
+      "Iafallo",
+      "Bj\u00f6rck"
+     ],
+     "players": [
+      "Adam Lowry",
+      "Alex Iafallo",
+      "Viggo Bj\u00f6rck"
+     ],
+     "toiMin": 44,
+     "games": 5
+    },
+    {
+     "names": [
+      "Lowry",
+      "Iafallo",
+      "Rosen"
+     ],
+     "players": [
+      "Adam Lowry",
+      "Alex Iafallo",
+      "Isak Rosen"
+     ],
+     "toiMin": 41,
+     "games": 4
+    }
+   ]
+  },
+  "WSH": {
+   "units": 19,
+   "kept": 28,
+   "opps": 38,
+   "keptPct": 73.7,
+   "top": [
+    {
+     "names": [
+      "Tuch",
+      "Strome",
+      "Kyrou"
+     ],
+     "players": [
+      "Alex Tuch",
+      "Dylan Strome",
+      "Jordan Kyrou"
+     ],
+     "toiMin": 81,
+     "games": 10
+    },
+    {
+     "names": [
+      "Wilson",
+      "Dubois",
+      "Protas"
+     ],
+     "players": [
+      "Tom Wilson",
+      "Pierre-Luc Dubois",
+      "Aliaksei Protas"
+     ],
+     "toiMin": 53,
+     "games": 5
+    },
+    {
+     "names": [
+      "Jenner",
+      "Sourdif",
+      "Leonard"
+     ],
+     "players": [
+      "Boone Jenner",
+      "Justin Sourdif",
+      "Ryan Leonard"
+     ],
+     "toiMin": 29,
+     "games": 4
+    },
+    {
+     "names": [
+      "Tuch",
+      "Dubois",
+      "Protas"
+     ],
+     "players": [
+      "Alex Tuch",
+      "Pierre-Luc Dubois",
+      "Aliaksei Protas"
+     ],
+     "toiMin": 24,
+     "games": 3
+    }
+   ]
+  }
+ },
+ "def": {
+  "ANA": {
+   "units": 12,
+   "kept": 34,
+   "opps": 39,
+   "keptPct": 87.2,
+   "top": [
+    {
+     "names": [
+      "Helleson",
+      "LaCombe"
+     ],
+     "players": [
+      "Drew Helleson",
+      "Jackson LaCombe"
+     ],
+     "toiMin": 96,
+     "games": 8
+    },
+    {
+     "names": [
+      "LaCombe",
+      "Warren"
+     ],
+     "players": [
+      "Jackson LaCombe",
+      "Noah Warren"
+     ],
+     "toiMin": 94,
+     "games": 9
+    },
+    {
+     "names": [
+      "Hinds",
+      "Luneau"
+     ],
+     "players": [
+      "Tyson Hinds",
+      "Tristan Luneau"
+     ],
+     "toiMin": 78,
+     "games": 7
+    }
+   ]
+  },
+  "BOS": {
+   "units": 9,
+   "kept": 38,
+   "opps": 39,
+   "keptPct": 97.4,
+   "top": [
+    {
+     "names": [
+      "Lindholm",
+      "McAvoy"
+     ],
+     "players": [
+      "Hampus Lindholm",
+      "Charlie McAvoy"
+     ],
+     "toiMin": 189,
+     "games": 13
+    },
+    {
+     "names": [
+      "Zadorov",
+      "Borgen"
+     ],
+     "players": [
+      "Nikita Zadorov",
+      "Will Borgen"
+     ],
+     "toiMin": 159,
+     "games": 13
+    },
+    {
+     "names": [
+      "Lohrei",
+      "Brunet"
+     ],
+     "players": [
+      "Mason Lohrei",
+      "Frederic Brunet"
+     ],
+     "toiMin": 137,
+     "games": 12
+    }
+   ]
+  },
+  "BUF": {
+   "units": 11,
+   "kept": 39,
+   "opps": 44,
+   "keptPct": 88.6,
+   "top": [
+    {
+     "names": [
+      "Samuelsson",
+      "Dahlin"
+     ],
+     "players": [
+      "Mattias Samuelsson",
+      "Rasmus Dahlin"
+     ],
+     "toiMin": 148,
+     "games": 14
+    },
+    {
+     "names": [
+      "Power",
+      "Zellweger"
+     ],
+     "players": [
+      "Owen Power",
+      "Olen Zellweger"
+     ],
+     "toiMin": 100,
+     "games": 7
+    },
+    {
+     "names": [
+      "Samuelsson",
+      "Zellweger"
+     ],
+     "players": [
+      "Mattias Samuelsson",
+      "Olen Zellweger"
+     ],
+     "toiMin": 67,
+     "games": 5
+    }
+   ]
+  },
+  "CAR": {
+   "units": 4,
+   "kept": 40,
+   "opps": 40,
+   "keptPct": 100.0,
+   "top": [
+    {
+     "names": [
+      "Walker",
+      "Miller"
+     ],
+     "players": [
+      "Sean Walker",
+      "K'Andre Miller"
+     ],
+     "toiMin": 239,
+     "games": 18
+    },
+    {
+     "names": [
+      "Slavin",
+      "Chatfield"
+     ],
+     "players": [
+      "Jaccob Slavin",
+      "Jalen Chatfield"
+     ],
+     "toiMin": 230,
+     "games": 18
+    },
+    {
+     "names": [
+      "Gostisbehere",
+      "V\u00e4lim\u00e4ki"
+     ],
+     "players": [
+      "Shayne Gostisbehere",
+      "Juuso V\u00e4lim\u00e4ki"
+     ],
+     "toiMin": 72,
+     "games": 8
+    }
+   ]
+  },
+  "CBJ": {
+   "units": 10,
+   "kept": 33,
+   "opps": 35,
+   "keptPct": 94.3,
+   "top": [
+    {
+     "names": [
+      "Severson",
+      "Werenski"
+     ],
+     "players": [
+      "Damon Severson",
+      "Zach Werenski"
+     ],
+     "toiMin": 205,
+     "games": 16
+    },
+    {
+     "names": [
+      "Christiansen",
+      "Mateychuk"
+     ],
+     "players": [
+      "Jake Christiansen",
+      "Denton Mateychuk"
+     ],
+     "toiMin": 68,
+     "games": 6
+    },
+    {
+     "names": [
+      "Provorov",
+      "Mateychuk"
+     ],
+     "players": [
+      "Ivan Provorov",
+      "Denton Mateychuk"
+     ],
+     "toiMin": 62,
+     "games": 6
+    }
+   ]
+  },
+  "CGY": {
+   "units": 9,
+   "kept": 41,
+   "opps": 43,
+   "keptPct": 95.3,
+   "top": [
+    {
+     "names": [
+      "Bahl",
+      "Nemec"
+     ],
+     "players": [
+      "Kevin Bahl",
+      "Simon Nemec"
+     ],
+     "toiMin": 152,
+     "games": 12
+    },
+    {
+     "names": [
+      "Middleton",
+      "Whitecloud"
+     ],
+     "players": [
+      "Jake Middleton",
+      "Zach Whitecloud"
+     ],
+     "toiMin": 143,
+     "games": 10
+    },
+    {
+     "names": [
+      "Kuznetsov",
+      "Parekh"
+     ],
+     "players": [
+      "Yan Kuznetsov",
+      "Zayne Parekh"
+     ],
+     "toiMin": 108,
+     "games": 10
+    }
+   ]
+  },
+  "CHI": {
+   "units": 11,
+   "kept": 42,
+   "opps": 43,
+   "keptPct": 97.7,
+   "top": [
+    {
+     "names": [
+      "Cole",
+      "Vlasic"
+     ],
+     "players": [
+      "Ian Cole",
+      "Alex Vlasic"
+     ],
+     "toiMin": 147,
+     "games": 16
+    },
+    {
+     "names": [
+      "Kaiser",
+      "Levshunov"
+     ],
+     "players": [
+      "Wyatt Kaiser",
+      "Artyom Levshunov"
+     ],
+     "toiMin": 117,
+     "games": 10
+    },
+    {
+     "names": [
+      "Kaiser",
+      "Rinzel"
+     ],
+     "players": [
+      "Wyatt Kaiser",
+      "Sam Rinzel"
+     ],
+     "toiMin": 73,
+     "games": 7
+    }
+   ]
+  },
+  "COL": {
+   "units": 10,
+   "kept": 46,
+   "opps": 51,
+   "keptPct": 90.2,
+   "top": [
+    {
+     "names": [
+      "Toews",
+      "Makar"
+     ],
+     "players": [
+      "Devon Toews",
+      "Cale Makar"
+     ],
+     "toiMin": 154,
+     "games": 14
+    },
+    {
+     "names": [
+      "Kulak",
+      "Malinski"
+     ],
+     "players": [
+      "Brett Kulak",
+      "Sam Malinski"
+     ],
+     "toiMin": 93,
+     "games": 9
+    },
+    {
+     "names": [
+      "Toews",
+      "Malinski"
+     ],
+     "players": [
+      "Devon Toews",
+      "Sam Malinski"
+     ],
+     "toiMin": 90,
+     "games": 8
+    }
+   ]
+  },
+  "DAL": {
+   "units": 14,
+   "kept": 44,
+   "opps": 49,
+   "keptPct": 89.8,
+   "top": [
+    {
+     "names": [
+      "Lundkvist",
+      "Harley"
+     ],
+     "players": [
+      "Nils Lundkvist",
+      "Thomas Harley"
+     ],
+     "toiMin": 150,
+     "games": 12
+    },
+    {
+     "names": [
+      "Myers",
+      "Bichsel"
+     ],
+     "players": [
+      "Tyler Myers",
+      "Lian Bichsel"
+     ],
+     "toiMin": 101,
+     "games": 11
+    },
+    {
+     "names": [
+      "Lindell",
+      "Heiskanen"
+     ],
+     "players": [
+      "Esa Lindell",
+      "Miro Heiskanen"
+     ],
+     "toiMin": 93,
+     "games": 8
+    }
+   ]
+  },
+  "DET": {
+   "units": 8,
+   "kept": 32,
+   "opps": 32,
+   "keptPct": 100.0,
+   "top": [
+    {
+     "names": [
+      "Chiarot",
+      "Seider"
+     ],
+     "players": [
+      "Ben Chiarot",
+      "Moritz Seider"
+     ],
+     "toiMin": 109,
+     "games": 9
+    },
+    {
+     "names": [
+      "Faulk",
+      "Wallinder"
+     ],
+     "players": [
+      "Justin Faulk",
+      "William Wallinder"
+     ],
+     "toiMin": 103,
+     "games": 10
+    },
+    {
+     "names": [
+      "Englund",
+      "Johansson"
+     ],
+     "players": [
+      "Andreas Englund",
+      "Anton Johansson"
+     ],
+     "toiMin": 87,
+     "games": 8
+    }
+   ]
+  },
+  "EDM": {
+   "units": 8,
+   "kept": 38,
+   "opps": 42,
+   "keptPct": 90.5,
+   "top": [
+    {
+     "names": [
+      "Ekholm",
+      "Bouchard"
+     ],
+     "players": [
+      "Mattias Ekholm",
+      "Evan Bouchard"
+     ],
+     "toiMin": 222,
+     "games": 16
+    },
+    {
+     "names": [
+      "Murphy",
+      "Shea"
+     ],
+     "players": [
+      "Connor Murphy",
+      "Ryan Shea"
+     ],
+     "toiMin": 220,
+     "games": 17
+    },
+    {
+     "names": [
+      "Emberson",
+      "Mukhamadullin"
+     ],
+     "players": [
+      "Ty Emberson",
+      "Shakir Mukhamadullin"
+     ],
+     "toiMin": 98,
+     "games": 10
+    }
+   ]
+  },
+  "FLA": {
+   "units": 6,
+   "kept": 42,
+   "opps": 43,
+   "keptPct": 97.7,
+   "top": [
+    {
+     "names": [
+      "Ekblad",
+      "Forsling"
+     ],
+     "players": [
+      "Aaron Ekblad",
+      "Gustav Forsling"
+     ],
+     "toiMin": 205,
+     "games": 17
+    },
+    {
+     "names": [
+      "Jones",
+      "Mikkola"
+     ],
+     "players": [
+      "Seth Jones",
+      "Niko Mikkola"
+     ],
+     "toiMin": 188,
+     "games": 18
+    },
+    {
+     "names": [
+      "Kulikov",
+      "Gudas"
+     ],
+     "players": [
+      "Dmitry Kulikov",
+      "Radko Gudas"
+     ],
+     "toiMin": 91,
+     "games": 9
+    }
+   ]
+  },
+  "LAK": {
+   "units": 11,
+   "kept": 31,
+   "opps": 39,
+   "keptPct": 79.5,
+   "top": [
+    {
+     "names": [
+      "Dumoulin",
+      "Anderson"
+     ],
+     "players": [
+      "Brian Dumoulin",
+      "Mikey Anderson"
+     ],
+     "toiMin": 95,
+     "games": 10
+    },
+    {
+     "names": [
+      "Gustafsson",
+      "Clarke"
+     ],
+     "players": [
+      "Erik Gustafsson",
+      "Brandt Clarke"
+     ],
+     "toiMin": 95,
+     "games": 10
+    },
+    {
+     "names": [
+      "Doughty",
+      "Edmundson"
+     ],
+     "players": [
+      "Drew Doughty",
+      "Joel Edmundson"
+     ],
+     "toiMin": 85,
+     "games": 8
+    }
+   ]
+  },
+  "MIN": {
+   "units": 10,
+   "kept": 31,
+   "opps": 34,
+   "keptPct": 91.2,
+   "top": [
+    {
+     "names": [
+      "Brodin",
+      "Hughes"
+     ],
+     "players": [
+      "Jonas Brodin",
+      "Quinn Hughes"
+     ],
+     "toiMin": 193,
+     "games": 12
+    },
+    {
+     "names": [
+      "Spurgeon",
+      "Hughes"
+     ],
+     "players": [
+      "Jared Spurgeon",
+      "Quinn Hughes"
+     ],
+     "toiMin": 99,
+     "games": 8
+    },
+    {
+     "names": [
+      "Bogosian",
+      "Maatta"
+     ],
+     "players": [
+      "Zach Bogosian",
+      "Olli Maatta"
+     ],
+     "toiMin": 74,
+     "games": 7
+    }
+   ]
+  },
+  "MTL": {
+   "units": 10,
+   "kept": 35,
+   "opps": 39,
+   "keptPct": 89.7,
+   "top": [
+    {
+     "names": [
+      "Dobson",
+      "Hutson"
+     ],
+     "players": [
+      "Noah Dobson",
+      "Lane Hutson"
+     ],
+     "toiMin": 199,
+     "games": 15
+    },
+    {
+     "names": [
+      "Carrier",
+      "Guhle"
+     ],
+     "players": [
+      "Alexandre Carrier",
+      "Kaiden Guhle"
+     ],
+     "toiMin": 173,
+     "games": 12
+    },
+    {
+     "names": [
+      "Xhekaj",
+      "Engstrom"
+     ],
+     "players": [
+      "Arber Xhekaj",
+      "Adam Engstrom"
+     ],
+     "toiMin": 87,
+     "games": 11
+    }
+   ]
+  },
+  "NJD": {
+   "units": 8,
+   "kept": 44,
+   "opps": 46,
+   "keptPct": 95.7,
+   "top": [
+    {
+     "names": [
+      "Pesce",
+      "Hughes"
+     ],
+     "players": [
+      "Brett Pesce",
+      "Luke Hughes"
+     ],
+     "toiMin": 203,
+     "games": 17
+    },
+    {
+     "names": [
+      "Hamilton",
+      "Siegenthaler"
+     ],
+     "players": [
+      "Dougie Hamilton",
+      "Jonas Siegenthaler"
+     ],
+     "toiMin": 186,
+     "games": 16
+    },
+    {
+     "names": [
+      "Kovacevic",
+      "Chisholm"
+     ],
+     "players": [
+      "Johnathan Kovacevic",
+      "Declan Chisholm"
+     ],
+     "toiMin": 74,
+     "games": 7
+    }
+   ]
+  },
+  "NSH": {
+   "units": 9,
+   "kept": 39,
+   "opps": 41,
+   "keptPct": 95.1,
+   "top": [
+    {
+     "names": [
+      "Josi",
+      "Wilsby"
+     ],
+     "players": [
+      "Roman Josi",
+      "Adam Wilsby"
+     ],
+     "toiMin": 192,
+     "games": 14
+    },
+    {
+     "names": [
+      "Skjei",
+      "Perbix"
+     ],
+     "players": [
+      "Brady Skjei",
+      "Nick Perbix"
+     ],
+     "toiMin": 147,
+     "games": 12
+    },
+    {
+     "names": [
+      "Struble",
+      "Hunt"
+     ],
+     "players": [
+      "Jayden Struble",
+      "Daemon Hunt"
+     ],
+     "toiMin": 72,
+     "games": 8
+    }
+   ]
+  },
+  "NYI": {
+   "units": 12,
+   "kept": 35,
+   "opps": 41,
+   "keptPct": 85.4,
+   "top": [
+    {
+     "names": [
+      "Stanley",
+      "Schaefer"
+     ],
+     "players": [
+      "Logan Stanley",
+      "Matthew Schaefer"
+     ],
+     "toiMin": 168,
+     "games": 13
+    },
+    {
+     "names": [
+      "Pelech",
+      "Pulock"
+     ],
+     "players": [
+      "Adam Pelech",
+      "Ryan Pulock"
+     ],
+     "toiMin": 117,
+     "games": 11
+    },
+    {
+     "names": [
+      "Pelech",
+      "Schaefer"
+     ],
+     "players": [
+      "Adam Pelech",
+      "Matthew Schaefer"
+     ],
+     "toiMin": 53,
+     "games": 4
+    }
+   ]
+  },
+  "NYR": {
+   "units": 7,
+   "kept": 40,
+   "opps": 41,
+   "keptPct": 97.6,
+   "top": [
+    {
+     "names": [
+      "Gavrikov",
+      "Fox"
+     ],
+     "players": [
+      "Vladislav Gavrikov",
+      "Adam Fox"
+     ],
+     "toiMin": 202,
+     "games": 17
+    },
+    {
+     "names": [
+      "Pettersson",
+      "Schneider"
+     ],
+     "players": [
+      "Marcus Pettersson",
+      "Braden Schneider"
+     ],
+     "toiMin": 103,
+     "games": 7
+    },
+    {
+     "names": [
+      "Pettersson",
+      "Durzi"
+     ],
+     "players": [
+      "Marcus Pettersson",
+      "Sean Durzi"
+     ],
+     "toiMin": 97,
+     "games": 8
+    }
+   ]
+  },
+  "OTT": {
+   "units": 10,
+   "kept": 41,
+   "opps": 42,
+   "keptPct": 97.6,
+   "top": [
+    {
+     "names": [
+      "Chabot",
+      "Spence"
+     ],
+     "players": [
+      "Thomas Chabot",
+      "Jordan Spence"
+     ],
+     "toiMin": 146,
+     "games": 13
+    },
+    {
+     "names": [
+      "Sanderson",
+      "Zub"
+     ],
+     "players": [
+      "Jake Sanderson",
+      "Artem Zub"
+     ],
+     "toiMin": 121,
+     "games": 12
+    },
+    {
+     "names": [
+      "Spence",
+      "Kleven"
+     ],
+     "players": [
+      "Jordan Spence",
+      "Tyler Kleven"
+     ],
+     "toiMin": 80,
+     "games": 6
+    }
+   ]
+  },
+  "PHI": {
+   "units": 12,
+   "kept": 34,
+   "opps": 40,
+   "keptPct": 85.0,
+   "top": [
+    {
+     "names": [
+      "Sanheim",
+      "Drysdale"
+     ],
+     "players": [
+      "Travis Sanheim",
+      "Jamie Drysdale"
+     ],
+     "toiMin": 157,
+     "games": 11
+    },
+    {
+     "names": [
+      "York",
+      "Bonk"
+     ],
+     "players": [
+      "Cam York",
+      "Oliver Bonk"
+     ],
+     "toiMin": 83,
+     "games": 7
+    },
+    {
+     "names": [
+      "Sanheim",
+      "Bonk"
+     ],
+     "players": [
+      "Travis Sanheim",
+      "Oliver Bonk"
+     ],
+     "toiMin": 77,
+     "games": 7
+    }
+   ]
+  },
+  "PIT": {
+   "units": 9,
+   "kept": 43,
+   "opps": 47,
+   "keptPct": 91.5,
+   "top": [
+    {
+     "names": [
+      "Girard",
+      "Korczak"
+     ],
+     "players": [
+      "Samuel Girard",
+      "Kaedan Korczak"
+     ],
+     "toiMin": 126,
+     "games": 13
+    },
+    {
+     "names": [
+      "Karlsson",
+      "Stastney"
+     ],
+     "players": [
+      "Erik Karlsson",
+      "Spencer Stastney"
+     ],
+     "toiMin": 114,
+     "games": 10
+    },
+    {
+     "names": [
+      "Letang",
+      "Carlile"
+     ],
+     "players": [
+      "Kris Letang",
+      "Declan Carlile"
+     ],
+     "toiMin": 84,
+     "games": 8
+    }
+   ]
+  },
+  "SEA": {
+   "units": 6,
+   "kept": 29,
+   "opps": 29,
+   "keptPct": 100.0,
+   "top": [
+    {
+     "names": [
+      "Montour",
+      "Evans"
+     ],
+     "players": [
+      "Brandon Montour",
+      "Ryker Evans"
+     ],
+     "toiMin": 178,
+     "games": 14
+    },
+    {
+     "names": [
+      "Larsson",
+      "Dunn"
+     ],
+     "players": [
+      "Adam Larsson",
+      "Vince Dunn"
+     ],
+     "toiMin": 167,
+     "games": 14
+    },
+    {
+     "names": [
+      "Mahura",
+      "Ottavainen"
+     ],
+     "players": [
+      "Josh Mahura",
+      "Ville Ottavainen"
+     ],
+     "toiMin": 60,
+     "games": 5
+    }
+   ]
+  },
+  "SJS": {
+   "units": 8,
+   "kept": 38,
+   "opps": 42,
+   "keptPct": 90.5,
+   "top": [
+    {
+     "names": [
+      "Trouba",
+      "Dickinson"
+     ],
+     "players": [
+      "Jacob Trouba",
+      "Sam Dickinson"
+     ],
+     "toiMin": 211,
+     "games": 17
+    },
+    {
+     "names": [
+      "Nurse",
+      "Kesselring"
+     ],
+     "players": [
+      "Darnell Nurse",
+      "Michael Kesselring"
+     ],
+     "toiMin": 198,
+     "games": 16
+    },
+    {
+     "names": [
+      "Orlov",
+      "Pohlkamp"
+     ],
+     "players": [
+      "Dmitry Orlov",
+      "Eric Pohlkamp"
+     ],
+     "toiMin": 49,
+     "games": 4
+    }
+   ]
+  },
+  "STL": {
+   "units": 7,
+   "kept": 24,
+   "opps": 29,
+   "keptPct": 82.8,
+   "top": [
+    {
+     "names": [
+      "Fowler",
+      "Carlo"
+     ],
+     "players": [
+      "Cam Fowler",
+      "Brandon Carlo"
+     ],
+     "toiMin": 111,
+     "games": 11
+    },
+    {
+     "names": [
+      "Parayko",
+      "Barron"
+     ],
+     "players": [
+      "Colton Parayko",
+      "Justin Barron"
+     ],
+     "toiMin": 82,
+     "games": 6
+    },
+    {
+     "names": [
+      "Carlo",
+      "Broberg"
+     ],
+     "players": [
+      "Brandon Carlo",
+      "Philip Broberg"
+     ],
+     "toiMin": 73,
+     "games": 6
+    }
+   ]
+  },
+  "TBL": {
+   "units": 13,
+   "kept": 41,
+   "opps": 44,
+   "keptPct": 93.2,
+   "top": [
+    {
+     "names": [
+      "McDonagh",
+      "Cernak"
+     ],
+     "players": [
+      "Ryan McDonagh",
+      "Erik Cernak"
+     ],
+     "toiMin": 133,
+     "games": 13
+    },
+    {
+     "names": [
+      "Carlson",
+      "D'Astous"
+     ],
+     "players": [
+      "John Carlson",
+      "Charle-Edouard D'Astous"
+     ],
+     "toiMin": 110,
+     "games": 9
+    },
+    {
+     "names": [
+      "Carlson",
+      "Moser"
+     ],
+     "players": [
+      "John Carlson",
+      "J.J. Moser"
+     ],
+     "toiMin": 105,
+     "games": 10
+    }
+   ]
+  },
+  "TOR": {
+   "units": 14,
+   "kept": 42,
+   "opps": 46,
+   "keptPct": 91.3,
+   "top": [
+    {
+     "names": [
+      "McCabe",
+      "Raddysh"
+     ],
+     "players": [
+      "Jake McCabe",
+      "Darren Raddysh"
+     ],
+     "toiMin": 208,
+     "games": 16
+    },
+    {
+     "names": [
+      "Ekman-Larsson",
+      "Stecher"
+     ],
+     "players": [
+      "Oliver Ekman-Larsson",
+      "Troy Stecher"
+     ],
+     "toiMin": 100,
+     "games": 9
+    },
+    {
+     "names": [
+      "Rielly",
+      "Stecher"
+     ],
+     "players": [
+      "Morgan Rielly",
+      "Troy Stecher"
+     ],
+     "toiMin": 76,
+     "games": 9
+    }
+   ]
+  },
+  "UTA": {
+   "units": 7,
+   "kept": 39,
+   "opps": 44,
+   "keptPct": 88.6,
+   "top": [
+    {
+     "names": [
+      "Weegar",
+      "Sergachev"
+     ],
+     "players": [
+      "MacKenzie Weegar",
+      "Mikhail Sergachev"
+     ],
+     "toiMin": 191,
+     "games": 15
+    },
+    {
+     "names": [
+      "Schmidt",
+      "Peeke"
+     ],
+     "players": [
+      "Nate Schmidt",
+      "Andrew Peeke"
+     ],
+     "toiMin": 86,
+     "games": 7
+    },
+    {
+     "names": [
+      "Peeke",
+      "Simashev"
+     ],
+     "players": [
+      "Andrew Peeke",
+      "Dmitri Simashev"
+     ],
+     "toiMin": 80,
+     "games": 7
+    }
+   ]
+  },
+  "VAN": {
+   "units": 13,
+   "kept": 30,
+   "opps": 31,
+   "keptPct": 96.8,
+   "top": [
+    {
+     "names": [
+      "Hronek",
+      "Pettersson"
+     ],
+     "players": [
+      "Filip Hronek",
+      "Elias Pettersson"
+     ],
+     "toiMin": 123,
+     "games": 11
+    },
+    {
+     "names": [
+      "Hronek",
+      "Buium"
+     ],
+     "players": [
+      "Filip Hronek",
+      "Zeev Buium"
+     ],
+     "toiMin": 99,
+     "games": 6
+    },
+    {
+     "names": [
+      "Oleksiak",
+      "Willander"
+     ],
+     "players": [
+      "Jamie Oleksiak",
+      "Tom Willander"
+     ],
+     "toiMin": 95,
+     "games": 8
+    }
+   ]
+  },
+  "VGK": {
+   "units": 7,
+   "kept": 41,
+   "opps": 44,
+   "keptPct": 93.2,
+   "top": [
+    {
+     "names": [
+      "McNabb",
+      "Theodore"
+     ],
+     "players": [
+      "Brayden McNabb",
+      "Shea Theodore"
+     ],
+     "toiMin": 241,
+     "games": 18
+    },
+    {
+     "names": [
+      "Andersson",
+      "Lauzon"
+     ],
+     "players": [
+      "Rasmus Andersson",
+      "Jeremy Lauzon"
+     ],
+     "toiMin": 147,
+     "games": 11
+    },
+    {
+     "names": [
+      "Hanifin",
+      "Coghlan"
+     ],
+     "players": [
+      "Noah Hanifin",
+      "Dylan Coghlan"
+     ],
+     "toiMin": 98,
+     "games": 9
+    }
+   ]
+  },
+  "WPG": {
+   "units": 10,
+   "kept": 36,
+   "opps": 39,
+   "keptPct": 92.3,
+   "top": [
+    {
+     "names": [
+      "Samberg",
+      "Pionk"
+     ],
+     "players": [
+      "Dylan Samberg",
+      "Neal Pionk"
+     ],
+     "toiMin": 208,
+     "games": 18
+    },
+    {
+     "names": [
+      "DeMelo",
+      "Ferraro"
+     ],
+     "players": [
+      "Dylan DeMelo",
+      "Mario Ferraro"
+     ],
+     "toiMin": 94,
+     "games": 8
+    },
+    {
+     "names": [
+      "DeMelo",
+      "Samberg"
+     ],
+     "players": [
+      "Dylan DeMelo",
+      "Dylan Samberg"
+     ],
+     "toiMin": 48,
+     "games": 3
+    }
+   ]
+  },
+  "WSH": {
+   "units": 11,
+   "kept": 36,
+   "opps": 41,
+   "keptPct": 87.8,
+   "top": [
+    {
+     "names": [
+      "Roy",
+      "Chychrun"
+     ],
+     "players": [
+      "Matt Roy",
+      "Jakob Chychrun"
+     ],
+     "toiMin": 96,
+     "games": 10
+    },
+    {
+     "names": [
+      "Chychrun",
+      "Liljegren"
+     ],
+     "players": [
+      "Jakob Chychrun",
+      "Timothy Liljegren"
+     ],
+     "toiMin": 78,
+     "games": 6
+    },
+    {
+     "names": [
+      "St. Ivany",
+      "Hutson"
+     ],
+     "players": [
+      "Jack St. Ivany",
+      "Cole Hutson"
+     ],
+     "toiMin": 68,
+     "games": 6
+    }
+   ]
+  }
+ },
+ "league": {
+  "fwd": {
+   "unitsAvg": 16,
+   "keptAvg": 79
+  },
+  "def": {
+   "unitsAvg": 10,
+   "keptAvg": 92
+  }
+ }
+}
