@@ -151,6 +151,9 @@ body.sport-glass .sl-gcard.vice-city, .sl-gcard.vice-city { border: 2px solid #f
 .sl-gcard.vice-city .sl-tag.dim { background: rgba(150,60,255,.10); border-color: rgba(150,60,255,.35); color: #cbb8ea; }
 .sl-gcard.vice-city details.sl-fold { border-top-color: rgba(150,60,255,.35); }
 .sl-gcard.vice-city .sl-tap { color: #a79bc4; }
+.vice-intro-overlay { position: fixed; inset: 0; z-index: 9999; background: #0d0218; opacity: 1; transition: opacity .3s ease; cursor: pointer; }
+.vice-intro-overlay.out { opacity: 0; }
+.vice-intro-overlay video { width: 100%; height: 100%; object-fit: cover; display: block; }
 .sl-trow .vice-name { display: block; font-family: 'Brush Script MT', 'Segoe Script', 'Snell Roundhand', cursive; font-style: italic; font-weight: 700; font-size: 1.5rem; line-height: 1.1; background: linear-gradient(180deg, #ff6ec7, #963cff); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 0 8px rgba(255,46,136,.5)); }
 .sl-score { margin-left: auto; font-weight: 800; font-size: 1.25rem; font-variant-numeric: tabular-nums; color: var(--muted); }
 .sl-trow.right .sl-score { margin-left: 0; margin-right: auto; }
@@ -1404,8 +1407,12 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
     slateEl.querySelectorAll('.sl-look').forEach((el) => el.addEventListener('click', () => openPlayerCard(el.dataset.pid)));
     slateEl.querySelectorAll('.sl-gcard').forEach((el) => el.addEventListener('click', (e) => {
       if (e.target.closest('.sl-look') || e.target.closest('.sl-fold')) return;
+      if (el.classList.contains('vice-city')) { playViceIntro(() => openGame(el.dataset.gid)); return; }
       openGame(el.dataset.gid);
     }));
+    // Lazy: the intro <video> (and its asset request) exists only when
+    // tonight's Vice City card is actually on the slate.
+    if (slateEl.querySelector('.sl-gcard.vice-city')) ensureViceIntroVideo();
   }
 
   // Vice City banner (top of Home) is a button: tap jumps to the
@@ -1435,6 +1442,101 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
     viceBannerEl.addEventListener('click', viceGoToCard);
     viceBannerEl.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); viceGoToCard(); }
+    });
+  }
+
+  // Vice City intro: tapping tonight's MIL @ MIA slate card plays a
+  // full-screen intro, then opens the game exactly as a normal tap
+  // would. The overlay hangs off document.body so the slate's periodic
+  // re-render can't kill it mid-play. Tap anywhere skips. Fail soft:
+  // any video error opens the game immediately — the intro never
+  // blocks the game view.
+  let viceIntroVideo = null;
+  let viceIntroReady = null; // Promise<blob URL | null>
+  // The GitHub push path carries UTF-8 text only, so the MP4 ships as
+  // base64 in assets/vice-intro-data.js and is decoded to a Blob URL
+  // here. That file is fetched lazily — only when the vice card
+  // renders — so the bytes never load on any other slate or date.
+  function viceIntroLoad() {
+    if (viceIntroReady) return viceIntroReady;
+    viceIntroReady = new Promise((resolve) => {
+      const decode = () => {
+        try {
+          const b64 = window.VICE_INTRO_B64;
+          if (!b64) { resolve(null); return; }
+          const bin = atob(b64);
+          const bytes = new Uint8Array(bin.length);
+          for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+          resolve(URL.createObjectURL(new Blob([bytes], { type: 'video/mp4' })));
+        } catch (e) { resolve(null); }
+      };
+      if (window.VICE_INTRO_B64) { decode(); return; }
+      const s = document.createElement('script');
+      s.src = 'assets/vice-intro-data.js';
+      s.onload = decode;
+      s.onerror = () => resolve(null);
+      document.head.appendChild(s);
+    });
+    return viceIntroReady;
+  }
+  function ensureViceIntroVideo() {
+    if (viceIntroVideo) return viceIntroVideo;
+    try {
+      const v = document.createElement('video');
+      v.muted = true;
+      v.loop = false;
+      v.preload = 'auto';
+      v.setAttribute('playsinline', '');
+      v.setAttribute('webkit-playsinline', '');
+      viceIntroVideo = v;
+      viceIntroLoad().then((url) => { if (url) { try { v.src = url; } catch (e) { /* ignore */ } } });
+    } catch (e) { /* fail soft */ }
+    return viceIntroVideo;
+  }
+  function playViceIntro(openIt) {
+    const v = ensureViceIntroVideo();
+    if (!v) { openIt(); return; }
+    let done = false;
+    const overlay = document.createElement('div');
+    overlay.className = 'vice-intro-overlay';
+    overlay.setAttribute('role', 'button');
+    overlay.setAttribute('aria-label', 'Vice City intro — tap to skip');
+    try { v.currentTime = 0; } catch (e) { /* not loaded yet */ }
+    overlay.appendChild(v);
+    document.body.appendChild(overlay);
+    const cleanup = () => {
+      v.removeEventListener('ended', finish);
+      v.removeEventListener('error', bail);
+    };
+    const finish = () => {
+      if (done) return; done = true; cleanup();
+      try { v.pause(); } catch (e) { /* ignore */ }
+      overlay.classList.add('out');
+      setTimeout(() => {
+        if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+        openIt();
+      }, 320);
+    };
+    const bail = () => {
+      if (done) return; done = true; cleanup();
+      if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+      openIt();
+    };
+    v.addEventListener('ended', finish);
+    v.addEventListener('error', bail);
+    overlay.addEventListener('click', finish);
+    const start = () => {
+      if (done) return;
+      let p = null;
+      try { p = v.play(); } catch (e) { bail(); return; }
+      if (p && p.catch) p.catch(bail);
+    };
+    if (v.src) start();
+    else viceIntroLoad().then((url) => {
+      if (done) return;
+      if (!url) { bail(); return; }
+      try { v.src = url; } catch (e) { /* ignore */ }
+      start();
     });
   }
 
