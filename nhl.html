@@ -493,8 +493,8 @@ body.sport-glass #boardTable tr.scored td:first-child{background:linear-gradient
       <div>
         <p class="kicker">Season</p>
         <h2>Lines</h2>
-        <p class="view-sub muted">Which team juggles their lines the most — distinct 5v5 forward lines and defence pairs used this season, and how often a unit stayed together the next game. A stability sheet, not a projection.</p>
-        <details class="how-works"><summary>How it works</summary><p class="muted small">Built from the NHL's official Time On Ice reports (data-builder/nhl-lines.py): a line or pair counts in a game once it plays 5+ minutes together at 5v5. Kept = that unit was together again the next game, counted only when every player from it dressed again — injuries and scratches don't count against a team. Lines are display only — they never move a price, a probability or a sort.</p></details>
+        <p class="view-sub muted">Which team juggles their lines the most — distinct 5v5 forward lines and defence pairs used this season, and how often a unit stayed together the next game. Plus Scored On: who is on the ice when goals go in, goals for and against for every unit, and each team's power-play and penalty-kill units. A stability sheet, not a projection.</p>
+        <details class="how-works"><summary>How it works</summary><p class="muted small">Built from the NHL's official Time On Ice reports (data-builder/nhl-lines.py): a line or pair counts in a game once it plays 5+ minutes together at 5v5. Kept = that unit was together again the next game, counted only when every player from it dressed again — injuries and scratches don't count against a team. Scored On crosses play-by-play goal times with those same shifts: a goal counts for or against every skater on the ice for it — 5v5 only, both goalies in net, empty-net goals out, and skaters need 150+ minutes at 5v5 to make the boards. Power-play and penalty-kill units are the exact skater groups a team used most with and without the man advantage. Lines are display only — they never move a price, a probability or a sort.</p></details>
       </div>
     </div>
     <div id="linesBody"></div>

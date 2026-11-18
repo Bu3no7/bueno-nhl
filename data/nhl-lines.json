@@ -1,13 +1,13 @@
 {
- "builtAt": "2026-11-16T03:50:34Z",
- "through": "2026-11-14",
- "games": 286,
+ "builtAt": "2026-11-18T03:44:20Z",
+ "through": "2026-11-16",
+ "games": 293,
  "fwd": {
   "ANA": {
-   "units": 22,
-   "kept": 19,
-   "opps": 34,
-   "keptPct": 55.9,
+   "units": 23,
+   "kept": 20,
+   "opps": 38,
+   "keptPct": 52.6,
    "top": [
     {
      "names": [
@@ -20,8 +20,12 @@
       "Cutter Gauthier",
       "Beckett Sennecke"
      ],
-     "toiMin": 66,
-     "games": 7
+     "toiMin": 67,
+     "games": 7,
+     "gf": 7,
+     "ga": 4,
+     "gf60": 6.28,
+     "ga60": 3.59
     },
     {
      "names": [
@@ -35,21 +39,11 @@
       "Leo Carlsson"
      ],
      "toiMin": 59,
-     "games": 6
-    },
-    {
-     "names": [
-      "Caulfield",
-      "Malott",
-      "Washe"
-     ],
-     "players": [
-      "Judd Caulfield",
-      "Jeff Malott",
-      "Tim Washe"
-     ],
-     "toiMin": 26,
-     "games": 3
+     "games": 6,
+     "gf": 1,
+     "ga": 1,
+     "gf60": 1.02,
+     "ga60": 1.02
     },
     {
      "names": [
@@ -62,8 +56,30 @@
       "Cutter Gauthier",
       "Leo Carlsson"
      ],
-     "toiMin": 25,
-     "games": 3
+     "toiMin": 36,
+     "games": 4,
+     "gf": 2,
+     "ga": 2,
+     "gf60": 3.3,
+     "ga60": 3.3
+    },
+    {
+     "names": [
+      "Granlund",
+      "Malott",
+      "Sennecke"
+     ],
+     "players": [
+      "Mikael Granlund",
+      "Jeff Malott",
+      "Beckett Sennecke"
+     ],
+     "toiMin": 32,
+     "games": 3,
+     "gf": 3,
+     "ga": 2,
+     "gf60": 5.66,
+     "ga60": 3.78
     }
    ]
   },
@@ -85,7 +101,11 @@
       "JJ Peterka"
      ],
      "toiMin": 127,
-     "games": 11
+     "games": 11,
+     "gf": 9,
+     "ga": 4,
+     "gf60": 4.25,
+     "ga60": 1.89
     },
     {
      "names": [
@@ -99,7 +119,11 @@
       "James Hagens"
      ],
      "toiMin": 105,
-     "games": 13
+     "games": 13,
+     "gf": 8,
+     "ga": 3,
+     "gf60": 4.58,
+     "ga60": 1.72
     },
     {
      "names": [
@@ -113,7 +137,11 @@
       "Matthew Poitras"
      ],
      "toiMin": 68,
-     "games": 5
+     "games": 5,
+     "gf": 3,
+     "ga": 1,
+     "gf60": 2.63,
+     "ga60": 0.88
     },
     {
      "names": [
@@ -127,7 +155,11 @@
       "Fraser Minten"
      ],
      "toiMin": 61,
-     "games": 7
+     "games": 7,
+     "gf": 1,
+     "ga": 1,
+     "gf60": 0.98,
+     "ga60": 0.98
     }
    ]
   },
@@ -149,7 +181,11 @@
       "Zach Benson"
      ],
      "toiMin": 77,
-     "games": 8
+     "games": 8,
+     "gf": 6,
+     "ga": 3,
+     "gf60": 4.66,
+     "ga60": 2.33
     },
     {
      "names": [
@@ -163,7 +199,11 @@
       "Zach Benson"
      ],
      "toiMin": 73,
-     "games": 8
+     "games": 8,
+     "gf": 8,
+     "ga": 2,
+     "gf60": 6.58,
+     "ga60": 1.65
     },
     {
      "names": [
@@ -177,7 +217,11 @@
       "Noah Ostlund"
      ],
      "toiMin": 49,
-     "games": 5
+     "games": 5,
+     "gf": 1,
+     "ga": 2,
+     "gf60": 1.23,
+     "ga60": 2.47
     },
     {
      "names": [
@@ -191,7 +235,11 @@
       "Tyson Kozak"
      ],
      "toiMin": 35,
-     "games": 3
+     "games": 3,
+     "gf": 2,
+     "ga": 2,
+     "gf60": 3.39,
+     "ga60": 3.39
     }
    ]
   },
@@ -213,7 +261,11 @@
       "Andrei Svechnikov"
      ],
      "toiMin": 161,
-     "games": 17
+     "games": 17,
+     "gf": 11,
+     "ga": 6,
+     "gf60": 4.11,
+     "ga60": 2.24
     },
     {
      "names": [
@@ -227,7 +279,11 @@
       "Jackson Blake"
      ],
      "toiMin": 112,
-     "games": 10
+     "games": 10,
+     "gf": 12,
+     "ga": 1,
+     "gf60": 6.41,
+     "ga60": 0.53
     },
     {
      "names": [
@@ -241,7 +297,11 @@
       "Seth Jarvis"
      ],
      "toiMin": 39,
-     "games": 4
+     "games": 4,
+     "gf": 2,
+     "ga": 1,
+     "gf60": 3.1,
+     "ga60": 1.55
     },
     {
      "names": [
@@ -255,7 +315,11 @@
       "Jesperi Kotkaniemi"
      ],
      "toiMin": 34,
-     "games": 4
+     "games": 4,
+     "gf": 1,
+     "ga": 1,
+     "gf60": 1.76,
+     "ga60": 1.76
     }
    ]
   },
@@ -277,7 +341,11 @@
       "Cole Sillinger"
      ],
      "toiMin": 95,
-     "games": 9
+     "games": 9,
+     "gf": 6,
+     "ga": 7,
+     "gf60": 3.79,
+     "ga60": 4.42
     },
     {
      "names": [
@@ -291,7 +359,11 @@
       "Adam Fantilli"
      ],
      "toiMin": 78,
-     "games": 7
+     "games": 7,
+     "gf": 2,
+     "ga": 4,
+     "gf60": 1.54,
+     "ga60": 3.09
     },
     {
      "names": [
@@ -305,7 +377,11 @@
       "Matthew Knies"
      ],
      "toiMin": 39,
-     "games": 3
+     "games": 3,
+     "gf": 1,
+     "ga": 2,
+     "gf60": 1.53,
+     "ga60": 3.06
     },
     {
      "names": [
@@ -319,15 +395,19 @@
       "Adam Fantilli"
      ],
      "toiMin": 37,
-     "games": 4
+     "games": 4,
+     "gf": 2,
+     "ga": 2,
+     "gf60": 3.23,
+     "ga60": 3.23
     }
    ]
   },
   "CGY": {
    "units": 12,
-   "kept": 35,
-   "opps": 40,
-   "keptPct": 87.5,
+   "kept": 39,
+   "opps": 44,
+   "keptPct": 88.6,
    "top": [
     {
      "names": [
@@ -340,8 +420,12 @@
       "Joel Farabee",
       "Matt Coronato"
      ],
-     "toiMin": 122,
-     "games": 11
+     "toiMin": 134,
+     "games": 12,
+     "gf": 3,
+     "ga": 5,
+     "gf60": 1.35,
+     "ga60": 2.25
     },
     {
      "names": [
@@ -354,8 +438,12 @@
       "Martin Pospisil",
       "Matvei Gridin"
      ],
-     "toiMin": 119,
-     "games": 13
+     "toiMin": 129,
+     "games": 14,
+     "gf": 5,
+     "ga": 6,
+     "gf60": 2.32,
+     "ga60": 2.79
     },
     {
      "names": [
@@ -369,7 +457,11 @@
       "Aydar Suniev"
      ],
      "toiMin": 64,
-     "games": 5
+     "games": 5,
+     "gf": 6,
+     "ga": 6,
+     "gf60": 5.61,
+     "ga60": 5.61
     },
     {
      "names": [
@@ -383,7 +475,11 @@
       "Yegor Sharangovich"
      ],
      "toiMin": 45,
-     "games": 3
+     "games": 3,
+     "gf": 0,
+     "ga": 2,
+     "gf60": 0.0,
+     "ga60": 2.69
     }
    ]
   },
@@ -405,7 +501,11 @@
       "Roman Kantserov"
      ],
      "toiMin": 68,
-     "games": 5
+     "games": 5,
+     "gf": 4,
+     "ga": 7,
+     "gf60": 3.52,
+     "ga60": 6.16
     },
     {
      "names": [
@@ -419,7 +519,11 @@
       "Ryan Greene"
      ],
      "toiMin": 67,
-     "games": 6
+     "games": 6,
+     "gf": 0,
+     "ga": 2,
+     "gf60": 0.0,
+     "ga60": 1.78
     },
     {
      "names": [
@@ -433,7 +537,11 @@
       "Roman Kantserov"
      ],
      "toiMin": 54,
-     "games": 5
+     "games": 5,
+     "gf": 3,
+     "ga": 4,
+     "gf60": 3.35,
+     "ga60": 4.47
     },
     {
      "names": [
@@ -447,7 +555,11 @@
       "Oliver Moore"
      ],
      "toiMin": 48,
-     "games": 5
+     "games": 5,
+     "gf": 2,
+     "ga": 3,
+     "gf60": 2.51,
+     "ga60": 3.76
     }
    ]
   },
@@ -469,7 +581,11 @@
       "Martin Necas"
      ],
      "toiMin": 155,
-     "games": 14
+     "games": 14,
+     "gf": 17,
+     "ga": 10,
+     "gf60": 6.6,
+     "ga60": 3.88
     },
     {
      "names": [
@@ -483,7 +599,11 @@
       "Fedor Svechkov"
      ],
      "toiMin": 57,
-     "games": 7
+     "games": 7,
+     "gf": 4,
+     "ga": 1,
+     "gf60": 4.24,
+     "ga60": 1.06
     },
     {
      "names": [
@@ -497,7 +617,11 @@
       "Gabriel Landeskog"
      ],
      "toiMin": 54,
-     "games": 5
+     "games": 5,
+     "gf": 3,
+     "ga": 1,
+     "gf60": 3.35,
+     "ga60": 1.12
     },
     {
      "names": [
@@ -511,15 +635,19 @@
       "T.J. Hughes"
      ],
      "toiMin": 49,
-     "games": 4
+     "games": 4,
+     "gf": 6,
+     "ga": 2,
+     "gf60": 7.37,
+     "ga60": 2.46
     }
    ]
   },
   "DAL": {
-   "units": 18,
-   "kept": 30,
-   "opps": 38,
-   "keptPct": 78.9,
+   "units": 19,
+   "kept": 31,
+   "opps": 39,
+   "keptPct": 79.5,
    "top": [
     {
      "names": [
@@ -532,8 +660,12 @@
       "Sam Steel",
       "Wyatt Johnston"
      ],
-     "toiMin": 63,
-     "games": 8
+     "toiMin": 64,
+     "games": 8,
+     "gf": 2,
+     "ga": 3,
+     "gf60": 1.89,
+     "ga60": 2.83
     },
     {
      "names": [
@@ -547,7 +679,11 @@
       "Jason Robertson"
      ],
      "toiMin": 56,
-     "games": 6
+     "games": 6,
+     "gf": 3,
+     "ga": 3,
+     "gf60": 3.2,
+     "ga60": 3.2
     },
     {
      "names": [
@@ -561,21 +697,29 @@
       "Wyatt Johnston"
      ],
      "toiMin": 46,
-     "games": 4
+     "games": 4,
+     "gf": 2,
+     "ga": 1,
+     "gf60": 2.6,
+     "ga60": 1.3
     },
     {
      "names": [
-      "Hintz",
+      "Rantanen",
       "Robertson",
-      "Hyry"
+      "Johnston"
      ],
      "players": [
-      "Roope Hintz",
+      "Mikko Rantanen",
       "Jason Robertson",
-      "Arttu Hyry"
+      "Wyatt Johnston"
      ],
-     "toiMin": 37,
-     "games": 3
+     "toiMin": 46,
+     "games": 3,
+     "gf": 3,
+     "ga": 0,
+     "gf60": 3.94,
+     "ga60": 0.0
     }
    ]
   },
@@ -597,7 +741,11 @@
       "Emmitt Finnie"
      ],
      "toiMin": 100,
-     "games": 10
+     "games": 10,
+     "gf": 4,
+     "ga": 5,
+     "gf60": 2.4,
+     "ga60": 3.0
     },
     {
      "names": [
@@ -611,7 +759,11 @@
       "Michael Brandsegg-Nyg\u00e5rd"
      ],
      "toiMin": 95,
-     "games": 8
+     "games": 8,
+     "gf": 5,
+     "ga": 4,
+     "gf60": 3.15,
+     "ga60": 2.52
     },
     {
      "names": [
@@ -625,7 +777,11 @@
       "Michael Brandsegg-Nyg\u00e5rd"
      ],
      "toiMin": 54,
-     "games": 6
+     "games": 6,
+     "gf": 7,
+     "ga": 1,
+     "gf60": 7.74,
+     "ga60": 1.11
     },
     {
      "names": [
@@ -639,15 +795,19 @@
       "Carter Mazur"
      ],
      "toiMin": 35,
-     "games": 4
+     "games": 4,
+     "gf": 3,
+     "ga": 1,
+     "gf60": 5.16,
+     "ga60": 1.72
     }
    ]
   },
   "EDM": {
-   "units": 12,
-   "kept": 39,
-   "opps": 43,
-   "keptPct": 90.7,
+   "units": 13,
+   "kept": 41,
+   "opps": 46,
+   "keptPct": 89.1,
    "top": [
     {
      "names": [
@@ -660,8 +820,12 @@
       "Connor McDavid",
       "Vasily Podkolzin"
      ],
-     "toiMin": 217,
-     "games": 17
+     "toiMin": 224,
+     "games": 18,
+     "gf": 19,
+     "ga": 6,
+     "gf60": 5.08,
+     "ga60": 1.6
     },
     {
      "names": [
@@ -674,8 +838,12 @@
       "Alex Formenton",
       "Owen Michaels"
      ],
-     "toiMin": 76,
-     "games": 9
+     "toiMin": 80,
+     "games": 9,
+     "gf": 3,
+     "ga": 9,
+     "gf60": 2.24,
+     "ga60": 6.73
     },
     {
      "names": [
@@ -689,7 +857,11 @@
       "Kasperi Kapanen"
      ],
      "toiMin": 57,
-     "games": 5
+     "games": 5,
+     "gf": 0,
+     "ga": 3,
+     "gf60": 0.0,
+     "ga60": 3.15
     },
     {
      "names": [
@@ -702,16 +874,20 @@
       "Mathieu Joseph",
       "Alex Formenton"
      ],
-     "toiMin": 54,
-     "games": 6
+     "toiMin": 55,
+     "games": 6,
+     "gf": 2,
+     "ga": 0,
+     "gf60": 2.2,
+     "ga60": 0.0
     }
    ]
   },
   "FLA": {
    "units": 11,
-   "kept": 38,
-   "opps": 43,
-   "keptPct": 88.4,
+   "kept": 42,
+   "opps": 47,
+   "keptPct": 89.4,
    "top": [
     {
      "names": [
@@ -724,8 +900,12 @@
       "Matthew Tkachuk",
       "Brady Tkachuk"
      ],
-     "toiMin": 127,
-     "games": 13
+     "toiMin": 128,
+     "games": 13,
+     "gf": 9,
+     "ga": 8,
+     "gf60": 4.21,
+     "ga60": 3.74
     },
     {
      "names": [
@@ -738,8 +918,12 @@
       "Carter Verhaeghe",
       "Sam Reinhart"
      ],
-     "toiMin": 76,
-     "games": 8
+     "toiMin": 89,
+     "games": 9,
+     "gf": 7,
+     "ga": 1,
+     "gf60": 4.74,
+     "ga60": 0.68
     },
     {
      "names": [
@@ -752,8 +936,12 @@
       "Bokondji Imama",
       "Cole Schwindt"
      ],
-     "toiMin": 64,
-     "games": 6
+     "toiMin": 70,
+     "games": 7,
+     "gf": 0,
+     "ga": 3,
+     "gf60": 0.0,
+     "ga60": 2.58
     },
     {
      "names": [
@@ -767,7 +955,11 @@
       "Sandis Vilmanis"
      ],
      "toiMin": 62,
-     "games": 8
+     "games": 8,
+     "gf": 1,
+     "ga": 4,
+     "gf60": 0.96,
+     "ga60": 3.84
     }
    ]
   },
@@ -789,7 +981,11 @@
       "Alex Laferriere"
      ],
      "toiMin": 119,
-     "games": 11
+     "games": 11,
+     "gf": 8,
+     "ga": 3,
+     "gf60": 4.03,
+     "ga60": 1.51
     },
     {
      "names": [
@@ -803,7 +999,11 @@
       "Quinton Byfield"
      ],
      "toiMin": 46,
-     "games": 5
+     "games": 5,
+     "gf": 2,
+     "ga": 3,
+     "gf60": 2.59,
+     "ga60": 3.89
     },
     {
      "names": [
@@ -817,7 +1017,11 @@
       "Quinton Byfield"
      ],
      "toiMin": 39,
-     "games": 4
+     "games": 4,
+     "gf": 0,
+     "ga": 2,
+     "gf60": 0.0,
+     "ga60": 3.04
     },
     {
      "names": [
@@ -831,7 +1035,11 @@
       "Scott Laughton"
      ],
      "toiMin": 36,
-     "games": 3
+     "games": 3,
+     "gf": 0,
+     "ga": 2,
+     "gf60": 0.0,
+     "ga60": 3.35
     }
    ]
   },
@@ -853,7 +1061,11 @@
       "Matt Boldy"
      ],
      "toiMin": 204,
-     "games": 19
+     "games": 19,
+     "gf": 16,
+     "ga": 1,
+     "gf60": 4.7,
+     "ga60": 0.29
     },
     {
      "names": [
@@ -867,7 +1079,11 @@
       "Maxim Shabanov"
      ],
      "toiMin": 103,
-     "games": 10
+     "games": 10,
+     "gf": 4,
+     "ga": 1,
+     "gf60": 2.34,
+     "ga60": 0.59
     },
     {
      "names": [
@@ -881,7 +1097,11 @@
       "Bobby Brink"
      ],
      "toiMin": 84,
-     "games": 9
+     "games": 9,
+     "gf": 4,
+     "ga": 0,
+     "gf60": 2.85,
+     "ga60": 0.0
     },
     {
      "names": [
@@ -895,15 +1115,19 @@
       "Bobby Brink"
      ],
      "toiMin": 35,
-     "games": 2
+     "games": 2,
+     "gf": 3,
+     "ga": 2,
+     "gf60": 5.14,
+     "ga60": 3.43
     }
    ]
   },
   "MTL": {
-   "units": 13,
-   "kept": 43,
-   "opps": 47,
-   "keptPct": 91.5,
+   "units": 14,
+   "kept": 46,
+   "opps": 50,
+   "keptPct": 92.0,
    "top": [
     {
      "names": [
@@ -916,8 +1140,12 @@
       "Alexandre Texier",
       "Zachary Bolduc"
      ],
-     "toiMin": 146,
-     "games": 15
+     "toiMin": 157,
+     "games": 16,
+     "gf": 4,
+     "ga": 3,
+     "gf60": 1.53,
+     "ga60": 1.15
     },
     {
      "names": [
@@ -930,8 +1158,12 @@
       "Cole Caufield",
       "Juraj Slafkovsk\u00fd"
      ],
-     "toiMin": 124,
-     "games": 10
+     "toiMin": 136,
+     "games": 11,
+     "gf": 6,
+     "ga": 3,
+     "gf60": 2.65,
+     "ga60": 1.33
     },
     {
      "names": [
@@ -945,21 +1177,29 @@
       "Alex Newhook"
      ],
      "toiMin": 64,
-     "games": 8
+     "games": 8,
+     "gf": 3,
+     "ga": 3,
+     "gf60": 2.79,
+     "ga60": 2.79
     },
     {
      "names": [
-      "Kreider",
-      "Anderson",
-      "Evans"
+      "Dach",
+      "Newhook",
+      "Kapanen"
      ],
      "players": [
-      "Chris Kreider",
-      "Josh Anderson",
-      "Jake Evans"
+      "Kirby Dach",
+      "Alex Newhook",
+      "Oliver Kapanen"
      ],
-     "toiMin": 40,
-     "games": 5
+     "toiMin": 46,
+     "games": 6,
+     "gf": 4,
+     "ga": 1,
+     "gf60": 5.17,
+     "ga60": 1.29
     }
    ]
   },
@@ -981,7 +1221,11 @@
       "Arseny Gritsyuk"
      ],
      "toiMin": 158,
-     "games": 16
+     "games": 16,
+     "gf": 12,
+     "ga": 5,
+     "gf60": 4.57,
+     "ga60": 1.9
     },
     {
      "names": [
@@ -995,7 +1239,11 @@
       "Luke Evangelista"
      ],
      "toiMin": 152,
-     "games": 16
+     "games": 16,
+     "gf": 6,
+     "ga": 5,
+     "gf60": 2.36,
+     "ga60": 1.97
     },
     {
      "names": [
@@ -1009,7 +1257,11 @@
       "Amadeus Lombardi"
      ],
      "toiMin": 51,
-     "games": 5
+     "games": 5,
+     "gf": 1,
+     "ga": 1,
+     "gf60": 1.18,
+     "ga60": 1.18
     },
     {
      "names": [
@@ -1023,15 +1275,19 @@
       "Amadeus Lombardi"
      ],
      "toiMin": 44,
-     "games": 3
+     "games": 3,
+     "gf": 3,
+     "ga": 1,
+     "gf60": 4.12,
+     "ga60": 1.37
     }
    ]
   },
   "NSH": {
    "units": 12,
-   "kept": 32,
-   "opps": 38,
-   "keptPct": 84.2,
+   "kept": 36,
+   "opps": 42,
+   "keptPct": 85.7,
    "top": [
     {
      "names": [
@@ -1044,8 +1300,12 @@
       "Jack Drury",
       "Adam Edstrom"
      ],
-     "toiMin": 119,
-     "games": 13
+     "toiMin": 129,
+     "games": 14,
+     "gf": 5,
+     "ga": 7,
+     "gf60": 2.33,
+     "ga60": 3.26
     },
     {
      "names": [
@@ -1058,8 +1318,12 @@
       "Ryan O'Reilly",
       "Mavrik Bourque"
      ],
-     "toiMin": 92,
-     "games": 10
+     "toiMin": 101,
+     "games": 11,
+     "gf": 3,
+     "ga": 7,
+     "gf60": 1.79,
+     "ga60": 4.17
     },
     {
      "names": [
@@ -1072,8 +1336,12 @@
       "Nils Hoglander",
       "Shane Wright"
      ],
-     "toiMin": 50,
-     "games": 6
+     "toiMin": 62,
+     "games": 7,
+     "gf": 8,
+     "ga": 2,
+     "gf60": 7.7,
+     "ga60": 1.93
     },
     {
      "names": [
@@ -1086,8 +1354,12 @@
       "Reid Schaefer",
       "Vitali Pinchuk"
      ],
-     "toiMin": 38,
-     "games": 6
+     "toiMin": 45,
+     "games": 7,
+     "gf": 1,
+     "ga": 0,
+     "gf60": 1.32,
+     "ga60": 0.0
     }
    ]
   },
@@ -1109,7 +1381,11 @@
       "Simon Holmstrom"
      ],
      "toiMin": 118,
-     "games": 12
+     "games": 12,
+     "gf": 9,
+     "ga": 7,
+     "gf60": 4.56,
+     "ga60": 3.55
     },
     {
      "names": [
@@ -1123,7 +1399,11 @@
       "Victor Eklund"
      ],
      "toiMin": 97,
-     "games": 10
+     "games": 10,
+     "gf": 8,
+     "ga": 1,
+     "gf60": 4.94,
+     "ga60": 0.62
     },
     {
      "names": [
@@ -1137,7 +1417,11 @@
       "Anthony Duclair"
      ],
      "toiMin": 94,
-     "games": 10
+     "games": 10,
+     "gf": 4,
+     "ga": 8,
+     "gf60": 2.56,
+     "ga60": 5.12
     },
     {
      "names": [
@@ -1151,15 +1435,19 @@
       "Emil Heineman"
      ],
      "toiMin": 40,
-     "games": 4
+     "games": 4,
+     "gf": 2,
+     "ga": 0,
+     "gf60": 2.99,
+     "ga60": 0.0
     }
    ]
   },
   "NYR": {
-   "units": 15,
-   "kept": 34,
-   "opps": 47,
-   "keptPct": 72.3,
+   "units": 18,
+   "kept": 35,
+   "opps": 50,
+   "keptPct": 70.0,
    "top": [
     {
      "names": [
@@ -1172,8 +1460,12 @@
       "Alexis Lafreni\u00e8re",
       "Gabe Perreault"
      ],
-     "toiMin": 127,
-     "games": 11
+     "toiMin": 139,
+     "games": 12,
+     "gf": 7,
+     "ga": 5,
+     "gf60": 3.02,
+     "ga60": 2.16
     },
     {
      "names": [
@@ -1187,7 +1479,11 @@
       "Tye Kartye"
      ],
      "toiMin": 90,
-     "games": 8
+     "games": 8,
+     "gf": 2,
+     "ga": 6,
+     "gf60": 1.34,
+     "ga60": 4.01
     },
     {
      "names": [
@@ -1201,7 +1497,11 @@
       "Noah Laba"
      ],
      "toiMin": 68,
-     "games": 8
+     "games": 8,
+     "gf": 2,
+     "ga": 1,
+     "gf60": 1.75,
+     "ga60": 0.88
     },
     {
      "names": [
@@ -1215,7 +1515,11 @@
       "Gabe Perreault"
      ],
      "toiMin": 35,
-     "games": 3
+     "games": 3,
+     "gf": 1,
+     "ga": 2,
+     "gf60": 1.69,
+     "ga60": 3.39
     }
    ]
   },
@@ -1237,7 +1541,11 @@
       "Ridly Greig"
      ],
      "toiMin": 53,
-     "games": 5
+     "games": 5,
+     "gf": 5,
+     "ga": 1,
+     "gf60": 5.69,
+     "ga60": 1.14
     },
     {
      "names": [
@@ -1251,7 +1559,11 @@
       "Tim St\u00fctzle"
      ],
      "toiMin": 47,
-     "games": 5
+     "games": 5,
+     "gf": 4,
+     "ga": 0,
+     "gf60": 5.06,
+     "ga60": 0.0
     },
     {
      "names": [
@@ -1265,7 +1577,11 @@
       "Ridly Greig"
      ],
      "toiMin": 42,
-     "games": 5
+     "games": 5,
+     "gf": 1,
+     "ga": 1,
+     "gf60": 1.42,
+     "ga60": 1.42
     },
     {
      "names": [
@@ -1279,15 +1595,19 @@
       "Tim St\u00fctzle"
      ],
      "toiMin": 40,
-     "games": 5
+     "games": 5,
+     "gf": 2,
+     "ga": 0,
+     "gf60": 3.03,
+     "ga60": 0.0
     }
    ]
   },
   "PHI": {
    "units": 24,
-   "kept": 25,
-   "opps": 39,
-   "keptPct": 64.1,
+   "kept": 28,
+   "opps": 42,
+   "keptPct": 66.7,
    "top": [
     {
      "names": [
@@ -1300,8 +1620,12 @@
       "Matvei Michkov",
       "Porter Martone"
      ],
-     "toiMin": 87,
-     "games": 10
+     "toiMin": 94,
+     "games": 11,
+     "gf": 7,
+     "ga": 6,
+     "gf60": 4.46,
+     "ga60": 3.83
     },
     {
      "names": [
@@ -1315,7 +1639,29 @@
       "Denver Barkey"
      ],
      "toiMin": 43,
-     "games": 4
+     "games": 4,
+     "gf": 4,
+     "ga": 1,
+     "gf60": 5.63,
+     "ga60": 1.41
+    },
+    {
+     "names": [
+      "Konecny",
+      "Zegras",
+      "Foerster"
+     ],
+     "players": [
+      "Travis Konecny",
+      "Trevor Zegras",
+      "Tyson Foerster"
+     ],
+     "toiMin": 35,
+     "games": 4,
+     "gf": 1,
+     "ga": 0,
+     "gf60": 1.72,
+     "ga60": 0.0
     },
     {
      "names": [
@@ -1329,21 +1675,11 @@
       "Trevor Zegras"
      ],
      "toiMin": 30,
-     "games": 3
-    },
-    {
-     "names": [
-      "Konecny",
-      "Zegras",
-      "Foerster"
-     ],
-     "players": [
-      "Travis Konecny",
-      "Trevor Zegras",
-      "Tyson Foerster"
-     ],
-     "toiMin": 30,
-     "games": 3
+     "games": 3,
+     "gf": 2,
+     "ga": 1,
+     "gf60": 4.02,
+     "ga60": 2.01
     }
    ]
   },
@@ -1365,7 +1701,11 @@
       "Nick Robertson"
      ],
      "toiMin": 75,
-     "games": 9
+     "games": 9,
+     "gf": 4,
+     "ga": 1,
+     "gf60": 3.21,
+     "ga60": 0.8
     },
     {
      "names": [
@@ -1379,7 +1719,11 @@
       "Rickard Rakell"
      ],
      "toiMin": 60,
-     "games": 5
+     "games": 5,
+     "gf": 3,
+     "ga": 5,
+     "gf60": 3.02,
+     "ga60": 5.03
     },
     {
      "names": [
@@ -1393,7 +1737,11 @@
       "Tommy Novak"
      ],
      "toiMin": 56,
-     "games": 6
+     "games": 6,
+     "gf": 4,
+     "ga": 3,
+     "gf60": 4.28,
+     "ga60": 3.21
     },
     {
      "names": [
@@ -1407,7 +1755,11 @@
       "Rickard Rakell"
      ],
      "toiMin": 45,
-     "games": 4
+     "games": 4,
+     "gf": 3,
+     "ga": 1,
+     "gf60": 3.96,
+     "ga60": 1.32
     }
    ]
   },
@@ -1429,7 +1781,11 @@
       "Matty Beniers"
      ],
      "toiMin": 74,
-     "games": 6
+     "games": 6,
+     "gf": 2,
+     "ga": 2,
+     "gf60": 1.61,
+     "ga60": 1.61
     },
     {
      "names": [
@@ -1443,7 +1799,11 @@
       "Ben Meyers"
      ],
      "toiMin": 60,
-     "games": 5
+     "games": 5,
+     "gf": 7,
+     "ga": 3,
+     "gf60": 6.97,
+     "ga60": 2.99
     },
     {
      "names": [
@@ -1457,7 +1817,11 @@
       "Bobby McMann"
      ],
      "toiMin": 57,
-     "games": 6
+     "games": 6,
+     "gf": 1,
+     "ga": 7,
+     "gf60": 1.05,
+     "ga60": 7.32
     },
     {
      "names": [
@@ -1471,15 +1835,19 @@
       "Mackie Samoskevich"
      ],
      "toiMin": 54,
-     "games": 6
+     "games": 6,
+     "gf": 4,
+     "ga": 1,
+     "gf60": 4.43,
+     "ga60": 1.11
     }
    ]
   },
   "SJS": {
-   "units": 22,
-   "kept": 25,
-   "opps": 38,
-   "keptPct": 65.8,
+   "units": 23,
+   "kept": 26,
+   "opps": 39,
+   "keptPct": 66.7,
    "top": [
     {
      "names": [
@@ -1493,7 +1861,11 @@
       "Igor Chernyshov"
      ],
      "toiMin": 51,
-     "games": 4
+     "games": 4,
+     "gf": 4,
+     "ga": 2,
+     "gf60": 4.67,
+     "ga60": 2.33
     },
     {
      "names": [
@@ -1507,7 +1879,11 @@
       "Michael Misa"
      ],
      "toiMin": 46,
-     "games": 4
+     "games": 4,
+     "gf": 2,
+     "ga": 3,
+     "gf60": 2.59,
+     "ga60": 3.89
     },
     {
      "names": [
@@ -1521,7 +1897,11 @@
       "Ivar Stenberg"
      ],
      "toiMin": 45,
-     "games": 4
+     "games": 4,
+     "gf": 1,
+     "ga": 4,
+     "gf60": 1.34,
+     "ga60": 5.37
     },
     {
      "names": [
@@ -1535,7 +1915,11 @@
       "Collin Graf"
      ],
      "toiMin": 32,
-     "games": 3
+     "games": 3,
+     "gf": 1,
+     "ga": 2,
+     "gf60": 1.88,
+     "ga60": 3.77
     }
    ]
   },
@@ -1557,7 +1941,11 @@
       "Jimmy Snuggerud"
      ],
      "toiMin": 124,
-     "games": 11
+     "games": 11,
+     "gf": 7,
+     "ga": 5,
+     "gf60": 3.38,
+     "ga60": 2.42
     },
     {
      "names": [
@@ -1571,7 +1959,11 @@
       "Mason McTavish"
      ],
      "toiMin": 52,
-     "games": 3
+     "games": 3,
+     "gf": 5,
+     "ga": 5,
+     "gf60": 5.82,
+     "ga60": 5.82
     },
     {
      "names": [
@@ -1585,7 +1977,11 @@
       "Dalibor Dvorsky"
      ],
      "toiMin": 47,
-     "games": 5
+     "games": 5,
+     "gf": 2,
+     "ga": 1,
+     "gf60": 2.53,
+     "ga60": 1.27
     },
     {
      "names": [
@@ -1599,7 +1995,11 @@
       "Pius Suter"
      ],
      "toiMin": 39,
-     "games": 4
+     "games": 4,
+     "gf": 2,
+     "ga": 1,
+     "gf60": 3.06,
+     "ga60": 1.53
     }
    ]
   },
@@ -1621,7 +2021,11 @@
       "Ilya Mikheyev"
      ],
      "toiMin": 145,
-     "games": 15
+     "games": 15,
+     "gf": 10,
+     "ga": 4,
+     "gf60": 4.13,
+     "ga60": 1.65
     },
     {
      "names": [
@@ -1635,7 +2039,11 @@
       "Brayden Point"
      ],
      "toiMin": 70,
-     "games": 5
+     "games": 5,
+     "gf": 8,
+     "ga": 2,
+     "gf60": 6.89,
+     "ga60": 1.72
     },
     {
      "names": [
@@ -1649,7 +2057,11 @@
       "Brandon Hagel"
      ],
      "toiMin": 57,
-     "games": 4
+     "games": 4,
+     "gf": 4,
+     "ga": 3,
+     "gf60": 4.19,
+     "ga60": 3.14
     },
     {
      "names": [
@@ -1663,7 +2075,11 @@
       "Brandon Hagel"
      ],
      "toiMin": 45,
-     "games": 4
+     "games": 4,
+     "gf": 5,
+     "ga": 4,
+     "gf60": 6.67,
+     "ga60": 5.34
     }
    ]
   },
@@ -1685,7 +2101,11 @@
       "Easton Cowan"
      ],
      "toiMin": 106,
-     "games": 10
+     "games": 10,
+     "gf": 9,
+     "ga": 3,
+     "gf60": 5.09,
+     "ga60": 1.7
     },
     {
      "names": [
@@ -1699,7 +2119,11 @@
       "Zack MacEwen"
      ],
      "toiMin": 87,
-     "games": 11
+     "games": 11,
+     "gf": 4,
+     "ga": 3,
+     "gf60": 2.76,
+     "ga60": 2.07
     },
     {
      "names": [
@@ -1713,7 +2137,11 @@
       "Auston Matthews"
      ],
      "toiMin": 56,
-     "games": 4
+     "games": 4,
+     "gf": 4,
+     "ga": 3,
+     "gf60": 4.28,
+     "ga60": 3.21
     },
     {
      "names": [
@@ -1727,15 +2155,19 @@
       "Kirill Marchenko"
      ],
      "toiMin": 45,
-     "games": 4
+     "games": 4,
+     "gf": 1,
+     "ga": 1,
+     "gf60": 1.33,
+     "ga60": 1.33
     }
    ]
   },
   "UTA": {
-   "units": 17,
-   "kept": 39,
-   "opps": 48,
-   "keptPct": 81.3,
+   "units": 18,
+   "kept": 40,
+   "opps": 49,
+   "keptPct": 81.6,
    "top": [
     {
      "names": [
@@ -1748,8 +2180,12 @@
       "Kailer Yamamoto",
       "Barrett Hayton"
      ],
-     "toiMin": 83,
-     "games": 10
+     "toiMin": 88,
+     "games": 11,
+     "gf": 5,
+     "ga": 5,
+     "gf60": 3.4,
+     "ga60": 3.4
     },
     {
      "names": [
@@ -1763,7 +2199,11 @@
       "Logan Cooley"
      ],
      "toiMin": 66,
-     "games": 6
+     "games": 6,
+     "gf": 3,
+     "ga": 1,
+     "gf60": 2.71,
+     "ga60": 0.9
     },
     {
      "names": [
@@ -1777,7 +2217,11 @@
       "Clayton Keller"
      ],
      "toiMin": 63,
-     "games": 5
+     "games": 5,
+     "gf": 2,
+     "ga": 3,
+     "gf60": 1.89,
+     "ga60": 2.84
     },
     {
      "names": [
@@ -1791,15 +2235,19 @@
       "Daniil But"
      ],
      "toiMin": 55,
-     "games": 6
+     "games": 6,
+     "gf": 4,
+     "ga": 2,
+     "gf60": 4.38,
+     "ga60": 2.19
     }
    ]
   },
   "VAN": {
    "units": 26,
-   "kept": 17,
-   "opps": 36,
-   "keptPct": 47.2,
+   "kept": 24,
+   "opps": 44,
+   "keptPct": 54.5,
    "top": [
     {
      "names": [
@@ -1812,8 +2260,12 @@
       "Jake DeBrusk",
       "Elias Pettersson"
      ],
-     "toiMin": 61,
-     "games": 6
+     "toiMin": 62,
+     "games": 6,
+     "gf": 5,
+     "ga": 6,
+     "gf60": 4.84,
+     "ga60": 5.8
     },
     {
      "names": [
@@ -1826,8 +2278,12 @@
       "Elias Pettersson",
       "Jonathan Lekkerim\u00e4ki"
      ],
-     "toiMin": 46,
-     "games": 5
+     "toiMin": 61,
+     "games": 7,
+     "gf": 3,
+     "ga": 4,
+     "gf60": 2.94,
+     "ga60": 3.92
     },
     {
      "names": [
@@ -1840,8 +2296,12 @@
       "Marco Rossi",
       "Liam Ohgren"
      ],
-     "toiMin": 33,
-     "games": 3
+     "toiMin": 47,
+     "games": 4,
+     "gf": 2,
+     "ga": 1,
+     "gf60": 2.58,
+     "ga60": 1.29
     },
     {
      "names": [
@@ -1854,16 +2314,20 @@
       "Filip Chytil",
       "Paul Cotter"
      ],
-     "toiMin": 23,
-     "games": 3
+     "toiMin": 41,
+     "games": 5,
+     "gf": 2,
+     "ga": 1,
+     "gf60": 2.93,
+     "ga60": 1.46
     }
    ]
   },
   "VGK": {
-   "units": 12,
-   "kept": 40,
-   "opps": 48,
-   "keptPct": 83.3,
+   "units": 13,
+   "kept": 43,
+   "opps": 51,
+   "keptPct": 84.3,
    "top": [
     {
      "names": [
@@ -1876,8 +2340,12 @@
       "Ivan Barbashev",
       "Jack Eichel"
      ],
-     "toiMin": 130,
-     "games": 13
+     "toiMin": 135,
+     "games": 13,
+     "gf": 9,
+     "ga": 4,
+     "gf60": 4.01,
+     "ga60": 1.78
     },
     {
      "names": [
@@ -1890,8 +2358,12 @@
       "Mitch Marner",
       "Brett Howden"
      ],
-     "toiMin": 116,
-     "games": 12
+     "toiMin": 121,
+     "games": 12,
+     "gf": 6,
+     "ga": 8,
+     "gf60": 2.98,
+     "ga60": 3.97
     },
     {
      "names": [
@@ -1905,7 +2377,11 @@
       "Braeden Bowman"
      ],
      "toiMin": 74,
-     "games": 8
+     "games": 8,
+     "gf": 0,
+     "ga": 4,
+     "gf60": 0.0,
+     "ga60": 3.22
     },
     {
      "names": [
@@ -1919,7 +2395,11 @@
       "Trevor Connelly"
      ],
      "toiMin": 51,
-     "games": 6
+     "games": 6,
+     "gf": 3,
+     "ga": 2,
+     "gf60": 3.54,
+     "ga60": 2.36
     }
    ]
   },
@@ -1941,7 +2421,11 @@
       "Cole Perfetti"
      ],
      "toiMin": 109,
-     "games": 10
+     "games": 10,
+     "gf": 9,
+     "ga": 4,
+     "gf60": 4.95,
+     "ga60": 2.2
     },
     {
      "names": [
@@ -1955,7 +2439,11 @@
       "Gabriel Vilardi"
      ],
      "toiMin": 79,
-     "games": 7
+     "games": 7,
+     "gf": 6,
+     "ga": 8,
+     "gf60": 4.53,
+     "ga60": 6.05
     },
     {
      "names": [
@@ -1969,7 +2457,11 @@
       "Viggo Bj\u00f6rck"
      ],
      "toiMin": 44,
-     "games": 5
+     "games": 5,
+     "gf": 0,
+     "ga": 0,
+     "gf60": 0.0,
+     "ga60": 0.0
     },
     {
      "names": [
@@ -1983,7 +2475,11 @@
       "Isak Rosen"
      ],
      "toiMin": 41,
-     "games": 4
+     "games": 4,
+     "gf": 4,
+     "ga": 3,
+     "gf60": 5.85,
+     "ga60": 4.39
     }
    ]
   },
@@ -2005,7 +2501,11 @@
       "Jordan Kyrou"
      ],
      "toiMin": 81,
-     "games": 10
+     "games": 10,
+     "gf": 5,
+     "ga": 7,
+     "gf60": 3.7,
+     "ga60": 5.18
     },
     {
      "names": [
@@ -2019,7 +2519,11 @@
       "Aliaksei Protas"
      ],
      "toiMin": 53,
-     "games": 5
+     "games": 5,
+     "gf": 4,
+     "ga": 1,
+     "gf60": 4.5,
+     "ga60": 1.12
     },
     {
      "names": [
@@ -2033,7 +2537,11 @@
       "Ryan Leonard"
      ],
      "toiMin": 29,
-     "games": 4
+     "games": 4,
+     "gf": 2,
+     "ga": 0,
+     "gf60": 4.09,
+     "ga60": 0.0
     },
     {
      "names": [
@@ -2047,17 +2555,21 @@
       "Aliaksei Protas"
      ],
      "toiMin": 24,
-     "games": 3
+     "games": 3,
+     "gf": 2,
+     "ga": 1,
+     "gf60": 4.93,
+     "ga60": 2.47
     }
    ]
   }
  },
  "def": {
   "ANA": {
-   "units": 12,
-   "kept": 34,
-   "opps": 39,
-   "keptPct": 87.2,
+   "units": 13,
+   "kept": 39,
+   "opps": 44,
+   "keptPct": 88.6,
    "top": [
     {
      "names": [
@@ -2068,8 +2580,12 @@
       "Drew Helleson",
       "Jackson LaCombe"
      ],
-     "toiMin": 96,
-     "games": 8
+     "toiMin": 100,
+     "games": 8,
+     "gf": 4,
+     "ga": 7,
+     "gf60": 2.41,
+     "ga60": 4.22
     },
     {
      "names": [
@@ -2080,8 +2596,12 @@
       "Jackson LaCombe",
       "Noah Warren"
      ],
-     "toiMin": 94,
-     "games": 9
+     "toiMin": 96,
+     "games": 9,
+     "gf": 6,
+     "ga": 7,
+     "gf60": 3.76,
+     "ga60": 4.39
     },
     {
      "names": [
@@ -2092,8 +2612,12 @@
       "Tyson Hinds",
       "Tristan Luneau"
      ],
-     "toiMin": 78,
-     "games": 7
+     "toiMin": 88,
+     "games": 8,
+     "gf": 6,
+     "ga": 8,
+     "gf60": 4.08,
+     "ga60": 5.43
     }
    ]
   },
@@ -2113,7 +2637,11 @@
       "Charlie McAvoy"
      ],
      "toiMin": 189,
-     "games": 13
+     "games": 13,
+     "gf": 12,
+     "ga": 6,
+     "gf60": 3.82,
+     "ga60": 1.91
     },
     {
      "names": [
@@ -2125,7 +2653,11 @@
       "Will Borgen"
      ],
      "toiMin": 159,
-     "games": 13
+     "games": 13,
+     "gf": 10,
+     "ga": 3,
+     "gf60": 3.78,
+     "ga60": 1.14
     },
     {
      "names": [
@@ -2137,7 +2669,11 @@
       "Frederic Brunet"
      ],
      "toiMin": 137,
-     "games": 12
+     "games": 12,
+     "gf": 7,
+     "ga": 4,
+     "gf60": 3.06,
+     "ga60": 1.75
     }
    ]
   },
@@ -2157,7 +2693,11 @@
       "Rasmus Dahlin"
      ],
      "toiMin": 148,
-     "games": 14
+     "games": 14,
+     "gf": 7,
+     "ga": 6,
+     "gf60": 2.83,
+     "ga60": 2.43
     },
     {
      "names": [
@@ -2169,7 +2709,11 @@
       "Olen Zellweger"
      ],
      "toiMin": 100,
-     "games": 7
+     "games": 7,
+     "gf": 4,
+     "ga": 6,
+     "gf60": 2.4,
+     "ga60": 3.6
     },
     {
      "names": [
@@ -2181,7 +2725,11 @@
       "Olen Zellweger"
      ],
      "toiMin": 67,
-     "games": 5
+     "games": 5,
+     "gf": 4,
+     "ga": 2,
+     "gf60": 3.6,
+     "ga60": 1.8
     }
    ]
   },
@@ -2201,7 +2749,11 @@
       "K'Andre Miller"
      ],
      "toiMin": 239,
-     "games": 18
+     "games": 18,
+     "gf": 20,
+     "ga": 11,
+     "gf60": 5.02,
+     "ga60": 2.76
     },
     {
      "names": [
@@ -2213,7 +2765,11 @@
       "Jalen Chatfield"
      ],
      "toiMin": 230,
-     "games": 18
+     "games": 18,
+     "gf": 13,
+     "ga": 8,
+     "gf60": 3.39,
+     "ga60": 2.09
     },
     {
      "names": [
@@ -2225,7 +2781,11 @@
       "Juuso V\u00e4lim\u00e4ki"
      ],
      "toiMin": 72,
-     "games": 8
+     "games": 8,
+     "gf": 9,
+     "ga": 3,
+     "gf60": 7.47,
+     "ga60": 2.49
     }
    ]
   },
@@ -2245,7 +2805,11 @@
       "Zach Werenski"
      ],
      "toiMin": 205,
-     "games": 16
+     "games": 16,
+     "gf": 13,
+     "ga": 7,
+     "gf60": 3.81,
+     "ga60": 2.05
     },
     {
      "names": [
@@ -2257,7 +2821,11 @@
       "Denton Mateychuk"
      ],
      "toiMin": 68,
-     "games": 6
+     "games": 6,
+     "gf": 2,
+     "ga": 1,
+     "gf60": 1.76,
+     "ga60": 0.88
     },
     {
      "names": [
@@ -2269,16 +2837,36 @@
       "Denton Mateychuk"
      ],
      "toiMin": 62,
-     "games": 6
+     "games": 6,
+     "gf": 3,
+     "ga": 1,
+     "gf60": 2.89,
+     "ga60": 0.96
     }
    ]
   },
   "CGY": {
    "units": 9,
-   "kept": 41,
-   "opps": 43,
-   "keptPct": 95.3,
+   "kept": 44,
+   "opps": 46,
+   "keptPct": 95.7,
    "top": [
+    {
+     "names": [
+      "Middleton",
+      "Whitecloud"
+     ],
+     "players": [
+      "Jake Middleton",
+      "Zach Whitecloud"
+     ],
+     "toiMin": 161,
+     "games": 11,
+     "gf": 7,
+     "ga": 8,
+     "gf60": 2.6,
+     "ga60": 2.97
+    },
     {
      "names": [
       "Bahl",
@@ -2289,19 +2877,11 @@
       "Simon Nemec"
      ],
      "toiMin": 152,
-     "games": 12
-    },
-    {
-     "names": [
-      "Middleton",
-      "Whitecloud"
-     ],
-     "players": [
-      "Jake Middleton",
-      "Zach Whitecloud"
-     ],
-     "toiMin": 143,
-     "games": 10
+     "games": 12,
+     "gf": 5,
+     "ga": 6,
+     "gf60": 1.97,
+     "ga60": 2.36
     },
     {
      "names": [
@@ -2312,8 +2892,12 @@
       "Yan Kuznetsov",
       "Zayne Parekh"
      ],
-     "toiMin": 108,
-     "games": 10
+     "toiMin": 119,
+     "games": 11,
+     "gf": 5,
+     "ga": 7,
+     "gf60": 2.51,
+     "ga60": 3.52
     }
    ]
   },
@@ -2333,7 +2917,11 @@
       "Alex Vlasic"
      ],
      "toiMin": 147,
-     "games": 16
+     "games": 16,
+     "gf": 1,
+     "ga": 6,
+     "gf60": 0.41,
+     "ga60": 2.45
     },
     {
      "names": [
@@ -2345,7 +2933,11 @@
       "Artyom Levshunov"
      ],
      "toiMin": 117,
-     "games": 10
+     "games": 10,
+     "gf": 4,
+     "ga": 13,
+     "gf60": 2.06,
+     "ga60": 6.69
     },
     {
      "names": [
@@ -2357,7 +2949,11 @@
       "Sam Rinzel"
      ],
      "toiMin": 73,
-     "games": 7
+     "games": 7,
+     "gf": 3,
+     "ga": 6,
+     "gf60": 2.47,
+     "ga60": 4.93
     }
    ]
   },
@@ -2377,7 +2973,11 @@
       "Cale Makar"
      ],
      "toiMin": 154,
-     "games": 14
+     "games": 14,
+     "gf": 15,
+     "ga": 9,
+     "gf60": 5.85,
+     "ga60": 3.51
     },
     {
      "names": [
@@ -2389,7 +2989,11 @@
       "Sam Malinski"
      ],
      "toiMin": 93,
-     "games": 9
+     "games": 9,
+     "gf": 8,
+     "ga": 5,
+     "gf60": 5.14,
+     "ga60": 3.21
     },
     {
      "names": [
@@ -2401,15 +3005,19 @@
       "Sam Malinski"
      ],
      "toiMin": 90,
-     "games": 8
+     "games": 8,
+     "gf": 2,
+     "ga": 3,
+     "gf60": 1.34,
+     "ga60": 2.01
     }
    ]
   },
   "DAL": {
    "units": 14,
-   "kept": 44,
-   "opps": 49,
-   "keptPct": 89.8,
+   "kept": 47,
+   "opps": 52,
+   "keptPct": 90.4,
    "top": [
     {
      "names": [
@@ -2420,8 +3028,12 @@
       "Nils Lundkvist",
       "Thomas Harley"
      ],
-     "toiMin": 150,
-     "games": 12
+     "toiMin": 163,
+     "games": 13,
+     "gf": 11,
+     "ga": 6,
+     "gf60": 4.06,
+     "ga60": 2.21
     },
     {
      "names": [
@@ -2433,7 +3045,11 @@
       "Lian Bichsel"
      ],
      "toiMin": 101,
-     "games": 11
+     "games": 11,
+     "gf": 2,
+     "ga": 1,
+     "gf60": 1.18,
+     "ga60": 0.59
     },
     {
      "names": [
@@ -2445,7 +3061,11 @@
       "Miro Heiskanen"
      ],
      "toiMin": 93,
-     "games": 8
+     "games": 8,
+     "gf": 2,
+     "ga": 2,
+     "gf60": 1.28,
+     "ga60": 1.28
     }
    ]
   },
@@ -2465,7 +3085,11 @@
       "Moritz Seider"
      ],
      "toiMin": 109,
-     "games": 9
+     "games": 9,
+     "gf": 5,
+     "ga": 10,
+     "gf60": 2.74,
+     "ga60": 5.49
     },
     {
      "names": [
@@ -2477,7 +3101,11 @@
       "William Wallinder"
      ],
      "toiMin": 103,
-     "games": 10
+     "games": 10,
+     "gf": 6,
+     "ga": 6,
+     "gf60": 3.49,
+     "ga60": 3.49
     },
     {
      "names": [
@@ -2489,15 +3117,19 @@
       "Anton Johansson"
      ],
      "toiMin": 87,
-     "games": 8
+     "games": 8,
+     "gf": 5,
+     "ga": 4,
+     "gf60": 3.46,
+     "ga60": 2.77
     }
    ]
   },
   "EDM": {
    "units": 8,
-   "kept": 38,
-   "opps": 42,
-   "keptPct": 90.5,
+   "kept": 41,
+   "opps": 45,
+   "keptPct": 91.1,
    "top": [
     {
      "names": [
@@ -2508,8 +3140,12 @@
       "Mattias Ekholm",
       "Evan Bouchard"
      ],
-     "toiMin": 222,
-     "games": 16
+     "toiMin": 234,
+     "games": 17,
+     "gf": 21,
+     "ga": 5,
+     "gf60": 5.39,
+     "ga60": 1.28
     },
     {
      "names": [
@@ -2520,8 +3156,12 @@
       "Connor Murphy",
       "Ryan Shea"
      ],
-     "toiMin": 220,
-     "games": 17
+     "toiMin": 230,
+     "games": 18,
+     "gf": 1,
+     "ga": 7,
+     "gf60": 0.26,
+     "ga60": 1.83
     },
     {
      "names": [
@@ -2532,16 +3172,20 @@
       "Ty Emberson",
       "Shakir Mukhamadullin"
      ],
-     "toiMin": 98,
-     "games": 10
+     "toiMin": 109,
+     "games": 11,
+     "gf": 3,
+     "ga": 4,
+     "gf60": 1.65,
+     "ga60": 2.2
     }
    ]
   },
   "FLA": {
    "units": 6,
-   "kept": 42,
-   "opps": 43,
-   "keptPct": 97.7,
+   "kept": 44,
+   "opps": 45,
+   "keptPct": 97.8,
    "top": [
     {
      "names": [
@@ -2552,8 +3196,12 @@
       "Aaron Ekblad",
       "Gustav Forsling"
      ],
-     "toiMin": 205,
-     "games": 17
+     "toiMin": 222,
+     "games": 18,
+     "gf": 12,
+     "ga": 14,
+     "gf60": 3.25,
+     "ga60": 3.79
     },
     {
      "names": [
@@ -2564,8 +3212,12 @@
       "Seth Jones",
       "Niko Mikkola"
      ],
-     "toiMin": 188,
-     "games": 18
+     "toiMin": 205,
+     "games": 19,
+     "gf": 14,
+     "ga": 13,
+     "gf60": 4.11,
+     "ga60": 3.81
     },
     {
      "names": [
@@ -2577,7 +3229,11 @@
       "Radko Gudas"
      ],
      "toiMin": 91,
-     "games": 9
+     "games": 9,
+     "gf": 1,
+     "ga": 6,
+     "gf60": 0.66,
+     "ga60": 3.95
     }
    ]
   },
@@ -2597,7 +3253,11 @@
       "Mikey Anderson"
      ],
      "toiMin": 95,
-     "games": 10
+     "games": 10,
+     "gf": 7,
+     "ga": 4,
+     "gf60": 4.42,
+     "ga60": 2.53
     },
     {
      "names": [
@@ -2609,7 +3269,11 @@
       "Brandt Clarke"
      ],
      "toiMin": 95,
-     "games": 10
+     "games": 10,
+     "gf": 6,
+     "ga": 5,
+     "gf60": 3.81,
+     "ga60": 3.17
     },
     {
      "names": [
@@ -2621,7 +3285,11 @@
       "Joel Edmundson"
      ],
      "toiMin": 85,
-     "games": 8
+     "games": 8,
+     "gf": 6,
+     "ga": 1,
+     "gf60": 4.25,
+     "ga60": 0.71
     }
    ]
   },
@@ -2641,7 +3309,11 @@
       "Quinn Hughes"
      ],
      "toiMin": 193,
-     "games": 12
+     "games": 12,
+     "gf": 11,
+     "ga": 7,
+     "gf60": 3.41,
+     "ga60": 2.17
     },
     {
      "names": [
@@ -2653,7 +3325,11 @@
       "Quinn Hughes"
      ],
      "toiMin": 99,
-     "games": 8
+     "games": 8,
+     "gf": 6,
+     "ga": 3,
+     "gf60": 3.64,
+     "ga60": 1.82
     },
     {
      "names": [
@@ -2665,15 +3341,19 @@
       "Olli Maatta"
      ],
      "toiMin": 74,
-     "games": 7
+     "games": 7,
+     "gf": 5,
+     "ga": 2,
+     "gf60": 4.07,
+     "ga60": 1.63
     }
    ]
   },
   "MTL": {
    "units": 10,
-   "kept": 35,
-   "opps": 39,
-   "keptPct": 89.7,
+   "kept": 38,
+   "opps": 42,
+   "keptPct": 90.5,
    "top": [
     {
      "names": [
@@ -2684,8 +3364,12 @@
       "Noah Dobson",
       "Lane Hutson"
      ],
-     "toiMin": 199,
-     "games": 15
+     "toiMin": 214,
+     "games": 16,
+     "gf": 9,
+     "ga": 10,
+     "gf60": 2.52,
+     "ga60": 2.8
     },
     {
      "names": [
@@ -2696,8 +3380,12 @@
       "Alexandre Carrier",
       "Kaiden Guhle"
      ],
-     "toiMin": 173,
-     "games": 12
+     "toiMin": 186,
+     "games": 13,
+     "gf": 6,
+     "ga": 6,
+     "gf60": 1.94,
+     "ga60": 1.94
     },
     {
      "names": [
@@ -2708,8 +3396,12 @@
       "Arber Xhekaj",
       "Adam Engstrom"
      ],
-     "toiMin": 87,
-     "games": 11
+     "toiMin": 97,
+     "games": 12,
+     "gf": 8,
+     "ga": 6,
+     "gf60": 4.96,
+     "ga60": 3.72
     }
    ]
   },
@@ -2729,7 +3421,11 @@
       "Luke Hughes"
      ],
      "toiMin": 203,
-     "games": 17
+     "games": 17,
+     "gf": 18,
+     "ga": 9,
+     "gf60": 5.31,
+     "ga60": 2.65
     },
     {
      "names": [
@@ -2741,7 +3437,11 @@
       "Jonas Siegenthaler"
      ],
      "toiMin": 186,
-     "games": 16
+     "games": 16,
+     "gf": 11,
+     "ga": 11,
+     "gf60": 3.55,
+     "ga60": 3.55
     },
     {
      "names": [
@@ -2753,15 +3453,19 @@
       "Declan Chisholm"
      ],
      "toiMin": 74,
-     "games": 7
+     "games": 7,
+     "gf": 7,
+     "ga": 2,
+     "gf60": 5.67,
+     "ga60": 1.62
     }
    ]
   },
   "NSH": {
    "units": 9,
-   "kept": 39,
-   "opps": 41,
-   "keptPct": 95.1,
+   "kept": 42,
+   "opps": 44,
+   "keptPct": 95.5,
    "top": [
     {
      "names": [
@@ -2772,8 +3476,12 @@
       "Roman Josi",
       "Adam Wilsby"
      ],
-     "toiMin": 192,
-     "games": 14
+     "toiMin": 209,
+     "games": 15,
+     "gf": 12,
+     "ga": 11,
+     "gf60": 3.45,
+     "ga60": 3.16
     },
     {
      "names": [
@@ -2784,8 +3492,12 @@
       "Brady Skjei",
       "Nick Perbix"
      ],
-     "toiMin": 147,
-     "games": 12
+     "toiMin": 158,
+     "games": 13,
+     "gf": 6,
+     "ga": 9,
+     "gf60": 2.28,
+     "ga60": 3.41
     },
     {
      "names": [
@@ -2796,8 +3508,12 @@
       "Jayden Struble",
       "Daemon Hunt"
      ],
-     "toiMin": 72,
-     "games": 8
+     "toiMin": 85,
+     "games": 9,
+     "gf": 5,
+     "ga": 2,
+     "gf60": 3.55,
+     "ga60": 1.42
     }
    ]
   },
@@ -2817,7 +3533,11 @@
       "Matthew Schaefer"
      ],
      "toiMin": 168,
-     "games": 13
+     "games": 13,
+     "gf": 8,
+     "ga": 8,
+     "gf60": 2.86,
+     "ga60": 2.86
     },
     {
      "names": [
@@ -2829,7 +3549,11 @@
       "Ryan Pulock"
      ],
      "toiMin": 117,
-     "games": 11
+     "games": 11,
+     "gf": 6,
+     "ga": 1,
+     "gf60": 3.08,
+     "ga60": 0.51
     },
     {
      "names": [
@@ -2841,15 +3565,19 @@
       "Matthew Schaefer"
      ],
      "toiMin": 53,
-     "games": 4
+     "games": 4,
+     "gf": 2,
+     "ga": 4,
+     "gf60": 2.27,
+     "ga60": 4.55
     }
    ]
   },
   "NYR": {
    "units": 7,
-   "kept": 40,
-   "opps": 41,
-   "keptPct": 97.6,
+   "kept": 43,
+   "opps": 44,
+   "keptPct": 97.7,
    "top": [
     {
      "names": [
@@ -2860,8 +3588,12 @@
       "Vladislav Gavrikov",
       "Adam Fox"
      ],
-     "toiMin": 202,
-     "games": 17
+     "toiMin": 215,
+     "games": 18,
+     "gf": 13,
+     "ga": 11,
+     "gf60": 3.63,
+     "ga60": 3.08
     },
     {
      "names": [
@@ -2872,8 +3604,12 @@
       "Marcus Pettersson",
       "Braden Schneider"
      ],
-     "toiMin": 103,
-     "games": 7
+     "toiMin": 117,
+     "games": 8,
+     "gf": 5,
+     "ga": 6,
+     "gf60": 2.56,
+     "ga60": 3.07
     },
     {
      "names": [
@@ -2885,7 +3621,11 @@
       "Sean Durzi"
      ],
      "toiMin": 97,
-     "games": 8
+     "games": 8,
+     "gf": 6,
+     "ga": 6,
+     "gf60": 3.69,
+     "ga60": 3.69
     }
    ]
   },
@@ -2905,7 +3645,11 @@
       "Jordan Spence"
      ],
      "toiMin": 146,
-     "games": 13
+     "games": 13,
+     "gf": 15,
+     "ga": 5,
+     "gf60": 6.16,
+     "ga60": 2.05
     },
     {
      "names": [
@@ -2917,7 +3661,11 @@
       "Artem Zub"
      ],
      "toiMin": 121,
-     "games": 12
+     "games": 12,
+     "gf": 7,
+     "ga": 6,
+     "gf60": 3.46,
+     "ga60": 2.97
     },
     {
      "names": [
@@ -2929,15 +3677,19 @@
       "Tyler Kleven"
      ],
      "toiMin": 80,
-     "games": 6
+     "games": 6,
+     "gf": 3,
+     "ga": 0,
+     "gf60": 2.24,
+     "ga60": 0.0
     }
    ]
   },
   "PHI": {
-   "units": 12,
-   "kept": 34,
-   "opps": 40,
-   "keptPct": 85.0,
+   "units": 14,
+   "kept": 36,
+   "opps": 42,
+   "keptPct": 85.7,
    "top": [
     {
      "names": [
@@ -2948,8 +3700,12 @@
       "Travis Sanheim",
       "Jamie Drysdale"
      ],
-     "toiMin": 157,
-     "games": 11
+     "toiMin": 163,
+     "games": 12,
+     "gf": 10,
+     "ga": 8,
+     "gf60": 3.69,
+     "ga60": 2.95
     },
     {
      "names": [
@@ -2961,7 +3717,11 @@
       "Oliver Bonk"
      ],
      "toiMin": 83,
-     "games": 7
+     "games": 7,
+     "gf": 2,
+     "ga": 4,
+     "gf60": 1.44,
+     "ga60": 2.88
     },
     {
      "names": [
@@ -2973,7 +3733,11 @@
       "Oliver Bonk"
      ],
      "toiMin": 77,
-     "games": 7
+     "games": 7,
+     "gf": 3,
+     "ga": 8,
+     "gf60": 2.35,
+     "ga60": 6.27
     }
    ]
   },
@@ -2993,7 +3757,11 @@
       "Kaedan Korczak"
      ],
      "toiMin": 126,
-     "games": 13
+     "games": 13,
+     "gf": 7,
+     "ga": 9,
+     "gf60": 3.32,
+     "ga60": 4.27
     },
     {
      "names": [
@@ -3005,7 +3773,11 @@
       "Spencer Stastney"
      ],
      "toiMin": 114,
-     "games": 10
+     "games": 10,
+     "gf": 6,
+     "ga": 8,
+     "gf60": 3.15,
+     "ga60": 4.2
     },
     {
      "names": [
@@ -3017,7 +3789,11 @@
       "Declan Carlile"
      ],
      "toiMin": 84,
-     "games": 8
+     "games": 8,
+     "gf": 4,
+     "ga": 6,
+     "gf60": 2.85,
+     "ga60": 4.27
     }
    ]
   },
@@ -3037,7 +3813,11 @@
       "Ryker Evans"
      ],
      "toiMin": 178,
-     "games": 14
+     "games": 14,
+     "gf": 12,
+     "ga": 11,
+     "gf60": 4.05,
+     "ga60": 3.71
     },
     {
      "names": [
@@ -3049,7 +3829,11 @@
       "Vince Dunn"
      ],
      "toiMin": 167,
-     "games": 14
+     "games": 14,
+     "gf": 7,
+     "ga": 10,
+     "gf60": 2.52,
+     "ga60": 3.6
     },
     {
      "names": [
@@ -3061,7 +3845,11 @@
       "Ville Ottavainen"
      ],
      "toiMin": 60,
-     "games": 5
+     "games": 5,
+     "gf": 5,
+     "ga": 6,
+     "gf60": 5.0,
+     "ga60": 6.0
     }
    ]
   },
@@ -3080,8 +3868,12 @@
       "Jacob Trouba",
       "Sam Dickinson"
      ],
-     "toiMin": 211,
-     "games": 17
+     "toiMin": 225,
+     "games": 18,
+     "gf": 6,
+     "ga": 9,
+     "gf60": 1.6,
+     "ga60": 2.4
     },
     {
      "names": [
@@ -3092,8 +3884,12 @@
       "Darnell Nurse",
       "Michael Kesselring"
      ],
-     "toiMin": 198,
-     "games": 16
+     "toiMin": 214,
+     "games": 17,
+     "gf": 5,
+     "ga": 13,
+     "gf60": 1.4,
+     "ga60": 3.65
     },
     {
      "names": [
@@ -3104,8 +3900,12 @@
       "Dmitry Orlov",
       "Eric Pohlkamp"
      ],
-     "toiMin": 49,
-     "games": 4
+     "toiMin": 62,
+     "games": 5,
+     "gf": 5,
+     "ga": 3,
+     "gf60": 4.83,
+     "ga60": 2.9
     }
    ]
   },
@@ -3125,7 +3925,11 @@
       "Brandon Carlo"
      ],
      "toiMin": 111,
-     "games": 11
+     "games": 11,
+     "gf": 6,
+     "ga": 10,
+     "gf60": 3.23,
+     "ga60": 5.38
     },
     {
      "names": [
@@ -3137,7 +3941,11 @@
       "Justin Barron"
      ],
      "toiMin": 82,
-     "games": 6
+     "games": 6,
+     "gf": 3,
+     "ga": 6,
+     "gf60": 2.2,
+     "ga60": 4.39
     },
     {
      "names": [
@@ -3149,7 +3957,11 @@
       "Philip Broberg"
      ],
      "toiMin": 73,
-     "games": 6
+     "games": 6,
+     "gf": 3,
+     "ga": 3,
+     "gf60": 2.47,
+     "ga60": 2.47
     }
    ]
   },
@@ -3169,7 +3981,11 @@
       "Erik Cernak"
      ],
      "toiMin": 133,
-     "games": 13
+     "games": 13,
+     "gf": 14,
+     "ga": 4,
+     "gf60": 6.31,
+     "ga60": 1.8
     },
     {
      "names": [
@@ -3181,7 +3997,11 @@
       "Charle-Edouard D'Astous"
      ],
      "toiMin": 110,
-     "games": 9
+     "games": 9,
+     "gf": 13,
+     "ga": 3,
+     "gf60": 7.07,
+     "ga60": 1.63
     },
     {
      "names": [
@@ -3193,7 +4013,11 @@
       "J.J. Moser"
      ],
      "toiMin": 105,
-     "games": 10
+     "games": 10,
+     "gf": 5,
+     "ga": 3,
+     "gf60": 2.85,
+     "ga60": 1.71
     }
    ]
   },
@@ -3213,7 +4037,11 @@
       "Darren Raddysh"
      ],
      "toiMin": 208,
-     "games": 16
+     "games": 16,
+     "gf": 8,
+     "ga": 13,
+     "gf60": 2.31,
+     "ga60": 3.75
     },
     {
      "names": [
@@ -3225,7 +4053,11 @@
       "Troy Stecher"
      ],
      "toiMin": 100,
-     "games": 9
+     "games": 9,
+     "gf": 5,
+     "ga": 3,
+     "gf60": 3.0,
+     "ga60": 1.8
     },
     {
      "names": [
@@ -3237,15 +4069,19 @@
       "Troy Stecher"
      ],
      "toiMin": 76,
-     "games": 9
+     "games": 9,
+     "gf": 9,
+     "ga": 5,
+     "gf60": 7.14,
+     "ga60": 3.97
     }
    ]
   },
   "UTA": {
    "units": 7,
-   "kept": 39,
-   "opps": 44,
-   "keptPct": 88.6,
+   "kept": 40,
+   "opps": 45,
+   "keptPct": 88.9,
    "top": [
     {
      "names": [
@@ -3256,8 +4092,12 @@
       "MacKenzie Weegar",
       "Mikhail Sergachev"
      ],
-     "toiMin": 191,
-     "games": 15
+     "toiMin": 192,
+     "games": 15,
+     "gf": 6,
+     "ga": 13,
+     "gf60": 1.88,
+     "ga60": 4.06
     },
     {
      "names": [
@@ -3269,7 +4109,11 @@
       "Andrew Peeke"
      ],
      "toiMin": 86,
-     "games": 7
+     "games": 7,
+     "gf": 3,
+     "ga": 5,
+     "gf60": 2.1,
+     "ga60": 3.5
     },
     {
      "names": [
@@ -3280,16 +4124,20 @@
       "Andrew Peeke",
       "Dmitri Simashev"
      ],
-     "toiMin": 80,
-     "games": 7
+     "toiMin": 81,
+     "games": 7,
+     "gf": 3,
+     "ga": 4,
+     "gf60": 2.22,
+     "ga60": 2.97
     }
    ]
   },
   "VAN": {
    "units": 13,
-   "kept": 30,
-   "opps": 31,
-   "keptPct": 96.8,
+   "kept": 36,
+   "opps": 37,
+   "keptPct": 97.3,
    "top": [
     {
      "names": [
@@ -3300,8 +4148,12 @@
       "Filip Hronek",
       "Elias Pettersson"
      ],
-     "toiMin": 123,
-     "games": 11
+     "toiMin": 125,
+     "games": 11,
+     "gf": 4,
+     "ga": 11,
+     "gf60": 1.93,
+     "ga60": 5.3
     },
     {
      "names": [
@@ -3312,8 +4164,12 @@
       "Filip Hronek",
       "Zeev Buium"
      ],
-     "toiMin": 99,
-     "games": 6
+     "toiMin": 122,
+     "games": 8,
+     "gf": 4,
+     "ga": 8,
+     "gf60": 1.96,
+     "ga60": 3.92
     },
     {
      "names": [
@@ -3324,16 +4180,20 @@
       "Jamie Oleksiak",
       "Tom Willander"
      ],
-     "toiMin": 95,
-     "games": 8
+     "toiMin": 97,
+     "games": 8,
+     "gf": 4,
+     "ga": 7,
+     "gf60": 2.48,
+     "ga60": 4.34
     }
    ]
   },
   "VGK": {
    "units": 7,
-   "kept": 41,
-   "opps": 44,
-   "keptPct": 93.2,
+   "kept": 44,
+   "opps": 47,
+   "keptPct": 93.6,
    "top": [
     {
      "names": [
@@ -3344,8 +4204,12 @@
       "Brayden McNabb",
       "Shea Theodore"
      ],
-     "toiMin": 241,
-     "games": 18
+     "toiMin": 255,
+     "games": 19,
+     "gf": 14,
+     "ga": 10,
+     "gf60": 3.3,
+     "ga60": 2.35
     },
     {
      "names": [
@@ -3356,8 +4220,12 @@
       "Rasmus Andersson",
       "Jeremy Lauzon"
      ],
-     "toiMin": 147,
-     "games": 11
+     "toiMin": 158,
+     "games": 12,
+     "gf": 4,
+     "ga": 10,
+     "gf60": 1.51,
+     "ga60": 3.79
     },
     {
      "names": [
@@ -3369,7 +4237,11 @@
       "Dylan Coghlan"
      ],
      "toiMin": 98,
-     "games": 9
+     "games": 9,
+     "gf": 6,
+     "ga": 6,
+     "gf60": 3.67,
+     "ga60": 3.67
     }
    ]
   },
@@ -3389,7 +4261,11 @@
       "Neal Pionk"
      ],
      "toiMin": 208,
-     "games": 18
+     "games": 18,
+     "gf": 12,
+     "ga": 10,
+     "gf60": 3.47,
+     "ga60": 2.89
     },
     {
      "names": [
@@ -3401,7 +4277,11 @@
       "Mario Ferraro"
      ],
      "toiMin": 94,
-     "games": 8
+     "games": 8,
+     "gf": 5,
+     "ga": 3,
+     "gf60": 3.18,
+     "ga60": 1.91
     },
     {
      "names": [
@@ -3413,7 +4293,11 @@
       "Dylan Samberg"
      ],
      "toiMin": 48,
-     "games": 3
+     "games": 3,
+     "gf": 3,
+     "ga": 2,
+     "gf60": 3.77,
+     "ga60": 2.51
     }
    ]
   },
@@ -3433,7 +4317,11 @@
       "Jakob Chychrun"
      ],
      "toiMin": 96,
-     "games": 10
+     "games": 10,
+     "gf": 8,
+     "ga": 6,
+     "gf60": 5.0,
+     "ga60": 3.75
     },
     {
      "names": [
@@ -3445,7 +4333,11 @@
       "Timothy Liljegren"
      ],
      "toiMin": 78,
-     "games": 6
+     "games": 6,
+     "gf": 4,
+     "ga": 5,
+     "gf60": 3.06,
+     "ga60": 3.83
     },
     {
      "names": [
@@ -3457,7 +4349,11 @@
       "Cole Hutson"
      ],
      "toiMin": 68,
-     "games": 6
+     "games": 6,
+     "gf": 9,
+     "ga": 4,
+     "gf60": 7.99,
+     "ga60": 3.55
     }
    ]
   }
@@ -3470,6 +4366,2575 @@
   "def": {
    "unitsAvg": 10,
    "keptAvg": 92
+  }
+ },
+ "scoredOn": {
+  "floorMin": 150,
+  "most": [
+   {
+    "pid": 8476905,
+    "name": "Chandler Stephenson",
+    "last": "Stephenson",
+    "team": "SEA",
+    "pos": "C",
+    "min": 170,
+    "ga": 19,
+    "gf": 6,
+    "ga60": 6.72,
+    "gf60": 2.12
+   },
+   {
+    "pid": 8485414,
+    "name": "Ben Kindel",
+    "last": "Kindel",
+    "team": "PIT",
+    "pos": "C",
+    "min": 156,
+    "ga": 17,
+    "gf": 9,
+    "ga60": 6.56,
+    "gf60": 3.47
+   },
+   {
+    "pid": 8479385,
+    "name": "Jordan Kyrou",
+    "last": "Kyrou",
+    "team": "WSH",
+    "pos": "R",
+    "min": 156,
+    "ga": 17,
+    "gf": 12,
+    "ga60": 6.55,
+    "gf60": 4.62
+   },
+   {
+    "pid": 8475200,
+    "name": "Dmitry Orlov",
+    "last": "Orlov",
+    "team": "SJS",
+    "pos": "D",
+    "min": 157,
+    "ga": 17,
+    "gf": 12,
+    "ga60": 6.51,
+    "gf60": 4.6
+   },
+   {
+    "pid": 8477951,
+    "name": "Nick Schmaltz",
+    "last": "Schmaltz",
+    "team": "UTA",
+    "pos": "C",
+    "min": 160,
+    "ga": 17,
+    "gf": 5,
+    "ga60": 6.36,
+    "gf60": 1.87
+   },
+   {
+    "pid": 8482176,
+    "name": "Wyatt Kaiser",
+    "last": "Kaiser",
+    "team": "CHI",
+    "pos": "D",
+    "min": 234,
+    "ga": 24,
+    "gf": 10,
+    "ga60": 6.14,
+    "gf60": 2.56
+   },
+   {
+    "pid": 8474578,
+    "name": "Erik Karlsson",
+    "last": "Karlsson",
+    "team": "PIT",
+    "pos": "D",
+    "min": 256,
+    "ga": 24,
+    "gf": 12,
+    "ga60": 5.62,
+    "gf60": 2.81
+   },
+   {
+    "pid": 8483398,
+    "name": "Declan Carlile",
+    "last": "Carlile",
+    "team": "PIT",
+    "pos": "D",
+    "min": 228,
+    "ga": 21,
+    "gf": 12,
+    "ga60": 5.53,
+    "gf60": 3.16
+   }
+  ],
+  "fewest": [
+   {
+    "pid": 8476479,
+    "name": "Phillip Danault",
+    "last": "Danault",
+    "team": "MTL",
+    "pos": "C",
+    "min": 205,
+    "ga": 3,
+    "gf": 8,
+    "ga60": 0.88,
+    "gf60": 2.34
+   },
+   {
+    "pid": 8481557,
+    "name": "Matt Boldy",
+    "last": "Boldy",
+    "team": "MIN",
+    "pos": "L",
+    "min": 266,
+    "ga": 4,
+    "gf": 21,
+    "ga60": 0.9,
+    "gf60": 4.74
+   },
+   {
+    "pid": 8476874,
+    "name": "Olli Maatta",
+    "last": "Maatta",
+    "team": "MIN",
+    "pos": "D",
+    "min": 199,
+    "ga": 3,
+    "gf": 12,
+    "ga60": 0.91,
+    "gf60": 3.62
+   },
+   {
+    "pid": 8482737,
+    "name": "Zachary Bolduc",
+    "last": "Bolduc",
+    "team": "MTL",
+    "pos": "R",
+    "min": 193,
+    "ga": 3,
+    "gf": 7,
+    "ga60": 0.93,
+    "gf60": 2.17
+   },
+   {
+    "pid": 8485388,
+    "name": "Victor Eklund",
+    "last": "Eklund",
+    "team": "NYI",
+    "pos": "R",
+    "min": 193,
+    "ga": 3,
+    "gf": 10,
+    "ga60": 0.93,
+    "gf60": 3.11
+   },
+   {
+    "pid": 8478493,
+    "name": "Joel Eriksson Ek",
+    "last": "Eriksson Ek",
+    "team": "MIN",
+    "pos": "C",
+    "min": 238,
+    "ga": 4,
+    "gf": 19,
+    "ga60": 1.01,
+    "gf60": 4.8
+   },
+   {
+    "pid": 8480018,
+    "name": "Nick Suzuki",
+    "last": "Suzuki",
+    "team": "MTL",
+    "pos": "C",
+    "min": 172,
+    "ga": 3,
+    "gf": 10,
+    "ga60": 1.05,
+    "gf60": 3.48
+   },
+   {
+    "pid": 8474563,
+    "name": "Drew Doughty",
+    "last": "Doughty",
+    "team": "LAK",
+    "pos": "D",
+    "min": 202,
+    "ga": 4,
+    "gf": 8,
+    "ga60": 1.19,
+    "gf60": 2.38
+   }
+  ]
+ },
+ "pppk": {
+  "ANA": {
+   "pp": [
+    {
+     "names": [
+      "Granlund",
+      "LaCombe",
+      "Gauthier",
+      "Carlsson",
+      "Sennecke"
+     ],
+     "players": [
+      "Mikael Granlund",
+      "Jackson LaCombe",
+      "Cutter Gauthier",
+      "Leo Carlsson",
+      "Beckett Sennecke"
+     ],
+     "toiMin": 55,
+     "share": 29.2
+    },
+    {
+     "names": [
+      "Granlund",
+      "Caulfield",
+      "LaCombe",
+      "Carlsson",
+      "Sennecke"
+     ],
+     "players": [
+      "Mikael Granlund",
+      "Judd Caulfield",
+      "Jackson LaCombe",
+      "Leo Carlsson",
+      "Beckett Sennecke"
+     ],
+     "toiMin": 7,
+     "share": 3.6
+    }
+   ],
+   "pk": [
+    {
+     "names": [
+      "Killorn",
+      "Helleson",
+      "LaCombe",
+      "Washe"
+     ],
+     "players": [
+      "Alex Killorn",
+      "Drew Helleson",
+      "Jackson LaCombe",
+      "Tim Washe"
+     ],
+     "toiMin": 8,
+     "share": 4.0
+    },
+    {
+     "names": [
+      "Killorn",
+      "LaCombe",
+      "Warren",
+      "Washe"
+     ],
+     "players": [
+      "Alex Killorn",
+      "Jackson LaCombe",
+      "Noah Warren",
+      "Tim Washe"
+     ],
+     "toiMin": 7,
+     "share": 3.4
+    }
+   ]
+  },
+  "BOS": {
+   "pp": [
+    {
+     "names": [
+      "Lindholm",
+      "Pastrnak",
+      "Zacha",
+      "McAvoy",
+      "Geekie"
+     ],
+     "players": [
+      "Elias Lindholm",
+      "David Pastrnak",
+      "Pavel Zacha",
+      "Charlie McAvoy",
+      "Morgan Geekie"
+     ],
+     "toiMin": 42,
+     "share": 22.1
+    },
+    {
+     "names": [
+      "Mittelstadt",
+      "Peterka",
+      "Lohrei",
+      "Minten",
+      "Hagens"
+     ],
+     "players": [
+      "Casey Mittelstadt",
+      "JJ Peterka",
+      "Mason Lohrei",
+      "Fraser Minten",
+      "James Hagens"
+     ],
+     "toiMin": 8,
+     "share": 4.2
+    }
+   ],
+   "pk": [
+    {
+     "names": [
+      "Lindholm",
+      "Zadorov",
+      "Borgen",
+      "Khusnutdinov"
+     ],
+     "players": [
+      "Elias Lindholm",
+      "Nikita Zadorov",
+      "Will Borgen",
+      "Marat Khusnutdinov"
+     ],
+     "toiMin": 9,
+     "share": 10.4
+    },
+    {
+     "names": [
+      "Lindholm",
+      "Lindholm",
+      "McAvoy",
+      "Khusnutdinov"
+     ],
+     "players": [
+      "Hampus Lindholm",
+      "Elias Lindholm",
+      "Charlie McAvoy",
+      "Marat Khusnutdinov"
+     ],
+     "toiMin": 6,
+     "share": 6.9
+    }
+   ]
+  },
+  "BUF": {
+   "pp": [
+    {
+     "names": [
+      "Thompson",
+      "Dahlin",
+      "Quinn",
+      "Ostlund",
+      "Benson"
+     ],
+     "players": [
+      "Tage Thompson",
+      "Rasmus Dahlin",
+      "Jack Quinn",
+      "Noah Ostlund",
+      "Zach Benson"
+     ],
+     "toiMin": 48,
+     "share": 21.7
+    },
+    {
+     "names": [
+      "Thompson",
+      "Quinn",
+      "Power",
+      "Ostlund",
+      "Benson"
+     ],
+     "players": [
+      "Tage Thompson",
+      "Jack Quinn",
+      "Owen Power",
+      "Noah Ostlund",
+      "Zach Benson"
+     ],
+     "toiMin": 14,
+     "share": 6.1
+    }
+   ],
+   "pk": [
+    {
+     "names": [
+      "Crevier",
+      "Quinn",
+      "Ostlund",
+      "Benson"
+     ],
+     "players": [
+      "Louis Crevier",
+      "Jack Quinn",
+      "Noah Ostlund",
+      "Zach Benson"
+     ],
+     "toiMin": 7,
+     "share": 5.3
+    },
+    {
+     "names": [
+      "Malenstyn",
+      "Timmins",
+      "McLeod",
+      "Samuelsson"
+     ],
+     "players": [
+      "Beck Malenstyn",
+      "Conor Timmins",
+      "Ryan McLeod",
+      "Mattias Samuelsson"
+     ],
+     "toiMin": 6,
+     "share": 4.6
+    }
+   ]
+  },
+  "CAR": {
+   "pp": [
+    {
+     "names": [
+      "Gostisbehere",
+      "Ehlers",
+      "Aho",
+      "Svechnikov",
+      "Blake"
+     ],
+     "players": [
+      "Shayne Gostisbehere",
+      "Nikolaj Ehlers",
+      "Sebastian Aho",
+      "Andrei Svechnikov",
+      "Jackson Blake"
+     ],
+     "toiMin": 51,
+     "share": 27.8
+    },
+    {
+     "names": [
+      "Carrier",
+      "Aho",
+      "Walker",
+      "Miller",
+      "Svechnikov"
+     ],
+     "players": [
+      "William Carrier",
+      "Sebastian Aho",
+      "Sean Walker",
+      "K'Andre Miller",
+      "Andrei Svechnikov"
+     ],
+     "toiMin": 8,
+     "share": 4.3
+    }
+   ],
+   "pk": [
+    {
+     "names": [
+      "Jankowski",
+      "Martinook",
+      "Slavin",
+      "Chatfield"
+     ],
+     "players": [
+      "Mark Jankowski",
+      "Jordan Martinook",
+      "Jaccob Slavin",
+      "Jalen Chatfield"
+     ],
+     "toiMin": 11,
+     "share": 5.2
+    },
+    {
+     "names": [
+      "Gostisbehere",
+      "Carrier",
+      "Aho",
+      "Svechnikov"
+     ],
+     "players": [
+      "Shayne Gostisbehere",
+      "William Carrier",
+      "Sebastian Aho",
+      "Andrei Svechnikov"
+     ],
+     "toiMin": 9,
+     "share": 4.6
+    }
+   ]
+  },
+  "CBJ": {
+   "pp": [
+    {
+     "names": [
+      "Coyle",
+      "Werenski",
+      "Johnson",
+      "Knies",
+      "Fantilli"
+     ],
+     "players": [
+      "Charlie Coyle",
+      "Zach Werenski",
+      "Kent Johnson",
+      "Matthew Knies",
+      "Adam Fantilli"
+     ],
+     "toiMin": 35,
+     "share": 23.0
+    },
+    {
+     "names": [
+      "Severson",
+      "Werenski",
+      "Johnson",
+      "Knies",
+      "Fantilli"
+     ],
+     "players": [
+      "Damon Severson",
+      "Zach Werenski",
+      "Kent Johnson",
+      "Matthew Knies",
+      "Adam Fantilli"
+     ],
+     "toiMin": 6,
+     "share": 3.7
+    }
+   ],
+   "pk": [
+    {
+     "names": [
+      "Coyle",
+      "Gudbranson",
+      "Olivier",
+      "Sillinger"
+     ],
+     "players": [
+      "Charlie Coyle",
+      "Erik Gudbranson",
+      "Mathieu Olivier",
+      "Cole Sillinger"
+     ],
+     "toiMin": 6,
+     "share": 3.7
+    },
+    {
+     "names": [
+      "Johnson",
+      "Knies",
+      "Mateychuk",
+      "Fantilli"
+     ],
+     "players": [
+      "Kent Johnson",
+      "Matthew Knies",
+      "Denton Mateychuk",
+      "Adam Fantilli"
+     ],
+     "toiMin": 6,
+     "share": 3.6
+    }
+   ]
+  },
+  "CGY": {
+   "pp": [
+    {
+     "names": [
+      "Frost",
+      "Farabee",
+      "Coronato",
+      "Parekh",
+      "Gridin"
+     ],
+     "players": [
+      "Morgan Frost",
+      "Joel Farabee",
+      "Matt Coronato",
+      "Zayne Parekh",
+      "Matvei Gridin"
+     ],
+     "toiMin": 41,
+     "share": 22.9
+    },
+    {
+     "names": [
+      "Strome",
+      "Sharangovich",
+      "Nemec",
+      "Klapka",
+      "Suniev"
+     ],
+     "players": [
+      "Ryan Strome",
+      "Yegor Sharangovich",
+      "Simon Nemec",
+      "Adam Klapka",
+      "Aydar Suniev"
+     ],
+     "toiMin": 13,
+     "share": 7.0
+    }
+   ],
+   "pk": [
+    {
+     "names": [
+      "Backlund",
+      "Middleton",
+      "Whitecloud",
+      "Sharangovich"
+     ],
+     "players": [
+      "Mikael Backlund",
+      "Jake Middleton",
+      "Zach Whitecloud",
+      "Yegor Sharangovich"
+     ],
+     "toiMin": 16,
+     "share": 14.5
+    },
+    {
+     "names": [
+      "Strome",
+      "Middleton",
+      "Pospisil",
+      "Parekh"
+     ],
+     "players": [
+      "Ryan Strome",
+      "Jake Middleton",
+      "Martin Pospisil",
+      "Zayne Parekh"
+     ],
+     "toiMin": 7,
+     "share": 6.7
+    }
+   ]
+  },
+  "CHI": {
+   "pp": [
+    {
+     "names": [
+      "Kane",
+      "Teravainen",
+      "Bertuzzi",
+      "Bedard",
+      "Kantserov"
+     ],
+     "players": [
+      "Patrick Kane",
+      "Teuvo Teravainen",
+      "Tyler Bertuzzi",
+      "Connor Bedard",
+      "Roman Kantserov"
+     ],
+     "toiMin": 24,
+     "share": 15.2
+    },
+    {
+     "names": [
+      "Kane",
+      "Bertuzzi",
+      "Byram",
+      "Kantserov",
+      "Frondell"
+     ],
+     "players": [
+      "Patrick Kane",
+      "Tyler Bertuzzi",
+      "Bowen Byram",
+      "Roman Kantserov",
+      "Anton Frondell"
+     ],
+     "toiMin": 8,
+     "share": 5.2
+    }
+   ],
+   "pk": [
+    {
+     "names": [
+      "Cole",
+      "Teravainen",
+      "Vlasic",
+      "Frondell"
+     ],
+     "players": [
+      "Ian Cole",
+      "Teuvo Teravainen",
+      "Alex Vlasic",
+      "Anton Frondell"
+     ],
+     "toiMin": 11,
+     "share": 8.5
+    },
+    {
+     "names": [
+      "Cole",
+      "Vlasic",
+      "Smith",
+      "Greene"
+     ],
+     "players": [
+      "Ian Cole",
+      "Alex Vlasic",
+      "Cole Smith",
+      "Ryan Greene"
+     ],
+     "toiMin": 8,
+     "share": 6.6
+    }
+   ]
+  },
+  "COL": {
+   "pp": [
+    {
+     "names": [
+      "Kadri",
+      "MacKinnon",
+      "Necas",
+      "Makar",
+      "Hughes"
+     ],
+     "players": [
+      "Nazem Kadri",
+      "Nathan MacKinnon",
+      "Martin Necas",
+      "Cale Makar",
+      "T.J. Hughes"
+     ],
+     "toiMin": 42,
+     "share": 18.7
+    },
+    {
+     "names": [
+      "Kadri",
+      "Schwartz",
+      "MacKinnon",
+      "Makar",
+      "Hughes"
+     ],
+     "players": [
+      "Nazem Kadri",
+      "Jaden Schwartz",
+      "Nathan MacKinnon",
+      "Cale Makar",
+      "T.J. Hughes"
+     ],
+     "toiMin": 16,
+     "share": 7.4
+    }
+   ],
+   "pk": [
+    {
+     "names": [
+      "Nelson",
+      "Lehkonen",
+      "Toews",
+      "Makar"
+     ],
+     "players": [
+      "Brock Nelson",
+      "Artturi Lehkonen",
+      "Devon Toews",
+      "Cale Makar"
+     ],
+     "toiMin": 10,
+     "share": 10.9
+    },
+    {
+     "names": [
+      "Burns",
+      "Nelson",
+      "Lehkonen",
+      "Toews"
+     ],
+     "players": [
+      "Brent Burns",
+      "Brock Nelson",
+      "Artturi Lehkonen",
+      "Devon Toews"
+     ],
+     "toiMin": 7,
+     "share": 7.7
+    }
+   ]
+  },
+  "DAL": {
+   "pp": [
+    {
+     "names": [
+      "Rantanen",
+      "Hintz",
+      "Robertson",
+      "Heiskanen",
+      "Johnston"
+     ],
+     "players": [
+      "Mikko Rantanen",
+      "Roope Hintz",
+      "Jason Robertson",
+      "Miro Heiskanen",
+      "Wyatt Johnston"
+     ],
+     "toiMin": 29,
+     "share": 25.4
+    },
+    {
+     "names": [
+      "Rantanen",
+      "Hintz",
+      "Robertson",
+      "Harley",
+      "Johnston"
+     ],
+     "players": [
+      "Mikko Rantanen",
+      "Roope Hintz",
+      "Jason Robertson",
+      "Thomas Harley",
+      "Wyatt Johnston"
+     ],
+     "toiMin": 13,
+     "share": 11.4
+    }
+   ],
+   "pk": [
+    {
+     "names": [
+      "Lindell",
+      "Steel",
+      "Heiskanen",
+      "Hyry"
+     ],
+     "players": [
+      "Esa Lindell",
+      "Sam Steel",
+      "Miro Heiskanen",
+      "Arttu Hyry"
+     ],
+     "toiMin": 6,
+     "share": 4.2
+    },
+    {
+     "names": [
+      "Myers",
+      "Faksa",
+      "Lindell",
+      "Hryckowian"
+     ],
+     "players": [
+      "Tyler Myers",
+      "Radek Faksa",
+      "Esa Lindell",
+      "Justin Hryckowian"
+     ],
+     "toiMin": 5,
+     "share": 3.8
+    }
+   ]
+  },
+  "DET": {
+   "pp": [
+    {
+     "names": [
+      "Arvidsson",
+      "DeBrincat",
+      "Seider",
+      "Raymond",
+      "Finnie"
+     ],
+     "players": [
+      "Viktor Arvidsson",
+      "Alex DeBrincat",
+      "Moritz Seider",
+      "Lucas Raymond",
+      "Emmitt Finnie"
+     ],
+     "toiMin": 21,
+     "share": 17.7
+    },
+    {
+     "names": [
+      "Faulk",
+      "Copp",
+      "Rasmussen",
+      "Finnie",
+      "Brandsegg-Nyg\u00e5rd"
+     ],
+     "players": [
+      "Justin Faulk",
+      "Andrew Copp",
+      "Michael Rasmussen",
+      "Emmitt Finnie",
+      "Michael Brandsegg-Nyg\u00e5rd"
+     ],
+     "toiMin": 12,
+     "share": 9.8
+    }
+   ],
+   "pk": [
+    {
+     "names": [
+      "Chiarot",
+      "Arvidsson",
+      "Seider",
+      "Raymond"
+     ],
+     "players": [
+      "Ben Chiarot",
+      "Viktor Arvidsson",
+      "Moritz Seider",
+      "Lucas Raymond"
+     ],
+     "toiMin": 21,
+     "share": 5.9
+    },
+    {
+     "names": [
+      "Chiarot",
+      "Compher",
+      "Rasmussen",
+      "Seider"
+     ],
+     "players": [
+      "Ben Chiarot",
+      "J.T. Compher",
+      "Michael Rasmussen",
+      "Moritz Seider"
+     ],
+     "toiMin": 16,
+     "share": 4.4
+    }
+   ]
+  },
+  "EDM": {
+   "pp": [
+    {
+     "names": [
+      "Nugent-Hopkins",
+      "Draisaitl",
+      "Kapanen",
+      "McDavid",
+      "Bouchard"
+     ],
+     "players": [
+      "Ryan Nugent-Hopkins",
+      "Leon Draisaitl",
+      "Kasperi Kapanen",
+      "Connor McDavid",
+      "Evan Bouchard"
+     ],
+     "toiMin": 21,
+     "share": 11.4
+    },
+    {
+     "names": [
+      "Hyman",
+      "Nugent-Hopkins",
+      "Draisaitl",
+      "McDavid",
+      "Bouchard"
+     ],
+     "players": [
+      "Zach Hyman",
+      "Ryan Nugent-Hopkins",
+      "Leon Draisaitl",
+      "Connor McDavid",
+      "Evan Bouchard"
+     ],
+     "toiMin": 16,
+     "share": 8.4
+    }
+   ],
+   "pk": [
+    {
+     "names": [
+      "Murphy",
+      "McDavid",
+      "Shea",
+      "Formenton"
+     ],
+     "players": [
+      "Connor Murphy",
+      "Connor McDavid",
+      "Ryan Shea",
+      "Alex Formenton"
+     ],
+     "toiMin": 9,
+     "share": 7.5
+    },
+    {
+     "names": [
+      "Ekholm",
+      "Kapanen",
+      "Joseph",
+      "Mukhamadullin"
+     ],
+     "players": [
+      "Mattias Ekholm",
+      "Kasperi Kapanen",
+      "Mathieu Joseph",
+      "Shakir Mukhamadullin"
+     ],
+     "toiMin": 6,
+     "share": 4.6
+    }
+   ]
+  },
+  "FLA": {
+   "pp": [
+    {
+     "names": [
+      "Verhaeghe",
+      "Jones",
+      "Reinhart",
+      "Tkachuk",
+      "Tkachuk"
+     ],
+     "players": [
+      "Carter Verhaeghe",
+      "Seth Jones",
+      "Sam Reinhart",
+      "Matthew Tkachuk",
+      "Brady Tkachuk"
+     ],
+     "toiMin": 54,
+     "share": 25.2
+    },
+    {
+     "names": [
+      "Eller",
+      "Ekblad",
+      "Bennett",
+      "Luostarinen",
+      "Lundell"
+     ],
+     "players": [
+      "Lars Eller",
+      "Aaron Ekblad",
+      "Sam Bennett",
+      "Eetu Luostarinen",
+      "Anton Lundell"
+     ],
+     "toiMin": 10,
+     "share": 4.8
+    }
+   ],
+   "pk": [
+    {
+     "names": [
+      "Ekblad",
+      "Forsling",
+      "Luostarinen",
+      "Lundell"
+     ],
+     "players": [
+      "Aaron Ekblad",
+      "Gustav Forsling",
+      "Eetu Luostarinen",
+      "Anton Lundell"
+     ],
+     "toiMin": 25,
+     "share": 16.1
+    },
+    {
+     "names": [
+      "Eller",
+      "Jones",
+      "Hathaway",
+      "Mikkola"
+     ],
+     "players": [
+      "Lars Eller",
+      "Seth Jones",
+      "Garnet Hathaway",
+      "Niko Mikkola"
+     ],
+     "toiMin": 15,
+     "share": 9.7
+    }
+   ]
+  },
+  "LAK": {
+   "pp": [
+    {
+     "names": [
+      "Gustafsson",
+      "Kempe",
+      "Panarin",
+      "Byfield",
+      "Laferriere"
+     ],
+     "players": [
+      "Erik Gustafsson",
+      "Adrian Kempe",
+      "Artemi Panarin",
+      "Quinton Byfield",
+      "Alex Laferriere"
+     ],
+     "toiMin": 20,
+     "share": 18.0
+    },
+    {
+     "names": [
+      "Kempe",
+      "Panarin",
+      "Byfield",
+      "Laferriere",
+      "Clarke"
+     ],
+     "players": [
+      "Adrian Kempe",
+      "Artemi Panarin",
+      "Quinton Byfield",
+      "Alex Laferriere",
+      "Brandt Clarke"
+     ],
+     "toiMin": 12,
+     "share": 10.8
+    }
+   ],
+   "pk": [
+    {
+     "names": [
+      "Doughty",
+      "Haula",
+      "Edmundson",
+      "Armia"
+     ],
+     "players": [
+      "Drew Doughty",
+      "Erik Haula",
+      "Joel Edmundson",
+      "Joel Armia"
+     ],
+     "toiMin": 12,
+     "share": 6.3
+    },
+    {
+     "names": [
+      "Dumoulin",
+      "Haula",
+      "Armia",
+      "Anderson"
+     ],
+     "players": [
+      "Brian Dumoulin",
+      "Erik Haula",
+      "Joel Armia",
+      "Mikey Anderson"
+     ],
+     "toiMin": 8,
+     "share": 4.3
+    }
+   ]
+  },
+  "MIN": {
+   "pp": [
+    {
+     "names": [
+      "Eriksson Ek",
+      "Kaprizov",
+      "Hughes",
+      "Boldy",
+      "Shabanov"
+     ],
+     "players": [
+      "Joel Eriksson Ek",
+      "Kirill Kaprizov",
+      "Quinn Hughes",
+      "Matt Boldy",
+      "Maxim Shabanov"
+     ],
+     "toiMin": 60,
+     "share": 39.4
+    },
+    {
+     "names": [
+      "Brodin",
+      "Eriksson Ek",
+      "Kaprizov",
+      "Hughes",
+      "Boldy"
+     ],
+     "players": [
+      "Jonas Brodin",
+      "Joel Eriksson Ek",
+      "Kirill Kaprizov",
+      "Quinn Hughes",
+      "Matt Boldy"
+     ],
+     "toiMin": 8,
+     "share": 4.9
+    }
+   ],
+   "pk": [
+    {
+     "names": [
+      "Bogosian",
+      "Maatta",
+      "Hartman",
+      "Sturm"
+     ],
+     "players": [
+      "Zach Bogosian",
+      "Olli Maatta",
+      "Ryan Hartman",
+      "Nico Sturm"
+     ],
+     "toiMin": 10,
+     "share": 3.4
+    },
+    {
+     "names": [
+      "Spurgeon",
+      "Coleman",
+      "Brodin",
+      "McCarron"
+     ],
+     "players": [
+      "Jared Spurgeon",
+      "Blake Coleman",
+      "Jonas Brodin",
+      "Michael McCarron"
+     ],
+     "toiMin": 9,
+     "share": 3.2
+    }
+   ]
+  },
+  "MTL": {
+   "pp": [
+    {
+     "names": [
+      "Suzuki",
+      "Caufield",
+      "Bolduc",
+      "Hutson",
+      "Slafkovsk\u00fd"
+     ],
+     "players": [
+      "Nick Suzuki",
+      "Cole Caufield",
+      "Zachary Bolduc",
+      "Lane Hutson",
+      "Juraj Slafkovsk\u00fd"
+     ],
+     "toiMin": 24,
+     "share": 11.4
+    },
+    {
+     "names": [
+      "Kreider",
+      "Suzuki",
+      "Caufield",
+      "Hutson",
+      "Slafkovsk\u00fd"
+     ],
+     "players": [
+      "Chris Kreider",
+      "Nick Suzuki",
+      "Cole Caufield",
+      "Lane Hutson",
+      "Juraj Slafkovsk\u00fd"
+     ],
+     "toiMin": 18,
+     "share": 8.9
+    }
+   ],
+   "pk": [
+    {
+     "names": [
+      "Danault",
+      "Evans",
+      "Carrier",
+      "Guhle"
+     ],
+     "players": [
+      "Phillip Danault",
+      "Jake Evans",
+      "Alexandre Carrier",
+      "Kaiden Guhle"
+     ],
+     "toiMin": 28,
+     "share": 26.4
+    },
+    {
+     "names": [
+      "Danault",
+      "Matheson",
+      "Evans",
+      "Carrier"
+     ],
+     "players": [
+      "Phillip Danault",
+      "Mike Matheson",
+      "Jake Evans",
+      "Alexandre Carrier"
+     ],
+     "toiMin": 12,
+     "share": 11.0
+    }
+   ]
+  },
+  "NJD": {
+   "pp": [
+    {
+     "names": [
+      "Bratt",
+      "Hischier",
+      "Hughes",
+      "Evangelista",
+      "Hughes"
+     ],
+     "players": [
+      "Jesper Bratt",
+      "Nico Hischier",
+      "Jack Hughes",
+      "Luke Evangelista",
+      "Luke Hughes"
+     ],
+     "toiMin": 24,
+     "share": 10.8
+    },
+    {
+     "names": [
+      "Brown",
+      "Bratt",
+      "Hischier",
+      "Hughes",
+      "Hughes"
+     ],
+     "players": [
+      "Connor Brown",
+      "Jesper Bratt",
+      "Nico Hischier",
+      "Jack Hughes",
+      "Luke Hughes"
+     ],
+     "toiMin": 20,
+     "share": 9.2
+    }
+   ],
+   "pk": [
+    {
+     "names": [
+      "Hamilton",
+      "Siegenthaler",
+      "Rodrigues",
+      "Hischier"
+     ],
+     "players": [
+      "Dougie Hamilton",
+      "Jonas Siegenthaler",
+      "Evan Rodrigues",
+      "Nico Hischier"
+     ],
+     "toiMin": 10,
+     "share": 6.5
+    },
+    {
+     "names": [
+      "Pesce",
+      "Rodrigues",
+      "Gritsyuk",
+      "Hughes"
+     ],
+     "players": [
+      "Brett Pesce",
+      "Evan Rodrigues",
+      "Arseny Gritsyuk",
+      "Luke Hughes"
+     ],
+     "toiMin": 9,
+     "share": 5.6
+    }
+   ]
+  },
+  "NSH": {
+   "pp": [
+    {
+     "names": [
+      "Stamkos",
+      "Josi",
+      "O'Reilly",
+      "Marchessault",
+      "Forsberg"
+     ],
+     "players": [
+      "Steven Stamkos",
+      "Roman Josi",
+      "Ryan O'Reilly",
+      "Jonathan Marchessault",
+      "Filip Forsberg"
+     ],
+     "toiMin": 37,
+     "share": 22.0
+    },
+    {
+     "names": [
+      "Stamkos",
+      "Josi",
+      "O'Reilly",
+      "Forsberg",
+      "Bourque"
+     ],
+     "players": [
+      "Steven Stamkos",
+      "Roman Josi",
+      "Ryan O'Reilly",
+      "Filip Forsberg",
+      "Mavrik Bourque"
+     ],
+     "toiMin": 21,
+     "share": 12.7
+    }
+   ],
+   "pk": [
+    {
+     "names": [
+      "Skjei",
+      "Kerfoot",
+      "Perbix",
+      "Drury"
+     ],
+     "players": [
+      "Brady Skjei",
+      "Alexander Kerfoot",
+      "Nick Perbix",
+      "Jack Drury"
+     ],
+     "toiMin": 27,
+     "share": 12.2
+    },
+    {
+     "names": [
+      "Skjei",
+      "Forsberg",
+      "Perbix",
+      "Hoglander"
+     ],
+     "players": [
+      "Brady Skjei",
+      "Filip Forsberg",
+      "Nick Perbix",
+      "Nils Hoglander"
+     ],
+     "toiMin": 14,
+     "share": 6.2
+    }
+   ]
+  },
+  "NYI": {
+   "pp": [
+    {
+     "names": [
+      "Palmieri",
+      "Schenn",
+      "Horvat",
+      "Holmstrom",
+      "Schaefer"
+     ],
+     "players": [
+      "Kyle Palmieri",
+      "Brayden Schenn",
+      "Bo Horvat",
+      "Simon Holmstrom",
+      "Matthew Schaefer"
+     ],
+     "toiMin": 25,
+     "share": 17.2
+    },
+    {
+     "names": [
+      "Palmieri",
+      "Schenn",
+      "Horvat",
+      "Maccelli",
+      "Schaefer"
+     ],
+     "players": [
+      "Kyle Palmieri",
+      "Brayden Schenn",
+      "Bo Horvat",
+      "Matias Maccelli",
+      "Matthew Schaefer"
+     ],
+     "toiMin": 14,
+     "share": 9.5
+    }
+   ],
+   "pk": [
+    {
+     "names": [
+      "Pageau",
+      "Pelech",
+      "Pulock",
+      "Holmstrom"
+     ],
+     "players": [
+      "Jean-Gabriel Pageau",
+      "Adam Pelech",
+      "Ryan Pulock",
+      "Simon Holmstrom"
+     ],
+     "toiMin": 11,
+     "share": 7.5
+    },
+    {
+     "names": [
+      "Cizikas",
+      "Stanley",
+      "Chaffee",
+      "Schaefer"
+     ],
+     "players": [
+      "Casey Cizikas",
+      "Logan Stanley",
+      "Mitchell Chaffee",
+      "Matthew Schaefer"
+     ],
+     "toiMin": 9,
+     "share": 5.8
+    }
+   ]
+  },
+  "NYR": {
+   "pp": [
+    {
+     "names": [
+      "Zibanejad",
+      "Miller",
+      "Fox",
+      "Dorofeyev",
+      "Lafreni\u00e8re"
+     ],
+     "players": [
+      "Mika Zibanejad",
+      "J.T. Miller",
+      "Adam Fox",
+      "Pavel Dorofeyev",
+      "Alexis Lafreni\u00e8re"
+     ],
+     "toiMin": 25,
+     "share": 15.3
+    },
+    {
+     "names": [
+      "Miller",
+      "Bjorkstrand",
+      "Fox",
+      "Kartye",
+      "Cuylle"
+     ],
+     "players": [
+      "J.T. Miller",
+      "Oliver Bjorkstrand",
+      "Adam Fox",
+      "Tye Kartye",
+      "Will Cuylle"
+     ],
+     "toiMin": 13,
+     "share": 7.7
+    }
+   ],
+   "pk": [
+    {
+     "names": [
+      "Gavrikov",
+      "Schneider",
+      "Cuylle",
+      "Laba"
+     ],
+     "players": [
+      "Vladislav Gavrikov",
+      "Braden Schneider",
+      "Will Cuylle",
+      "Noah Laba"
+     ],
+     "toiMin": 10,
+     "share": 6.6
+    },
+    {
+     "names": [
+      "Pettersson",
+      "Schneider",
+      "Cuylle",
+      "Laba"
+     ],
+     "players": [
+      "Marcus Pettersson",
+      "Braden Schneider",
+      "Will Cuylle",
+      "Noah Laba"
+     ],
+     "toiMin": 10,
+     "share": 6.2
+    }
+   ]
+  },
+  "OTT": {
+   "pp": [
+    {
+     "names": [
+      "Batherson",
+      "Cozens",
+      "Sanderson",
+      "St\u00fctzle",
+      "Halliday"
+     ],
+     "players": [
+      "Drake Batherson",
+      "Dylan Cozens",
+      "Jake Sanderson",
+      "Tim St\u00fctzle",
+      "Stephen Halliday"
+     ],
+     "toiMin": 17,
+     "share": 7.8
+    },
+    {
+     "names": [
+      "Giroux",
+      "Batherson",
+      "Cozens",
+      "Sanderson",
+      "St\u00fctzle"
+     ],
+     "players": [
+      "Claude Giroux",
+      "Drake Batherson",
+      "Dylan Cozens",
+      "Jake Sanderson",
+      "Tim St\u00fctzle"
+     ],
+     "toiMin": 11,
+     "share": 5.1
+    }
+   ],
+   "pk": [
+    {
+     "names": [
+      "Chabot",
+      "Batherson",
+      "Pinto",
+      "Spence"
+     ],
+     "players": [
+      "Thomas Chabot",
+      "Drake Batherson",
+      "Shane Pinto",
+      "Jordan Spence"
+     ],
+     "toiMin": 18,
+     "share": 7.0
+    },
+    {
+     "names": [
+      "Pinto",
+      "Greig",
+      "Sanderson",
+      "Zub"
+     ],
+     "players": [
+      "Shane Pinto",
+      "Ridly Greig",
+      "Jake Sanderson",
+      "Artem Zub"
+     ],
+     "toiMin": 14,
+     "share": 5.5
+    }
+   ]
+  },
+  "PHI": {
+   "pp": [
+    {
+     "names": [
+      "Zegras",
+      "Drysdale",
+      "Barkey",
+      "Michkov",
+      "Martone"
+     ],
+     "players": [
+      "Trevor Zegras",
+      "Jamie Drysdale",
+      "Denver Barkey",
+      "Matvei Michkov",
+      "Porter Martone"
+     ],
+     "toiMin": 31,
+     "share": 18.2
+    },
+    {
+     "names": [
+      "Dvorak",
+      "Konecny",
+      "Tippett",
+      "Foerster",
+      "Bonk"
+     ],
+     "players": [
+      "Christian Dvorak",
+      "Travis Konecny",
+      "Owen Tippett",
+      "Tyson Foerster",
+      "Oliver Bonk"
+     ],
+     "toiMin": 6,
+     "share": 3.6
+    }
+   ],
+   "pk": [
+    {
+     "names": [
+      "Couturier",
+      "Sanheim",
+      "Acciari",
+      "York"
+     ],
+     "players": [
+      "Sean Couturier",
+      "Travis Sanheim",
+      "Noel Acciari",
+      "Cam York"
+     ],
+     "toiMin": 21,
+     "share": 7.6
+    },
+    {
+     "names": [
+      "Seeler",
+      "Couturier",
+      "Sanheim",
+      "Acciari"
+     ],
+     "players": [
+      "Nick Seeler",
+      "Sean Couturier",
+      "Travis Sanheim",
+      "Noel Acciari"
+     ],
+     "toiMin": 11,
+     "share": 4.1
+    }
+   ]
+  },
+  "PIT": {
+   "pp": [
+    {
+     "names": [
+      "Malkin",
+      "Crosby",
+      "Karlsson",
+      "Rakell",
+      "Kindel"
+     ],
+     "players": [
+      "Evgeni Malkin",
+      "Sidney Crosby",
+      "Erik Karlsson",
+      "Rickard Rakell",
+      "Ben Kindel"
+     ],
+     "toiMin": 18,
+     "share": 8.4
+    },
+    {
+     "names": [
+      "Crosby",
+      "Karlsson",
+      "Rakell",
+      "Novak",
+      "Kindel"
+     ],
+     "players": [
+      "Sidney Crosby",
+      "Erik Karlsson",
+      "Rickard Rakell",
+      "Tommy Novak",
+      "Ben Kindel"
+     ],
+     "toiMin": 18,
+     "share": 8.3
+    }
+   ],
+   "pk": [
+    {
+     "names": [
+      "Dewar",
+      "Lizotte",
+      "Korczak",
+      "Carlile"
+     ],
+     "players": [
+      "Connor Dewar",
+      "Blake Lizotte",
+      "Kaedan Korczak",
+      "Declan Carlile"
+     ],
+     "toiMin": 10,
+     "share": 7.9
+    },
+    {
+     "names": [
+      "Lizotte",
+      "Korczak",
+      "Robertson",
+      "Carlile"
+     ],
+     "players": [
+      "Blake Lizotte",
+      "Kaedan Korczak",
+      "Nick Robertson",
+      "Declan Carlile"
+     ],
+     "toiMin": 7,
+     "share": 5.1
+    }
+   ]
+  },
+  "SEA": {
+   "pp": [
+    {
+     "names": [
+      "Eberle",
+      "Stephenson",
+      "Dunn",
+      "McMann",
+      "Beniers"
+     ],
+     "players": [
+      "Jordan Eberle",
+      "Chandler Stephenson",
+      "Vince Dunn",
+      "Bobby McMann",
+      "Matty Beniers"
+     ],
+     "toiMin": 19,
+     "share": 13.6
+    },
+    {
+     "names": [
+      "Eberle",
+      "Stephenson",
+      "McCann",
+      "Dunn",
+      "McMann"
+     ],
+     "players": [
+      "Jordan Eberle",
+      "Chandler Stephenson",
+      "Jared McCann",
+      "Vince Dunn",
+      "Bobby McMann"
+     ],
+     "toiMin": 16,
+     "share": 11.6
+    }
+   ],
+   "pk": [
+    {
+     "names": [
+      "Montour",
+      "Kakko",
+      "Evans",
+      "Catton"
+     ],
+     "players": [
+      "Brandon Montour",
+      "Kaapo Kakko",
+      "Ryker Evans",
+      "Berkly Catton"
+     ],
+     "toiMin": 22,
+     "share": 14.0
+    },
+    {
+     "names": [
+      "Larsson",
+      "Dunn",
+      "Kakko",
+      "Catton"
+     ],
+     "players": [
+      "Adam Larsson",
+      "Vince Dunn",
+      "Kaapo Kakko",
+      "Berkly Catton"
+     ],
+     "toiMin": 18,
+     "share": 11.5
+    }
+   ]
+  },
+  "SJS": {
+   "pp": [
+    {
+     "names": [
+      "Orlov",
+      "Marchment",
+      "Smith",
+      "Celebrini",
+      "Stenberg"
+     ],
+     "players": [
+      "Dmitry Orlov",
+      "Mason Marchment",
+      "Will Smith",
+      "Macklin Celebrini",
+      "Ivar Stenberg"
+     ],
+     "toiMin": 21,
+     "share": 8.3
+    },
+    {
+     "names": [
+      "Orlov",
+      "Wennberg",
+      "Smith",
+      "Celebrini",
+      "Stenberg"
+     ],
+     "players": [
+      "Dmitry Orlov",
+      "Alexander Wennberg",
+      "Will Smith",
+      "Macklin Celebrini",
+      "Ivar Stenberg"
+     ],
+     "toiMin": 14,
+     "share": 5.8
+    }
+   ],
+   "pk": [
+    {
+     "names": [
+      "Goodrow",
+      "Trouba",
+      "Nurse",
+      "Graf"
+     ],
+     "players": [
+      "Barclay Goodrow",
+      "Jacob Trouba",
+      "Darnell Nurse",
+      "Collin Graf"
+     ],
+     "toiMin": 14,
+     "share": 6.6
+    },
+    {
+     "names": [
+      "Orlov",
+      "Toffoli",
+      "Wennberg",
+      "Marchment"
+     ],
+     "players": [
+      "Dmitry Orlov",
+      "Tyler Toffoli",
+      "Alexander Wennberg",
+      "Mason Marchment"
+     ],
+     "toiMin": 7,
+     "share": 3.4
+    }
+   ]
+  },
+  "STL": {
+   "pp": [
+    {
+     "names": [
+      "Thomas",
+      "Broberg",
+      "Neighbours",
+      "McTavish",
+      "Snuggerud"
+     ],
+     "players": [
+      "Robert Thomas",
+      "Philip Broberg",
+      "Jake Neighbours",
+      "Mason McTavish",
+      "Jimmy Snuggerud"
+     ],
+     "toiMin": 22,
+     "share": 13.4
+    },
+    {
+     "names": [
+      "Thomas",
+      "Broberg",
+      "Holloway",
+      "Neighbours",
+      "Snuggerud"
+     ],
+     "players": [
+      "Robert Thomas",
+      "Philip Broberg",
+      "Dylan Holloway",
+      "Jake Neighbours",
+      "Jimmy Snuggerud"
+     ],
+     "toiMin": 12,
+     "share": 7.7
+    }
+   ],
+   "pk": [
+    {
+     "names": [
+      "Thomas",
+      "Broberg",
+      "Holloway",
+      "Snuggerud"
+     ],
+     "players": [
+      "Robert Thomas",
+      "Philip Broberg",
+      "Dylan Holloway",
+      "Jimmy Snuggerud"
+     ],
+     "toiMin": 15,
+     "share": 4.7
+    },
+    {
+     "names": [
+      "Fowler",
+      "Thomas",
+      "Holloway",
+      "Snuggerud"
+     ],
+     "players": [
+      "Cam Fowler",
+      "Robert Thomas",
+      "Dylan Holloway",
+      "Jimmy Snuggerud"
+     ],
+     "toiMin": 13,
+     "share": 4.0
+    }
+   ]
+  },
+  "TBL": {
+   "pp": [
+    {
+     "names": [
+      "Carlson",
+      "Kucherov",
+      "Guentzel",
+      "Point",
+      "Hagel"
+     ],
+     "players": [
+      "John Carlson",
+      "Nikita Kucherov",
+      "Jake Guentzel",
+      "Brayden Point",
+      "Brandon Hagel"
+     ],
+     "toiMin": 22,
+     "share": 13.4
+    },
+    {
+     "names": [
+      "Kucherov",
+      "Guentzel",
+      "Point",
+      "Hagel",
+      "D'Astous"
+     ],
+     "players": [
+      "Nikita Kucherov",
+      "Jake Guentzel",
+      "Brayden Point",
+      "Brandon Hagel",
+      "Charle-Edouard D'Astous"
+     ],
+     "toiMin": 16,
+     "share": 9.7
+    }
+   ],
+   "pk": [
+    {
+     "names": [
+      "McDonagh",
+      "Girgensons",
+      "Cernak",
+      "Mikheyev"
+     ],
+     "players": [
+      "Ryan McDonagh",
+      "Zemgus Girgensons",
+      "Erik Cernak",
+      "Ilya Mikheyev"
+     ],
+     "toiMin": 14,
+     "share": 12.0
+    },
+    {
+     "names": [
+      "McDonagh",
+      "Cernak",
+      "Cirelli",
+      "Hagel"
+     ],
+     "players": [
+      "Ryan McDonagh",
+      "Erik Cernak",
+      "Anthony Cirelli",
+      "Brandon Hagel"
+     ],
+     "toiMin": 12,
+     "share": 10.5
+    }
+   ]
+  },
+  "TOR": {
+   "pp": [
+    {
+     "names": [
+      "Nylander",
+      "Raddysh",
+      "Matthews",
+      "Marchenko",
+      "McKenna"
+     ],
+     "players": [
+      "William Nylander",
+      "Darren Raddysh",
+      "Auston Matthews",
+      "Kirill Marchenko",
+      "Gavin McKenna"
+     ],
+     "toiMin": 22,
+     "share": 18.7
+    },
+    {
+     "names": [
+      "Tavares",
+      "Nylander",
+      "Raddysh",
+      "Matthews",
+      "Marchenko"
+     ],
+     "players": [
+      "John Tavares",
+      "William Nylander",
+      "Darren Raddysh",
+      "Auston Matthews",
+      "Kirill Marchenko"
+     ],
+     "toiMin": 10,
+     "share": 8.2
+    }
+   ],
+   "pk": [
+    {
+     "names": [
+      "Sissons",
+      "Blueger",
+      "McCabe",
+      "Stecher"
+     ],
+     "players": [
+      "Colton Sissons",
+      "Teddy Blueger",
+      "Jake McCabe",
+      "Troy Stecher"
+     ],
+     "toiMin": 13,
+     "share": 8.3
+    },
+    {
+     "names": [
+      "Rielly",
+      "Sissons",
+      "Stecher",
+      "McKenna"
+     ],
+     "players": [
+      "Morgan Rielly",
+      "Colton Sissons",
+      "Troy Stecher",
+      "Gavin McKenna"
+     ],
+     "toiMin": 10,
+     "share": 6.4
+    }
+   ]
+  },
+  "UTA": {
+   "pp": [
+    {
+     "names": [
+      "Schmaltz",
+      "Keller",
+      "Sergachev",
+      "Guenther",
+      "Cooley"
+     ],
+     "players": [
+      "Nick Schmaltz",
+      "Clayton Keller",
+      "Mikhail Sergachev",
+      "Dylan Guenther",
+      "Logan Cooley"
+     ],
+     "toiMin": 53,
+     "share": 31.8
+    },
+    {
+     "names": [
+      "Trocheck",
+      "Keller",
+      "Sergachev",
+      "Yamamoto",
+      "Hayton"
+     ],
+     "players": [
+      "Vincent Trocheck",
+      "Clayton Keller",
+      "Mikhail Sergachev",
+      "Kailer Yamamoto",
+      "Barrett Hayton"
+     ],
+     "toiMin": 8,
+     "share": 4.5
+    }
+   ],
+   "pk": [
+    {
+     "names": [
+      "Weegar",
+      "Crouse",
+      "Stenlund",
+      "Sergachev"
+     ],
+     "players": [
+      "MacKenzie Weegar",
+      "Lawson Crouse",
+      "Kevin Stenlund",
+      "Mikhail Sergachev"
+     ],
+     "toiMin": 13,
+     "share": 6.2
+    },
+    {
+     "names": [
+      "Lee",
+      "Trocheck",
+      "Keller",
+      "Sergachev"
+     ],
+     "players": [
+      "Anders Lee",
+      "Vincent Trocheck",
+      "Clayton Keller",
+      "Mikhail Sergachev"
+     ],
+     "toiMin": 8,
+     "share": 4.0
+    }
+   ]
+  },
+  "VAN": {
+   "pp": [
+    {
+     "names": [
+      "Boeser",
+      "DeBrusk",
+      "Hronek",
+      "Pettersson",
+      "Lekkerim\u00e4ki"
+     ],
+     "players": [
+      "Brock Boeser",
+      "Jake DeBrusk",
+      "Filip Hronek",
+      "Elias Pettersson",
+      "Jonathan Lekkerim\u00e4ki"
+     ],
+     "toiMin": 48,
+     "share": 22.1
+    },
+    {
+     "names": [
+      "Chytil",
+      "Karlsson",
+      "Cotter",
+      "Rossi",
+      "Buium"
+     ],
+     "players": [
+      "Filip Chytil",
+      "Linus Karlsson",
+      "Paul Cotter",
+      "Marco Rossi",
+      "Zeev Buium"
+     ],
+     "toiMin": 9,
+     "share": 4.0
+    }
+   ],
+   "pk": [
+    {
+     "names": [
+      "Hronek",
+      "Pettersson",
+      "O'Connor",
+      "Pettersson"
+     ],
+     "players": [
+      "Filip Hronek",
+      "Elias Pettersson",
+      "Drew O'Connor",
+      "Elias Pettersson"
+     ],
+     "toiMin": 13,
+     "share": 8.4
+    },
+    {
+     "names": [
+      "Boeser",
+      "Hronek",
+      "Pettersson",
+      "Pettersson"
+     ],
+     "players": [
+      "Brock Boeser",
+      "Filip Hronek",
+      "Elias Pettersson",
+      "Elias Pettersson"
+     ],
+     "toiMin": 12,
+     "share": 7.7
+    }
+   ]
+  },
+  "VGK": {
+   "pp": [
+    {
+     "names": [
+      "Stone",
+      "Hertl",
+      "Eichel",
+      "Marner",
+      "Connelly"
+     ],
+     "players": [
+      "Mark Stone",
+      "Tomas Hertl",
+      "Jack Eichel",
+      "Mitch Marner",
+      "Trevor Connelly"
+     ],
+     "toiMin": 36,
+     "share": 17.8
+    },
+    {
+     "names": [
+      "Stone",
+      "Hertl",
+      "Olofsson",
+      "Eichel",
+      "Marner"
+     ],
+     "players": [
+      "Mark Stone",
+      "Tomas Hertl",
+      "Victor Olofsson",
+      "Jack Eichel",
+      "Mitch Marner"
+     ],
+     "toiMin": 19,
+     "share": 9.2
+    }
+   ],
+   "pk": [
+    {
+     "names": [
+      "McNabb",
+      "Karlsson",
+      "Theodore",
+      "Marner"
+     ],
+     "players": [
+      "Brayden McNabb",
+      "William Karlsson",
+      "Shea Theodore",
+      "Mitch Marner"
+     ],
+     "toiMin": 10,
+     "share": 7.7
+    },
+    {
+     "names": [
+      "Stone",
+      "Hanifin",
+      "Eichel",
+      "Lauzon"
+     ],
+     "players": [
+      "Mark Stone",
+      "Noah Hanifin",
+      "Jack Eichel",
+      "Jeremy Lauzon"
+     ],
+     "toiMin": 6,
+     "share": 4.4
+    }
+   ]
+  },
+  "WPG": {
+   "pp": [
+    {
+     "names": [
+      "Scheifele",
+      "Connor",
+      "Vilardi",
+      "Pionk",
+      "Perfetti"
+     ],
+     "players": [
+      "Mark Scheifele",
+      "Kyle Connor",
+      "Gabriel Vilardi",
+      "Neal Pionk",
+      "Cole Perfetti"
+     ],
+     "toiMin": 46,
+     "share": 27.8
+    },
+    {
+     "names": [
+      "Scheifele",
+      "Morrissey",
+      "Connor",
+      "Vilardi",
+      "Perfetti"
+     ],
+     "players": [
+      "Mark Scheifele",
+      "Josh Morrissey",
+      "Kyle Connor",
+      "Gabriel Vilardi",
+      "Cole Perfetti"
+     ],
+     "toiMin": 13,
+     "share": 8.1
+    }
+   ],
+   "pk": [
+    {
+     "names": [
+      "Scheifele",
+      "Connor",
+      "Ferraro",
+      "Perfetti"
+     ],
+     "players": [
+      "Mark Scheifele",
+      "Kyle Connor",
+      "Mario Ferraro",
+      "Cole Perfetti"
+     ],
+     "toiMin": 9,
+     "share": 3.2
+    },
+    {
+     "names": [
+      "Samberg",
+      "Pionk",
+      "Barron",
+      "Koepke"
+     ],
+     "players": [
+      "Dylan Samberg",
+      "Neal Pionk",
+      "Morgan Barron",
+      "Cole Koepke"
+     ],
+     "toiMin": 8,
+     "share": 3.0
+    }
+   ]
+  },
+  "WSH": {
+   "pp": [
+    {
+     "names": [
+      "Ovechkin",
+      "Wilson",
+      "Strome",
+      "Chychrun",
+      "Kyrou"
+     ],
+     "players": [
+      "Alex Ovechkin",
+      "Tom Wilson",
+      "Dylan Strome",
+      "Jakob Chychrun",
+      "Jordan Kyrou"
+     ],
+     "toiMin": 20,
+     "share": 10.1
+    },
+    {
+     "names": [
+      "Tuch",
+      "Dubois",
+      "Leonard",
+      "Hutson",
+      "Protas"
+     ],
+     "players": [
+      "Alex Tuch",
+      "Pierre-Luc Dubois",
+      "Ryan Leonard",
+      "Cole Hutson",
+      "Ilya Protas"
+     ],
+     "toiMin": 13,
+     "share": 6.8
+    }
+   ],
+   "pk": [
+    {
+     "names": [
+      "Jenner",
+      "Wilson",
+      "Roy",
+      "Feh\u00e9rv\u00e1ry"
+     ],
+     "players": [
+      "Boone Jenner",
+      "Tom Wilson",
+      "Matt Roy",
+      "Martin Feh\u00e9rv\u00e1ry"
+     ],
+     "toiMin": 10,
+     "share": 8.8
+    },
+    {
+     "names": [
+      "Jenner",
+      "Tuch",
+      "Roy",
+      "Feh\u00e9rv\u00e1ry"
+     ],
+     "players": [
+      "Boone Jenner",
+      "Alex Tuch",
+      "Matt Roy",
+      "Martin Feh\u00e9rv\u00e1ry"
+     ],
+     "toiMin": 8,
+     "share": 7.3
+    }
+   ]
   }
  }
 }

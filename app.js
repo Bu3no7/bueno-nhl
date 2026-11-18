@@ -3825,6 +3825,24 @@ function linesPanel(kind, title, unitWord) {
     <div class="lines-chips"><span class="lines-chiplab">FEWEST</span>${sorted.slice(-3).reverse().map(chip).join('')}</div>
   </div>`;
 }
+function scoredOnPanel(kind, title, sub, rows) {
+  if (!rows || !rows.length) return '';
+  const neg = kind === 'most';
+  const max = Math.max(...rows.map((r) => r.ga60)) || 1;
+  const ring = neg ? 'var(--danger, #f0665e)' : 'var(--teal)';
+  const body = rows.map((r, i) => `<div class="scn-row">
+    <span class="scn-rank">${i + 1}</span>
+    <img class="pavatar scn-face" src="${esc(headshotUrl(r.team, r.pid))}" alt="" ${imgFallback} style="border-color:${ring}">
+    <span class="scn-who"><span class="scn-name">${esc(r.name)}</span><span class="scn-meta"><img class="scn-tlogo" src="${esc(teamLogoUrl(r.team))}" alt="" ${imgFallback}>${esc(r.team)} · ${r.min} MIN · ${r.ga} GA</span></span>
+    <span class="scn-nums"><span class="scn-val ${neg ? 'neg' : 'pos'}">${r.ga60.toFixed(2)}</span><span class="scn-lab">GA/60</span></span>
+    <span class="scn-bar"><span class="scn-fill ${neg ? 'neg' : 'pos'}" style="width:${Math.max(4, Math.round(r.ga60 / max * 100))}%"></span></span>
+  </div>`).join('');
+  return `<div class="lines-group scn-group">
+    <div class="lines-head"><span class="lines-title${neg ? ' neg' : ''}">${title}</span><span class="lines-count">LEAGUE-WIDE</span></div>
+    <p class="lines-desc">${sub}</p>
+    ${body}
+  </div>`;
+}
 function renderLines() {
   const el = $('linesBody');
   if (!el) return;
@@ -3833,14 +3851,23 @@ function renderLines() {
     return;
   }
   let html = linesPanel('fwd', 'FORWARD LINES', 'lines') + linesPanel('def', 'DEFENCE PAIRS', 'pairs');
+  const so = linesSidecar.scoredOn;
+  if (so) {
+    html += scoredOnPanel('most', 'GETTING SCORED ON MOST', 'Highest on-ice goals against per 60 at 5v5 · skaters with 150+ min · empty-net goals out', so.most)
+      + scoredOnPanel('fewest', 'HARDEST TO SCORE ON', 'Lowest on-ice goals against per 60 at 5v5 · the clamps', so.fewest);
+  }
   const t = linesTeam && linesSidecar.fwd[linesTeam] ? linesTeam : null;
   if (t) {
     const f = linesSidecar.fwd[t], d = linesSidecar.def[t];
-    const unitRow = (u) => `<div class="lines-unit"><span class="lines-unit-names">${u.players.map(esc).join(' · ')}</span><span class="lines-unit-meta">${u.toiMin} min together · ${u.games} games</span></div>`;
+    const unitRow = (u) => `<div class="lines-unit"><span class="lines-unit-names">${u.players.map(esc).join(' · ')}</span><span class="lines-unit-meta">${u.toiMin} min together · ${u.games} games${u.gf60 != null ? ` · <span class="scn-gf">GF ${u.gf60.toFixed(2)}/60</span> · <span class="scn-ga">GA ${u.ga60.toFixed(2)}/60</span>` : ''}</span></div>`;
+    const stRow = (s, word) => `<div class="lines-unit"><span class="lines-unit-names">${s.players.map(esc).join(' · ')}</span><span class="lines-unit-meta">${s.toiMin} min · ${s.share}% of ${word} time</span></div>`;
+    const sp = linesSidecar.pppk && linesSidecar.pppk[t];
     html += `<div class="lines-group lines-detail"><div class="lines-head"><img class="lines-dlogo" src="${esc(teamLogoUrl(t))}" alt="" ${imgFallback}><span class="lines-title">${esc(t)}</span><span class="lines-count">${f.units} lines · ${Math.round(f.keptPct)}% kept — ${d.units} pairs · ${Math.round(d.keptPct)}% kept</span></div>`
       + '<p class="lines-desc">Most-used forward lines at 5v5 this season</p>'
       + f.top.map(unitRow).join('')
       + (d.top.length ? '<p class="lines-desc lines-sub">Defence pairs</p>' + d.top.map(unitRow).join('') : '')
+      + (sp && sp.pp && sp.pp.length ? '<p class="lines-desc lines-sub">Power-play units</p>' + sp.pp.map((s) => stRow(s, 'PP')).join('') : '')
+      + (sp && sp.pk && sp.pk.length ? '<p class="lines-desc lines-sub">Penalty-kill units</p>' + sp.pk.map((s) => stRow(s, 'PK')).join('') : '')
       + '</div>';
   } else {
     html += '<p class="muted small">Tap a team logo or a chip for its most-used lines and pairs.</p>';

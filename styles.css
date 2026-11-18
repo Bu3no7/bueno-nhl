@@ -1376,6 +1376,27 @@ tr.team-row:focus-visible { outline: 2px solid var(--teal); outline-offset: -2px
 .lines-unit-names { flex: 1 1 auto; min-width: 0; font-weight: 600; font-size: .88rem; }
 .lines-unit-meta { color: var(--muted); font-size: .74rem; white-space: nowrap; }
 .lines-sub { margin-top: .6rem; font-weight: 700; color: var(--text); }
+/* Scored On panels inside the Lines view (on-ice GA/60, 5v5) */
+.lines-title.neg { color: var(--danger, #f0665e); }
+.scn-row { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; padding: .45rem .2rem .55rem; border-bottom: 1px solid rgba(255, 255, 255, .06); }
+.scn-group .scn-row:last-child { border-bottom: none; }
+.scn-rank { width: 1.3rem; text-align: center; color: var(--muted); font-weight: 800; font-size: .85rem; flex: none; }
+img.pavatar.scn-face { width: 38px; height: 38px; }
+.scn-who { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; }
+.scn-name { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.scn-meta { font-size: .74rem; color: var(--muted); display: flex; align-items: center; gap: .3rem; }
+.scn-tlogo { width: 15px; height: 15px; object-fit: contain; }
+.scn-nums { text-align: right; flex: none; display: flex; flex-direction: column; }
+.scn-val { font-size: 1.15rem; font-weight: 800; line-height: 1.1; }
+.scn-val.neg { color: var(--danger, #f0665e); }
+.scn-val.pos { color: var(--teal); }
+.scn-lab { font-size: .62rem; color: var(--muted); letter-spacing: .06em; }
+.scn-bar { order: 5; flex: 0 0 calc(100% - 5.6rem); margin-left: auto; height: 5px; border-radius: 3px; background: rgba(255, 255, 255, .08); overflow: hidden; }
+.scn-fill { display: block; height: 100%; border-radius: 3px; }
+.scn-fill.neg { background: var(--danger, #f0665e); }
+.scn-fill.pos { background: var(--teal); }
+.scn-gf { color: #5ed6a0; font-weight: 700; }
+.scn-ga { color: var(--danger, #f0665e); font-weight: 700; }
 /* ---------------- best book + model vs market (nhl-bestbook sidecar) ---------------- */
 .bb-chip { flex: none; font-size: .72rem; font-weight: 800; color: var(--teal); border: 1px solid rgba(58, 219, 227, .5); background: rgba(58, 219, 227, .10); border-radius: 999px; padding: .16rem .5rem; white-space: nowrap; }
 .bb-chip.neg { color: var(--danger, #f0665e); border-color: rgba(240, 102, 94, .45); background: rgba(240, 102, 94, .08); }

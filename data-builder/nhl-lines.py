@@ -26,6 +26,8 @@ ROOT = os.path.dirname(HERE)
 CACHE = os.path.join(HERE, "cache", "lines")
 REPORTS = os.path.join(CACHE, "reports")
 os.makedirs(REPORTS, exist_ok=True)
+PBP_DIR = os.path.join(CACHE, "pbp")
+os.makedirs(PBP_DIR, exist_ok=True)
 OUT = os.path.join(ROOT, "data", "nhl-lines.json")
 SEASON = "20262027"
 UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
@@ -50,6 +52,14 @@ def cached_json(name, url):
     if os.path.exists(p) and os.path.getsize(p) > 100:
         return json.load(open(p))
     j = json.loads(curl(url))
+    json.dump(j, open(p, "w"))
+    return j
+
+def fetch_pbp(gid):
+    p = os.path.join(PBP_DIR, f"{gid}.json")
+    if os.path.exists(p) and os.path.getsize(p) > 1000:
+        return json.load(open(p))
+    j = json.loads(curl(f"https://api-web.nhle.com/v1/gamecenter/{gid}/play-by-play"))
     json.dump(j, open(p, "w"))
     return j
 
@@ -186,6 +196,78 @@ def accumulate(away_int, home_int):
                 out[k][("D",) + d] += b - a
     return out[0], out[1]
 
+def accumulate_extra(away_int, home_int):
+    """Parallel sweep over the same breakpoints. Returns (away, home) dicts:
+    psec {pid: 5v5 seconds} (exact-5v5 intervals only), pp {skater tuple: sec}
+    and pk {skater tuple: sec} for man-advantage splits (5,4)/(5,3)/(4,3) in
+    either orientation, plus ppTot / pkTot team seconds."""
+    times = sorted({t for _, _, s, e in away_int + home_int for t in (s, e)})
+    out = [{"psec": defaultdict(float), "pp": defaultdict(float),
+            "pk": defaultdict(float), "ppTot": 0.0, "pkTot": 0.0} for _ in range(2)]
+    for a, b in zip(times, times[1:]):
+        if b - a <= 0:
+            continue
+        mid = (a + b) / 2
+        ons = [tuple(sorted(pid for pid, pos, s, e in ints if s <= mid < e))
+               for ints in (away_int, home_int)]
+        na, nh = len(ons[0]), len(ons[1])
+        if na == 5 and nh == 5:
+            for k in range(2):
+                for pid in ons[k]:
+                    out[k]["psec"][pid] += b - a
+        else:
+            for adv, dfn, counts in ((0, 1, (na, nh)), (1, 0, (nh, na))):
+                if counts in ((5, 4), (5, 3), (4, 3)):
+                    out[adv]["pp"][ons[adv]] += b - a
+                    out[adv]["ppTot"] += b - a
+                    out[dfn]["pk"][ons[dfn]] += b - a
+                    out[dfn]["pkTot"] += b - a
+                    break
+    return out[0], out[1]
+
+def process_goals(pbp, away_int, home_int, away_ab, home_ab,
+                  player_stats, unit_goals, counters):
+    """Credit 5v5 GF/GA (both goalies in net, per situationCode) to the skaters
+    on the ice at the goal's absolute time, and to each side's exact on-ice
+    F trio / D pair. counters tracks the scorer-on-ice self-check."""
+    sides = [(away_int, away_ab), (home_int, home_ab)]
+    id2side = {pbp["awayTeam"]["id"]: 0, pbp["homeTeam"]["id"]: 1}
+    for play in pbp.get("plays", []):
+        if play.get("typeDescKey") != "goal":
+            continue
+        pd = play.get("periodDescriptor", {})
+        if pd.get("periodType") == "SO" or pd.get("number", 99) > 4:
+            continue
+        code = play.get("situationCode") or ""
+        if len(code) != 4 or code[0] != "1" or code[1] != "5" or code[2] != "5" or code[3] != "1":
+            continue
+        m = re.match(r"^(\d+):(\d{2})$", play.get("timeInPeriod", ""))
+        if not m:
+            continue
+        t = (pd["number"] - 1) * 1200 + int(m.group(1)) * 60 + int(m.group(2))
+        det = play.get("details", {})
+        si = id2side.get(det.get("eventOwnerTeamId"))
+        if si is None:
+            continue
+        counters["total"] += 1
+        # On-ice at a goal uses s < t <= e, NOT s <= t <= e: the clock stops
+        # at the goal, so the off-going unit's shifts END at t and the next
+        # unit's shifts START at t (the ensuing faceoff). Inclusive both ends
+        # credits ~17 skaters/goal (both units); s <= t < e loses the scorer
+        # 74% of the time. s < t <= e keeps the scorer and gives (5,5) sets
+        # on ~80% of goals (rest = mid-play changes in progress).
+        on = [{pid: pos for pid, pos, s, e in ints if s < t <= e} for ints, _ in sides]
+        if det.get("scoringPlayerId") not in on[si]:
+            counters["miss"] += 1
+        for k in range(2):
+            ab = sides[k][1]
+            for pid in on[k]:
+                player_stats[ab][pid][1 if k == si else 2] += 1
+            f = tuple(sorted(pid for pid, pos in on[k].items() if pos != "D"))
+            dd = tuple(sorted(pid for pid, pos in on[k].items() if pos == "D"))
+            for key in (("F",) + f, ("D",) + dd):
+                unit_goals[ab][key][0 if k == si else 1] += 1
+
 # ---------------------------------------------------------------- main
 def main():
     games = load_schedule()
@@ -201,6 +283,15 @@ def main():
         for info in m.values():
             pid_name[info["pid"]] = info
     fails = []
+    # season accumulators for the scored-on / PP-PK layers
+    player_stats = defaultdict(lambda: defaultdict(lambda: [0.0, 0, 0]))  # team -> pid -> [5v5 sec, gf, ga]
+    unit_goals = defaultdict(lambda: defaultdict(lambda: [0, 0]))         # team -> unit -> [gf, ga]
+    pp_sets = defaultdict(lambda: defaultdict(float))
+    pk_sets = defaultdict(lambda: defaultdict(float))
+    pp_tot = defaultdict(float)
+    pk_tot = defaultdict(float)
+    goal_check = {"total": 0, "miss": 0}
+    pbp_fails = []
     for i, g in enumerate(games):
         try:
             a_html = fetch_report(g["id"], "TV")
@@ -211,6 +302,21 @@ def main():
         a_int, a_dressed = game_units(parse_shifts(a_html), rosters[g["away"]])
         h_int, h_dressed = game_units(parse_shifts(h_html), rosters[g["home"]])
         a_units, h_units = accumulate(a_int, h_int)
+        a_ex, h_ex = accumulate_extra(a_int, h_int)
+        for ab, ex in ((g["away"], a_ex), (g["home"], h_ex)):
+            for pid, sec in ex["psec"].items():
+                player_stats[ab][pid][0] += sec
+            for tup, sec in ex["pp"].items():
+                pp_sets[ab][tup] += sec
+            for tup, sec in ex["pk"].items():
+                pk_sets[ab][tup] += sec
+            pp_tot[ab] += ex["ppTot"]
+            pk_tot[ab] += ex["pkTot"]
+        try:
+            process_goals(fetch_pbp(g["id"]), a_int, h_int, g["away"], g["home"],
+                          player_stats, unit_goals, goal_check)
+        except Exception as ex:
+            pbp_fails.append((g["id"], str(ex)[:80]))
         team_games[g["away"]].append({"date": g["date"], "units": a_units, "dressed": a_dressed})
         team_games[g["home"]].append({"date": g["date"], "units": h_units, "dressed": h_dressed})
         if (i + 1) % 50 == 0:
@@ -218,6 +324,13 @@ def main():
         time.sleep(0.05)
     if fails:
         print(f"WARNING: {len(fails)} games failed: {fails[:5]}")
+    if pbp_fails:
+        print(f"WARNING: {len(pbp_fails)} games missing pbp (goals skipped): {pbp_fails[:5]}")
+    gt, gm = goal_check["total"], goal_check["miss"]
+    grate = (100.0 * gm / gt) if gt else 0.0
+    print(f"5v5 goals: {gt}, scorer-not-on-ice misses: {gm} ({grate:.2f}%)")
+    if gt and gm / gt > 0.02:
+        raise RuntimeError(f"scorer on-ice miss rate {grate:.2f}% > 2% — refusing to ship")
 
     result = {"builtAt": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
               "through": games[-1]["date"], "games": len(games), "fwd": {}, "def": {}}
@@ -243,13 +356,21 @@ def main():
                             if nxt["units"].get(u, 0) >= 60:
                                 kept += 1
             top = sorted(season_toi.items(), key=lambda kv: -kv[1])[:4 if tag == "F" else 3]
+            top_rows = []
+            for u, s in top:
+                if s < 300:
+                    continue
+                ugf, uga = unit_goals[team].get(u, [0, 0])
+                top_rows.append({"names": [pid_name[p]["last"] for p in u[1:]],
+                                 "players": [pid_name[p]["name"] for p in u[1:]],
+                                 "toiMin": round(s / 60), "games": unit_games.get(u, 0),
+                                 "gf": ugf, "ga": uga,
+                                 "gf60": round(ugf * 3600 / s, 2),
+                                 "ga60": round(uga * 3600 / s, 2)})
             result[kind][team] = {
                 "units": len(used), "kept": kept, "opps": opps,
                 "keptPct": (int(1000.0 * kept / opps + 0.5) / 10.0) if opps else None,
-                "top": [{"names": [pid_name[p]["last"] for p in u[1:]],
-                         "players": [pid_name[p]["name"] for p in u[1:]],
-                         "toiMin": round(s / 60), "games": unit_games.get(u, 0)}
-                        for u, s in top if s >= 300],
+                "top": top_rows,
             }
     for kind in ("fwd", "def"):
         rows = [result[kind][t] for t in TEAMS if result[kind][t]["keptPct"] is not None]
@@ -259,6 +380,45 @@ def main():
             "unitsAvg": round(sum(r["units"] for r in rows) / len(rows)),
             "keptAvg": round(sum(r["keptPct"] for r in rows) / len(rows)),
         }
+
+    # ------------------------------------------------ scored-on + PP/PK sets
+    uni = []
+    for team in TEAMS:
+        for pid, (sec, gf, ga) in player_stats[team].items():
+            if sec >= 9000:
+                info = pid_name.get(pid, {})
+                uni.append({"pid": pid, "name": info.get("name", str(pid)),
+                            "last": info.get("last", ""), "team": team,
+                            "pos": info.get("pos", "?"), "min": round(sec / 60),
+                            "ga": ga, "gf": gf,
+                            "ga60": round(ga * 3600 / sec, 2),
+                            "gf60": round(gf * 3600 / sec, 2), "_sec": sec})
+    most = sorted(uni, key=lambda r: (-r["ga60"], -r["_sec"]))[:8]
+    fewest = sorted(uni, key=lambda r: (r["ga60"], -r["_sec"]))[:8]
+    for r in most + fewest:
+        r.pop("_sec", None)
+    result["scoredOn"] = {"floorMin": 150, "most": most, "fewest": fewest}
+
+    def set_rows(sets, total):
+        rows = []
+        for tup, sec in sorted(sets.items(), key=lambda kv: -kv[1]):
+            if sec < 120:
+                continue
+            rows.append({"names": [pid_name[p]["last"] for p in tup],
+                         "players": [pid_name[p]["name"] for p in tup],
+                         "toiMin": round(sec / 60),
+                         "share": (int(1000.0 * sec / total + 0.5) / 10.0) if total else None})
+            if len(rows) == 2:
+                break
+        return rows
+
+    result["pppk"] = {t: {"pp": set_rows(pp_sets[t], pp_tot[t]),
+                          "pk": set_rows(pk_sets[t], pk_tot[t])} for t in TEAMS}
+    if len(most) < 8 or len(fewest) < 8:
+        raise RuntimeError(f"scoredOn rows too few: most={len(most)} fewest={len(fewest)}")
+    missing = [t for t in TEAMS if t not in result["pppk"]]
+    if missing:
+        raise RuntimeError(f"pppk missing teams: {missing}")
     json.dump(result, open(OUT, "w"), indent=1)
     print("wrote", OUT)
     for kind in ("fwd", "def"):
@@ -266,6 +426,10 @@ def main():
         print(kind, "most:", [(t, result[kind][t]["units"], result[kind][t]["keptPct"]) for t in rows[:3]],
               "| fewest:", [(t, result[kind][t]["units"], result[kind][t]["keptPct"]) for t in rows[-3:]])
     print("league:", result["league"])
+    print("scoredOn most:", [(r["name"], r["team"], r["min"], r["ga"], r["ga60"]) for r in result["scoredOn"]["most"]])
+    print("scoredOn fewest:", [(r["name"], r["team"], r["min"], r["ga"], r["ga60"]) for r in result["scoredOn"]["fewest"]])
+    print("pppk EDM:", result["pppk"]["EDM"])
+    print("EDM fwd top[0]:", result["fwd"]["EDM"]["top"][0] if result["fwd"]["EDM"]["top"] else None)
 
 if __name__ == "__main__":
     main()
