@@ -1649,6 +1649,16 @@ body.sport-glass .ls-card.heat-edge-cold, .ls-card.heat-edge-cold { border-color
   background: #131e33; color: var(--gold); font-weight: 800; font-size: .78rem; letter-spacing: .06em;
 }
 #boardTable .team-cell img { width: 24px; height: 24px; }
+/* Phone fix (2026-11-17): the sticky name column is sized for the longest
+   name on the slate (~70% of a phone screen) and its shadow buries the
+   team logo at the edge. On phones the name cell flows naturally instead —
+   name, logo and probability fit side by side, the rest scrolls. */
+@media (max-width: 560px) {
+  #boardTable th:first-child, #boardTable td:first-child {
+    position: static; width: auto; min-width: 0; max-width: none; box-shadow: none;
+  }
+  #boardTable .board-game-row td { position: static; }
+}
 #boardTable td.fac { font-weight: 700; }
 #boardTable td.fac.g { color: #57e389; }
 #boardTable td.fac.y { color: var(--gold); }
