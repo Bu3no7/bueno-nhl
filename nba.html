@@ -131,7 +131,26 @@ img.hs { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; objec
 .vice-banner:focus-visible { outline: 2px solid #21e6d1; outline-offset: 2px; }
 .sl-gcard.vice-pulse { animation: vicePulse 1.6s ease-in-out; }
 @keyframes vicePulse { 0%, 100% { box-shadow: 0 0 18px rgba(255,46,136,.35), inset 0 0 24px rgba(255,46,136,.10); } 50% { box-shadow: 0 0 46px rgba(255,46,136,.95), 0 0 22px rgba(33,230,209,.5), inset 0 0 36px rgba(255,46,136,.35); } }
-.sl-gcard.vice-city { border: 2px solid #ff2e88; box-shadow: 0 0 18px rgba(255,46,136,.35), inset 0 0 24px rgba(255,46,136,.10); }
+/* Vice City card skin (approved mock v2, 2026-11-18): full neon treatment for
+   tonight's MIL @ MIA slate card only. renderSlate adds the .vice-city class
+   solely for isViceCityGame() (MIL @ MIA, game date 2026-11-18 ET), so this
+   skin can never appear on another card or another date. Palm layer is an
+   inline SVG data-URI (no external files). */
+body.sport-glass .sl-gcard.vice-city, .sl-gcard.vice-city { border: 2px solid #ff2e88; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300' preserveAspectRatio='xMidYMax slice'%3E%3Cg fill='none' stroke='%230a0113' stroke-width='4.5' stroke-linecap='round' opacity='.92'%3E%3Cg transform='translate(-20,148) scale(1.55)'%3E%3Cpath d='M44,100 C48,76 52,58 56,40'/%3E%3Cpath d='M56,40 C42,28 28,24 12,28'/%3E%3Cpath d='M56,40 C46,24 34,16 18,14'/%3E%3Cpath d='M56,40 C44,34 32,36 22,44'/%3E%3Cpath d='M56,40 C64,22 76,14 90,12'/%3E%3Cpath d='M56,40 C70,28 84,24 98,28'/%3E%3Cpath d='M56,40 C68,34 80,36 90,44'/%3E%3Cpath d='M56,40 C46,24 34,16 18,14' stroke='%2321e6d1' stroke-opacity='.4' stroke-width='2'/%3E%3C/g%3E%3Cg transform='translate(118,218) scale(0.85)'%3E%3Cpath d='M44,100 C48,76 52,58 56,40'/%3E%3Cpath d='M56,40 C42,28 28,24 12,28'/%3E%3Cpath d='M56,40 C46,24 34,16 18,14'/%3E%3Cpath d='M56,40 C44,34 32,36 22,44'/%3E%3Cpath d='M56,40 C64,22 76,14 90,12'/%3E%3Cpath d='M56,40 C70,28 84,24 98,28'/%3E%3Cpath d='M56,40 C68,34 80,36 90,44'/%3E%3C/g%3E%3Cg transform='translate(212,205) scale(0.95)'%3E%3Cpath d='M44,100 C48,76 52,58 56,40'/%3E%3Cpath d='M56,40 C42,28 28,24 12,28'/%3E%3Cpath d='M56,40 C46,24 34,16 18,14'/%3E%3Cpath d='M56,40 C44,34 32,36 22,44'/%3E%3Cpath d='M56,40 C64,22 76,14 90,12'/%3E%3Cpath d='M56,40 C70,28 84,24 98,28'/%3E%3Cpath d='M56,40 C68,34 80,36 90,44'/%3E%3C/g%3E%3Cg transform='translate(298,138) scale(1.62)'%3E%3Cpath d='M44,100 C48,76 52,58 56,40'/%3E%3Cpath d='M56,40 C42,28 28,24 12,28'/%3E%3Cpath d='M56,40 C46,24 34,16 18,14'/%3E%3Cpath d='M56,40 C44,34 32,36 22,44'/%3E%3Cpath d='M56,40 C64,22 76,14 90,12'/%3E%3Cpath d='M56,40 C70,28 84,24 98,28'/%3E%3Cpath d='M56,40 C68,34 80,36 90,44'/%3E%3Cpath d='M56,40 C64,22 76,14 90,12' stroke='%23ff2e88' stroke-opacity='.4' stroke-width='2'/%3E%3C/g%3E%3Cg transform='translate(255,238) scale(0.62)'%3E%3Cpath d='M44,100 C48,76 52,58 56,40'/%3E%3Cpath d='M56,40 C42,28 28,24 12,28'/%3E%3Cpath d='M56,40 C46,24 34,16 18,14'/%3E%3Cpath d='M56,40 C44,34 32,36 22,44'/%3E%3Cpath d='M56,40 C64,22 76,14 90,12'/%3E%3Cpath d='M56,40 C70,28 84,24 98,28'/%3E%3Cpath d='M56,40 C68,34 80,36 90,44'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") center bottom / 100% 100% no-repeat, radial-gradient(420px 210px at 88% -10%, rgba(255,46,136,.30), rgba(255,46,136,0) 62%), radial-gradient(380px 230px at 4% 110%, rgba(33,230,209,.17), rgba(33,230,209,0) 62%), linear-gradient(165deg, #2c0a4e 0%, #1b0533 46%, #0d0218 100%); box-shadow: 0 0 22px rgba(255,46,136,.45), inset 0 0 28px rgba(255,46,136,.12); }
+.sl-gcard.vice-city .sl-tip { color: #ff5ea8; }
+.sl-gcard.vice-city .sl-tip span { color: #a79bc4; }
+.sl-gcard.vice-city .sl-tip.live, .sl-gcard.vice-city .sl-tip.live span { color: #ff6b6b; }
+.sl-gcard.vice-city .sl-rec { color: #b3a6d6; }
+.sl-gcard.vice-city .sl-tcell { background: linear-gradient(160deg, rgba(62,22,102,.55), rgba(17,4,34,.68)); border-width: 1.5px; }
+.sl-gcard.vice-city .sl-trio .sl-tcell:first-child { border-color: #21e6d1; box-shadow: 0 0 10px rgba(33,230,209,.25); }
+.sl-gcard.vice-city .sl-tcell.mid { border-color: #ff2e88; box-shadow: 0 0 10px rgba(255,46,136,.30); }
+.sl-gcard.vice-city .sl-trio .sl-tcell:last-child { border-color: #a06bff; box-shadow: 0 0 10px rgba(150,60,255,.30); }
+.sl-gcard.vice-city .sl-tk { color: #b3a6d6; }
+.sl-gcard.vice-city .sl-proj { color: #ded4f7; }
+.sl-gcard.vice-city .sl-tag { background: rgba(150,60,255,.18); border-color: rgba(255,46,136,.55); color: #ffd7ec; }
+.sl-gcard.vice-city .sl-tag.dim { background: rgba(150,60,255,.10); border-color: rgba(150,60,255,.35); color: #cbb8ea; }
+.sl-gcard.vice-city details.sl-fold { border-top-color: rgba(150,60,255,.35); }
+.sl-gcard.vice-city .sl-tap { color: #a79bc4; }
 .sl-trow .vice-name { display: block; font-family: 'Brush Script MT', 'Segoe Script', 'Snell Roundhand', cursive; font-style: italic; font-weight: 700; font-size: 1.5rem; line-height: 1.1; background: linear-gradient(180deg, #ff6ec7, #963cff); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 0 8px rgba(255,46,136,.5)); }
 .sl-score { margin-left: auto; font-weight: 800; font-size: 1.25rem; font-variant-numeric: tabular-nums; color: var(--muted); }
 .sl-trow.right .sl-score { margin-left: 0; margin-right: auto; }
