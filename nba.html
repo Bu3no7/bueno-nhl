@@ -127,6 +127,10 @@ img.hs { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; objec
 .vice-banner .vice-pre { display: block; color: #21e6d1; font-weight: 800; font-size: .85rem; letter-spacing: .28em; }
 .vice-banner .vice-script { display: block; font-family: 'Brush Script MT', 'Segoe Script', 'Snell Roundhand', cursive; font-style: italic; font-weight: 700; font-size: 2.6rem; line-height: 1.15; background: linear-gradient(180deg, #ff6ec7, #963cff); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 0 10px rgba(255,46,136,.55)); }
 .vice-banner .vice-sub { display: block; color: #fff; font-weight: 800; font-size: .78rem; letter-spacing: .08em; margin-top: .15rem; }
+.vice-banner { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.vice-banner:focus-visible { outline: 2px solid #21e6d1; outline-offset: 2px; }
+.sl-gcard.vice-pulse { animation: vicePulse 1.6s ease-in-out; }
+@keyframes vicePulse { 0%, 100% { box-shadow: 0 0 18px rgba(255,46,136,.35), inset 0 0 24px rgba(255,46,136,.10); } 50% { box-shadow: 0 0 46px rgba(255,46,136,.95), 0 0 22px rgba(33,230,209,.5), inset 0 0 36px rgba(255,46,136,.35); } }
 .sl-gcard.vice-city { border: 2px solid #ff2e88; box-shadow: 0 0 18px rgba(255,46,136,.35), inset 0 0 24px rgba(255,46,136,.10); }
 .sl-trow .vice-name { display: block; font-family: 'Brush Script MT', 'Segoe Script', 'Snell Roundhand', cursive; font-style: italic; font-weight: 700; font-size: 1.5rem; line-height: 1.1; background: linear-gradient(180deg, #ff6ec7, #963cff); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 0 8px rgba(255,46,136,.5)); }
 .sl-score { margin-left: auto; font-weight: 800; font-size: 1.25rem; font-variant-numeric: tabular-nums; color: var(--muted); }
@@ -749,6 +753,11 @@ body.sport-glass .pc-overlay,body.sport-glass .gm-overlay{background:rgba(2,5,10
     <img src="https://a.espncdn.com/i/teamlogos/leagues/500/nba.png" alt="NBA">
     <p class="muted small" style="margin-top:.4rem">NBA scores, standings &amp; top performers · live data</p>
   </div>
+  <div class="vice-banner" id="viceBanner" hidden role="button" tabindex="0" aria-label="Vice City night — jump to tonight's Milwaukee at Miami game card">
+    <span class="vice-pre">A NIGHT IN</span>
+    <span class="vice-script">Vice City</span>
+    <span class="vice-sub">TONIGHT ONLY · MIAMI PLAYS AS VICE CITY · GTA VI EVE</span>
+  </div>
   <div class="nba-search-wrap">
     <div class="ci-search">
       <input id="nbaSearchInput" type="search" placeholder="Search players, teams, matchups…" autocomplete="off" aria-label="Search NBA">
@@ -812,12 +821,6 @@ body.sport-glass .pc-overlay,body.sport-glass .gm-overlay{background:rgba(2,5,10
       <button class="fb-menu-item" data-fbview="paint" type="button">In the Paint</button>
       <button class="fb-menu-item" data-fbview="parlay" type="button">Parlay builder</button>
     </div>
-  </div>
-
-  <div class="vice-banner" id="viceBanner" hidden>
-    <span class="vice-pre">A NIGHT IN</span>
-    <span class="vice-script">Vice City</span>
-    <span class="vice-sub">TONIGHT ONLY · MIAMI PLAYS AS VICE CITY · GTA VI EVE</span>
   </div>
 
   <section id="nba-view-standouts" class="view">
@@ -1384,6 +1387,36 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
       if (e.target.closest('.sl-look') || e.target.closest('.sl-fold')) return;
       openGame(el.dataset.gid);
     }));
+  }
+
+  // Vice City banner (top of Home) is a button: tap jumps to the
+  // MIL @ MIA card in Slate and pulses it. Fail soft — landing on
+  // Slate is enough if the card can't be found.
+  const viceBannerEl = document.getElementById('viceBanner');
+  if (viceBannerEl) {
+    const viceGoToCard = () => {
+      try {
+        nbaGoSlate();
+        const t0 = Date.now();
+        const tick = () => {
+          const card = document.querySelector('.sl-gcard.vice-city');
+          if (card) {
+            if (card.scrollIntoView) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            card.classList.remove('vice-pulse');
+            void card.offsetWidth;
+            card.classList.add('vice-pulse');
+            setTimeout(() => card.classList.remove('vice-pulse'), 1750);
+            return;
+          }
+          if (Date.now() - t0 < 2000) setTimeout(tick, 120);
+        };
+        setTimeout(tick, 200);
+      } catch (e) { /* fail soft */ }
+    };
+    viceBannerEl.addEventListener('click', viceGoToCard);
+    viceBannerEl.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); viceGoToCard(); }
+    });
   }
 
   // ---- In the Paint (live player tracker) ----
