@@ -892,9 +892,9 @@ function renderSlate(){
       if(L.situation) body += '<div class="live-situation"><span class="live-dot"></span><b>'+L.clock+'</b> · '+L.situation+'</div>';
       var wp = WP[g.espnId];
       if(wp!=null && L.state==="in"){ body += '<div class="winbar"><span class="away" style="width:'+Math.round((1-wp)*100)+'%"></span><span class="home" style="width:'+Math.round(wp*100)+'%"></span></div><div class="winlabels"><span>'+g.away+' <b>'+Math.round((1-wp)*100)+'%</b></span><span>LIVE WIN %</span><span><b>'+Math.round(wp*100)+'%</b> '+g.home+'</span></div>'; }
-      body += '<div class="proj" style="margin-top:10px"><div class="box"><b>'+Math.round(gm.awayPts)+' – '+Math.round(gm.homePts)+'</b><i>PREGAME PROJ</i></div><div class="box"><b>'+(gm.awayWin>=gm.homeWin? g.away+" "+pct(gm.awayWin) : g.home+" "+pct(gm.homeWin))+'</b><i>PREGAME WIN %</i></div><div class="box"><b>'+gm.total.toFixed(1)+'</b><i>MODEL TOTAL</i></div></div>';
+      body += '<div class="proj" style="margin-top:10px"><div class="box"><b>'+Math.round(gm.awayPts)+' – '+Math.round(gm.homePts)+'</b><i>PREGAME PROJ</i></div><div class="box"><b>'+(gm.awayWin>=gm.homeWin? g.away+" "+pct(gm.awayWin) : g.home+" "+pct(gm.homeWin))+'</b><i>PREGAME WIN %</i></div><div class="box"><b>'+gm.total.toFixed(1)+'</b><i>O/U · MODEL</i></div></div>';
     } else {
-      body += '<div class="proj"><div class="box"><b>'+Math.round(gm.awayPts)+' – '+Math.round(gm.homePts)+'</b><i>PROJECTED</i></div><div class="box"><b>'+(gm.awayWin>=gm.homeWin? g.away+" "+pct(gm.awayWin) : g.home+" "+pct(gm.homeWin))+'</b><i>WIN PROB</i></div><div class="box"><b>'+gm.total.toFixed(1)+'</b><i>TOTAL</i></div></div>';
+      body += '<div class="proj"><div class="box"><b>'+Math.round(gm.awayPts)+' – '+Math.round(gm.homePts)+'</b><i>PROJECTED</i></div><div class="box"><b>'+(gm.awayWin>=gm.homeWin? g.away+" "+pct(gm.awayWin) : g.home+" "+pct(gm.homeWin))+'</b><i>WIN PROB</i></div><div class="box"><b>'+gm.total.toFixed(1)+'</b><i>O/U · MODEL</i></div></div>';
     }
     return '<div class="card'+(gi===0?" featured":"")+'" data-game="'+key+'" style="cursor:pointer">'+head+body+wxHtml(g)+'</div>';
   }).join("");

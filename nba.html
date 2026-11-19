@@ -1382,7 +1382,7 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
         body += '<div class="sl-trio">' +
           '<div class="sl-tcell"><div class="sl-tv">' + favML + ' <span class="pct">' + favPct + '%</span></div><div class="sl-tk">' + esc(favAbbr) + ' moneyline</div></div>' +
           '<div class="sl-tcell mid"><div class="sl-tv">' + spreadTxt + '</div><div class="sl-tk">Model spread</div></div>' +
-          '<div class="sl-tcell"><div class="sl-tv">' + proj.total + '</div><div class="sl-tk">Model total</div></div></div>' +
+          '<div class="sl-tcell"><div class="sl-tv">' + proj.total + '</div><div class="sl-tk">O/U · Model</div></div></div>' +
           '<div class="sl-proj">Proj score: ' + esc(g.away.abbr) + ' ' + Math.round(proj.expAway) + ' — ' + Math.round(proj.expHome) + ' ' + esc(g.home.abbr) + ' · pace ' + proj.pace + '</div>' +
           '<div class="sl-tags">' + (proj.tags.length
             ? proj.tags.map((t) => '<span class="sl-tag">' + esc(t) + '</span>').join('')
