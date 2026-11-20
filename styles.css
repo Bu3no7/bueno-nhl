@@ -1260,6 +1260,12 @@ tr.team-row:focus-visible { outline: 2px solid var(--teal); outline-offset: -2px
 .fin-tick { position: absolute; left: 12%; right: 12%; height: 3px; border-radius: 2px; background: var(--gold); }
 .fin-cap { font-size: .72rem; color: var(--muted); margin: .35rem 0 0; }
 .fin-foot { font-size: .72rem; color: var(--muted); font-style: italic; margin: .55rem 0 0; border-top: 1px solid rgba(255, 255, 255, .09); padding-top: .5rem; }
+/* ---------------- heat check (nhl-heat sidecar) ---------------- */
+.heat-box { margin-top: .8rem; border-top: 1px solid rgba(255, 255, 255, .09); padding-top: .15rem; }
+.fin-chip.heat-hot { color: #f08a66; border-color: rgba(240, 138, 102, .7); background: rgba(240, 102, 94, .1); }
+.fin-chip.heat-due { color: var(--blue); border-color: rgba(94, 168, 255, .7); background: rgba(94, 168, 255, .1); }
+.heat-nums { font-size: .85rem; font-weight: 700; margin: .5rem 0 0; }
+.heat-read { font-size: .8rem; color: var(--muted); margin: .3rem 0 0; }
 
 /* ---------------- NHL EDGE tracking (player + goalie cards) ----------------
    Live NHL EDGE season tracking (shot speed / skating / zone time;

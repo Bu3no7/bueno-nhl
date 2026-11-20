@@ -3352,6 +3352,7 @@ function pcFinHtml(r) {
     <div class="fin-strip">${cols}</div>
     <p class="fin-cap">Teal = goals · gold tick = expected that game · ${tg} goals vs ${tx.toFixed(1)} expected</p>`;
   }
+  h += pcHeatSlotHtml(r);
   h += `<p class="fin-foot">What he's done with his chances — not a price input.</p></div>`;
   return h;
 }
@@ -3364,6 +3365,58 @@ async function ensureFinish(r) {
   const html = finSidecarState === 'ok' ? pcFinHtml(r) : '';
   if (!html) { dropAccSlot(slot); return; }
   slot.outerHTML = html;
+  ensureHeat();
+}
+/* ---------------- heat check (nhl-heat sidecar) ----------------
+   data/nhl-heat.json is built by data-builder/nhl-heat.py from the
+   NHL's official Time On Ice reports crossed with play-by-play:
+   5v5 on-ice shooting % (the finishing environment around him, not
+   his own shot), on-ice save % and PDO, season to date. DISPLAY
+   ONLY — a read layer; feeds no price, probability or sort. Rides
+   inside the Finishing section and loads with it; players under
+   the sample floor are absent from the file and render nothing. */
+let heatSidecar = null, heatState = 'idle'; // idle | loading | ok | fail
+async function loadHeatSidecar() {
+  if (heatState === 'loading' || heatState === 'ok') return;
+  heatState = 'loading';
+  try {
+    const r = await dataFetch('data/nhl-heat.json', { headers: { 'Accept': 'application/json' } });
+    if (!r.ok) throw new Error('no sidecar');
+    heatSidecar = await r.json();
+    heatState = 'ok';
+  } catch (e) { heatState = 'fail'; }
+}
+function heatOrd(n) {
+  const suf = (n % 100 >= 10 && n % 100 <= 20) ? 'th' : ({ 1: 'st', 2: 'nd', 3: 'rd' }[n % 10] || 'th');
+  return n + suf;
+}
+function pcHeatHtml(pid) {
+  const x = (heatSidecar && heatSidecar.players && heatSidecar.players[String(pid)]) || null;
+  if (!x) return '';
+  const chip = x.tag === 'HOT' ? '<span class="fin-chip heat-hot">RUNNING HOT</span>'
+    : x.tag === 'DUE' ? '<span class="fin-chip heat-due">DUE</span>' : '';
+  const read = x.tag === 'HOT' ? '<p class="heat-read">Linemates finishing everything — points running ahead of the chances</p>'
+    : x.tag === 'DUE' ? '<p class="heat-read">Nothing going in around him — chances are there, bounces aren\u2019t</p>' : '';
+  return `<div class="heat-box" data-heat-root>
+    <div class="chem-sec-t">Heat check · 5v5 on-ice finishing</div>
+    ${chip}
+    <p class="heat-nums">On-ice SH% ${x.shPct.toFixed(1)}% · PDO ${Math.round(x.pdo)} · ${heatOrd(x.pct)} pct</p>
+    ${read}
+  </div>`;
+}
+function pcHeatSlotHtml(r) {
+  if (heatState === 'ok') return pcHeatHtml(r.pid);
+  if (heatState === 'fail') return '';
+  return `<div data-heat-slot="${esc(String(r.pid))}"></div>`;
+}
+async function ensureHeat() {
+  await loadHeatSidecar();
+  const body = $('modalBody');
+  if (!body) return;
+  const slot = body.querySelector('[data-heat-slot]');
+  if (!slot) return;
+  const html = heatState === 'ok' ? pcHeatHtml(slot.dataset.heatSlot) : '';
+  if (html) slot.outerHTML = html; else slot.remove();
 }
 /* ---------------- NHL EDGE tracking (live EDGE endpoints) ----------------
    Season tracking from the NHL's own EDGE API — shot speed, skating
