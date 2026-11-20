@@ -291,6 +291,13 @@ main { max-width: 1120px; margin: 0 auto; padding: 1.4rem 1rem 2.2rem; }
   animation: pulse-dot 1.6s ease-in-out infinite;
 }
 @keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: .6; } }
+/* WATCH row (TV broadcasts on slate cards, all sports): ghosted network
+   logos on the glass — no chips, ~40% opacity, thin divider above. */
+.watch-row { display: flex; align-items: center; gap: .55rem; margin-top: .55rem; padding-top: .55rem; border-top: 1px solid rgba(255,255,255,.06); }
+.watch-lbl { font-size: .6rem; font-weight: 800; letter-spacing: .14em; color: var(--muted-2); }
+.watch-logos { margin-left: auto; display: flex; align-items: center; gap: .65rem; min-width: 0; }
+.watch-logo { height: 15px; width: auto; max-width: 92px; object-fit: contain; opacity: .42; display: block; }
+.watch-txt { font-size: .62rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #cfe0f2; opacity: .42; white-space: nowrap; }
 .scorers { margin-top: .65rem; font-size: .82rem; color: var(--muted); }
 .scorers summary { cursor: pointer; color: var(--teal); font-weight: 600; font-size: .82rem; padding: .15rem 0; }
 .scorers summary:hover { color: #7cebf1; }

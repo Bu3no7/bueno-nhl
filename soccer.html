@@ -575,6 +575,7 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
 <div id="socToast" role="status"></div>
 
 <script src="data-cdn.js"></script>
+<script src="assets/tv-logos.js"></script>
 <script>
 /* ================= SOCCER — live ESPN data + model bundle surfaces =================
    LIVE NOW (ESPN keyless): fixtures/scoreboards (site v2), standings (v2),
@@ -718,6 +719,14 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
       winner: !!comp.winner, shootout: comp.shootoutScore != null ? Number(comp.shootoutScore) : null
     };
   }
+  /* Broadcast names from the same ESPN event (national first). */
+  function parseBroadcasts(c) {
+    var ord = { national: 0, home: 1, away: 2 };
+    return ((c && c.broadcasts) || []).slice().sort(function (a, b) {
+      var x = ord[a.market] != null ? ord[a.market] : 3, y = ord[b.market] != null ? ord[b.market] : 3;
+      return x - y;
+    }).reduce(function (acc, b) { return acc.concat(b.names || []); }, []);
+  }
   function parseEvent(e, slug) {
     var c = (e.competitions || [])[0] || {};
     var home = null, away = null;
@@ -741,7 +750,7 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
       seasonSlug: (e.season || {}).slug || '',
       state: st.state || 'pre', detail: st.detail || '', shortDetail: st.shortDetail || '',
       clock: (e.status || {}).displayClock || '', venue: ((c.venue || {}).fullName) || ((e.venue || {}).fullName) || '',
-      home: home, away: away, scorers: scorers, note: (((c.notes || [])[0] || {}).headline || ((c.notes || [])[0] || {}).text || '')
+      home: home, away: away, scorers: scorers, broadcasts: parseBroadcasts(c), note: (((c.notes || [])[0] || {}).headline || ((c.notes || [])[0] || {}).text || '')
     };
   }
   function loadScoreboard(slug) {
@@ -1813,7 +1822,7 @@ details.acc[open] summary .chev{transform:rotate(90deg)}
     }
     return '<div class="fx" data-act="fixture" data-slug="' + ev.slug + '" data-eid="' + ev.id + '">' +
       (showTag ? '<span class="fx-lg"><img src="' + L.logo + '" alt="" onerror="this.style.display=\'none\'"></span>' : '') +
-      '<span class="fx-main">' + trow(ev.away) + trow(ev.home) + top + '</span>' +
+      '<span class="fx-main">' + trow(ev.away) + trow(ev.home) + top + (window.tvWatchRow ? window.tvWatchRow(ev.broadcasts) : '') + '</span>' +
       chip + '</div>';
   }
 

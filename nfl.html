@@ -236,6 +236,11 @@
   .usg-track{height:8px;border-radius:4px;background:rgba(10,20,40,.6);border:1px solid rgba(165,195,255,.14);overflow:hidden}
   .usg-fill{height:100%;background:#e8b64c}
   .usg-rolepct{font-size:10px;font-weight:700;color:#e8b64c;margin-top:2px}
+.watch-row{display:flex;align-items:center;gap:.55rem;margin-top:.55rem;padding-top:.55rem;border-top:1px solid rgba(255,255,255,.06)}
+  .watch-lbl{font-size:.6rem;font-weight:800;letter-spacing:.14em;color:#7d90a5}
+  .watch-logos{margin-left:auto;display:flex;align-items:center;gap:.65rem;min-width:0}
+  .watch-logo{height:15px;width:auto;max-width:92px;object-fit:contain;opacity:.42;display:block}
+  .watch-txt{font-size:.62rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#cfe0f2;opacity:.42;white-space:nowrap}
   /* player card: NBA-style hero header + accordion sections (gold = Football accent) */
   #view-player .phead .face{width:84px;height:84px;font-size:26px}
   .phead-main{min-width:0}
@@ -474,7 +479,7 @@
 /* ===== Bueno Football — production build. Prices: data/nfl-2026-w11.json (NFL props model v1 + FG model). Live: ESPN feed. ===== */
 var TEAMNAME = {ARI:"Arizona Cardinals",ATL:"Atlanta Falcons",BAL:"Baltimore Ravens",BUF:"Buffalo Bills",CAR:"Carolina Panthers",CHI:"Chicago Bears",CIN:"Cincinnati Bengals",CLE:"Cleveland Browns",DAL:"Dallas Cowboys",DEN:"Denver Broncos",DET:"Detroit Lions",GB:"Green Bay Packers",HOU:"Houston Texans",IND:"Indianapolis Colts",JAX:"Jacksonville Jaguars",KC:"Kansas City Chiefs",LAC:"Los Angeles Chargers",LAR:"Los Angeles Rams",LV:"Las Vegas Raiders",MIA:"Miami Dolphins",MIN:"Minnesota Vikings",NE:"New England Patriots",NO:"New Orleans Saints",NYG:"New York Giants",NYJ:"New York Jets",PHI:"Philadelphia Eagles",PIT:"Pittsburgh Steelers",SEA:"Seattle Seahawks",SF:"San Francisco 49ers",TB:"Tampa Bay Buccaneers",TEN:"Tennessee Titans",WSH:"Washington Commanders"};
 var TEAMCOLOR32 = {ARI:"#97233F",ATL:"#A71930",BAL:"#241773",BUF:"#00338D",CAR:"#0085CA",CHI:"#C83803",CIN:"#FB4F14",CLE:"#311D00",DAL:"#003594",DEN:"#FB4F14",DET:"#0076B6",GB:"#FFB612",HOU:"#A71930",IND:"#002C5F",JAX:"#006778",KC:"#E31837",LAC:"#FFC20E",LAR:"#FFD100",LV:"#A5ACAF",MIA:"#008E97",MIN:"#4F2683",NE:"#C8102E",NO:"#D3BC8D",NYG:"#0B2265",NYJ:"#125740",PHI:"#004C54",PIT:"#FFB612",SEA:"#69BE28",SF:"#AA0000",TB:"#D50A0A",TEN:"#4B92DB",WSH:"#FFB612"};
-var B = null, PLAYERS = {}, KICKERS = {}, GAMES = {}, BOARDS = {}, FACES = {}, TEAMCOLOR = {}, BYID = {}, TEAMINFO = {}, LIVE = {}, WP = {}, SEARCH_ITEMS = [];
+var B = null, PLAYERS = {}, KICKERS = {}, GAMES = {}, BOARDS = {}, FACES = {}, TEAMCOLOR = {}, BYID = {}, TEAMINFO = {}, LIVE = {}, WP = {}, TVB = {}, SEARCH_ITEMS = [];
 var currentGame = null, currentView = "view-football", lastView = "view-football";
 function $(id){ return document.getElementById(id); }
 function fmtOdds(p){ if(p==null) return "—"; p = Math.min(0.995, Math.max(0.005, p)); return p>=0.5 ? "−"+Math.round(100*p/(1-p)) : "+"+Math.round(100*(1-p)/p); }
@@ -882,6 +887,11 @@ function teamScoreRow(abbr, score, win){
   var ti = TEAMINFO[abbr] || {};
   return '<div class="team-score-row'+(win?" win":"")+'"><div class="bye-logo"><img src="https://a.espncdn.com/i/teamlogos/nfl/500/'+logoFile(abbr)+'.png" alt=""></div><div class="who"><b>'+TEAMNAME[abbr]+'</b><span>'+(ti.rec||"")+(ti.div? " · "+ti.div : "")+'</span></div><div class="score">'+score+'</div></div>';
 }
+function tvHtml(g){
+  if(!window.tvWatchRow) return "";
+  var names = (g.broadcasts && g.broadcasts.length) ? g.broadcasts : TVB[g.espnId];
+  return window.tvWatchRow(names);
+}
 function renderSlate(){
   $("slateWrap").innerHTML = B.games.map(function(g, gi){
     var L = LIVE[g.espnId], gm = g.model, key = slug(g.key);
@@ -896,7 +906,7 @@ function renderSlate(){
     } else {
       body += '<div class="proj"><div class="box"><b>'+Math.round(gm.awayPts)+' – '+Math.round(gm.homePts)+'</b><i>PROJECTED</i></div><div class="box"><b>'+(gm.awayWin>=gm.homeWin? g.away+" "+pct(gm.awayWin) : g.home+" "+pct(gm.homeWin))+'</b><i>WIN PROB</i></div><div class="box"><b>'+gm.total.toFixed(1)+'</b><i>O/U · MODEL</i></div></div>';
     }
-    return '<div class="card'+(gi===0?" featured":"")+'" data-game="'+key+'" style="cursor:pointer">'+head+body+wxHtml(g)+'</div>';
+    return '<div class="card'+(gi===0?" featured":"")+'" data-game="'+key+'" style="cursor:pointer">'+head+body+wxHtml(g)+tvHtml(g)+'</div>';
   }).join("");
 }
 function renderStandings(){
@@ -1020,6 +1030,9 @@ function parseScoreboard(d){
       awayScore: parseInt(away.score||"0",10), homeScore: parseInt(home.score||"0",10),
       awayLines: (away.linescores||[]).map(function(x){ return x.value; }), homeLines: (home.linescores||[]).map(function(x){ return x.value; }),
       situation: sit };
+    var tvn = [];
+    (c.broadcasts || []).forEach(function(b){ (b.names || []).forEach(function(n){ tvn.push(n); }); });
+    if(tvn.length) TVB[e.id] = tvn;
   });
 }
 function parseSummary(espnId, d){
@@ -2788,6 +2801,7 @@ document.addEventListener("click", function(e){
 }, true);
 </script>
 
+<script src="assets/tv-logos.js"></script>
 <script src="sports-menu.js"></script>
 </body>
 </html>

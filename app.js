@@ -1520,6 +1520,7 @@ async function renderSlate() {
   const d = new Date(state.date + 'T12:00:00');
   $('slateTitle').textContent = 'Slate — ' + d.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' });
   const stMap = await getStandings().catch(() => ({}));
+  const tvMap = await getTvBroadcasts().catch(() => ({}));
   const rec = (abbr) => { const s = stMap[abbr]; return s ? `${s.wins}-${s.losses}-${s.otLosses}` : ''; };
   // model odds: ML, puck line (-1.5), total — from Poisson team totals
   const oddsHtml = (g) => {
@@ -1567,6 +1568,7 @@ async function renderSlate() {
       ${oddsHtml(g)}
       ${goalieHtml}
       ${scorersHtml(g)}
+      ${window.tvWatchRow ? window.tvWatchRow(tvMap[g.id]) : ''}
     </div>`;
   }).join('');
   const ud = $('utilDate');
@@ -1627,6 +1629,31 @@ async function getStandings() {
     }
   } catch (e) { /* stats stay blank; win prob still shows */ }
   state.standingsCache = { key, map };
+  return map;
+}
+/* TV broadcasts per game for the slate's date, from the NHL schedule
+   (same /nhl-api proxy as everything else). US feeds only when any
+   exist (national before local); otherwise the national feeds. One
+   fetch per date, cached. Fails soft to {} — cards get no WATCH row. */
+async function getTvBroadcasts() {
+  const key = state.date;
+  if (state.tvCache && state.tvCache.key === key) return state.tvCache.map;
+  const map = {};
+  try {
+    const j = await fetchJSON(`${API}/schedule/${key}`);
+    for (const day of j.gameWeek || []) {
+      if (day.date !== key) continue;
+      for (const g of day.games || []) {
+        const bs = g.tvBroadcasts || [];
+        const us = bs.filter((b) => b.countryCode === 'US');
+        const pick = (us.length ? us : bs.filter((b) => b.market === 'N')).slice();
+        pick.sort((a, b) => (a.market === 'N' ? 0 : 1) - (b.market === 'N' ? 0 : 1));
+        const names = pick.map((b) => String(b.network || '').trim()).filter(Boolean);
+        if (names.length) map[g.id] = names;
+      }
+    }
+  } catch (e) { /* no WATCH rows */ }
+  state.tvCache = { key, map };
   return map;
 }
 function tapeRow(aVal, label, hVal, better) {

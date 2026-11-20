@@ -956,6 +956,7 @@ body.sport-glass .pc-overlay,body.sport-glass .gm-overlay{background:rgba(2,5,10
 
 <script src="nba-engine.js"></script>
 <script src="data-cdn.js"></script>
+<script src="assets/tv-logos.js"></script>
 <script>
 // Bottom nav (home <-> lab). The Fast Break's own views are switched
 // from the hamburger sheet inside the main script below.
@@ -1089,6 +1090,13 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
   })();
 
   // ---- tonight's games (scoreboard) ----
+  // Broadcast names from the same scoreboard payload (national first).
+  const espnTv = (comp) => {
+    const ord = { national: 0, home: 1, away: 2 };
+    return ((comp && comp.broadcasts) || []).slice()
+      .sort((a, b) => (ord[a.market] != null ? ord[a.market] : 3) - (ord[b.market] != null ? ord[b.market] : 3))
+      .flatMap((b) => b.names || []);
+  };
   async function fetchScoreboard() {
     const sb = await getJSON(API + '/scoreboard?dates=' + ymd);
     const events = sb.events || [];
@@ -1104,6 +1112,7 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
         id: ev.id, state: type.state || 'pre',
         detail: type.shortDetail || '', start: ev.date,
         venue: (comp.venue || {}).fullName || '',
+        broadcasts: espnTv(comp),
         home: { id: (home.team || {}).id, abbr: (home.team || {}).abbreviation, name: (home.team || {}).displayName, score: home.score, record: rec(home), rgb: teamColorRgb(home.team) },
         away: { id: (away.team || {}).id, abbr: (away.team || {}).abbreviation, name: (away.team || {}).displayName, score: away.score, record: rec(away), rgb: teamColorRgb(away.team) },
       };
@@ -1402,6 +1411,7 @@ document.querySelectorAll('[data-bnav]').forEach(b => b.addEventListener('click'
       ).join('');
       body += '<details class="sl-fold"><summary>Top looks<span class="chev">▸</span></summary><div class="sl-fold-body">' + looksHtml + '</div></details>';
       body += '<div class="sl-tap">Tap card for lineups</div>';
+      if (window.tvWatchRow) body += window.tvWatchRow(g.broadcasts);
       return '<div class="sl-gcard' + (vice ? ' vice-city' : '') + '" data-gid="' + g.id + '"><div class="sl-teams">' + trow(g.away, aS, false) + mid + trow(g.home, hS, true) + '</div>' + body + '</div>';
     }).join('') + '</div>';
     slateEl.querySelectorAll('.sl-look').forEach((el) => el.addEventListener('click', () => openPlayerCard(el.dataset.pid)));
