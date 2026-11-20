@@ -290,7 +290,7 @@ function slimStandings(d) {
    player landings already had). Final failures are counted per section and
    logged at the end; the health gate below decides whether the bundle is
    fit to publish at all. */
-const failCounts = { schedule: 0, pbp: 0, roster: 0, zonePbp: 0, landing: 0, clubSchedule: 0, seasonFinal: 0, standings: 0, minPbp: 0, shifts: 0, chemPbp: 0, goalieWork: 0 };
+const failCounts = { schedule: 0, pbp: 0, roster: 0, zonePbp: 0, landing: 0, clubSchedule: 0, seasonFinal: 0, standings: 0, minPbp: 0, shifts: 0, chemPbp: 0, goalieWork: 0, clubStats: 0 };
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 async function fetchRetry(url, section, retries = 3) {
   let lastErr = null;
@@ -474,6 +474,7 @@ async function main() {
   // (gameDate < dateStr), so the site merges live pbp shots at card-open
   // with zero overlap. Only slate skaters are kept, to bound bundle size.
   let seasonFinalCount = 0;
+  let seasonStart = null; // earliest regular-season gameDate across slate teams
   const seasonFinalsByTeam = {}; // team -> [gameId,...] most recent first (minutes sidecar)
   {
     const seenGameIds = new Set();
@@ -485,6 +486,7 @@ async function main() {
       const mine = [];
       for (const g of (sched.games || [])) {
         if (g.gameType !== 2) continue;
+        if (g.gameDate && (!seasonStart || g.gameDate < seasonStart)) seasonStart = g.gameDate;
         if (g.gameState !== 'OFF' && g.gameState !== 'FINAL') continue;
         if (!(g.gameDate < dateStr)) continue;
         mine.push(g);
@@ -569,6 +571,32 @@ async function main() {
     const st = await counted(fetchRetry(`${API}/standings/${dateStr}`, 'standings'));
     out.standings = slimStandings(st);
   } catch (e) { out.standings = {}; }
+
+  // 7b. first-month blend inputs (best effort, never gated): season start,
+  // league lambda from standings, and per-team season-to-date GP/GF/SOG
+  // entering today. SOG comes from club-stats skater sums (the standings
+  // feed carries no team shots). The site only consumes these inside the
+  // season's first 30 days (engine.seasonWindowFirstMonth); a missing
+  // team simply skips the blend for its skaters.
+  out.seasonStart = seasonStart;
+  {
+    let sumGF = 0, sumGP = 0;
+    for (const t of Object.values(out.standings)) {
+      if (t.gamesPlayed > 0) { sumGF += t.goalFor || 0; sumGP += t.gamesPlayed; }
+    }
+    out.leagueLam = sumGP > 0 ? sumGF / sumGP : 3.0;
+    out.teamForm = {};
+    await E.limitedMap(teams, 3, async (t) => {
+      const st = out.standings[t];
+      if (!st) return;
+      try {
+        const cs = await counted(fetchRetry(`${API}/club-stats/${t}/${seasonId}/2`, 'clubStats'));
+        const sog = (cs.skaters || []).reduce((sum, x) => sum + (x.shots || 0), 0);
+        out.teamForm[t] = { gp: st.gamesPlayed || 0, gf: st.goalFor || 0, sog };
+      } catch (e) { /* team omitted -> no blend for its skaters */ }
+    });
+    console.log(`[data-builder] teamForm for ${Object.keys(out.teamForm).length}/${teams.length} teams, leagueLam ${out.leagueLam.toFixed(3)}, seasonStart ${seasonStart}`);
+  }
 
   // 8. Daily Faceoff line combinations for slate teams (best effort)
   await E.limitedMap(teams, 3, async (t) => {

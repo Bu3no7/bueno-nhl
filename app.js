@@ -351,7 +351,8 @@ async function ctxFromPrecomputed(dateStr) {
   state.zonePbps = zonePbps;
   state.zoneShots = pre.zoneShots || {};
   state.recentIds = recentIds;
-  return { games, pbps, rosterMap, recentIds, zonePbps, zoneShots: pre.zoneShots || {}, goalieSv: pre.goalieSv || {}, lines: pre.lines || {} };
+  return { games, pbps, rosterMap, recentIds, zonePbps, zoneShots: pre.zoneShots || {}, goalieSv: pre.goalieSv || {}, lines: pre.lines || {},
+           seasonStart: pre.seasonStart || null, teamForm: pre.teamForm || {}, leagueLam: pre.leagueLam != null ? pre.leagueLam : null };
 }
 async function ctxFromLive(dateStr) {
   const sched = await fetchJSON(`${API}/schedule/${dateStr}`);
@@ -497,6 +498,17 @@ async function loadDate(dateStr) {
       if (zonePbps[id]) pushZone(zonePbps[id]);
     }
   }
+  // first-month blend setup (engine FIRST_MONTH_DAYS window, season-start
+  // anchored): only inside the window and only when the bundle carried the
+  // team-form inputs; otherwise fm stays null and prices are unblended.
+  const fmActive = seasonWindowFirstMonth(dateStr, ctx.seasonStart);
+  const priorSogByTeamGame = {};
+  if (fmActive) {
+    for (const d of defs) {
+      const k = d.team + ':' + d.gameId;
+      priorSogByTeamGame[k] = (priorSogByTeamGame[k] || 0) + priorsFor(d.pos).s;
+    }
+  }
   // compute model rows
   state.skaters = defs.map((d, i) => {
     const land = landings[i];
@@ -510,7 +522,18 @@ async function loadDate(dateStr) {
     const oppSv = (typeof gsEntry === 'number')
       ? gsEntry
       : (gsEntry ? ((d.team === g.awayTeam.abbrev ? gsEntry.home : gsEntry.away) || 0.900) : 0.900);
-    const m = computeProb(s, z.share, oppSv, d.pos);
+    let fm = null;
+    if (fmActive) {
+      const tf = (ctx.teamForm || {})[d.team];
+      const proxyP = tf ? shotShareProxyP({
+        shots: s.shots, pos: d.pos,
+        dressedPriorSogSum: priorSogByTeamGame[d.team + ':' + d.gameId] || 0,
+        teamGp: tf.gp, teamGf: tf.gf, teamSog: tf.sog,
+        leagueLam: ctx.leagueLam != null ? ctx.leagueLam : 3.0,
+      }) : null;
+      fm = { proxyP, firstMonth: true };
+    }
+    const m = computeProb(s, z.share, oppSv, d.pos, fm);
     return {
       ...d, ...s, zone: z, oppSv, oppAbbr,
       p: m.p, lam: m.lam, factors: m.factors,

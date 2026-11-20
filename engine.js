@@ -35,6 +35,35 @@ const PRIORS = {
   D: { g: 0.07, s: 1.5, a: 0.12, p: 0.19 },
 };
 
+/* ---- wired 2026-11-19 from the four-season walk-forward backtest
+   (188,890 priced skater-games, 2022-23 -> 2025-26; REPORT-CANDIDATES.md).
+   Each constant below is the tested variant, implemented as the exact
+   transformation the backtest graded — not an approximation of it. ---- */
+
+// GOALIE s=0.50 (WIN, cleanest candidate): when the goalie factor bites
+// (mGoal < 1, i.e. a better-than-average opposing goalie), shrink its
+// deviation below 1.0 by this fraction. The weak-goalie end (mGoal >= 1)
+// is untouched — the backtest showed actual scoring barely varies by
+// goalie tier while the raw factor over-spread it ~4.5 pts.
+const GOALIE_SHRINK = 0.50;
+
+// FWD k=1.10 (WIN, gentler step of the tested 1.10/1.20 grid): forwards'
+// final lambda multiplier; defensemen unmoved. The evidence indicts the
+// forward base rate (forwards score ~19-20% in every era vs the model's
+// light pricing), but a PRIORS.F.g raise canNOT reproduce this variant:
+// the needed prior varies 0.25->0.48 across GP and the shots term of
+// lamBase never sees the g prior, so any fixed prior under-lifts veterans
+// and over-lifts rookies. The tested transformation is a constant
+// multiplier on final lambda, so that is what ships (see backtest notes).
+const F_LAM_LIFT = 1.10;
+
+// FIRST-MONTH blend (WIN): for games in the first FIRST_MONTH_DAYS days
+// of a season (season-start anchored), the model price is blended 50/50
+// in probability space with the shot-share proxy (shotShareProxyP below).
+// The backtest: in month one the machinery earns nothing over the proxy;
+// after day 30 the blend has zero footprint.
+const FIRST_MONTH_DAYS = 30;
+
 function regress(obs, gp, prior) {
   const w = gp / (gp + REG_K);
   return w * obs + (1 - w) * prior;
@@ -77,7 +106,7 @@ function fmtToi(min) {
   return `${m}:${String(s).padStart(2, '0')}`;
 }
 
-function computeProb(s, hdShare, oppSv, pos) {
+function computeProb(s, hdShare, oppSv, pos, fm) {
   const gp = Math.max(s.gp, 1);
   const pr = priorsFor(pos);
   const gpg = regress(s.goals / gp, gp, pr.g);
@@ -85,7 +114,9 @@ function computeProb(s, hdShare, oppSv, pos) {
   const lamBase = 0.6 * gpg + 0.4 * (sogpg * LEAGUE_SH_PCT);
   const mToi = clamp(0.6 + 0.4 * (s.toiMin / 20), 0.7, 1.3);
   const mPp = 1 + clamp((s.ppg / gp) * 2, 0, 0.35);
-  const mGoal = clamp((1 - oppSv) / 0.10, 0.7, 1.4);
+  let mGoal = clamp((1 - oppSv) / 0.10, 0.7, 1.4);
+  // GOALIE s=0.50: shrink only the sub-1.0 (strong-goalie) deviation.
+  if (mGoal < 1) mGoal = mGoal + GOALIE_SHRINK * (1 - mGoal);
   const mZone = 1 + clamp((hdShare - HD_NEUTRAL) * 1.2, -0.25, 0.35);
   // shooting talent: regressed season SH% vs league average (elite finishers are real)
   const shPctReg = (s.goals + 10.5) / (s.shots + 100);
@@ -93,7 +124,13 @@ function computeProb(s, hdShare, oppSv, pos) {
   let lam = lamBase * mToi * mPp * mGoal * mZone * mShoot;
   lam *= CALIBRATION;
   if (lam < LONGSHOT_P) lam *= TAIL_DAMP;
-  const p = 1 - Math.exp(-lam);
+  // FWD k=1.10: applied to final lambda, exactly where the backtest's
+  // variant transformation applied it (post-calibration, post-tail-damp).
+  if (pos !== 'D') lam *= F_LAM_LIFT;
+  let p = 1 - Math.exp(-lam);
+  // FIRST-MONTH blend: 50/50 probability-space blend with the shot-share
+  // proxy, only when the caller supplies it and flags a first-month game.
+  if (fm && fm.firstMonth && fm.proxyP != null) p = 0.5 * p + 0.5 * fm.proxyP;
   return {
     p, lam,
     factors: [
@@ -106,6 +143,35 @@ function computeProb(s, hdShare, oppSv, pos) {
       { label: 'Zone score', value: `${Math.round(hdShare * 100)} HD share`, mult: mZone },
     ],
   };
+}
+
+/* First-month window: true when dateStr falls within the first
+   FIRST_MONTH_DAYS days of the season that started on seasonStartStr
+   (both 'YYYY-MM-DD'). Season-anchored, never calendar-anchored: the
+   backtest's per-season windows were opening night + 30 days. */
+function seasonWindowFirstMonth(dateStr, seasonStartStr) {
+  if (!dateStr || !seasonStartStr) return false;
+  const d = Date.parse(dateStr + 'T00:00:00Z'), s0 = Date.parse(seasonStartStr + 'T00:00:00Z');
+  if (isNaN(d) || isNaN(s0)) return false;
+  const days = Math.round((d - s0) / 86400000);
+  return days >= 0 && days <= FIRST_MONTH_DAYS;
+}
+
+/* Shot-share proxy (the backtest's pProxy, verbatim): a skater's shrunk
+   share of his team's shots on goal, times a shrunk team lambda.
+   opts: { shots, pos, dressedPriorSogSum, teamGp, teamGf, teamSog,
+           leagueLam } — team totals are season-to-date ENTERING the game.
+   Returns null when the inputs can't support it (callers then skip the
+   first-month blend for that skater). */
+function shotShareProxyP(opts) {
+  if (!opts || opts.teamSog == null || !(opts.dressedPriorSogSum > 0)) return null;
+  const teamGp = opts.teamGp || 0;
+  const leagueLam = opts.leagueLam || 3.0;
+  const myPriorShare = priorsFor(opts.pos).s / opts.dressedPriorSogSum;
+  const share = ((opts.shots || 0) + 200 * myPriorShare) / (opts.teamSog + 200);
+  const wTeam = teamGp / (teamGp + 15);
+  const teamLam = wTeam * (teamGp > 0 ? (opts.teamGf || 0) / teamGp : leagueLam) + (1 - wTeam) * leagueLam;
+  return 1 - Math.exp(-teamLam * share);
 }
 
 function normalizeShot(x, y, shooterTeamId, homeId, homeDefSide) {
@@ -427,8 +493,10 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     SEASON, LEAGUE_SH_PCT, CALIBRATION, TAIL_DAMP, LONGSHOT_P, HD_NEUTRAL,
     REG_K, PRIORS, MIN_ZONE_ATTEMPTS, EN_RATE, LEAGUE_XG,
+    GOALIE_SHRINK, F_LAM_LIFT, FIRST_MONTH_DAYS,
     clamp, fetchJSON, limitedMap,
     parseToi, fmtToi, regress, priorsFor, computeProb, regressTeamXG,
+    seasonWindowFirstMonth, shotShareProxyP,
     normalizeShot, zoneShareFor, skaterSeason,
     recentFinalsByTeam, shotsFromPbp, displayShotsByPid, displayShotsFromPbp, goalieForGame,
     simLambda, poissonSample, pickWeighted, pickWeightedBy, simUnits,
