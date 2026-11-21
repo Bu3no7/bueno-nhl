@@ -7,8 +7,12 @@
 (function () {
   var now = new Date();
   var inWindow = now.getFullYear() === 2026 && now.getMonth() === 10 && now.getDate() >= 25 && now.getDate() <= 27;
+  /* TEMP one-night test window for Alex, Fri Nov 20 2026 22:02–22:31 local.
+     Self-extinguishing; the pristine file is restored by a one-off job after. */
+  var mins = now.getHours() * 60 + now.getMinutes();
+  var tempLive = now.getFullYear() === 2026 && now.getMonth() === 10 && now.getDate() === 20 && mins >= 22 * 60 + 2 && mins < 22 * 60 + 31;
   var preview = /[?&]tgpreview=1/.test(location.search);
-  if (!inWindow && !preview) return;
+  if (!inWindow && !preview && !tempLive) return;
   if (window.__tgSkin) return;
   window.__tgSkin = true;
 
