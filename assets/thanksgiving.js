@@ -18,8 +18,8 @@
   window.__tgSkin = true;
 
   var file = location.pathname.split('/').pop() || '';
-  var isHome = file === '' || file === 'index.html';
-  var isNFL = file === 'nfl.html';
+  var isHome = file === '' || file === 'index.html' || file === 'index';
+  var isNFL = file === 'nfl.html' || file === 'nfl';
 
   var CSS = [
     '.tg-leaves{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:1090;}',
@@ -39,6 +39,10 @@
     '@keyframes tgKickBall{0%,31%{transform:translate(0,0) rotate(0deg);opacity:1;}38%{transform:translate(170px,-80px) rotate(140deg);opacity:1;}44%{transform:translate(350px,-128px) rotate(280deg);opacity:1;}50%{transform:translate(530px,-118px) rotate(420deg);opacity:1;}56%{transform:translate(710px,-104px) rotate(540deg);opacity:1;}62%{transform:translate(830px,-38px) rotate(650deg);opacity:1;}66%{transform:translate(905px,6px) rotate(720deg);opacity:0;}67%,89%{transform:translate(0,0) rotate(0deg);opacity:0;}95%,100%{transform:translate(0,0) rotate(0deg);opacity:1;}}',
     '.tg-postglow{animation:tgPostGlow 5.4s ease-in-out infinite;}',
     '@keyframes tgPostGlow{0%,53%{opacity:0;}58%{opacity:.75;}70%,100%{opacity:0;}}',
+    '.tg-kick svg.tg-compact .tg-uposts{transform:translateX(-540px);}',
+    '.tg-kick svg.tg-compact .tg-postglow{transform:translateX(-540px);}',
+    '.tg-kick svg.tg-compact .tg-kickball{animation-name:tgKickBallC;}',
+    '@keyframes tgKickBallC{0%,31%{transform:translate(0,0) rotate(0deg);opacity:1;}38%{transform:translate(32px,-80px) rotate(140deg);opacity:1;}44%{transform:translate(66px,-128px) rotate(280deg);opacity:1;}50%{transform:translate(100px,-118px) rotate(420deg);opacity:1;}56%{transform:translate(133px,-104px) rotate(540deg);opacity:1;}62%{transform:translate(156px,-38px) rotate(650deg);opacity:1;}66%{transform:translate(170px,6px) rotate(720deg);opacity:0;}67%,89%{transform:translate(0,0) rotate(0deg);opacity:0;}95%,100%{transform:translate(0,0) rotate(0deg);opacity:1;}}',
     '.tg-body{transform-box:fill-box;transform-origin:50% 85%;animation:tgSquash .26s ease-in-out infinite alternate;}',
     '@keyframes tgSquash{from{transform:scale(1.03,.94) rotate(-1.6deg) translateY(2px);}to{transform:scale(.98,1.03) rotate(1.6deg) translateY(-3px);}}',
     '.tg-head{transform-box:fill-box;transform-origin:20% 80%;animation:tgThrust .52s ease-in-out infinite;}',
@@ -73,7 +77,7 @@
     '.tg-card .tg-sub{margin-top:6px;font-size:.9rem;line-height:1.45;color:#c6cfdd;font-weight:600;}',
     '.tg-card .tg-cta{display:block;margin-top:14px;padding:.72rem 1rem;border-radius:12px;background:linear-gradient(90deg,#e07b39,#b5443c);color:#fff;font-weight:900;letter-spacing:.03em;text-decoration:none;font-size:.95rem;}',
     '.tg-card .tg-close{margin-top:9px;width:100%;padding:.55rem 1rem;border:1px solid rgba(255,255,255,.22);border-radius:12px;background:transparent;color:#aeb8c6;font-weight:700;cursor:pointer;font-size:.85rem;}',
-    '@media (prefers-reduced-motion: reduce){.tg-leaves,.tg-kick{display:none;}}'
+    '@media (prefers-reduced-motion: reduce){.tg-leaves{display:none;}.tg-kick *{animation:none !important;}}'
   ].join('\n');
 
   var TURKEY =
@@ -126,13 +130,13 @@
     '</defs>' +
     /* uprights: two bars up, crossbar, single post below — Bueno gold */
     '<ellipse class="tg-postglow" cx="1010" cy="128" rx="118" ry="86" fill="none" stroke="#f5b942" stroke-width="10" opacity="0"/>' +
-    '<g fill="#f5b942">' +
+    '<g class="tg-uposts" fill="#f5b942">' +
     '<rect x="928" y="58" width="13" height="134"/>' +
     '<rect x="1079" y="58" width="13" height="134"/>' +
     '<rect x="928" y="185" width="164" height="13"/>' +
     '<rect x="1003" y="198" width="14" height="76"/>' +
     '</g>' +
-    '<g fill="#c98d1e"><rect x="928" y="58" width="4" height="134"/><rect x="1079" y="58" width="4" height="134"/><rect x="1003" y="198" width="4" height="76"/></g>' +
+    '<g class="tg-uposts" fill="#c98d1e"><rect x="928" y="58" width="4" height="134"/><rect x="1079" y="58" width="4" height="134"/><rect x="1003" y="198" width="4" height="76"/></g>' +
     /* the turkey, bottom-left */
     '<g class="tg-kickturkey"><g transform="translate(46,106) scale(1.06)">' +
     '<ellipse cx="102" cy="160" rx="52" ry="6" fill="#000" opacity=".25"/>' +
@@ -213,6 +217,8 @@
       kick.className = 'tg-kick';
       kick.setAttribute('aria-hidden', 'true');
       kick.innerHTML = KICKSCENE;
+      var ksvg = kick.querySelector('svg');
+      if (ksvg && window.innerWidth < 720) { ksvg.classList.add('tg-compact'); ksvg.setAttribute('viewBox', '0 0 620 300'); }
       document.body.appendChild(kick);
     }
 
