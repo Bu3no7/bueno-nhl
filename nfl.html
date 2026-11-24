@@ -1041,15 +1041,21 @@ function parseSummary(espnId, d){
   if(wpArr.length){ WP[espnId] = wpArr[wpArr.length-1].homeWinPercentage; }
   var sp = (d.scoringPlays||[]).slice().reverse();
   out.plays = sp.slice(0, 10).map(function(p){
-    var pid = null;
+    var pid = null, pidK = false;
     var cand = (p.participants&&p.participants[0]&&p.participants[0].athlete&&p.participants[0].athlete.id) || (p.athlete&&p.athlete.id) || null;
     if(cand && BYID[String(cand)]) pid = BYID[String(cand)];
-    var nm = pid? PLAYERS[pid].name : (p.text? p.text.split(" ").slice(0,2).join(" ") : "Scoring play");
-    var row = { name: pid? PLAYERS[pid].name : nm, label: (p.text||"").toUpperCase().slice(0, 64), big: "+"+(p.scoreValue||""), small: (p.awayScore!=null? p.awayScore+"–"+p.homeScore : "") };
-    if(pid){ if(PLAYERS[pid] && PLAYERS[pid].raw && PLAYERS[pid].raw.pos==="K") row.k = pid; else row.p = pid; }
-    else {
-      var kk = (B.kickers||[]).filter(function(k2){ return d.gameInfo && false; });
+    if(!pid && p.text){
+      /* ESPN summaries here carry no participants — resolve the scorer from
+         the play text: longest bundle name the text starts with, on the
+         scoring team when the feed names one. */
+      var tA = p.team && p.team.abbreviation, bl = 0;
+      B.players.forEach(function(pl){ if(pl.name && pl.name.length>bl && p.text.indexOf(pl.name)===0 && (!tA || pl.team===tA)){ pid = pl.key; bl = pl.name.length; pidK = false; } });
+      (B.kickers||[]).forEach(function(k2){ if(k2.name && k2.name.length>bl && p.text.indexOf(k2.name)===0 && (!tA || k2.team===tA)){ pid = k2.key; bl = k2.name.length; pidK = true; } });
     }
+    var pnm = pid ? (PLAYERS[pid] ? PLAYERS[pid].name : (KICKERS[pid] ? KICKERS[pid].name : null)) : null;
+    var nm = pnm || (p.text? p.text.split(" ").slice(0,2).join(" ") : "Scoring play");
+    var row = { name: nm, label: (p.text||"").toUpperCase().slice(0, 64), big: "+"+(p.scoreValue||""), small: (p.awayScore!=null? p.awayScore+"–"+p.homeScore : "") };
+    if(pid){ if(pidK || (PLAYERS[pid] && PLAYERS[pid].raw && PLAYERS[pid].raw.pos==="K")) row.k = pid; else row.p = pid; }
     return row;
   });
   if(wpArr.length>1 && sp.length){
@@ -2803,6 +2809,5 @@ document.addEventListener("click", function(e){
 
 <script src="assets/tv-logos.js"></script>
 <script src="sports-menu.js"></script>
-<script src="assets/thanksgiving.js"></script>
 </body>
 </html>
