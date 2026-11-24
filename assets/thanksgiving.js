@@ -1,7 +1,8 @@
 /* Bueno Sports — Thanksgiving skin (Alex-approved animated mock v3, 2026-11-20).
    Date-keyed: Wed Nov 25 – Fri Nov 27, 2026 (visitor-local), self-reverting.
    Site-wide: falling leaves ONLY — fields, courts, rinks and pitches untouched.
-   Football page: leaves + the turkey runner + a Full Plate banner.
+   Football page: leaves + the turkey kicker (background scene: he kicks a
+   football through gold uprights on a loop) + a Full Plate banner.
    Home page: leaves + a one-time Happy Thanksgiving popup (waits for the
    What's New popup to close first). Preview anytime with ?tgpreview=1. */
 (function () {
@@ -23,9 +24,17 @@
     /* NFL Full Plate banner */
     '.tg-banner{display:block;text-align:center;padding:9px 12px;background:linear-gradient(90deg,#e07b39,#b5443c);color:#fff;font:800 .72rem/1.3 -apple-system,"Segoe UI",Roboto,sans-serif;letter-spacing:.14em;text-decoration:none;}',
     '.tg-banner b{color:#ffe9b8;}',
-    /* Turkey runner (Football) */
-    '.tg-runner{position:fixed;bottom:4px;left:0;width:122px;z-index:1085;pointer-events:none;animation:tgRun 11s linear infinite;}',
-    '@keyframes tgRun{0%{transform:translateX(-150px);}100%{transform:translateX(100vw);}}',
+    /* Turkey kicker scene (Football background piece) */
+    '.tg-kick{position:fixed;left:0;right:0;bottom:0;z-index:1085;pointer-events:none;}',
+    '.tg-kick svg{display:block;width:100%;height:min(27vh,290px);}',
+    '.tg-kickleg{transform-box:fill-box;transform-origin:50% 6%;animation:tgKickLeg 5.4s ease-in-out infinite;}',
+    '@keyframes tgKickLeg{0%,21%{transform:rotate(-6deg);}29%{transform:rotate(-52deg);}31.5%{transform:rotate(64deg);}38%{transform:rotate(18deg);}48%,100%{transform:rotate(-6deg);}}',
+    '.tg-kickturkey{animation:tgKickHop 5.4s ease-in-out infinite;}',
+    '@keyframes tgKickHop{0%,59%{transform:translateY(0);}63%{transform:translateY(-9px);}67%{transform:translateY(0);}71%{transform:translateY(-7px);}75%,100%{transform:translateY(0);}}',
+    '.tg-kickball{animation:tgKickBall 5.4s linear infinite;}',
+    '@keyframes tgKickBall{0%,31%{transform:translate(0,0) rotate(0deg);opacity:1;}38%{transform:translate(170px,-80px) rotate(140deg);opacity:1;}44%{transform:translate(350px,-128px) rotate(280deg);opacity:1;}50%{transform:translate(530px,-118px) rotate(420deg);opacity:1;}56%{transform:translate(710px,-104px) rotate(540deg);opacity:1;}62%{transform:translate(830px,-38px) rotate(650deg);opacity:1;}66%{transform:translate(905px,6px) rotate(720deg);opacity:0;}67%,89%{transform:translate(0,0) rotate(0deg);opacity:0;}95%,100%{transform:translate(0,0) rotate(0deg);opacity:1;}}',
+    '.tg-postglow{animation:tgPostGlow 5.4s ease-in-out infinite;}',
+    '@keyframes tgPostGlow{0%,53%{opacity:0;}58%{opacity:.75;}70%,100%{opacity:0;}}',
     '.tg-body{transform-box:fill-box;transform-origin:50% 85%;animation:tgSquash .26s ease-in-out infinite alternate;}',
     '@keyframes tgSquash{from{transform:scale(1.03,.94) rotate(-1.6deg) translateY(2px);}to{transform:scale(.98,1.03) rotate(1.6deg) translateY(-3px);}}',
     '.tg-head{transform-box:fill-box;transform-origin:20% 80%;animation:tgThrust .52s ease-in-out infinite;}',
@@ -60,7 +69,7 @@
     '.tg-card .tg-sub{margin-top:6px;font-size:.9rem;line-height:1.45;color:#c6cfdd;font-weight:600;}',
     '.tg-card .tg-cta{display:block;margin-top:14px;padding:.72rem 1rem;border-radius:12px;background:linear-gradient(90deg,#e07b39,#b5443c);color:#fff;font-weight:900;letter-spacing:.03em;text-decoration:none;font-size:.95rem;}',
     '.tg-card .tg-close{margin-top:9px;width:100%;padding:.55rem 1rem;border:1px solid rgba(255,255,255,.22);border-radius:12px;background:transparent;color:#aeb8c6;font-weight:700;cursor:pointer;font-size:.85rem;}',
-    '@media (prefers-reduced-motion: reduce){.tg-leaves,.tg-runner{display:none;}}'
+    '@media (prefers-reduced-motion: reduce){.tg-leaves,.tg-kick{display:none;}}'
   ].join('\n');
 
   var TURKEY =
@@ -98,6 +107,65 @@
     '<path d="M127 97 q13 9 26 18" stroke="#fff" stroke-width="3" fill="none"/>' +
     '<path d="M135 102 l9 6 M139 99 l9 6" stroke="#fff" stroke-width="2.4"/></g>' +
     '</g></svg>';
+
+  /* Kicker scene: the same turkey, reposed — planted leg + kicking leg —
+     a tee and ball in front of him, gold uprights downfield. One 5.4s
+     master cycle drives the leg, the ball flight, the post glow and the
+     celebration hops so everything stays in sync. */
+  var KICKSCENE =
+    '<svg viewBox="0 0 1200 300" preserveAspectRatio="xMidYMax slice" aria-hidden="true">' +
+    '<defs>' +
+    '<linearGradient id="tgKFA" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#5d3a17"/><stop offset=".72" stop-color="#a33c31"/><stop offset=".88" stop-color="#e8b04b"/><stop offset="1" stop-color="#8a5a2b"/></linearGradient>' +
+    '<linearGradient id="tgKFB" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#5d3a17"/><stop offset=".72" stop-color="#c96a2c"/><stop offset=".88" stop-color="#f2cd7e"/><stop offset="1" stop-color="#a06a30"/></linearGradient>' +
+    '<radialGradient id="tgKBodyG" cx=".38" cy=".3" r=".95"><stop offset="0" stop-color="#a06a30"/><stop offset=".6" stop-color="#7a4a21"/><stop offset="1" stop-color="#54300f"/></radialGradient>' +
+    '<linearGradient id="tgKHelm" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2c4a7d"/><stop offset="1" stop-color="#101f3a"/></linearGradient>' +
+    '</defs>' +
+    /* uprights: two bars up, crossbar, single post below — Bueno gold */
+    '<ellipse class="tg-postglow" cx="1010" cy="128" rx="118" ry="86" fill="none" stroke="#f5b942" stroke-width="10" opacity="0"/>' +
+    '<g fill="#f5b942">' +
+    '<rect x="928" y="58" width="13" height="134"/>' +
+    '<rect x="1079" y="58" width="13" height="134"/>' +
+    '<rect x="928" y="185" width="164" height="13"/>' +
+    '<rect x="1003" y="198" width="14" height="76"/>' +
+    '</g>' +
+    '<g fill="#c98d1e"><rect x="928" y="58" width="4" height="134"/><rect x="1079" y="58" width="4" height="134"/><rect x="1003" y="198" width="4" height="76"/></g>' +
+    /* the turkey, bottom-left */
+    '<g class="tg-kickturkey"><g transform="translate(46,106) scale(1.06)">' +
+    '<ellipse cx="102" cy="160" rx="52" ry="6" fill="#000" opacity=".25"/>' +
+    '<g><g class="tg-fan1"><ellipse cx="52" cy="52" rx="15" ry="40" fill="url(#tgKFA)" transform="rotate(-52 52 96)"/></g>' +
+    '<g class="tg-fan2"><ellipse cx="62" cy="40" rx="15" ry="44" fill="url(#tgKFB)" transform="rotate(-30 62 96)"/></g>' +
+    '<g class="tg-fan3"><ellipse cx="76" cy="34" rx="15" ry="46" fill="url(#tgKFA)" transform="rotate(-10 76 96)"/></g>' +
+    '<g class="tg-fan4"><ellipse cx="90" cy="34" rx="15" ry="46" fill="url(#tgKFB)" transform="rotate(12 90 96)"/></g>' +
+    '<g class="tg-fan5"><ellipse cx="102" cy="42" rx="14" ry="42" fill="url(#tgKFA)" transform="rotate(32 102 96)"/></g></g>' +
+    '<line x1="94" y1="124" x2="92" y2="156" stroke="#e07b39" stroke-width="5.4" stroke-linecap="round"/>' +
+    '<path d="M83 158 h19" stroke="#e07b39" stroke-width="5.4" stroke-linecap="round"/>' +
+    '<g class="tg-kickleg"><line x1="118" y1="122" x2="121" y2="140" stroke="#54300f" stroke-width="8" stroke-linecap="round"/>' +
+    '<line x1="121" y1="138" x2="128" y2="155" stroke="#d96f2e" stroke-width="5.4" stroke-linecap="round"/>' +
+    '<path d="M121 157 h19" stroke="#d96f2e" stroke-width="5.4" stroke-linecap="round"/></g>' +
+    '<ellipse cx="104" cy="102" rx="46" ry="34" fill="url(#tgKBodyG)"/>' +
+    '<ellipse cx="114" cy="110" rx="29" ry="21" fill="#8f5a28" opacity=".55"/>' +
+    '<ellipse cx="88" cy="88" rx="16" ry="9" fill="#c98d4e" opacity=".35" transform="rotate(-18 88 88)"/>' +
+    '<g><circle cx="146" cy="62" r="18" fill="#8a5a2b"/><circle cx="140" cy="52" r="7" fill="#c98d4e" opacity=".4"/>' +
+    '<path d="M160 60 l17 5 l-17 6 z" fill="#f59e0b"/>' +
+    '<g class="tg-wattle"><path d="M157 68 q6 13 0 19 q-8 -7 -5 -18 z" fill="#c0392b"/></g>' +
+    '<circle cx="150" cy="58" r="3.4" fill="#fff"/><circle cx="151.4" cy="58" r="1.8" fill="#14100a"/>' +
+    '<path d="M127 60 a19 19 0 0 1 38 -3 l0 4 l-38 3 z" fill="url(#tgKHelm)"/>' +
+    '<path d="M143 42 a19 19 0 0 1 8 2 l-2 6 a14 14 0 0 0 -6 -2 z" fill="#f5b942"/>' +
+    '<ellipse cx="138" cy="47" rx="7" ry="3.4" fill="#ffffff" opacity=".35" transform="rotate(-24 138 47)"/>' +
+    '<path d="M163 58 l10 2 M163 66 l10 0" stroke="#cfd6de" stroke-width="3" stroke-linecap="round"/></g>' +
+    '<g><path d="M96 92 q26 2 34 18 q-20 10 -34 -2 z" fill="#54300f"/>' +
+    '<ellipse cx="140" cy="106" rx="19" ry="13" fill="#8a4b2a" transform="rotate(24 140 106)"/>' +
+    '<path d="M127 97 q13 9 26 18" stroke="#fff" stroke-width="3" fill="none"/>' +
+    '<path d="M135 102 l9 6 M139 99 l9 6" stroke="#fff" stroke-width="2.4"/></g>' +
+    '</g></g>' +
+    /* tee + ball */
+    '<path d="M291 274 l9 -16 l9 16 z" fill="#e07b39"/>' +
+    '<g class="tg-kickball"><g transform="translate(300,246)">' +
+    '<ellipse cx="0" cy="0" rx="17" ry="11" fill="#7a4820"/>' +
+    '<path d="M-8 0 h16" stroke="#f0f0eb" stroke-width="2.6"/>' +
+    '<path d="M-4 -3.4 v6.8 M0 -3.4 v6.8 M4 -3.4 v6.8" stroke="#f0f0eb" stroke-width="2"/>' +
+    '</g></g>' +
+    '</svg>';
 
   function init() {
     var style = document.createElement('style');
@@ -137,11 +205,11 @@
       banner.addEventListener('click', function (e) { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
       document.body.insertBefore(banner, document.body.firstChild);
 
-      var runner = document.createElement('div');
-      runner.className = 'tg-runner';
-      runner.setAttribute('aria-hidden', 'true');
-      runner.innerHTML = TURKEY;
-      document.body.appendChild(runner);
+      var kick = document.createElement('div');
+      kick.className = 'tg-kick';
+      kick.setAttribute('aria-hidden', 'true');
+      kick.innerHTML = KICKSCENE;
+      document.body.appendChild(kick);
     }
 
     if (isHome) {
