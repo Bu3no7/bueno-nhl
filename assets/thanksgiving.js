@@ -29,8 +29,8 @@
     '.tg-banner{display:block;text-align:center;padding:9px 12px;background:linear-gradient(90deg,#e07b39,#b5443c);color:#fff;font:800 .72rem/1.3 -apple-system,"Segoe UI",Roboto,sans-serif;letter-spacing:.14em;text-decoration:none;}',
     '.tg-banner b{color:#ffe9b8;}',
     /* Turkey kicker scene (Football background piece) */
-    '.tg-kick{position:fixed;left:0;right:0;bottom:0;z-index:1085;pointer-events:none;}',
-    '.tg-kick svg{display:block;width:100%;height:min(27vh,290px);}',
+    '.tg-kick{position:fixed;left:0;right:0;bottom:11vh;z-index:-1;pointer-events:none;}',
+    '.tg-kick svg{display:block;width:100%;height:min(17vh,180px);}',
     '.tg-kickleg{transform-box:fill-box;transform-origin:50% 6%;animation:tgKickLeg 5.4s ease-in-out infinite;}',
     '@keyframes tgKickLeg{0%,21%{transform:rotate(-6deg);}29%{transform:rotate(-52deg);}31.5%{transform:rotate(64deg);}38%{transform:rotate(18deg);}48%,100%{transform:rotate(-6deg);}}',
     '.tg-kickturkey{animation:tgKickHop 5.4s ease-in-out infinite;}',
