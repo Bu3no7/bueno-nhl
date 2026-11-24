@@ -235,7 +235,7 @@
           '<div class="tg-card" role="dialog" aria-modal="true" aria-label="Happy Thanksgiving">' +
           TURKEY.replace('width="122" height="108"', 'width="110" height="97"') +
           '<div class="tg-script">Happy Thanksgiving</div>' +
-          '<div class="tg-sub">From us to you. The Full Plate is served on Football all week &mdash; the opener Wednesday night, three games Thursday, and the receipt Friday.</div>' +
+          '<div class="tg-sub">From us to you. The Full Plate is served on Football all week &mdash; the opener Wednesday night, three games Thursday, and the dessert Friday.</div>' +
           '<a class="tg-cta" href="/nfl.html">See the Full Plate</a>' +
           '<button class="tg-close" type="button">Close</button>' +
           '</div>';
