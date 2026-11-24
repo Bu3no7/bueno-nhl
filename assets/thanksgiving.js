@@ -1,5 +1,7 @@
 /* Bueno Sports — Thanksgiving skin (Alex-approved animated mock v3, 2026-11-20).
-   Date-keyed: Wed Nov 25 – Fri Nov 27, 2026 (visitor-local), self-reverting.
+   Date-keyed: Mon Nov 23, 2026 8:30 PM – Fri Nov 27, 2026 (visitor-local),
+   self-reverting. (Alex moved the cosmetics live early, 2026-11-23; the
+   Week 12 data and boards still update Nov 25.)
    Site-wide: falling leaves ONLY — fields, courts, rinks and pitches untouched.
    Football page: leaves + the turkey kicker (background scene: he kicks a
    football through gold uprights on a loop) + a Full Plate banner.
@@ -7,7 +9,9 @@
    What's New popup to close first). Preview anytime with ?tgpreview=1. */
 (function () {
   var now = new Date();
-  var inWindow = now.getFullYear() === 2026 && now.getMonth() === 10 && now.getDate() >= 25 && now.getDate() <= 27;
+  var start = new Date(2026, 10, 23, 20, 30, 0);
+  var end = new Date(2026, 10, 28, 0, 0, 0);
+  var inWindow = now >= start && now < end;
   var preview = /[?&]tgpreview=1/.test(location.search);
   if (!inWindow && !preview) return;
   if (window.__tgSkin) return;
